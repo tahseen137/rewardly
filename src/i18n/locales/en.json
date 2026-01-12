@@ -1,0 +1,90 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "done": "Done",
+    "cancel": "Cancel",
+    "remove": "Remove",
+    "search": "Search",
+    "close": "Close"
+  },
+  "tabs": {
+    "home": "Home",
+    "myCards": "My Cards",
+    "settings": "Settings"
+  },
+  "home": {
+    "title": "Find Best Card",
+    "searchPlaceholder": "Search for a store...",
+    "clearSearch": "Clear search",
+    "noCardsTitle": "No Cards Added",
+    "noCardsText": "Add your credit cards in the \"My Cards\" tab to get personalized recommendations.",
+    "findBestCardTitle": "Find Your Best Card",
+    "findBestCardText": "Enter a store name above to see which card earns the most rewards.",
+    "storeNotFoundTitle": "Store Not Found",
+    "storeNotFoundText": "We couldn't find \"{{storeName}}\" in our database. Try a different store name.",
+    "category": "Category",
+    "bestCardToUse": "BEST CARD TO USE",
+    "cashBackCards": "CASH BACK CARDS",
+    "pointsMilesCards": "POINTS & MILES CARDS",
+    "cardsThatCouldEarnMore": "CARDS THAT COULD EARN MORE",
+    "considerTheseCards": "Consider these cards for better rewards at this store",
+    "better": "Better",
+    "noCardsForCategory": "No cards in your portfolio have rewards for this category.",
+    "youHaveBestCard": "You have the best card for this store!",
+    "tapForDetails": "Tap for details"
+  },
+  "myCards": {
+    "title": "My Cards",
+    "noCardsTitle": "No Cards Yet",
+    "noCardsText": "Add your credit cards to get personalized reward recommendations.",
+    "addFirstCard": "Add Your First Card",
+    "addCard": "Add Card",
+    "searchCards": "Search cards...",
+    "owned": "Owned",
+    "removeCard": "Remove Card",
+    "removeCardConfirm": "Are you sure you want to remove {{cardName}} from your portfolio?",
+    "duplicateCard": "Duplicate Card",
+    "duplicateCardMessage": "{{cardName}} is already in your portfolio.",
+    "addError": "Failed to add card. Please try again.",
+    "removeError": "Failed to remove card. Please try again.",
+    "base": "Base",
+    "bonusCategories": "Bonus categories"
+  },
+  "settings": {
+    "title": "Settings",
+    "rewardPreference": "REWARD PREFERENCE",
+    "rewardPreferenceDescription": "Choose your preferred reward type. Cards matching this preference will be prioritized in recommendations.",
+    "recommendations": "RECOMMENDATIONS",
+    "newCardSuggestions": "New Card Suggestions",
+    "newCardSuggestionsDescription": "Show cards you don't own that could earn better rewards",
+    "language": "LANGUAGE",
+    "languageDescription": "Choose your preferred language",
+    "about": "ABOUT",
+    "version": "Version",
+    "cardsInDatabase": "Cards in Database",
+    "storesInDatabase": "Stores in Database",
+    "footerText": "Rewards Optimizer helps you maximize credit card rewards by recommending the best card for every purchase."
+  },
+  "rewardTypes": {
+    "cashback": "Cash Back",
+    "cashbackDescription": "Earn money back on purchases",
+    "points": "Points",
+    "pointsDescription": "Earn flexible reward points",
+    "airline_miles": "Airline Miles",
+    "airline_milesDescription": "Earn miles for flights",
+    "hotel_points": "Hotel Points",
+    "hotel_pointsDescription": "Earn points for hotel stays"
+  },
+  "cardDetail": {
+    "title": "Card Details",
+    "rewardAtThisStore": "REWARD AT THIS STORE",
+    "baseReward": "BASE REWARD",
+    "allPurchases": "All purchases",
+    "bonusCategories": "BONUS CATEGORIES"
+  },
+  "languages": {
+    "en": "English",
+    "fr": "Français"
+  }
+}

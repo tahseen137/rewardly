@@ -7,9 +7,11 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 
+import './src/i18n'; // Initialize i18n
+import i18n from './src/i18n';
 import { AppNavigator } from './src/navigation';
 import { initializePortfolio } from './src/services/CardPortfolioManager';
-import { initializePreferences } from './src/services/PreferenceManager';
+import { initializePreferences, getLanguage } from './src/services/PreferenceManager';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +21,9 @@ export default function App() {
     async function initialize() {
       try {
         await Promise.all([initializePortfolio(), initializePreferences()]);
+        // Set i18n language from preferences
+        const savedLanguage = getLanguage();
+        i18n.changeLanguage(savedLanguage);
         setIsLoading(false);
       } catch (err) {
         setError('Failed to initialize app');

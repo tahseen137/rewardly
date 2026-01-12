@@ -1,0 +1,90 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "done": "Terminé",
+    "cancel": "Annuler",
+    "remove": "Supprimer",
+    "search": "Rechercher",
+    "close": "Fermer"
+  },
+  "tabs": {
+    "home": "Accueil",
+    "myCards": "Mes cartes",
+    "settings": "Paramètres"
+  },
+  "home": {
+    "title": "Trouver la meilleure carte",
+    "searchPlaceholder": "Rechercher un magasin...",
+    "clearSearch": "Effacer la recherche",
+    "noCardsTitle": "Aucune carte ajoutée",
+    "noCardsText": "Ajoutez vos cartes de crédit dans l'onglet « Mes cartes » pour obtenir des recommandations personnalisées.",
+    "findBestCardTitle": "Trouvez votre meilleure carte",
+    "findBestCardText": "Entrez le nom d'un magasin ci-dessus pour voir quelle carte vous rapporte le plus de récompenses.",
+    "storeNotFoundTitle": "Magasin non trouvé",
+    "storeNotFoundText": "Nous n'avons pas trouvé « {{storeName}} » dans notre base de données. Essayez un autre nom de magasin.",
+    "category": "Catégorie",
+    "bestCardToUse": "MEILLEURE CARTE À UTILISER",
+    "cashBackCards": "CARTES REMISE EN ARGENT",
+    "pointsMilesCards": "CARTES POINTS ET MILLES",
+    "cardsThatCouldEarnMore": "CARTES QUI POURRAIENT RAPPORTER PLUS",
+    "considerTheseCards": "Considérez ces cartes pour de meilleures récompenses dans ce magasin",
+    "better": "Meilleur",
+    "noCardsForCategory": "Aucune carte de votre portefeuille n'offre de récompenses pour cette catégorie.",
+    "youHaveBestCard": "Vous avez la meilleure carte pour ce magasin!",
+    "tapForDetails": "Appuyez pour les détails"
+  },
+  "myCards": {
+    "title": "Mes cartes",
+    "noCardsTitle": "Aucune carte",
+    "noCardsText": "Ajoutez vos cartes de crédit pour obtenir des recommandations de récompenses personnalisées.",
+    "addFirstCard": "Ajouter votre première carte",
+    "addCard": "Ajouter une carte",
+    "searchCards": "Rechercher des cartes...",
+    "owned": "Possédée",
+    "removeCard": "Supprimer la carte",
+    "removeCardConfirm": "Êtes-vous sûr de vouloir supprimer {{cardName}} de votre portefeuille?",
+    "duplicateCard": "Carte en double",
+    "duplicateCardMessage": "{{cardName}} est déjà dans votre portefeuille.",
+    "addError": "Échec de l'ajout de la carte. Veuillez réessayer.",
+    "removeError": "Échec de la suppression de la carte. Veuillez réessayer.",
+    "base": "Base",
+    "bonusCategories": "Catégories bonus"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "rewardPreference": "PRÉFÉRENCE DE RÉCOMPENSE",
+    "rewardPreferenceDescription": "Choisissez votre type de récompense préféré. Les cartes correspondant à cette préférence seront prioritaires dans les recommandations.",
+    "recommendations": "RECOMMANDATIONS",
+    "newCardSuggestions": "Suggestions de nouvelles cartes",
+    "newCardSuggestionsDescription": "Afficher les cartes que vous ne possédez pas qui pourraient rapporter de meilleures récompenses",
+    "language": "LANGUE",
+    "languageDescription": "Choisissez votre langue préférée",
+    "about": "À PROPOS",
+    "version": "Version",
+    "cardsInDatabase": "Cartes dans la base de données",
+    "storesInDatabase": "Magasins dans la base de données",
+    "footerText": "L'optimiseur de récompenses vous aide à maximiser les récompenses de vos cartes de crédit en recommandant la meilleure carte pour chaque achat."
+  },
+  "rewardTypes": {
+    "cashback": "Remise en argent",
+    "cashbackDescription": "Gagnez de l'argent sur vos achats",
+    "points": "Points",
+    "pointsDescription": "Gagnez des points de récompense flexibles",
+    "airline_miles": "Milles aériens",
+    "airline_milesDescription": "Gagnez des milles pour vos vols",
+    "hotel_points": "Points hôtel",
+    "hotel_pointsDescription": "Gagnez des points pour vos séjours à l'hôtel"
+  },
+  "cardDetail": {
+    "title": "Détails de la carte",
+    "rewardAtThisStore": "RÉCOMPENSE DANS CE MAGASIN",
+    "baseReward": "RÉCOMPENSE DE BASE",
+    "allPurchases": "Tous les achats",
+    "bonusCategories": "CATÉGORIES BONUS"
+  },
+  "languages": {
+    "en": "English",
+    "fr": "Français"
+  }
+}
