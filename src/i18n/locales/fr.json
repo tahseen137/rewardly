@@ -81,7 +81,12 @@
     "rewardAtThisStore": "RÉCOMPENSE DANS CE MAGASIN",
     "baseReward": "RÉCOMPENSE DE BASE",
     "allPurchases": "Tous les achats",
-    "bonusCategories": "CATÉGORIES BONUS"
+    "bonusCategories": "CATÉGORIES BONUS",
+    "annualFee": "Frais annuels",
+    "noFee": "Sans frais annuels",
+    "signupBonus": "BONUS D'INSCRIPTION",
+    "signupBonusDetails": "Dépensez {{spendRequirement}} en {{timeframeDays}} jours",
+    "signupBonusAmount": "{{amount}} {{currency}}"
   },
   "languages": {
     "en": "English",

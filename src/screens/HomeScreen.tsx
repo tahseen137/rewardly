@@ -16,6 +16,7 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import {
   Card,
@@ -24,6 +25,7 @@ import {
   RewardType,
   UserPreferences,
   SpendingCategory,
+  SignupBonus,
 } from '../types';
 import { getCards, initializePortfolio } from '../services/CardPortfolioManager';
 import {
@@ -45,18 +47,18 @@ function formatRewardRate(value: number, type: RewardType, unit: 'percent' | 'mu
 }
 
 /**
- * Get reward type label
+ * Get reward type label (uses translation hook in component)
  */
-function getRewardTypeLabel(type: RewardType): string {
+function getRewardTypeLabelKey(type: RewardType): string {
   switch (type) {
     case RewardType.CASHBACK:
-      return 'cash back';
+      return 'rewardTypes.cashback';
     case RewardType.POINTS:
-      return 'points';
+      return 'rewardTypes.points';
     case RewardType.AIRLINE_MILES:
-      return 'miles';
+      return 'rewardTypes.airline_miles';
     case RewardType.HOTEL_POINTS:
-      return 'hotel points';
+      return 'rewardTypes.hotel_points';
     default:
       return type;
   }
@@ -70,6 +72,24 @@ function formatCategory(category: SpendingCategory): string {
 }
 
 /**
+ * Format signup bonus currency for display
+ */
+function formatSignupBonusCurrency(currency: RewardType): string {
+  switch (currency) {
+    case RewardType.CASHBACK:
+      return 'cash back';
+    case RewardType.POINTS:
+      return 'points';
+    case RewardType.AIRLINE_MILES:
+      return 'miles';
+    case RewardType.HOTEL_POINTS:
+      return 'hotel points';
+    default:
+      return currency;
+  }
+}
+
+/**
  * Card Detail Modal Component
  */
 function CardDetailModal({
@@ -77,21 +97,28 @@ function CardDetailModal({
   visible,
   onClose,
   currentRewardRate,
+  t,
 }: {
   card: Card | null;
   visible: boolean;
   onClose: () => void;
   currentRewardRate?: { value: number; type: RewardType; unit: 'percent' | 'multiplier' };
+  t: (key: string) => string;
 }) {
   if (!card) return null;
+
+  const formatAnnualFee = (fee?: number) => {
+    if (fee === undefined || fee === 0) return t('cardDetail.noFee');
+    return `$${fee}/year`;
+  };
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
       <View style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>Card Details</Text>
-          <TouchableOpacity onPress={onClose} accessibilityLabel="Close" accessibilityRole="button">
-            <Text style={styles.modalClose}>Done</Text>
+          <Text style={styles.modalTitle}>{t('cardDetail.title')}</Text>
+          <TouchableOpacity onPress={onClose} accessibilityLabel={t('common.close')} accessibilityRole="button">
+            <Text style={styles.modalClose}>{t('common.done')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -100,43 +127,63 @@ function CardDetailModal({
             <Text style={styles.cardDetailName}>{card.name}</Text>
             <Text style={styles.cardDetailIssuer}>{card.issuer}</Text>
             <Text style={styles.cardDetailProgram}>{card.rewardProgram}</Text>
+            <Text style={styles.cardDetailAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
           </View>
 
           {currentRewardRate && (
             <View style={styles.currentRateSection}>
-              <Text style={styles.currentRateLabel}>REWARD AT THIS STORE</Text>
+              <Text style={styles.currentRateLabel}>{t('cardDetail.rewardAtThisStore')}</Text>
               <View style={styles.currentRateBox}>
                 <Text style={styles.currentRateValue}>
                   {formatRewardRate(currentRewardRate.value, currentRewardRate.type, currentRewardRate.unit)}
                 </Text>
-                <Text style={styles.currentRateType}>{getRewardTypeLabel(currentRewardRate.type)}</Text>
+                <Text style={styles.currentRateType}>{t(getRewardTypeLabelKey(currentRewardRate.type))}</Text>
               </View>
             </View>
           )}
 
           <View style={styles.detailSection}>
-            <Text style={styles.detailSectionTitle}>BASE REWARD</Text>
+            <Text style={styles.detailSectionTitle}>{t('cardDetail.baseReward')}</Text>
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>All purchases</Text>
+              <Text style={styles.detailLabel}>{t('cardDetail.allPurchases')}</Text>
               <Text style={styles.detailValue}>
                 {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.type, card.baseRewardRate.unit)}{' '}
-                {getRewardTypeLabel(card.baseRewardRate.type)}
+                {t(getRewardTypeLabelKey(card.baseRewardRate.type))}
               </Text>
             </View>
           </View>
 
           {card.categoryRewards.length > 0 && (
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>BONUS CATEGORIES</Text>
+              <Text style={styles.detailSectionTitle}>{t('cardDetail.bonusCategories')}</Text>
               {card.categoryRewards.map((cr, index) => (
                 <View key={index} style={styles.detailRow}>
                   <Text style={styles.detailLabel}>{formatCategory(cr.category)}</Text>
                   <Text style={styles.detailValueHighlight}>
                     {formatRewardRate(cr.rewardRate.value, cr.rewardRate.type, cr.rewardRate.unit)}{' '}
-                    {getRewardTypeLabel(cr.rewardRate.type)}
+                    {t(getRewardTypeLabelKey(cr.rewardRate.type))}
                   </Text>
                 </View>
               ))}
+            </View>
+          )}
+
+          {card.signupBonus && (
+            <View style={styles.detailSection}>
+              <Text style={styles.detailSectionTitle}>{t('cardDetail.signupBonus')}</Text>
+              <View style={styles.signupBonusBox}>
+                <Text style={styles.signupBonusAmount}>
+                  {card.signupBonus.currency === RewardType.CASHBACK ? '$' : ''}
+                  {card.signupBonus.amount.toLocaleString()}
+                  {card.signupBonus.currency !== RewardType.CASHBACK ? ` ${formatSignupBonusCurrency(card.signupBonus.currency)}` : ''}
+                </Text>
+                <Text style={styles.signupBonusDetails}>
+                  {t('cardDetail.signupBonusDetails', {
+                    spendRequirement: `$${card.signupBonus.spendRequirement.toLocaleString()}`,
+                    timeframeDays: card.signupBonus.timeframeDays,
+                  })}
+                </Text>
+              </View>
             </View>
           )}
         </ScrollView>
@@ -151,13 +198,15 @@ function CardDetailModal({
 function BestCardSection({
   rankedCard,
   onPress,
+  t,
 }: {
   rankedCard: RankedCard;
   onPress: () => void;
+  t: (key: string) => string;
 }) {
   return (
     <View style={styles.bestCardSection}>
-      <Text style={styles.sectionLabel}>BEST CARD TO USE</Text>
+      <Text style={styles.sectionLabel}>{t('home.bestCardToUse')}</Text>
       <TouchableOpacity style={styles.bestCard} onPress={onPress} activeOpacity={0.8}>
         <View style={styles.bestCardBadge}>
           <Text style={styles.bestCardBadgeText}>🏆 #1</Text>
@@ -168,9 +217,9 @@ function BestCardSection({
           <Text style={styles.bestCardRewardValue}>
             {formatRewardRate(rankedCard.rewardRate.value, rankedCard.rewardRate.type, rankedCard.rewardRate.unit)}
           </Text>
-          <Text style={styles.bestCardRewardType}>{getRewardTypeLabel(rankedCard.rewardRate.type)}</Text>
+          <Text style={styles.bestCardRewardType}>{t(getRewardTypeLabelKey(rankedCard.rewardRate.type))}</Text>
         </View>
-        <Text style={styles.tapHint}>Tap for details</Text>
+        <Text style={styles.tapHint}>{t('home.tapForDetails')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -182,9 +231,11 @@ function BestCardSection({
 function CardsByTypeSection({
   rankedCards,
   onCardPress,
+  t,
 }: {
   rankedCards: RankedCard[];
   onCardPress: (rc: RankedCard) => void;
+  t: (key: string) => string;
 }) {
   if (rankedCards.length <= 1) {
     return null;
@@ -228,7 +279,7 @@ function CardsByTypeSection({
         <Text style={styles.rankedCardRewardValue}>
           {formatRewardRate(rc.rewardRate.value, rc.rewardRate.type, rc.rewardRate.unit)}
         </Text>
-        <Text style={styles.rankedCardRewardType}>{getRewardTypeLabel(rc.rewardRate.type)}</Text>
+        <Text style={styles.rankedCardRewardType}>{t(getRewardTypeLabelKey(rc.rewardRate.type))}</Text>
       </View>
       <Text style={styles.chevron}>›</Text>
     </TouchableOpacity>
@@ -240,7 +291,7 @@ function CardsByTypeSection({
         <View style={styles.allCardsSection}>
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionIcon}>💵</Text>
-            <Text style={styles.sectionLabel}>CASH BACK CARDS</Text>
+            <Text style={styles.sectionLabel}>{t('home.cashBackCards')}</Text>
           </View>
           {rankedCashBack.map(renderCardItem)}
         </View>
@@ -250,7 +301,7 @@ function CardsByTypeSection({
         <View style={styles.allCardsSection}>
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionIcon}>⭐</Text>
-            <Text style={styles.sectionLabel}>POINTS & MILES CARDS</Text>
+            <Text style={styles.sectionLabel}>{t('home.pointsMilesCards')}</Text>
           </View>
           {rankedPoints.map(renderCardItem)}
         </View>
@@ -265,9 +316,11 @@ function CardsByTypeSection({
 function SuggestedCardsSection({
   cards,
   onCardPress,
+  t,
 }: {
   cards: Card[];
   onCardPress: (card: Card) => void;
+  t: (key: string, options?: Record<string, string | number>) => string;
 }) {
   if (cards.length === 0) {
     return null;
@@ -275,16 +328,23 @@ function SuggestedCardsSection({
 
   return (
     <View style={styles.suggestedSection}>
-      <Text style={styles.sectionLabel}>CARDS THAT COULD EARN MORE</Text>
-      <Text style={styles.suggestedSubtitle}>Consider these cards for better rewards at this store</Text>
+      <Text style={styles.sectionLabel}>{t('home.cardsThatCouldEarnMore')}</Text>
+      <Text style={styles.suggestedSubtitle}>{t('home.considerTheseCards')}</Text>
       {cards.slice(0, 3).map((card) => (
         <TouchableOpacity key={card.id} style={styles.suggestedCardItem} onPress={() => onCardPress(card)} activeOpacity={0.7}>
           <View style={styles.suggestedCardInfo}>
             <Text style={styles.suggestedCardName}>{card.name}</Text>
             <Text style={styles.suggestedCardIssuer}>{card.issuer}</Text>
+            {card.signupBonus && (
+              <Text style={styles.suggestedCardBonus}>
+                🎁 {card.signupBonus.currency === RewardType.CASHBACK ? '$' : ''}
+                {card.signupBonus.amount.toLocaleString()}
+                {card.signupBonus.currency !== RewardType.CASHBACK ? ` ${formatSignupBonusCurrency(card.signupBonus.currency)}` : ''} bonus
+              </Text>
+            )}
           </View>
           <View style={styles.suggestedBadge}>
-            <Text style={styles.suggestedBadgeText}>Better</Text>
+            <Text style={styles.suggestedBadgeText}>{t('home.better')}</Text>
           </View>
           <Text style={styles.chevron}>›</Text>
         </TouchableOpacity>
@@ -320,6 +380,7 @@ function StoreSuggestionItem({
 }
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [recommendation, setRecommendation] = useState<StoreRecommendation | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -375,7 +436,7 @@ export default function HomeScreen() {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search for a store..."
+          placeholder={t('home.searchPlaceholder')}
           value={searchQuery}
           onChangeText={(text) => {
             setSearchQuery(text);
@@ -388,7 +449,7 @@ export default function HomeScreen() {
           returnKeyType="search"
           autoCapitalize="none"
           autoCorrect={false}
-          accessibilityLabel="Search for a store"
+          accessibilityLabel={t('home.searchPlaceholder')}
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity
@@ -398,7 +459,7 @@ export default function HomeScreen() {
               setRecommendation(null);
               setShowSuggestions(false);
             }}
-            accessibilityLabel="Clear search"
+            accessibilityLabel={t('home.clearSearch')}
             accessibilityRole="button"
           >
             <Text style={styles.clearButtonText}>✕</Text>
@@ -423,16 +484,16 @@ export default function HomeScreen() {
         {!hasCards && searchQuery.length > 0 && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateIcon}>💳</Text>
-            <Text style={styles.emptyStateTitle}>No Cards Added</Text>
-            <Text style={styles.emptyStateText}>Add your credit cards in the "My Cards" tab to get personalized recommendations.</Text>
+            <Text style={styles.emptyStateTitle}>{t('home.noCardsTitle')}</Text>
+            <Text style={styles.emptyStateText}>{t('home.noCardsText')}</Text>
           </View>
         )}
 
         {hasCards && !recommendation && !showSuggestions && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateIcon}>🔍</Text>
-            <Text style={styles.emptyStateTitle}>Find Your Best Card</Text>
-            <Text style={styles.emptyStateText}>Enter a store name above to see which card earns the most rewards.</Text>
+            <Text style={styles.emptyStateTitle}>{t('home.findBestCardTitle')}</Text>
+            <Text style={styles.emptyStateText}>{t('home.findBestCardText')}</Text>
           </View>
         )}
 
@@ -440,7 +501,7 @@ export default function HomeScreen() {
           <>
             <View style={styles.storeHeader}>
               <Text style={styles.storeName}>{recommendation.store.name}</Text>
-              <Text style={styles.storeCategory}>Category: {recommendation.store.category.replace('_', ' ')}</Text>
+              <Text style={styles.storeCategory}>{t('home.category')}: {recommendation.store.category.replace('_', ' ')}</Text>
             </View>
 
             {recommendation.bestCard ? (
@@ -448,20 +509,21 @@ export default function HomeScreen() {
                 <BestCardSection
                   rankedCard={recommendation.bestCard}
                   onPress={() => handleCardPress(recommendation.bestCard!.card, recommendation.bestCard!.rewardRate)}
+                  t={t}
                 />
-                <CardsByTypeSection rankedCards={recommendation.allCards} onCardPress={(rc) => handleCardPress(rc.card, rc.rewardRate)} />
-                <SuggestedCardsSection cards={recommendation.suggestedNewCards} onCardPress={(card) => handleCardPress(card)} />
+                <CardsByTypeSection rankedCards={recommendation.allCards} onCardPress={(rc) => handleCardPress(rc.card, rc.rewardRate)} t={t} />
+                <SuggestedCardsSection cards={recommendation.suggestedNewCards} onCardPress={(card) => handleCardPress(card)} t={t} />
               </>
             ) : (
               <View style={styles.noCardsMessage}>
-                <Text style={styles.noCardsText}>No cards in your portfolio have rewards for this category.</Text>
+                <Text style={styles.noCardsText}>{t('home.noCardsForCategory')}</Text>
               </View>
             )}
 
             {recommendation.suggestedNewCards.length === 0 && recommendation.bestCard && isNewCardSuggestionsEnabled() && (
               <View style={styles.optimalMessage}>
                 <Text style={styles.optimalIcon}>✓</Text>
-                <Text style={styles.optimalText}>You have the best card for this store!</Text>
+                <Text style={styles.optimalText}>{t('home.youHaveBestCard')}</Text>
               </View>
             )}
           </>
@@ -470,8 +532,8 @@ export default function HomeScreen() {
         {hasCards && searchQuery.length > 0 && !recommendation && !showSuggestions && (
           <View style={styles.notFoundState}>
             <Text style={styles.notFoundIcon}>🤔</Text>
-            <Text style={styles.notFoundTitle}>Store Not Found</Text>
-            <Text style={styles.notFoundText}>We couldn't find "{searchQuery}" in our database. Try a different store name.</Text>
+            <Text style={styles.notFoundTitle}>{t('home.storeNotFoundTitle')}</Text>
+            <Text style={styles.notFoundText}>{t('home.storeNotFoundText', { storeName: searchQuery })}</Text>
           </View>
         )}
       </ScrollView>
@@ -481,6 +543,7 @@ export default function HomeScreen() {
         visible={showCardDetail}
         onClose={() => setShowCardDetail(false)}
         currentRewardRate={selectedRewardRate}
+        t={t}
       />
     </KeyboardAvoidingView>
   );
@@ -596,6 +659,7 @@ const styles = StyleSheet.create({
   suggestedCardInfo: { flex: 1 },
   suggestedCardName: { fontSize: 15, fontWeight: '500', color: '#000' },
   suggestedCardIssuer: { fontSize: 13, color: '#8E8E93' },
+  suggestedCardBonus: { fontSize: 12, color: '#B8860B', marginTop: 2, fontWeight: '500' },
   suggestedBadge: { backgroundColor: '#34C759', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10, marginRight: 8 },
   suggestedBadgeText: { color: '#fff', fontSize: 12, fontWeight: '600' },
   noCardsMessage: { backgroundColor: '#fff', borderRadius: 12, padding: 20, alignItems: 'center' },
@@ -628,6 +692,7 @@ const styles = StyleSheet.create({
   cardDetailName: { fontSize: 22, fontWeight: 'bold', color: '#fff', textAlign: 'center', marginBottom: 4 },
   cardDetailIssuer: { fontSize: 16, color: 'rgba(255,255,255,0.9)', marginBottom: 4 },
   cardDetailProgram: { fontSize: 14, color: 'rgba(255,255,255,0.7)' },
+  cardDetailAnnualFee: { fontSize: 14, color: '#34C759', marginTop: 8, fontWeight: '600' },
   currentRateSection: { padding: 16 },
   currentRateLabel: { fontSize: 12, fontWeight: '600', color: '#8E8E93', letterSpacing: 0.5, marginBottom: 8 },
   currentRateBox: {
@@ -659,4 +724,25 @@ const styles = StyleSheet.create({
   detailLabel: { fontSize: 15, color: '#000' },
   detailValue: { fontSize: 15, color: '#8E8E93' },
   detailValueHighlight: { fontSize: 15, color: '#007AFF', fontWeight: '600' },
+  signupBonusBox: {
+    backgroundColor: '#FFF9E6',
+    borderRadius: 10,
+    padding: 16,
+    margin: 16,
+    marginTop: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FFD700',
+  },
+  signupBonusAmount: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#B8860B',
+    marginBottom: 4,
+  },
+  signupBonusDetails: {
+    fontSize: 14,
+    color: '#8B7355',
+    textAlign: 'center',
+  },
 });

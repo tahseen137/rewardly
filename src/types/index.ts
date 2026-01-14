@@ -53,6 +53,16 @@ export interface CategoryReward {
 }
 
 /**
+ * Signup bonus details
+ */
+export interface SignupBonus {
+  amount: number;
+  currency: RewardType;
+  spendRequirement: number; // In CAD
+  timeframeDays: number;
+}
+
+/**
  * Credit card with reward structure
  */
 export interface Card {
@@ -62,6 +72,8 @@ export interface Card {
   rewardProgram: string;
   baseRewardRate: RewardRate;
   categoryRewards: CategoryReward[];
+  annualFee?: number; // Annual fee in CAD
+  signupBonus?: SignupBonus; // Signup bonus details
 }
 
 /**
@@ -111,6 +123,70 @@ export interface StoreRecommendation {
   bestCard: RankedCard | null;
   allCards: RankedCard[];
   suggestedNewCards: Card[];
+}
+
+/**
+ * Store-card combination for product recommendations
+ */
+export interface StoreCardCombination {
+  store: Store;
+  bestCard: RankedCard | null;
+  rewardRate: number; // Numeric reward rate for comparison
+}
+
+/**
+ * Product recommendation result
+ * Requirements: 4.3, 4.4
+ */
+export interface ProductRecommendation {
+  productName: string;
+  productCategory: SpendingCategory;
+  recommendedStore: Store;
+  recommendedCard: RankedCard | null;
+  allStoreOptions: StoreCardCombination[];
+}
+
+// ============================================================================
+// Price Comparison Types (Requirements 6.1-6.6)
+// ============================================================================
+
+/**
+ * Sort options for price comparison results
+ * Requirement 6.5
+ */
+export enum PriceSortOption {
+  LOWEST_PRICE = 'lowest_price',
+  HIGHEST_REWARDS = 'highest_rewards',
+  LOWEST_EFFECTIVE_PRICE = 'lowest_effective_price',
+}
+
+/**
+ * Store option with price and reward information
+ * Requirements: 6.2, 6.3, 6.4
+ */
+export interface PricedStoreOption {
+  store: Store;
+  bestCard: RankedCard | null;
+  price: number | null; // null if price unavailable (Req 6.6)
+  rewardRate: number; // Reward rate percentage
+  rewardValue: number; // Calculated reward value in CAD
+  effectivePrice: number | null; // price - rewardValue (Req 6.3, 6.4)
+  priceAvailable: boolean; // Indicates if price data exists (Req 6.6)
+}
+
+/**
+ * Price comparison result for a product
+ * Requirements: 6.1-6.6
+ */
+export interface PriceComparisonResult {
+  productName: string;
+  productId: string;
+  productCategory: SpendingCategory;
+  storeOptions: PricedStoreOption[];
+  sortedBy: PriceSortOption;
+  lowestPrice: PricedStoreOption | null;
+  highestRewards: PricedStoreOption | null;
+  lowestEffectivePrice: PricedStoreOption | null;
 }
 
 // ============================================================================

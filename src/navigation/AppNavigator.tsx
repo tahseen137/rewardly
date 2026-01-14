@@ -8,6 +8,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, StyleSheet } from 'react-native';
 
 import { HomeScreen, MyCardsScreen, SettingsScreen } from '../screens';
+import { ErrorBoundary } from '../components';
 
 export type RootTabParamList = {
   Home: undefined;
@@ -34,6 +35,42 @@ function TabIcon({ name, focused }: { name: string; focused: boolean }) {
   );
 }
 
+/**
+ * Wrapped screen components with error boundaries
+ */
+function HomeScreenWithErrorBoundary() {
+  return (
+    <ErrorBoundary
+      fallbackTitle="Unable to load recommendations"
+      fallbackMessage="There was a problem loading the recommendation screen. Please try again."
+    >
+      <HomeScreen />
+    </ErrorBoundary>
+  );
+}
+
+function MyCardsScreenWithErrorBoundary() {
+  return (
+    <ErrorBoundary
+      fallbackTitle="Unable to load cards"
+      fallbackMessage="There was a problem loading your cards. Please try again."
+    >
+      <MyCardsScreen />
+    </ErrorBoundary>
+  );
+}
+
+function SettingsScreenWithErrorBoundary() {
+  return (
+    <ErrorBoundary
+      fallbackTitle="Unable to load settings"
+      fallbackMessage="There was a problem loading settings. Please try again."
+    >
+      <SettingsScreen />
+    </ErrorBoundary>
+  );
+}
+
 export default function AppNavigator() {
   return (
     <NavigationContainer>
@@ -55,7 +92,7 @@ export default function AppNavigator() {
       >
         <Tab.Screen
           name="Home"
-          component={HomeScreen}
+          component={HomeScreenWithErrorBoundary}
           options={{
             title: 'Find Best Card',
             tabBarLabel: 'Home',
@@ -63,7 +100,7 @@ export default function AppNavigator() {
         />
         <Tab.Screen
           name="MyCards"
-          component={MyCardsScreen}
+          component={MyCardsScreenWithErrorBoundary}
           options={{
             title: 'My Cards',
             tabBarLabel: 'My Cards',
@@ -71,7 +108,7 @@ export default function AppNavigator() {
         />
         <Tab.Screen
           name="Settings"
-          component={SettingsScreen}
+          component={SettingsScreenWithErrorBoundary}
           options={{
             title: 'Settings',
             tabBarLabel: 'Settings',

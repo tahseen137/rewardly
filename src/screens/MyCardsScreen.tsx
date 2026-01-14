@@ -23,7 +23,7 @@ import {
   removeCard,
   initializePortfolio,
 } from '../services/CardPortfolioManager';
-import { getAllCards, getCardById, searchCards } from '../services/CardDataService';
+import { getAllCardsSync, getCardByIdSync, searchCardsSync } from '../services/CardDataService';
 
 /**
  * Format reward rate for display
@@ -45,17 +45,23 @@ function CardItem({
   userCard: UserCard;
   onRemove: (cardId: string) => void;
 }) {
-  const card = getCardById(userCard.cardId);
+  const card = getCardByIdSync(userCard.cardId);
 
   if (!card) {
     return null;
   }
+
+  const formatAnnualFee = (fee?: number) => {
+    if (fee === undefined || fee === 0) return 'No annual fee';
+    return `$${fee}/year`;
+  };
 
   return (
     <View style={styles.cardItem}>
       <View style={styles.cardInfo}>
         <Text style={styles.cardName}>{card.name}</Text>
         <Text style={styles.cardIssuer}>{card.issuer}</Text>
+        <Text style={styles.cardAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
         <Text style={styles.cardReward}>
           Base: {formatRewardRate(
             card.baseRewardRate.value,
@@ -93,6 +99,11 @@ function CardPickerItem({
   isOwned: boolean;
   onSelect: (cardId: string) => void;
 }) {
+  const formatAnnualFee = (fee?: number) => {
+    if (fee === undefined || fee === 0) return 'No annual fee';
+    return `$${fee}/year`;
+  };
+
   return (
     <TouchableOpacity
       style={[styles.pickerItem, isOwned && styles.pickerItemDisabled]}
@@ -107,6 +118,9 @@ function CardPickerItem({
         </Text>
         <Text style={[styles.pickerItemIssuer, isOwned && styles.pickerItemTextDisabled]}>
           {card.issuer}
+        </Text>
+        <Text style={[styles.pickerItemAnnualFee, isOwned && styles.pickerItemTextDisabled]}>
+          {formatAnnualFee(card.annualFee)}
         </Text>
         <Text style={[styles.pickerItemReward, isOwned && styles.pickerItemTextDisabled]}>
           {formatRewardRate(
@@ -158,7 +172,7 @@ export default function MyCardsScreen() {
   };
 
   const handleRemoveCard = (cardId: string) => {
-    const card = getCardById(cardId);
+    const card = getCardByIdSync(cardId);
     Alert.alert(
       'Remove Card',
       `Are you sure you want to remove ${card?.name || 'this card'} from your portfolio?`,
@@ -181,7 +195,7 @@ export default function MyCardsScreen() {
   };
 
   const ownedCardIds = new Set(portfolio.map((uc) => uc.cardId));
-  const availableCards = searchQuery ? searchCards(searchQuery) : getAllCards();
+  const availableCards = searchQuery ? searchCardsSync(searchQuery) : getAllCardsSync();
 
   return (
     <View style={styles.container}>
@@ -315,6 +329,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#007AFF',
     marginBottom: 2,
+  },
+  cardAnnualFee: {
+    fontSize: 13,
+    color: '#34C759',
+    marginBottom: 4,
   },
   cardCategories: {
     fontSize: 12,
@@ -452,6 +471,11 @@ const styles = StyleSheet.create({
   pickerItemReward: {
     fontSize: 13,
     color: '#007AFF',
+  },
+  pickerItemAnnualFee: {
+    fontSize: 12,
+    color: '#34C759',
+    marginBottom: 2,
   },
   pickerItemTextDisabled: {
     color: '#8E8E93',

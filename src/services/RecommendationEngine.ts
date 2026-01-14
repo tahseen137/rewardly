@@ -10,11 +10,19 @@ import {
   RewardRate,
   RankedCard,
   StoreRecommendation,
+  ProductRecommendation,
+  StoreCardCombination,
   UserPreferences,
   UserCard,
+  Result,
+  success,
+  failure,
+  RecommendationError,
+  Store,
 } from '../types';
-import { getAllCards, getCardById } from './CardDataService';
+import { getAllCardsSync, getCardByIdSync } from './CardDataService';
 import { findStore } from './StoreDataService';
+import { searchProduct, ProductSearchResult } from './ProductService';
 
 /**
  * Get the reward rate for a card in a specific category
@@ -107,7 +115,7 @@ export function findBetterCards(
   rewardType: RewardType,
   userCardIds: Set<string>
 ): Card[] {
-  const allCards = getAllCards();
+  const allCards = getAllCardsSync();
   
   // Filter out cards the user already owns
   const availableCards = allCards.filter((card) => !userCardIds.has(card.id));
@@ -159,7 +167,7 @@ export function getStoreRecommendation(
   const userCardIds = new Set<string>();
   
   for (const userCard of portfolio) {
-    const card = getCardById(userCard.cardId);
+    const card = getCardByIdSync(userCard.cardId);
     if (card) {
       userCards.push(card);
       userCardIds.add(card.id);
@@ -189,4 +197,105 @@ export function getStoreRecommendation(
     allCards: rankedCards,
     suggestedNewCards,
   };
+}
+
+
+/**
+ * Get the best card-store combination for a product
+ * 
+ * Requirements:
+ * - 4.3: Display recommended store, card to use, and expected reward rate
+ * - 4.4: Rank by highest absolute reward value when rates are similar
+ * - 4.5: Notify user if product not found
+ * 
+ * @param productName - Name of the product to search for
+ * @param portfolio - User's card portfolio
+ * @param preferences - User's preferences
+ * @returns Result with ProductRecommendation or error if product not found
+ */
+export function getProductRecommendation(
+  productName: string,
+  portfolio: UserCard[],
+  preferences: UserPreferences
+): Result<ProductRecommendation, RecommendationError> {
+  // Search for the product
+  const productResult = searchProduct(productName);
+  
+  if (!productResult.success) {
+    // Requirement 4.5: Notify user if product not found
+    return failure({ type: 'PRODUCT_NOT_FOUND', productName });
+  }
+
+  const { product, stores } = productResult.value;
+
+  if (stores.length === 0) {
+    return failure({ type: 'PRODUCT_NOT_FOUND', productName });
+  }
+
+  // Get full card objects for user's portfolio
+  const userCards: Card[] = [];
+  for (const userCard of portfolio) {
+    const card = getCardByIdSync(userCard.cardId);
+    if (card) {
+      userCards.push(card);
+    }
+  }
+
+  // Calculate best card for each store
+  // Requirement 4.2: Calculate best card-store combination
+  const storeOptions: StoreCardCombination[] = stores.map((store) => {
+    const rankedCards = rankCardsForCategory(
+      store.category,
+      userCards,
+      preferences.rewardType
+    );
+    
+    const bestCard = rankedCards.length > 0 ? rankedCards[0] : null;
+    const rewardRate = bestCard?.rewardRate.value ?? 0;
+
+    return {
+      store,
+      bestCard,
+      rewardRate,
+    };
+  });
+
+  // Requirement 4.4: Rank by highest absolute reward value
+  storeOptions.sort((a, b) => b.rewardRate - a.rewardRate);
+
+  // Get the best store-card combination
+  const bestOption = storeOptions[0];
+
+  return success({
+    productName: product.name,
+    productCategory: product.category,
+    recommendedStore: bestOption.store,
+    recommendedCard: bestOption.bestCard,
+    allStoreOptions: storeOptions,
+  });
+}
+
+/**
+ * Get product recommendations for multiple stores
+ * Useful for comparing options across different retailers
+ * 
+ * @param productName - Name of the product to search for
+ * @param portfolio - User's card portfolio
+ * @param preferences - User's preferences
+ * @param limit - Maximum number of store options to return
+ * @returns Result with array of StoreCardCombination or error
+ */
+export function getProductStoreOptions(
+  productName: string,
+  portfolio: UserCard[],
+  preferences: UserPreferences,
+  limit: number = 5
+): Result<StoreCardCombination[], RecommendationError> {
+  const result = getProductRecommendation(productName, portfolio, preferences);
+  
+  if (!result.success) {
+    return result;
+  }
+
+  return success(result.value.allStoreOptions.slice(0, limit));
 }

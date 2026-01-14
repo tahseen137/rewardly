@@ -5,7 +5,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserCard, Result, PortfolioError, success, failure } from '../types';
-import { getCardById } from './CardDataService';
+import { getCardByIdSync } from './CardDataService';
 
 const PORTFOLIO_STORAGE_KEY = '@rewards_optimizer/card_portfolio';
 
@@ -72,7 +72,7 @@ export async function addCard(cardId: string): Promise<Result<UserCard, Portfoli
   }
 
   // Check if card exists in the database
-  const card = getCardById(cardId);
+  const card = getCardByIdSync(cardId);
   if (!card) {
     return failure({ type: 'CARD_NOT_FOUND', cardId });
   }

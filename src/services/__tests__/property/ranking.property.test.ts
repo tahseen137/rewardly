@@ -4,7 +4,7 @@
  */
 
 import * as fc from 'fast-check';
-import { getAllCards } from '../../CardDataService';
+import { getAllCardsSync } from '../../CardDataService';
 import {
   rankCardsForCategory,
   getRewardRateForCategory,
@@ -12,7 +12,7 @@ import {
 import { SpendingCategory, RewardType, Card } from '../../../types';
 
 // Get all cards and categories for testing
-const allCards = getAllCards();
+const allCards = getAllCardsSync();
 const allCategories = Object.values(SpendingCategory);
 const allRewardTypes = Object.values(RewardType);
 
