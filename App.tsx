@@ -10,6 +10,7 @@ import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import './src/i18n'; // Initialize i18n
 import i18n from './src/i18n';
 import { AppNavigator } from './src/navigation';
+import { ErrorBoundary } from './src/components';
 import { initializePortfolio } from './src/services/CardPortfolioManager';
 import { initializePreferences, getLanguage } from './src/services/PreferenceManager';
 
@@ -53,10 +54,13 @@ export default function App() {
   }
 
   return (
-    <>
+    <ErrorBoundary
+      fallbackTitle="App Error"
+      fallbackMessage="Something went wrong with the app. Please restart and try again."
+    >
       <AppNavigator />
       <StatusBar style="auto" />
-    </>
+    </ErrorBoundary>
   );
 }
 

@@ -81,7 +81,12 @@
     "rewardAtThisStore": "REWARD AT THIS STORE",
     "baseReward": "BASE REWARD",
     "allPurchases": "All purchases",
-    "bonusCategories": "BONUS CATEGORIES"
+    "bonusCategories": "BONUS CATEGORIES",
+    "annualFee": "Annual Fee",
+    "noFee": "No annual fee",
+    "signupBonus": "SIGNUP BONUS",
+    "signupBonusDetails": "Spend {{spendRequirement}} in {{timeframeDays}} days",
+    "signupBonusAmount": "{{amount}} {{currency}}"
   },
   "languages": {
     "en": "English",

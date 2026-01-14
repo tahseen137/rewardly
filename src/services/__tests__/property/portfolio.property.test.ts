@@ -14,10 +14,10 @@ import {
   resetCache,
   initializePortfolio,
 } from '../../CardPortfolioManager';
-import { getAllCards } from '../../CardDataService';
+import { getAllCardsSync } from '../../CardDataService';
 
 // Get all valid card IDs from the database
-const allCards = getAllCards();
+const allCards = getAllCardsSync();
 const validCardIds = allCards.map((card) => card.id);
 
 // Arbitrary for selecting a random valid card ID
