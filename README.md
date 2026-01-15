@@ -69,6 +69,61 @@ src/
 
 - [Design Document](./docs/design.md) - Architecture and technical design
 
+## Deployment
+
+Ready to deploy to the App Store and Play Store? We've got you covered!
+
+### 📚 Deployment Guides
+
+- **[Start Here: Quick Start Guide](QUICK_START_DEPLOYMENT.md)** - Fast-track deployment guide
+- **[Complete Guide](APP_STORE_DEPLOYMENT.md)** - Detailed step-by-step instructions
+- **[Deployment Checklist](DEPLOYMENT_CHECKLIST.md)** - Track your progress
+- **[Pre-Submission Checklist](PRE_SUBMISSION_CHECKLIST.md)** - Final verification before submitting
+- **[Guide Index](DEPLOYMENT_GUIDE_INDEX.md)** - Overview of all deployment documentation
+
+### 🚀 Quick Deploy
+
+```bash
+# Install EAS CLI
+npm install -g eas-cli
+
+# Login to Expo
+eas login
+
+# Initialize project
+eas init
+
+# Build for both platforms
+eas build --platform all --profile production
+
+# Submit to stores
+eas submit --platform ios --latest
+eas submit --platform android --latest
+```
+
+Or use the automated deployment script:
+
+**Windows:**
+```cmd
+cd scripts
+deploy.bat
+```
+
+**Mac/Linux:**
+```bash
+cd scripts
+chmod +x deploy.sh
+./deploy.sh
+```
+
+### 📱 Requirements
+
+- Apple Developer Account ($99/year)
+- Google Play Developer Account ($25 one-time)
+- Expo account (free)
+
+See [QUICK_START_DEPLOYMENT.md](QUICK_START_DEPLOYMENT.md) for complete requirements and timeline.
+
 ## Canadian Credit Cards Supported
 
 - **TD:** Aeroplan Visa Infinite, Cash Back Visa Infinite
