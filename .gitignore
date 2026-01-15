@@ -57,3 +57,16 @@ build/
 google-services.json
 GoogleService-Info.plist
 *.keystore
+*.p8
+*.cer
+*.certSigningRequest
+api-key.json
+service-account.json
+apple-api-key.json
+
+# App Store Connect
+AuthKey_*.p8
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
