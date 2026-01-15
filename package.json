@@ -18,7 +18,9 @@
     "build:android-apk": "eas build --profile preview --platform android",
     "build:ios-simulator": "eas build --profile development --platform ios",
     "submit:ios": "eas submit --platform ios",
-    "submit:android": "eas submit --platform android"
+    "submit:android": "eas submit --platform android",
+    "deploy:vercel": "vercel --prod",
+    "deploy:netlify": "netlify deploy --prod"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
