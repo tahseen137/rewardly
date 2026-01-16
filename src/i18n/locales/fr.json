@@ -6,7 +6,8 @@
     "cancel": "Annuler",
     "remove": "Supprimer",
     "search": "Rechercher",
-    "close": "Fermer"
+    "close": "Fermer",
+    "ok": "OK"
   },
   "tabs": {
     "home": "Accueil",
@@ -64,6 +65,15 @@
     "version": "Version",
     "cardsInDatabase": "Cartes dans la base de données",
     "storesInDatabase": "Magasins dans la base de données",
+    "lastSync": "Dernière synchronisation",
+    "dataSource": "Source de données",
+    "localData": "Local",
+    "refreshCards": "Actualiser les cartes depuis la base de données",
+    "refreshSuccess": "Succès",
+    "refreshSuccessMessage": "{{count}} cartes chargées depuis la base de données",
+    "refreshError": "Erreur",
+    "refreshErrorMessage": "Échec de l'actualisation des cartes. Veuillez vérifier votre connexion.",
+    "supabaseNotConfigured": "Connexion à la base de données non configurée. Utilisation des données locales.",
     "footerText": "L'optimiseur de récompenses vous aide à maximiser les récompenses de vos cartes de crédit en recommandant la meilleure carte pour chaque achat."
   },
   "rewardTypes": {

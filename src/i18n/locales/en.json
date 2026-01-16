@@ -6,7 +6,8 @@
     "cancel": "Cancel",
     "remove": "Remove",
     "search": "Search",
-    "close": "Close"
+    "close": "Close",
+    "ok": "OK"
   },
   "tabs": {
     "home": "Home",
@@ -64,6 +65,15 @@
     "version": "Version",
     "cardsInDatabase": "Cards in Database",
     "storesInDatabase": "Stores in Database",
+    "lastSync": "Last Synced",
+    "dataSource": "Data Source",
+    "localData": "Local",
+    "refreshCards": "Refresh Cards from Database",
+    "refreshSuccess": "Success",
+    "refreshSuccessMessage": "Loaded {{count}} cards from database",
+    "refreshError": "Error",
+    "refreshErrorMessage": "Failed to refresh cards. Please check your connection.",
+    "supabaseNotConfigured": "Database connection not configured. Using local data.",
     "footerText": "Rewards Optimizer helps you maximize credit card rewards by recommending the best card for every purchase."
   },
   "rewardTypes": {

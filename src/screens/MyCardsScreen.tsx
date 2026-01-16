@@ -23,7 +23,7 @@ import {
   removeCard,
   initializePortfolio,
 } from '../services/CardPortfolioManager';
-import { getAllCardsSync, getCardByIdSync, searchCardsSync } from '../services/CardDataService';
+import { getAllCards, getCardById, searchCards, getCardByIdSync } from '../services/CardDataService';
 
 /**
  * Format reward rate for display
@@ -140,15 +140,41 @@ export default function MyCardsScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [availableCards, setAvailableCards] = useState<Card[]>([]);
+  const [isLoadingCards, setIsLoadingCards] = useState(false);
 
   const loadPortfolio = useCallback(async () => {
     await initializePortfolio();
     setPortfolio(getCards());
   }, []);
 
+  const loadAvailableCards = useCallback(async () => {
+    setIsLoadingCards(true);
+    try {
+      if (searchQuery) {
+        const cards = await searchCards(searchQuery);
+        setAvailableCards(cards);
+      } else {
+        const cards = await getAllCards();
+        setAvailableCards(cards);
+      }
+    } catch (error) {
+      console.error('Failed to load cards:', error);
+      setAvailableCards([]);
+    } finally {
+      setIsLoadingCards(false);
+    }
+  }, [searchQuery]);
+
   useEffect(() => {
     loadPortfolio();
   }, [loadPortfolio]);
+
+  useEffect(() => {
+    if (isModalVisible) {
+      loadAvailableCards();
+    }
+  }, [isModalVisible, loadAvailableCards]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -173,29 +199,46 @@ export default function MyCardsScreen() {
 
   const handleRemoveCard = (cardId: string) => {
     const card = getCardByIdSync(cardId);
-    Alert.alert(
-      'Remove Card',
-      `Are you sure you want to remove ${card?.name || 'this card'} from your portfolio?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            const result = await removeCard(cardId);
-            if (result.success) {
-              setPortfolio(getCards());
-            } else {
-              Alert.alert('Error', 'Failed to remove card. Please try again.');
-            }
+    const cardName = card?.name || 'this card';
+    
+    // Use window.confirm for web, Alert for native
+    if (typeof window !== 'undefined' && window.confirm) {
+      const confirmed = window.confirm(
+        `Are you sure you want to remove ${cardName} from your portfolio?`
+      );
+      if (confirmed) {
+        removeCard(cardId).then((result) => {
+          if (result.success) {
+            setPortfolio(getCards());
+          } else {
+            alert('Failed to remove card. Please try again.');
+          }
+        });
+      }
+    } else {
+      Alert.alert(
+        'Remove Card',
+        `Are you sure you want to remove ${cardName} from your portfolio?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Remove',
+            style: 'destructive',
+            onPress: async () => {
+              const result = await removeCard(cardId);
+              if (result.success) {
+                setPortfolio(getCards());
+              } else {
+                Alert.alert('Error', 'Failed to remove card. Please try again.');
+              }
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   const ownedCardIds = new Set(portfolio.map((uc) => uc.cardId));
-  const availableCards = searchQuery ? searchCardsSync(searchQuery) : getAllCardsSync();
 
   return (
     <View style={styles.container}>
@@ -270,18 +313,24 @@ export default function MyCardsScreen() {
             accessibilityLabel="Search cards"
           />
 
-          <FlatList
-            data={availableCards}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <CardPickerItem
-                card={item}
-                isOwned={ownedCardIds.has(item.id)}
-                onSelect={handleAddCard}
-              />
-            )}
-            contentContainerStyle={styles.pickerListContent}
-          />
+          {isLoadingCards ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Loading cards...</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={availableCards}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <CardPickerItem
+                  card={item}
+                  isOwned={ownedCardIds.has(item.id)}
+                  onSelect={handleAddCard}
+                />
+              )}
+              contentContainerStyle={styles.pickerListContent}
+            />
+          )}
         </View>
       </Modal>
     </View>
@@ -485,5 +534,15 @@ const styles = StyleSheet.create({
     color: '#34C759',
     fontWeight: '600',
     marginLeft: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
   },
 });

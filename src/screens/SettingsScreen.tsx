@@ -11,6 +11,8 @@ import {
   Switch,
   TouchableOpacity,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +27,8 @@ import {
   initializePreferences,
   Language,
 } from '../services/PreferenceManager';
+import { refreshCards, getLastSyncTime, getAllCards } from '../services/CardDataService';
+import { isSupabaseConfigured } from '../services/supabase';
 
 /**
  * Reward type option data
@@ -170,12 +174,22 @@ export default function SettingsScreen() {
   const [newCardSuggestions, setNewCardSuggestions] = useState(true);
   const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastSync, setLastSync] = useState<Date | null>(null);
+  const [cardCount, setCardCount] = useState<number>(0);
 
   const loadPreferences = useCallback(async () => {
     await initializePreferences();
     setRewardType(getRewardTypePreference());
     setNewCardSuggestions(isNewCardSuggestionsEnabled());
     setCurrentLanguage(getLanguage());
+    
+    // Load card count and last sync time
+    const cards = await getAllCards();
+    setCardCount(cards.length);
+    const syncTime = await getLastSyncTime();
+    setLastSync(syncTime);
+    
     setIsLoading(false);
   }, []);
 
@@ -197,6 +211,39 @@ export default function SettingsScreen() {
     setCurrentLanguage(lang);
     await setLanguage(lang);
     i18n.changeLanguage(lang);
+  };
+
+  const handleRefreshCards = async () => {
+    if (!isSupabaseConfigured()) {
+      Alert.alert(
+        t('settings.refreshCards'),
+        t('settings.supabaseNotConfigured'),
+        [{ text: t('common.ok') }]
+      );
+      return;
+    }
+
+    setIsRefreshing(true);
+    try {
+      const cards = await refreshCards();
+      setCardCount(cards.length);
+      const syncTime = await getLastSyncTime();
+      setLastSync(syncTime);
+      
+      Alert.alert(
+        t('settings.refreshSuccess'),
+        t('settings.refreshSuccessMessage', { count: cards.length }),
+        [{ text: t('common.ok') }]
+      );
+    } catch (error) {
+      Alert.alert(
+        t('settings.refreshError'),
+        t('settings.refreshErrorMessage'),
+        [{ text: t('common.ok') }]
+      );
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   if (isLoading) {
@@ -276,12 +323,39 @@ export default function SettingsScreen() {
         </View>
         <View style={styles.aboutRow}>
           <Text style={styles.aboutLabel}>{t('settings.cardsInDatabase')}</Text>
-          <Text style={styles.aboutValue}>20+</Text>
+          <Text style={styles.aboutValue}>{cardCount}</Text>
         </View>
+        {lastSync && (
+          <View style={styles.aboutRow}>
+            <Text style={styles.aboutLabel}>{t('settings.lastSync')}</Text>
+            <Text style={styles.aboutValue}>
+              {lastSync.toLocaleDateString(currentLanguage === 'fr' ? 'fr-CA' : 'en-CA')}
+            </Text>
+          </View>
+        )}
         <View style={[styles.aboutRow, styles.aboutRowLast]}>
-          <Text style={styles.aboutLabel}>{t('settings.storesInDatabase')}</Text>
-          <Text style={styles.aboutValue}>50+</Text>
+          <Text style={styles.aboutLabel}>{t('settings.dataSource')}</Text>
+          <Text style={styles.aboutValue}>
+            {isSupabaseConfigured() ? 'Supabase' : t('settings.localData')}
+          </Text>
         </View>
+      </View>
+
+      <View style={styles.section}>
+        <TouchableOpacity
+          style={styles.refreshButton}
+          onPress={handleRefreshCards}
+          disabled={isRefreshing}
+        >
+          {isRefreshing ? (
+            <ActivityIndicator color="#007AFF" />
+          ) : (
+            <>
+              <Text style={styles.refreshButtonIcon}>🔄</Text>
+              <Text style={styles.refreshButtonText}>{t('settings.refreshCards')}</Text>
+            </>
+          )}
+        </TouchableOpacity>
       </View>
 
       <View style={styles.footer}>
@@ -435,5 +509,21 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
     textAlign: 'center',
     lineHeight: 18,
+  },
+  refreshButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    backgroundColor: '#F0F7FF',
+  },
+  refreshButtonIcon: {
+    fontSize: 20,
+    marginRight: 8,
+  },
+  refreshButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#007AFF',
   },
 });

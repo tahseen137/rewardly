@@ -13,6 +13,7 @@ import { AppNavigator } from './src/navigation';
 import { ErrorBoundary } from './src/components';
 import { initializePortfolio } from './src/services/CardPortfolioManager';
 import { initializePreferences, getLanguage } from './src/services/PreferenceManager';
+import { getAllCards } from './src/services/CardDataService';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -21,13 +22,19 @@ export default function App() {
   useEffect(() => {
     async function initialize() {
       try {
-        await Promise.all([initializePortfolio(), initializePreferences()]);
+        // Initialize services and preload cards
+        await Promise.all([
+          initializePortfolio(),
+          initializePreferences(),
+          getAllCards(), // Preload cards into memory cache
+        ]);
         // Set i18n language from preferences
         const savedLanguage = getLanguage();
         i18n.changeLanguage(savedLanguage);
         setIsLoading(false);
       } catch (err) {
-        setError('Failed to initialize app');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to initialize app';
+        setError(errorMessage);
         setIsLoading(false);
       }
     }

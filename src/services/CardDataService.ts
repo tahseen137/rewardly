@@ -30,6 +30,9 @@ interface CachedData {
   cards: Card[];
 }
 
+// In-memory cache for synchronous access
+let memoryCache: Card[] | null = null;
+
 // ============================================================================
 // Data Transformation
 // ============================================================================
@@ -254,17 +257,18 @@ function getBundledCards(): Card[] {
 
 /**
  * Get all cards from the database
- * Uses cache if available, fetches from Supabase if not, falls back to bundled data
+ * Fetches from Supabase with caching
  */
 export async function getAllCards(): Promise<Card[]> {
-  // If Supabase is not configured, use bundled data
+  // Check if Supabase is configured
   if (!isSupabaseConfigured()) {
-    return getBundledCards();
+    throw new Error('Database connection not configured. Please check your environment settings.');
   }
 
   // Try to get from cache first
   const cached = await getCachedCards();
   if (cached && cached.length > 0) {
+    memoryCache = cached; // Update memory cache
     return cached;
   }
 
@@ -273,22 +277,36 @@ export async function getAllCards(): Promise<Card[]> {
     const cards = await fetchCardsFromSupabase();
     if (cards.length > 0) {
       await setCachedCards(cards);
+      memoryCache = cards; // Update memory cache
       return cards;
     }
+    throw new Error('No cards found in database');
   } catch (error) {
-    console.warn('Failed to fetch from Supabase, using bundled data:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to fetch cards from database: ${errorMessage}`);
   }
-
-  // Fall back to bundled data
-  return getBundledCards();
 }
 
 /**
- * Get all cards synchronously (uses bundled data only)
- * Use this when you need immediate access without async
+ * Get a card by its ID synchronously from memory cache
+ * Returns null if not in cache - ensure getAllCards() is called first
+ */
+export function getCardByIdSync(id: string): Card | null {
+  if (!memoryCache) {
+    return null;
+  }
+  return memoryCache.find((card) => card.id === id) ?? null;
+}
+
+/**
+ * Get all cards synchronously from memory cache
+ * Returns empty array if not in cache - ensure getAllCards() is called first
  */
 export function getAllCardsSync(): Card[] {
-  return getBundledCards();
+  if (!memoryCache) {
+    return [];
+  }
+  return memoryCache;
 }
 
 /**
@@ -296,14 +314,6 @@ export function getAllCardsSync(): Card[] {
  */
 export async function getCardById(id: string): Promise<Card | null> {
   const cards = await getAllCards();
-  return cards.find((card) => card.id === id) ?? null;
-}
-
-/**
- * Get a card by its ID synchronously
- */
-export function getCardByIdSync(id: string): Card | null {
-  const cards = getBundledCards();
   return cards.find((card) => card.id === id) ?? null;
 }
 
@@ -338,26 +348,6 @@ export async function searchCards(query: string): Promise<Card[]> {
 }
 
 /**
- * Search cards synchronously (uses bundled data only)
- * Case-insensitive partial matching
- */
-export function searchCardsSync(query: string): Card[] {
-  if (!query || query.trim() === '') {
-    return getBundledCards();
-  }
-
-  const normalizedQuery = query.toLowerCase().trim();
-  const cards = getBundledCards();
-
-  return cards.filter(
-    (card) =>
-      card.name.toLowerCase().includes(normalizedQuery) ||
-      card.issuer.toLowerCase().includes(normalizedQuery) ||
-      card.rewardProgram.toLowerCase().includes(normalizedQuery)
-  );
-}
-
-/**
  * Force refresh cards from Supabase
  * Clears cache and fetches fresh data
  */
@@ -365,7 +355,7 @@ export async function refreshCards(): Promise<Card[]> {
   await clearCache();
 
   if (!isSupabaseConfigured()) {
-    return getBundledCards();
+    throw new Error('Database connection not configured. Please check your environment settings.');
   }
 
   try {
@@ -374,11 +364,11 @@ export async function refreshCards(): Promise<Card[]> {
       await setCachedCards(cards);
       return cards;
     }
+    throw new Error('No cards found in database');
   } catch (error) {
-    console.warn('Failed to refresh from Supabase:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to refresh cards from database: ${errorMessage}`);
   }
-
-  return getBundledCards();
 }
 
 /**
