@@ -33,7 +33,24 @@
     "better": "Meilleur",
     "noCardsForCategory": "Aucune carte de votre portefeuille n'offre de récompenses pour cette catégorie.",
     "youHaveBestCard": "Vous avez la meilleure carte pour ce magasin!",
-    "tapForDetails": "Appuyez pour les détails"
+    "tapForDetails": "Appuyez pour les détails",
+    "googlePlacesEnabled": "Recherche de magasin améliorée activée"
+  },
+  "productSearch": {
+    "title": "Recherche de produits",
+    "description": "Recherchez un produit pour comparer les prix et les récompenses dans les magasins",
+    "searchPlaceholder": "Rechercher un produit...",
+    "sortBy": "Trier par",
+    "bestDeal": "Meilleure offre",
+    "lowestPrice": "Prix le plus bas",
+    "highestRewards": "Récompenses les plus élevées",
+    "allOptions": "TOUTES LES OPTIONS DE MAGASIN",
+    "priceUnavailable": "Prix non disponible",
+    "rewards": "Récompenses",
+    "effectivePrice": "Prix effectif",
+    "earnRewards": "Gagnez {{rate}} de récompenses",
+    "productNotFound": "Produit « {{productName}} » non trouvé. Essayez une autre recherche.",
+    "noCardsError": "Ajoutez des cartes à votre portefeuille pour voir les recommandations"
   },
   "myCards": {
     "title": "Mes cartes",

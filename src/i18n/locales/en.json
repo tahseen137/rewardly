@@ -33,7 +33,24 @@
     "better": "Better",
     "noCardsForCategory": "No cards in your portfolio have rewards for this category.",
     "youHaveBestCard": "You have the best card for this store!",
-    "tapForDetails": "Tap for details"
+    "tapForDetails": "Tap for details",
+    "googlePlacesEnabled": "Enhanced store search enabled"
+  },
+  "productSearch": {
+    "title": "Product Search",
+    "description": "Search for a product to compare prices and rewards across stores",
+    "searchPlaceholder": "Search for a product...",
+    "sortBy": "Sort by",
+    "bestDeal": "Best Deal",
+    "lowestPrice": "Lowest Price",
+    "highestRewards": "Highest Rewards",
+    "allOptions": "ALL STORE OPTIONS",
+    "priceUnavailable": "Price unavailable",
+    "rewards": "Rewards",
+    "effectivePrice": "Effective Price",
+    "earnRewards": "Earn {{rate}} rewards",
+    "productNotFound": "Product \"{{productName}}\" not found. Try a different search.",
+    "noCardsError": "Add cards to your portfolio to see recommendations"
   },
   "myCards": {
     "title": "My Cards",

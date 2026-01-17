@@ -35,6 +35,7 @@ import {
 } from '../services/PreferenceManager';
 import { getStoreRecommendation } from '../services/RecommendationEngine';
 import { searchStores } from '../services/StoreDataService';
+import { searchMerchant, getAutocompleteSuggestions, isGooglePlacesConfigured } from '../services/google-places';
 
 /**
  * Format reward rate for display
@@ -388,11 +389,14 @@ export default function HomeScreen() {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [selectedRewardRate, setSelectedRewardRate] = useState<{ value: number; type: RewardType; unit: 'percent' | 'multiplier' } | undefined>();
   const [showCardDetail, setShowCardDetail] = useState(false);
+  const [googlePlacesEnabled, setGooglePlacesEnabled] = useState(false);
+  const [googleSuggestions, setGoogleSuggestions] = useState<Array<{ placeId: string; mainText: string; secondaryText: string }>>([]);
 
   const loadData = useCallback(async () => {
     await Promise.all([initializePortfolio(), initializePreferences()]);
     const cards = getCards();
     setHasCards(cards.length > 0);
+    setGooglePlacesEnabled(isGooglePlacesConfigured());
   }, []);
 
   useEffect(() => {
@@ -429,6 +433,22 @@ export default function HomeScreen() {
     setShowCardDetail(true);
   };
 
+  // Fetch Google Places autocomplete suggestions
+  const fetchGoogleSuggestions = useCallback(async (query: string) => {
+    if (!googlePlacesEnabled || query.length < 2) {
+      setGoogleSuggestions([]);
+      return;
+    }
+
+    const result = await getAutocompleteSuggestions(query);
+    if (result.success) {
+      setGoogleSuggestions(result.value);
+    } else {
+      setGoogleSuggestions([]);
+    }
+  }, [googlePlacesEnabled]);
+
+  // Combined store suggestions (local + Google Places)
   const storeSuggestions = searchQuery.length >= 2 ? searchStores(searchQuery).slice(0, 5) : [];
 
   return (
@@ -443,6 +463,9 @@ export default function HomeScreen() {
             setShowSuggestions(text.length >= 2);
             if (!text.trim()) {
               setRecommendation(null);
+              setGoogleSuggestions([]);
+            } else if (googlePlacesEnabled) {
+              fetchGoogleSuggestions(text);
             }
           }}
           onSubmitEditing={() => handleSearch(searchQuery)}
@@ -458,6 +481,7 @@ export default function HomeScreen() {
               setSearchQuery('');
               setRecommendation(null);
               setShowSuggestions(false);
+              setGoogleSuggestions([]);
             }}
             accessibilityLabel={t('home.clearSearch')}
             accessibilityRole="button"
@@ -467,10 +491,14 @@ export default function HomeScreen() {
         )}
       </View>
 
-      {showSuggestions && storeSuggestions.length > 0 && (
+      {showSuggestions && (storeSuggestions.length > 0 || googleSuggestions.length > 0) && (
         <View style={styles.suggestionsContainer}>
           <FlatList
-            data={storeSuggestions}
+            data={[...storeSuggestions, ...googleSuggestions.map(gs => ({
+              id: gs.placeId,
+              name: gs.mainText,
+              category: gs.secondaryText,
+            }))]}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <StoreSuggestionItem name={item.name} category={item.category} onSelect={() => handleSearch(item.name)} />
