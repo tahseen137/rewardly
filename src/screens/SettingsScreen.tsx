@@ -3,7 +3,7 @@
  * Requirements: 5.1, 3.4
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useTheme, Theme } from '../theme';
 
 import { RewardType } from '../types';
 import {
@@ -83,6 +84,7 @@ function RewardTypeOption({
   icon,
   isSelected,
   onSelect,
+  theme,
 }: {
   type: RewardType;
   labelKey: string;
@@ -90,8 +92,10 @@ function RewardTypeOption({
   icon: string;
   isSelected: boolean;
   onSelect: (type: RewardType) => void;
+  theme: Theme;
 }) {
   const { t } = useTranslation();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const label = t(labelKey);
   const description = t(descriptionKey);
 
@@ -126,14 +130,17 @@ function LanguageOption({
   icon,
   isSelected,
   onSelect,
+  theme,
 }: {
   code: Language;
   labelKey: string;
   icon: string;
   isSelected: boolean;
   onSelect: (code: Language) => void;
+  theme: Theme;
 }) {
   const { t } = useTranslation();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const label = t(labelKey);
 
   return (
@@ -160,7 +167,8 @@ function LanguageOption({
 /**
  * Settings section header component
  */
-function SectionHeader({ title }: { title: string }) {
+function SectionHeader({ title, theme }: { title: string; theme: Theme }) {
+  const styles = useMemo(() => createStyles(theme), [theme]);
   return (
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionHeaderText}>{title}</Text>
@@ -170,6 +178,8 @@ function SectionHeader({ title }: { title: string }) {
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const [rewardType, setRewardType] = useState<RewardType>(RewardType.CASHBACK);
   const [newCardSuggestions, setNewCardSuggestions] = useState(true);
   const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
@@ -256,7 +266,7 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <SectionHeader title={t('settings.rewardPreference')} />
+      <SectionHeader title={t('settings.rewardPreference')} theme={theme} />
       <View style={styles.section}>
         <Text style={styles.sectionDescription}>
           {t('settings.rewardPreferenceDescription')}
@@ -271,12 +281,13 @@ export default function SettingsScreen() {
               icon={option.icon}
               isSelected={rewardType === option.type}
               onSelect={handleRewardTypeChange}
+              theme={theme}
             />
           ))}
         </View>
       </View>
 
-      <SectionHeader title={t('settings.recommendations')} />
+      <SectionHeader title={t('settings.recommendations')} theme={theme} />
       <View style={styles.section}>
         <View style={styles.toggleRow}>
           <View style={styles.toggleInfo}>
@@ -288,15 +299,15 @@ export default function SettingsScreen() {
           <Switch
             value={newCardSuggestions}
             onValueChange={handleNewCardSuggestionsChange}
-            trackColor={{ false: '#E5E5EA', true: '#34C759' }}
-            thumbColor="#fff"
+            trackColor={{ false: theme.colors.border.light, true: theme.colors.success.main }}
+            thumbColor={theme.colors.background.secondary}
             accessibilityLabel={t('settings.newCardSuggestions')}
             accessibilityRole="switch"
           />
         </View>
       </View>
 
-      <SectionHeader title={t('settings.language')} />
+      <SectionHeader title={t('settings.language')} theme={theme} />
       <View style={styles.section}>
         <Text style={styles.sectionDescription}>
           {t('settings.languageDescription')}
@@ -310,12 +321,13 @@ export default function SettingsScreen() {
               icon={option.icon}
               isSelected={currentLanguage === option.code}
               onSelect={handleLanguageChange}
+              theme={theme}
             />
           ))}
         </View>
       </View>
 
-      <SectionHeader title={t('settings.about')} />
+      <SectionHeader title={t('settings.about')} theme={theme} />
       <View style={styles.section}>
         <View style={styles.aboutRow}>
           <Text style={styles.aboutLabel}>{t('settings.version')}</Text>
@@ -348,7 +360,7 @@ export default function SettingsScreen() {
           disabled={isRefreshing}
         >
           {isRefreshing ? (
-            <ActivityIndicator color="#007AFF" />
+            <ActivityIndicator color={theme.colors.primary.main} />
           ) : (
             <>
               <Text style={styles.refreshButtonIcon}>🔄</Text>
@@ -368,162 +380,161 @@ export default function SettingsScreen() {
 }
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F2F2F7',
-  },
-  contentContainer: {
-    paddingBottom: 40,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F2F2F7',
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  sectionHeader: {
-    paddingHorizontal: 16,
-    paddingTop: 24,
-    paddingBottom: 8,
-  },
-  sectionHeaderText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#8E8E93',
-    letterSpacing: 0.5,
-  },
-  section: {
-    backgroundColor: '#fff',
-    marginHorizontal: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  sectionDescription: {
-    fontSize: 14,
-    color: '#666',
-    padding: 16,
-    paddingBottom: 8,
-  },
-  optionsContainer: {
-    paddingBottom: 8,
-  },
-  optionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
-  },
-  optionItemSelected: {
-    backgroundColor: '#F0F7FF',
-  },
-  optionIcon: {
-    fontSize: 24,
-    marginRight: 12,
-  },
-  optionInfo: {
-    flex: 1,
-  },
-  optionLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 2,
-  },
-  optionLabelSelected: {
-    color: '#007AFF',
-  },
-  optionDescription: {
-    fontSize: 13,
-    color: '#8E8E93',
-  },
-  radioOuter: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: '#C7C7CC',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 12,
-  },
-  radioOuterSelected: {
-    borderColor: '#007AFF',
-  },
-  radioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#007AFF',
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  toggleInfo: {
-    flex: 1,
-    marginRight: 12,
-  },
-  toggleLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 4,
-  },
-  toggleDescription: {
-    fontSize: 13,
-    color: '#8E8E93',
-  },
-  aboutRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
-  },
-  aboutRowLast: {
-    borderBottomWidth: 0,
-  },
-  aboutLabel: {
-    fontSize: 16,
-    color: '#000',
-  },
-  aboutValue: {
-    fontSize: 16,
-    color: '#8E8E93',
-  },
-  footer: {
-    padding: 24,
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 13,
-    color: '#8E8E93',
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  refreshButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    backgroundColor: '#F0F7FF',
-  },
-  refreshButtonIcon: {
-    fontSize: 20,
-    marginRight: 8,
-  },
-  refreshButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#007AFF',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background.primary,
+    },
+    contentContainer: {
+      paddingBottom: theme.spacing.xl + theme.spacing.lg,
+    },
+    loadingContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.background.primary,
+    },
+    loadingText: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.secondary,
+    },
+    sectionHeader: {
+      paddingHorizontal: theme.spacing.screenPadding,
+      paddingTop: theme.spacing.xl,
+      paddingBottom: theme.spacing.sm,
+    },
+    sectionHeaderText: {
+      ...theme.textStyles.label,
+      color: theme.colors.text.tertiary,
+      letterSpacing: 0.5,
+    },
+    section: {
+      backgroundColor: theme.colors.background.secondary,
+      marginHorizontal: theme.spacing.screenPadding,
+      borderRadius: theme.borderRadius.md,
+      overflow: 'hidden',
+    },
+    sectionDescription: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.text.secondary,
+      padding: theme.spacing.screenPadding,
+      paddingBottom: theme.spacing.sm,
+    },
+    optionsContainer: {
+      paddingBottom: theme.spacing.sm,
+    },
+    optionItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.screenPadding,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.light,
+    },
+    optionItemSelected: {
+      backgroundColor: theme.colors.primary.light,
+    },
+    optionIcon: {
+      fontSize: 24,
+      marginRight: theme.spacing.md,
+    },
+    optionInfo: {
+      flex: 1,
+    },
+    optionLabel: {
+      ...theme.textStyles.body,
+      fontWeight: '500',
+      color: theme.colors.text.primary,
+      marginBottom: 2,
+    },
+    optionLabelSelected: {
+      color: theme.colors.primary.main,
+    },
+    optionDescription: {
+      ...theme.textStyles.caption,
+      color: theme.colors.text.tertiary,
+    },
+    radioOuter: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      borderWidth: 2,
+      borderColor: theme.colors.border.medium,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: theme.spacing.md,
+    },
+    radioOuterSelected: {
+      borderColor: theme.colors.primary.main,
+    },
+    radioInner: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      backgroundColor: theme.colors.primary.main,
+    },
+    toggleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: theme.spacing.screenPadding,
+    },
+    toggleInfo: {
+      flex: 1,
+      marginRight: theme.spacing.md,
+    },
+    toggleLabel: {
+      ...theme.textStyles.body,
+      fontWeight: '500',
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.xs,
+    },
+    toggleDescription: {
+      ...theme.textStyles.caption,
+      color: theme.colors.text.tertiary,
+    },
+    aboutRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: theme.spacing.screenPadding,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.light,
+    },
+    aboutRowLast: {
+      borderBottomWidth: 0,
+    },
+    aboutLabel: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.primary,
+    },
+    aboutValue: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.tertiary,
+    },
+    footer: {
+      padding: theme.spacing.xl,
+      alignItems: 'center',
+    },
+    footerText: {
+      ...theme.textStyles.caption,
+      color: theme.colors.text.tertiary,
+      textAlign: 'center',
+      lineHeight: 18,
+    },
+    refreshButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing.screenPadding,
+      backgroundColor: theme.colors.primary.light,
+    },
+    refreshButtonIcon: {
+      fontSize: 20,
+      marginRight: theme.spacing.sm,
+    },
+    refreshButtonText: {
+      ...theme.textStyles.button,
+      color: theme.colors.primary.main,
+    },
+  });

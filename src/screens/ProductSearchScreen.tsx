@@ -3,7 +3,7 @@
  * Requirements: 4.1-4.5, 6.1-6.6
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import {
   Modal,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useTheme, Theme } from '../theme';
 
 import {
   Card,
@@ -27,56 +28,46 @@ import {
 } from '../types';
 import { getCards } from '../services/CardPortfolioManager';
 import { getRewardTypePreference } from '../services/PreferenceManager';
-import { getPriceComparison, resortPriceComparison, formatPrice, formatRewardValue, formatEffectivePrice } from '../services/PriceComparisonService';
+import {
+  getPriceComparison,
+  resortPriceComparison,
+  formatPrice,
+  formatRewardValue,
+  formatEffectivePrice,
+} from '../services/PriceComparisonService';
 
-/**
- * Format reward rate for display
- */
-function formatRewardRate(value: number, type: RewardType, unit: 'percent' | 'multiplier'): string {
-  if (unit === 'percent') {
-    return `${value}%`;
-  }
-  return `${value}x`;
+function formatRewardRate(value: number, unit: 'percent' | 'multiplier'): string {
+  return unit === 'percent' ? `${value}%` : `${value}x`;
 }
 
-/**
- * Get reward type label key
- */
 function getRewardTypeLabelKey(type: RewardType): string {
-  switch (type) {
-    case RewardType.CASHBACK:
-      return 'rewardTypes.cashback';
-    case RewardType.POINTS:
-      return 'rewardTypes.points';
-    case RewardType.AIRLINE_MILES:
-      return 'rewardTypes.airline_miles';
-    case RewardType.HOTEL_POINTS:
-      return 'rewardTypes.hotel_points';
-    default:
-      return type;
-  }
+  const keys: Record<RewardType, string> = {
+    [RewardType.CASHBACK]: 'rewardTypes.cashback',
+    [RewardType.POINTS]: 'rewardTypes.points',
+    [RewardType.AIRLINE_MILES]: 'rewardTypes.airline_miles',
+    [RewardType.HOTEL_POINTS]: 'rewardTypes.hotel_points',
+  };
+  return keys[type] || type;
 }
 
-/**
- * Card Detail Modal Component
- */
 function CardDetailModal({
   card,
   visible,
   onClose,
   t,
+  theme,
 }: {
   card: Card | null;
   visible: boolean;
   onClose: () => void;
   t: (key: string) => string;
+  theme: Theme;
 }) {
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   if (!card) return null;
 
-  const formatAnnualFee = (fee?: number) => {
-    if (fee === undefined || fee === 0) return t('cardDetail.noFee');
-    return `$${fee}/year`;
-  };
+  const formatAnnualFee = (fee?: number) => (fee === undefined || fee === 0 ? t('cardDetail.noFee') : `$${fee}/year`);
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
@@ -87,20 +78,18 @@ function CardDetailModal({
             <Text style={styles.modalClose}>{t('common.done')}</Text>
           </TouchableOpacity>
         </View>
-
         <ScrollView style={styles.modalContent}>
           <View style={styles.cardDetailHeader}>
             <Text style={styles.cardDetailIssuer}>{card.issuer}</Text>
             <Text style={styles.cardDetailProgram}>{card.rewardProgram}</Text>
             <Text style={styles.cardDetailAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
           </View>
-
           <View style={styles.detailSection}>
             <Text style={styles.detailSectionTitle}>{t('cardDetail.baseReward')}</Text>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>{t('cardDetail.allPurchases')}</Text>
               <Text style={styles.detailValue}>
-                {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.type, card.baseRewardRate.unit)}{' '}
+                {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.unit)}{' '}
                 {t(getRewardTypeLabelKey(card.baseRewardRate.type))}
               </Text>
             </View>
@@ -111,18 +100,19 @@ function CardDetailModal({
   );
 }
 
-/**
- * Store option item component
- */
 function StoreOptionItem({
   option,
   onCardPress,
   t,
+  theme,
 }: {
   option: PricedStoreOption;
   onCardPress: (card: Card) => void;
   t: (key: string, options?: Record<string, string | number>) => string;
+  theme: Theme;
 }) {
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={styles.storeOptionItem}>
       <View style={styles.storeOptionHeader}>
@@ -130,21 +120,15 @@ function StoreOptionItem({
         {option.priceAvailable && option.price !== null && (
           <Text style={styles.storePrice}>${formatPrice(option.price)}</Text>
         )}
-        {!option.priceAvailable && (
-          <Text style={styles.storePriceUnavailable}>{t('productSearch.priceUnavailable')}</Text>
-        )}
+        {!option.priceAvailable && <Text style={styles.storePriceUnavailable}>{t('productSearch.priceUnavailable')}</Text>}
       </View>
 
       {option.bestCard && (
-        <TouchableOpacity
-          style={styles.cardInfo}
-          onPress={() => onCardPress(option.bestCard!.card)}
-          activeOpacity={0.7}
-        >
+        <TouchableOpacity style={styles.cardInfo} onPress={() => onCardPress(option.bestCard!.card)} activeOpacity={0.7}>
           <View style={styles.cardInfoLeft}>
             <Text style={styles.cardName}>{option.bestCard.card.name}</Text>
             <Text style={styles.rewardRate}>
-              {formatRewardRate(option.bestCard.rewardRate.value, option.bestCard.rewardRate.type, option.bestCard.rewardRate.unit)}{' '}
+              {formatRewardRate(option.bestCard.rewardRate.value, option.bestCard.rewardRate.unit)}{' '}
               {t(getRewardTypeLabelKey(option.bestCard.rewardRate.type))}
             </Text>
           </View>
@@ -167,9 +151,7 @@ function StoreOptionItem({
 
       {!option.priceAvailable && option.bestCard && (
         <View style={styles.noPriceInfo}>
-          <Text style={styles.noPriceText}>
-            {t('productSearch.earnRewards', { rate: `${option.rewardRate}%` })}
-          </Text>
+          <Text style={styles.noPriceText}>{t('productSearch.earnRewards', { rate: `${option.rewardRate}%` })}</Text>
         </View>
       )}
     </View>
@@ -178,6 +160,9 @@ function StoreOptionItem({
 
 export default function ProductSearchScreen() {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [result, setResult] = useState<PriceComparisonResult | null>(null);
   const [sortBy, setSortBy] = useState<PriceSortOption>(PriceSortOption.LOWEST_EFFECTIVE_PRICE);
@@ -199,11 +184,7 @@ export default function ProductSearchScreen() {
       return;
     }
 
-    const preferences: UserPreferences = {
-      rewardType: getRewardTypePreference(),
-      newCardSuggestionsEnabled: false,
-    };
-
+    const preferences: UserPreferences = { rewardType: getRewardTypePreference(), newCardSuggestionsEnabled: false };
     const searchResult = getPriceComparison(searchQuery, portfolio, preferences, sortBy);
 
     if (!searchResult.success) {
@@ -216,13 +197,13 @@ export default function ProductSearchScreen() {
     setError(null);
   }, [searchQuery, sortBy, t]);
 
-  const handleSortChange = useCallback((newSortBy: PriceSortOption) => {
-    setSortBy(newSortBy);
-    if (result) {
-      const resorted = resortPriceComparison(result, newSortBy);
-      setResult(resorted);
-    }
-  }, [result]);
+  const handleSortChange = useCallback(
+    (newSortBy: PriceSortOption) => {
+      setSortBy(newSortBy);
+      if (result) setResult(resortPriceComparison(result, newSortBy));
+    },
+    [result]
+  );
 
   const handleCardPress = (card: Card) => {
     setSelectedCard(card);
@@ -235,6 +216,7 @@ export default function ProductSearchScreen() {
         <TextInput
           style={styles.searchInput}
           placeholder={t('productSearch.searchPlaceholder')}
+          placeholderTextColor={theme.colors.text.tertiary}
           value={searchQuery}
           onChangeText={setSearchQuery}
           onSubmitEditing={handleSearch}
@@ -260,30 +242,21 @@ export default function ProductSearchScreen() {
         <View style={styles.sortContainer}>
           <Text style={styles.sortLabel}>{t('productSearch.sortBy')}:</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.sortButtons}>
-            <TouchableOpacity
-              style={[styles.sortButton, sortBy === PriceSortOption.LOWEST_EFFECTIVE_PRICE && styles.sortButtonActive]}
-              onPress={() => handleSortChange(PriceSortOption.LOWEST_EFFECTIVE_PRICE)}
-            >
-              <Text style={[styles.sortButtonText, sortBy === PriceSortOption.LOWEST_EFFECTIVE_PRICE && styles.sortButtonTextActive]}>
-                {t('productSearch.bestDeal')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.sortButton, sortBy === PriceSortOption.LOWEST_PRICE && styles.sortButtonActive]}
-              onPress={() => handleSortChange(PriceSortOption.LOWEST_PRICE)}
-            >
-              <Text style={[styles.sortButtonText, sortBy === PriceSortOption.LOWEST_PRICE && styles.sortButtonTextActive]}>
-                {t('productSearch.lowestPrice')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.sortButton, sortBy === PriceSortOption.HIGHEST_REWARDS && styles.sortButtonActive]}
-              onPress={() => handleSortChange(PriceSortOption.HIGHEST_REWARDS)}
-            >
-              <Text style={[styles.sortButtonText, sortBy === PriceSortOption.HIGHEST_REWARDS && styles.sortButtonTextActive]}>
-                {t('productSearch.highestRewards')}
-              </Text>
-            </TouchableOpacity>
+            {[
+              { key: PriceSortOption.LOWEST_EFFECTIVE_PRICE, label: 'productSearch.bestDeal' },
+              { key: PriceSortOption.LOWEST_PRICE, label: 'productSearch.lowestPrice' },
+              { key: PriceSortOption.HIGHEST_REWARDS, label: 'productSearch.highestRewards' },
+            ].map((opt) => (
+              <TouchableOpacity
+                key={opt.key}
+                style={[styles.sortButton, sortBy === opt.key && styles.sortButtonActive]}
+                onPress={() => handleSortChange(opt.key)}
+              >
+                <Text style={[styles.sortButtonText, sortBy === opt.key && styles.sortButtonTextActive]}>
+                  {t(opt.label)}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </ScrollView>
         </View>
       )}
@@ -313,174 +286,115 @@ export default function ProductSearchScreen() {
 
             {result.lowestEffectivePrice && (
               <View style={styles.bestDealCard}>
-                <Text style={styles.bestDealLabel}>🏆 {t('productSearch.bestDeal')}</Text>
+                <Text style={styles.bestDealLabel}>{t('productSearch.bestDeal')}</Text>
                 <Text style={styles.bestDealStore}>{result.lowestEffectivePrice.store.name}</Text>
                 {result.lowestEffectivePrice.bestCard && (
-                  <Text style={styles.bestDealCard}>{result.lowestEffectivePrice.bestCard.card.name}</Text>
+                  <Text style={styles.bestDealCardName}>{result.lowestEffectivePrice.bestCard.card.name}</Text>
                 )}
                 {result.lowestEffectivePrice.priceAvailable && (
-                  <Text style={styles.bestDealPrice}>
-                    ${formatEffectivePrice(result.lowestEffectivePrice.effectivePrice)}
-                  </Text>
+                  <Text style={styles.bestDealPrice}>${formatEffectivePrice(result.lowestEffectivePrice.effectivePrice)}</Text>
                 )}
               </View>
             )}
 
             <Text style={styles.sectionLabel}>{t('productSearch.allOptions')}</Text>
             {result.storeOptions.map((option, index) => (
-              <StoreOptionItem key={index} option={option} onCardPress={handleCardPress} t={t} />
+              <StoreOptionItem key={index} option={option} onCardPress={handleCardPress} t={t} theme={theme} />
             ))}
           </>
         )}
       </ScrollView>
 
-      <CardDetailModal card={selectedCard} visible={showCardDetail} onClose={() => setShowCardDetail(false)} t={t} />
+      <CardDetailModal card={selectedCard} visible={showCardDetail} onClose={() => setShowCardDetail(false)} t={t} theme={theme} />
     </KeyboardAvoidingView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2F2F7' },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    margin: 16,
-    marginBottom: 0,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  searchInput: { flex: 1, paddingVertical: 14, fontSize: 16 },
-  clearButton: { padding: 8 },
-  clearButtonText: { fontSize: 16, color: '#8E8E93' },
-  sortContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  sortLabel: { fontSize: 14, fontWeight: '600', color: '#666', marginRight: 8 },
-  sortButtons: { flex: 1 },
-  sortButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#E5E5EA',
-    marginRight: 8,
-  },
-  sortButtonActive: { backgroundColor: '#007AFF' },
-  sortButtonText: { fontSize: 14, color: '#666', fontWeight: '500' },
-  sortButtonTextActive: { color: '#fff' },
-  resultsContainer: { flex: 1 },
-  resultsContent: { padding: 16, paddingBottom: 40 },
-  emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
-  emptyStateIcon: { fontSize: 48, marginBottom: 16 },
-  emptyStateTitle: { fontSize: 20, fontWeight: '600', color: '#000', marginBottom: 8 },
-  emptyStateText: { fontSize: 15, color: '#666', textAlign: 'center', paddingHorizontal: 20 },
-  errorState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 40 },
-  errorIcon: { fontSize: 40, marginBottom: 12 },
-  errorText: { fontSize: 16, color: '#FF3B30', textAlign: 'center', paddingHorizontal: 20 },
-  productHeader: { marginBottom: 16 },
-  productName: { fontSize: 24, fontWeight: 'bold', color: '#000' },
-  productCategory: { fontSize: 14, color: '#8E8E93', marginTop: 4, textTransform: 'capitalize' },
-  bestDealCard: {
-    backgroundColor: '#34C759',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  bestDealLabel: { fontSize: 14, fontWeight: '600', color: '#fff', marginBottom: 8 },
-  bestDealStore: { fontSize: 20, fontWeight: 'bold', color: '#fff', marginBottom: 4 },
-  bestDealCardName: { fontSize: 14, color: 'rgba(255,255,255,0.9)', marginBottom: 8 },
-  bestDealPrice: { fontSize: 32, fontWeight: 'bold', color: '#fff' },
-  sectionLabel: { fontSize: 12, fontWeight: '600', color: '#8E8E93', letterSpacing: 0.5, marginBottom: 12 },
-  storeOptionItem: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  storeOptionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  storeName: { fontSize: 18, fontWeight: '600', color: '#000', flex: 1 },
-  storePrice: { fontSize: 18, fontWeight: 'bold', color: '#007AFF' },
-  storePriceUnavailable: { fontSize: 14, color: '#8E8E93', fontStyle: 'italic' },
-  cardInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E5EA',
-    marginBottom: 8,
-  },
-  cardInfoLeft: { flex: 1 },
-  cardName: { fontSize: 15, fontWeight: '500', color: '#000' },
-  rewardRate: { fontSize: 13, color: '#007AFF', marginTop: 2 },
-  chevron: { fontSize: 20, color: '#C7C7CC', fontWeight: '300' },
-  priceBreakdown: {
-    backgroundColor: '#F9F9F9',
-    borderRadius: 8,
-    padding: 12,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  priceLabel: { fontSize: 14, color: '#666' },
-  priceValue: { fontSize: 14, color: '#34C759', fontWeight: '500' },
-  priceLabelBold: { fontSize: 15, fontWeight: '600', color: '#000' },
-  priceValueBold: { fontSize: 15, fontWeight: 'bold', color: '#007AFF' },
-  noPriceInfo: {
-    backgroundColor: '#FFF9E6',
-    borderRadius: 8,
-    padding: 12,
-  },
-  noPriceText: { fontSize: 14, color: '#8B7355', textAlign: 'center' },
-  modalContainer: { flex: 1, backgroundColor: '#F2F2F7' },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
-  },
-  modalTitle: { fontSize: 17, fontWeight: '600' },
-  modalClose: { fontSize: 17, color: '#007AFF', fontWeight: '600' },
-  modalContent: { flex: 1 },
-  cardDetailHeader: { backgroundColor: '#007AFF', padding: 24, alignItems: 'center' },
-  cardDetailIssuer: { fontSize: 16, color: 'rgba(255,255,255,0.9)', marginBottom: 4 },
-  cardDetailProgram: { fontSize: 14, color: 'rgba(255,255,255,0.7)' },
-  cardDetailAnnualFee: { fontSize: 14, color: '#34C759', marginTop: 8, fontWeight: '600' },
-  detailSection: { backgroundColor: '#fff', marginHorizontal: 16, marginBottom: 16, borderRadius: 12, overflow: 'hidden' },
-  detailSectionTitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#8E8E93',
-    letterSpacing: 0.5,
-    padding: 16,
-    paddingBottom: 8,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E5EA',
-  },
-  detailLabel: { fontSize: 15, color: '#000' },
-  detailValue: { fontSize: 15, color: '#8E8E93' },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.colors.background.primary },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background.secondary,
+      margin: theme.spacing.screenPadding,
+      marginBottom: 0,
+      borderRadius: theme.borderRadius.md,
+      paddingHorizontal: theme.spacing.md,
+      ...theme.shadows.xs,
+    },
+    searchInput: { flex: 1, paddingVertical: theme.spacing.inputPadding, ...theme.textStyles.body, color: theme.colors.text.primary },
+    clearButton: { padding: theme.spacing.sm },
+    clearButtonText: { fontSize: 16, color: theme.colors.text.tertiary },
+    sortContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: theme.spacing.screenPadding, paddingVertical: theme.spacing.md },
+    sortLabel: { ...theme.textStyles.label, color: theme.colors.text.secondary, marginRight: theme.spacing.sm },
+    sortButtons: { flex: 1 },
+    sortButton: {
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.neutral.gray200,
+      marginRight: theme.spacing.sm,
+    },
+    sortButtonActive: { backgroundColor: theme.colors.primary.main },
+    sortButtonText: { ...theme.textStyles.bodySmall, fontWeight: '500', color: theme.colors.text.secondary },
+    sortButtonTextActive: { color: theme.colors.primary.contrast },
+    resultsContainer: { flex: 1 },
+    resultsContent: { padding: theme.spacing.screenPadding, paddingBottom: 40 },
+    emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
+    emptyStateIcon: { fontSize: 48, marginBottom: theme.spacing.lg },
+    emptyStateTitle: { ...theme.textStyles.h3, color: theme.colors.text.primary, marginBottom: theme.spacing.sm },
+    emptyStateText: { ...theme.textStyles.body, color: theme.colors.text.secondary, textAlign: 'center', paddingHorizontal: 20 },
+    errorState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 40 },
+    errorIcon: { fontSize: 40, marginBottom: theme.spacing.md },
+    errorText: { ...theme.textStyles.body, color: theme.colors.error.main, textAlign: 'center', paddingHorizontal: 20 },
+    productHeader: { marginBottom: theme.spacing.lg },
+    productName: { ...theme.textStyles.h1, color: theme.colors.text.primary },
+    productCategory: { ...theme.textStyles.bodySmall, color: theme.colors.text.tertiary, marginTop: theme.spacing.xs, textTransform: 'capitalize' },
+    bestDealCard: { backgroundColor: theme.colors.success.main, borderRadius: theme.borderRadius.md, padding: theme.spacing.cardPadding, marginBottom: theme.spacing.lg },
+    bestDealLabel: { ...theme.textStyles.label, color: theme.colors.success.contrast, marginBottom: theme.spacing.sm },
+    bestDealStore: { ...theme.textStyles.h3, color: theme.colors.success.contrast, marginBottom: theme.spacing.xs },
+    bestDealCardName: { ...theme.textStyles.bodySmall, color: 'rgba(255,255,255,0.9)', marginBottom: theme.spacing.sm },
+    bestDealPrice: { fontSize: 32, fontWeight: '700', color: theme.colors.success.contrast },
+    sectionLabel: { ...theme.textStyles.label, color: theme.colors.text.tertiary, letterSpacing: 0.5, marginBottom: theme.spacing.md },
+    storeOptionItem: { backgroundColor: theme.colors.background.secondary, borderRadius: theme.borderRadius.md, padding: theme.spacing.cardPadding, marginBottom: theme.spacing.md },
+    storeOptionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.md },
+    storeName: { ...theme.textStyles.h4, color: theme.colors.text.primary, flex: 1 },
+    storePrice: { ...theme.textStyles.h4, color: theme.colors.primary.main },
+    storePriceUnavailable: { ...theme.textStyles.bodySmall, color: theme.colors.text.tertiary, fontStyle: 'italic' },
+    cardInfo: { flexDirection: 'row', alignItems: 'center', paddingVertical: theme.spacing.sm, borderTopWidth: 1, borderTopColor: theme.colors.border.light, marginBottom: theme.spacing.sm },
+    cardInfoLeft: { flex: 1 },
+    cardName: { ...theme.textStyles.body, fontWeight: '500', color: theme.colors.text.primary },
+    rewardRate: { ...theme.textStyles.caption, color: theme.colors.primary.main, marginTop: 2 },
+    chevron: { fontSize: 20, color: theme.colors.text.disabled, fontWeight: '300' },
+    priceBreakdown: { backgroundColor: theme.colors.background.tertiary, borderRadius: theme.borderRadius.sm, padding: theme.spacing.md },
+    priceRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: theme.spacing.xs },
+    priceLabel: { ...theme.textStyles.bodySmall, color: theme.colors.text.secondary },
+    priceValue: { ...theme.textStyles.bodySmall, color: theme.colors.success.main, fontWeight: '500' },
+    priceLabelBold: { ...theme.textStyles.body, fontWeight: '600', color: theme.colors.text.primary },
+    priceValueBold: { ...theme.textStyles.body, fontWeight: '700', color: theme.colors.primary.main },
+    noPriceInfo: { backgroundColor: theme.colors.warning.background, borderRadius: theme.borderRadius.sm, padding: theme.spacing.md },
+    noPriceText: { ...theme.textStyles.bodySmall, color: theme.colors.warning.dark, textAlign: 'center' },
+    modalContainer: { flex: 1, backgroundColor: theme.colors.background.primary },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: theme.spacing.screenPadding,
+      backgroundColor: theme.colors.background.secondary,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.light,
+    },
+    modalTitle: { ...theme.textStyles.h4, color: theme.colors.text.primary },
+    modalClose: { ...theme.textStyles.button, color: theme.colors.primary.main },
+    modalContent: { flex: 1 },
+    cardDetailHeader: { backgroundColor: theme.colors.primary.main, padding: theme.spacing.xl, alignItems: 'center' },
+    cardDetailIssuer: { ...theme.textStyles.body, color: 'rgba(255,255,255,0.9)', marginBottom: theme.spacing.xs },
+    cardDetailProgram: { ...theme.textStyles.bodySmall, color: 'rgba(255,255,255,0.7)' },
+    cardDetailAnnualFee: { ...theme.textStyles.bodySmall, color: theme.colors.success.light, marginTop: theme.spacing.sm, fontWeight: '600' },
+    detailSection: { backgroundColor: theme.colors.background.secondary, marginHorizontal: theme.spacing.screenPadding, marginBottom: theme.spacing.lg, borderRadius: theme.borderRadius.md, overflow: 'hidden' },
+    detailSectionTitle: { ...theme.textStyles.label, color: theme.colors.text.tertiary, letterSpacing: 0.5, padding: theme.spacing.screenPadding, paddingBottom: theme.spacing.sm },
+    detailRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: theme.spacing.screenPadding, paddingVertical: theme.spacing.md, borderTopWidth: 1, borderTopColor: theme.colors.border.light },
+    detailLabel: { ...theme.textStyles.body, color: theme.colors.text.primary },
+    detailValue: { ...theme.textStyles.body, color: theme.colors.text.tertiary },
+  });

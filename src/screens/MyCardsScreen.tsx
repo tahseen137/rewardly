@@ -3,7 +3,7 @@
  * Requirements: 1.1, 1.2, 1.3
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
+import { useTheme, Theme } from '../theme';
 
 import { Card, UserCard, RewardType } from '../types';
 import {
@@ -23,11 +24,8 @@ import {
   removeCard,
   initializePortfolio,
 } from '../services/CardPortfolioManager';
-import { getAllCards, getCardById, searchCards, getCardByIdSync } from '../services/CardDataService';
+import { getAllCards, searchCards, getCardByIdSync } from '../services/CardDataService';
 
-/**
- * Format reward rate for display
- */
 function formatRewardRate(value: number, type: RewardType, unit: 'percent' | 'multiplier'): string {
   if (unit === 'percent') {
     return `${value}% ${type === RewardType.CASHBACK ? 'cash back' : type.replace('_', ' ')}`;
@@ -35,21 +33,19 @@ function formatRewardRate(value: number, type: RewardType, unit: 'percent' | 'mu
   return `${value}x ${type.replace('_', ' ')}`;
 }
 
-/**
- * Card item component for the portfolio list
- */
 function CardItem({
   userCard,
   onRemove,
+  theme,
 }: {
   userCard: UserCard;
   onRemove: (cardId: string) => void;
+  theme: Theme;
 }) {
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const card = getCardByIdSync(userCard.cardId);
 
-  if (!card) {
-    return null;
-  }
+  if (!card) return null;
 
   const formatAnnualFee = (fee?: number) => {
     if (fee === undefined || fee === 0) return 'No annual fee';
@@ -63,11 +59,7 @@ function CardItem({
         <Text style={styles.cardIssuer}>{card.issuer}</Text>
         <Text style={styles.cardAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
         <Text style={styles.cardReward}>
-          Base: {formatRewardRate(
-            card.baseRewardRate.value,
-            card.baseRewardRate.type,
-            card.baseRewardRate.unit
-          )}
+          Base: {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.type, card.baseRewardRate.unit)}
         </Text>
         {card.categoryRewards.length > 0 && (
           <Text style={styles.cardCategories}>
@@ -87,18 +79,19 @@ function CardItem({
   );
 }
 
-/**
- * Card picker item for the add card modal
- */
 function CardPickerItem({
   card,
   isOwned,
   onSelect,
+  theme,
 }: {
   card: Card;
   isOwned: boolean;
   onSelect: (cardId: string) => void;
+  theme: Theme;
 }) {
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   const formatAnnualFee = (fee?: number) => {
     if (fee === undefined || fee === 0) return 'No annual fee';
     return `$${fee}/year`;
@@ -113,21 +106,13 @@ function CardPickerItem({
       accessibilityRole="button"
     >
       <View style={styles.pickerItemInfo}>
-        <Text style={[styles.pickerItemName, isOwned && styles.pickerItemTextDisabled]}>
-          {card.name}
-        </Text>
-        <Text style={[styles.pickerItemIssuer, isOwned && styles.pickerItemTextDisabled]}>
-          {card.issuer}
-        </Text>
+        <Text style={[styles.pickerItemName, isOwned && styles.pickerItemTextDisabled]}>{card.name}</Text>
+        <Text style={[styles.pickerItemIssuer, isOwned && styles.pickerItemTextDisabled]}>{card.issuer}</Text>
         <Text style={[styles.pickerItemAnnualFee, isOwned && styles.pickerItemTextDisabled]}>
           {formatAnnualFee(card.annualFee)}
         </Text>
         <Text style={[styles.pickerItemReward, isOwned && styles.pickerItemTextDisabled]}>
-          {formatRewardRate(
-            card.baseRewardRate.value,
-            card.baseRewardRate.type,
-            card.baseRewardRate.unit
-          )}
+          {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.type, card.baseRewardRate.unit)}
         </Text>
       </View>
       {isOwned && <Text style={styles.ownedBadge}>Owned</Text>}
@@ -136,6 +121,9 @@ function CardPickerItem({
 }
 
 export default function MyCardsScreen() {
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   const [portfolio, setPortfolio] = useState<UserCard[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -151,13 +139,8 @@ export default function MyCardsScreen() {
   const loadAvailableCards = useCallback(async () => {
     setIsLoadingCards(true);
     try {
-      if (searchQuery) {
-        const cards = await searchCards(searchQuery);
-        setAvailableCards(cards);
-      } else {
-        const cards = await getAllCards();
-        setAvailableCards(cards);
-      }
+      const cards = searchQuery ? await searchCards(searchQuery) : await getAllCards();
+      setAvailableCards(cards);
     } catch (error) {
       console.error('Failed to load cards:', error);
       setAvailableCards([]);
@@ -171,9 +154,7 @@ export default function MyCardsScreen() {
   }, [loadPortfolio]);
 
   useEffect(() => {
-    if (isModalVisible) {
-      loadAvailableCards();
-    }
+    if (isModalVisible) loadAvailableCards();
   }, [isModalVisible, loadAvailableCards]);
 
   const onRefresh = useCallback(async () => {
@@ -200,41 +181,27 @@ export default function MyCardsScreen() {
   const handleRemoveCard = (cardId: string) => {
     const card = getCardByIdSync(cardId);
     const cardName = card?.name || 'this card';
-    
-    // Use window.confirm for web, Alert for native
+
     if (typeof window !== 'undefined' && window.confirm) {
-      const confirmed = window.confirm(
-        `Are you sure you want to remove ${cardName} from your portfolio?`
-      );
-      if (confirmed) {
+      if (window.confirm(`Are you sure you want to remove ${cardName} from your portfolio?`)) {
         removeCard(cardId).then((result) => {
-          if (result.success) {
-            setPortfolio(getCards());
-          } else {
-            alert('Failed to remove card. Please try again.');
-          }
+          if (result.success) setPortfolio(getCards());
+          else alert('Failed to remove card. Please try again.');
         });
       }
     } else {
-      Alert.alert(
-        'Remove Card',
-        `Are you sure you want to remove ${cardName} from your portfolio?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Remove',
-            style: 'destructive',
-            onPress: async () => {
-              const result = await removeCard(cardId);
-              if (result.success) {
-                setPortfolio(getCards());
-              } else {
-                Alert.alert('Error', 'Failed to remove card. Please try again.');
-              }
-            },
+      Alert.alert('Remove Card', `Are you sure you want to remove ${cardName} from your portfolio?`, [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await removeCard(cardId);
+            if (result.success) setPortfolio(getCards());
+            else Alert.alert('Error', 'Failed to remove card. Please try again.');
           },
-        ]
-      );
+        },
+      ]);
     }
   };
 
@@ -263,13 +230,9 @@ export default function MyCardsScreen() {
           <FlatList
             data={portfolio}
             keyExtractor={(item) => item.cardId}
-            renderItem={({ item }) => (
-              <CardItem userCard={item} onRemove={handleRemoveCard} />
-            )}
+            renderItem={({ item }) => <CardItem userCard={item} onRemove={handleRemoveCard} theme={theme} />}
             contentContainerStyle={styles.listContent}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           />
           <TouchableOpacity
             style={styles.fab}
@@ -306,6 +269,7 @@ export default function MyCardsScreen() {
           <TextInput
             style={styles.searchInput}
             placeholder="Search cards..."
+            placeholderTextColor={theme.colors.text.tertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"
@@ -322,11 +286,7 @@ export default function MyCardsScreen() {
               data={availableCards}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <CardPickerItem
-                  card={item}
-                  isOwned={ownedCardIds.has(item.id)}
-                  onSelect={handleAddCard}
-                />
+                <CardPickerItem card={item} isOwned={ownedCardIds.has(item.id)} onSelect={handleAddCard} theme={theme} />
               )}
               contentContainerStyle={styles.pickerListContent}
             />
@@ -337,212 +297,103 @@ export default function MyCardsScreen() {
   );
 }
 
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F2F2F7',
-  },
-  listContent: {
-    padding: 16,
-    paddingBottom: 80,
-  },
-  cardItem: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  cardInfo: {
-    flex: 1,
-  },
-  cardName: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#000',
-    marginBottom: 4,
-  },
-  cardIssuer: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  cardReward: {
-    fontSize: 14,
-    color: '#007AFF',
-    marginBottom: 2,
-  },
-  cardAnnualFee: {
-    fontSize: 13,
-    color: '#34C759',
-    marginBottom: 4,
-  },
-  cardCategories: {
-    fontSize: 12,
-    color: '#8E8E93',
-  },
-  removeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FF3B30',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 12,
-  },
-  removeButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  emptyState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-  },
-  emptyStateIcon: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
-  emptyStateTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 8,
-  },
-  emptyStateText: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  addButtonLarge: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 12,
-  },
-  addButtonLargeText: {
-    color: '#fff',
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#007AFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  fabText: {
-    color: '#fff',
-    fontSize: 28,
-    fontWeight: '400',
-    marginTop: -2,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#F2F2F7',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
-  },
-  modalTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  modalClose: {
-    fontSize: 17,
-    color: '#007AFF',
-    fontWeight: '600',
-  },
-  searchInput: {
-    backgroundColor: '#fff',
-    margin: 16,
-    padding: 12,
-    borderRadius: 10,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-  },
-  pickerListContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
-  },
-  pickerItem: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  pickerItemDisabled: {
-    opacity: 0.6,
-  },
-  pickerItemInfo: {
-    flex: 1,
-  },
-  pickerItemName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 2,
-  },
-  pickerItemIssuer: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 2,
-  },
-  pickerItemReward: {
-    fontSize: 13,
-    color: '#007AFF',
-  },
-  pickerItemAnnualFee: {
-    fontSize: 12,
-    color: '#34C759',
-    marginBottom: 2,
-  },
-  pickerItemTextDisabled: {
-    color: '#8E8E93',
-  },
-  ownedBadge: {
-    fontSize: 12,
-    color: '#34C759',
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#666',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.colors.background.primary },
+    listContent: { padding: theme.spacing.screenPadding, paddingBottom: 80 },
+    cardItem: {
+      backgroundColor: theme.colors.background.secondary,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.cardPadding,
+      marginBottom: theme.spacing.md,
+      flexDirection: 'row',
+      alignItems: 'center',
+      ...theme.shadows.xs,
+    },
+    cardInfo: { flex: 1 },
+    cardName: { ...theme.textStyles.h4, color: theme.colors.text.primary, marginBottom: theme.spacing.xs },
+    cardIssuer: { ...theme.textStyles.bodySmall, color: theme.colors.text.secondary, marginBottom: theme.spacing.xs },
+    cardReward: { ...theme.textStyles.bodySmall, color: theme.colors.primary.main, marginBottom: 2 },
+    cardAnnualFee: { ...theme.textStyles.caption, color: theme.colors.success.main, marginBottom: theme.spacing.xs },
+    cardCategories: { ...theme.textStyles.caption, color: theme.colors.text.tertiary },
+    removeButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: theme.colors.error.main,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: theme.spacing.md,
+    },
+    removeButtonText: { color: theme.colors.error.contrast, fontSize: 16, fontWeight: '700' },
+    emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
+    emptyStateIcon: { fontSize: 64, marginBottom: theme.spacing.lg },
+    emptyStateTitle: { ...theme.textStyles.h2, color: theme.colors.text.primary, marginBottom: theme.spacing.sm },
+    emptyStateText: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.secondary,
+      textAlign: 'center',
+      marginBottom: theme.spacing.xl,
+    },
+    addButtonLarge: {
+      backgroundColor: theme.colors.primary.main,
+      paddingHorizontal: theme.spacing.xl,
+      paddingVertical: theme.spacing.inputPadding,
+      borderRadius: theme.borderRadius.md,
+    },
+    addButtonLargeText: { ...theme.textStyles.button, color: theme.colors.primary.contrast },
+    fab: {
+      position: 'absolute',
+      right: 20,
+      bottom: 20,
+      width: theme.layout.fabSize,
+      height: theme.layout.fabSize,
+      borderRadius: theme.layout.fabSize / 2,
+      backgroundColor: theme.colors.primary.main,
+      alignItems: 'center',
+      justifyContent: 'center',
+      ...theme.shadows.md,
+    },
+    fabText: { color: theme.colors.primary.contrast, fontSize: 28, fontWeight: '400', marginTop: -2 },
+    modalContainer: { flex: 1, backgroundColor: theme.colors.background.primary },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: theme.spacing.screenPadding,
+      backgroundColor: theme.colors.background.secondary,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.light,
+    },
+    modalTitle: { ...theme.textStyles.h4, color: theme.colors.text.primary },
+    modalClose: { ...theme.textStyles.button, color: theme.colors.primary.main },
+    searchInput: {
+      backgroundColor: theme.colors.background.secondary,
+      margin: theme.spacing.screenPadding,
+      padding: theme.spacing.md,
+      borderRadius: theme.borderRadius.md,
+      ...theme.textStyles.body,
+      color: theme.colors.text.primary,
+      borderWidth: 1,
+      borderColor: theme.colors.border.light,
+    },
+    pickerListContent: { paddingHorizontal: theme.spacing.screenPadding, paddingBottom: 20 },
+    pickerItem: {
+      backgroundColor: theme.colors.background.secondary,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.inputPadding,
+      marginBottom: theme.spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    pickerItemDisabled: { opacity: 0.6 },
+    pickerItemInfo: { flex: 1 },
+    pickerItemName: { ...theme.textStyles.body, fontWeight: '500', color: theme.colors.text.primary, marginBottom: 2 },
+    pickerItemIssuer: { ...theme.textStyles.bodySmall, color: theme.colors.text.secondary, marginBottom: 2 },
+    pickerItemReward: { ...theme.textStyles.caption, color: theme.colors.primary.main },
+    pickerItemAnnualFee: { ...theme.textStyles.caption, color: theme.colors.success.main, marginBottom: 2 },
+    pickerItemTextDisabled: { color: theme.colors.text.tertiary },
+    ownedBadge: { ...theme.textStyles.caption, color: theme.colors.success.main, fontWeight: '600', marginLeft: theme.spacing.sm },
+    loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
+    loadingText: { ...theme.textStyles.body, color: theme.colors.text.secondary },
+  });
