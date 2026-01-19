@@ -121,7 +121,7 @@ function StoreOptionItem({
 }: {
   option: PricedStoreOption;
   onCardPress: (card: Card) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, string | number>) => string;
 }) {
   return (
     <View style={styles.storeOptionItem}>

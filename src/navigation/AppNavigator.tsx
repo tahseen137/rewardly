@@ -3,12 +3,13 @@
  */
 
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, StyleSheet } from 'react-native';
 
 import { HomeScreen, MyCardsScreen, SettingsScreen, ProductSearchScreen } from '../screens';
-import { ErrorBoundary } from '../components';
+import { ErrorBoundary, Icon } from '../components';
+import { useTheme } from '../theme';
 
 export type RootTabParamList = {
   Home: undefined;
@@ -20,20 +21,22 @@ export type RootTabParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 /**
- * Simple icon component using emoji
+ * Tab icon component using Icon component
  */
-function TabIcon({ name, focused }: { name: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    Home: '🏠',
-    ProductSearch: '🔍',
-    MyCards: '💳',
-    Settings: '⚙️',
+function TabIcon({ name, focused, color }: { name: string; focused: boolean; color: string }) {
+  const iconMap: Record<string, string> = {
+    Home: 'home',
+    ProductSearch: 'search',
+    MyCards: 'cards',
+    Settings: 'settings',
   };
 
   return (
-    <Text style={[styles.icon, focused && styles.iconFocused]}>
-      {icons[name] || '•'}
-    </Text>
+    <Icon
+      name={iconMap[name] || 'home'}
+      size={focused ? 26 : 24}
+      color={color}
+    />
   );
 }
 
@@ -85,19 +88,50 @@ function ProductSearchScreenWithErrorBoundary() {
 }
 
 export default function AppNavigator() {
+  const theme = useTheme();
+
+  // Create navigation theme based on app theme
+  const navigationTheme = theme.isDark
+    ? {
+        ...DarkTheme,
+        colors: {
+          ...DarkTheme.colors,
+          primary: theme.colors.primary.main,
+          background: theme.colors.background.primary,
+          card: theme.colors.background.secondary,
+          text: theme.colors.text.primary,
+          border: theme.colors.border.light,
+        },
+      }
+    : {
+        ...DefaultTheme,
+        colors: {
+          ...DefaultTheme.colors,
+          primary: theme.colors.primary.main,
+          background: theme.colors.background.primary,
+          card: theme.colors.background.secondary,
+          text: theme.colors.text.primary,
+          border: theme.colors.border.light,
+        },
+      };
+
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navigationTheme}>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused }) => (
-            <TabIcon name={route.name} focused={focused} />
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon name={route.name} focused={focused} color={color} />
           ),
-          tabBarActiveTintColor: '#007AFF',
-          tabBarInactiveTintColor: '#8E8E93',
-          headerStyle: {
-            backgroundColor: '#007AFF',
+          tabBarActiveTintColor: theme.colors.primary.main,
+          tabBarInactiveTintColor: theme.colors.text.tertiary,
+          tabBarStyle: {
+            backgroundColor: theme.colors.background.secondary,
+            borderTopColor: theme.colors.border.light,
           },
-          headerTintColor: '#fff',
+          headerStyle: {
+            backgroundColor: theme.colors.primary.main,
+          },
+          headerTintColor: theme.colors.primary.contrast,
           headerTitleStyle: {
             fontWeight: 'bold',
           },
@@ -140,11 +174,4 @@ export default function AppNavigator() {
   );
 }
 
-const styles = StyleSheet.create({
-  icon: {
-    fontSize: 24,
-  },
-  iconFocused: {
-    transform: [{ scale: 1.1 }],
-  },
-});
+// Styles removed - using theme-based Icon component
