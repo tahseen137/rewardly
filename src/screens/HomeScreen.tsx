@@ -8,7 +8,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   FlatList,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -17,6 +16,7 @@ import {
   Modal,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { SearchInput, EmptyState } from '../components';
 
 import {
   Card,
@@ -104,7 +104,7 @@ function CardDetailModal({
   visible: boolean;
   onClose: () => void;
   currentRewardRate?: { value: number; type: RewardType; unit: 'percent' | 'multiplier' };
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, string | number>) => string;
 }) {
   if (!card) return null;
 
@@ -453,43 +453,27 @@ export default function HomeScreen() {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder={t('home.searchPlaceholder')}
-          value={searchQuery}
-          onChangeText={(text) => {
-            setSearchQuery(text);
-            setShowSuggestions(text.length >= 2);
-            if (!text.trim()) {
-              setRecommendation(null);
-              setGoogleSuggestions([]);
-            } else if (googlePlacesEnabled) {
-              fetchGoogleSuggestions(text);
-            }
-          }}
-          onSubmitEditing={() => handleSearch(searchQuery)}
-          returnKeyType="search"
-          autoCapitalize="none"
-          autoCorrect={false}
-          accessibilityLabel={t('home.searchPlaceholder')}
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity
-            style={styles.clearButton}
-            onPress={() => {
-              setSearchQuery('');
-              setRecommendation(null);
-              setShowSuggestions(false);
-              setGoogleSuggestions([]);
-            }}
-            accessibilityLabel={t('home.clearSearch')}
-            accessibilityRole="button"
-          >
-            <Text style={styles.clearButtonText}>✕</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      <SearchInput
+        value={searchQuery}
+        onChangeText={(text) => {
+          setSearchQuery(text);
+          setShowSuggestions(text.length >= 2);
+          if (!text.trim()) {
+            setRecommendation(null);
+            setGoogleSuggestions([]);
+          } else if (googlePlacesEnabled) {
+            fetchGoogleSuggestions(text);
+          }
+        }}
+        onClear={() => {
+          setRecommendation(null);
+          setShowSuggestions(false);
+          setGoogleSuggestions([]);
+        }}
+        onSubmit={() => handleSearch(searchQuery)}
+        placeholder={t('home.searchPlaceholder')}
+        containerStyle={styles.searchContainer}
+      />
 
       {showSuggestions && (storeSuggestions.length > 0 || googleSuggestions.length > 0) && (
         <View style={styles.suggestionsContainer}>
@@ -510,19 +494,19 @@ export default function HomeScreen() {
 
       <ScrollView style={styles.resultsContainer} contentContainerStyle={styles.resultsContent} keyboardShouldPersistTaps="handled">
         {!hasCards && searchQuery.length > 0 && (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateIcon}>💳</Text>
-            <Text style={styles.emptyStateTitle}>{t('home.noCardsTitle')}</Text>
-            <Text style={styles.emptyStateText}>{t('home.noCardsText')}</Text>
-          </View>
+          <EmptyState
+            icon="cards"
+            title={t('home.noCardsTitle')}
+            description={t('home.noCardsText')}
+          />
         )}
 
         {hasCards && !recommendation && !showSuggestions && (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateIcon}>🔍</Text>
-            <Text style={styles.emptyStateTitle}>{t('home.findBestCardTitle')}</Text>
-            <Text style={styles.emptyStateText}>{t('home.findBestCardText')}</Text>
-          </View>
+          <EmptyState
+            icon="search"
+            title={t('home.findBestCardTitle')}
+            description={t('home.findBestCardText')}
+          />
         )}
 
         {recommendation && (
@@ -558,11 +542,12 @@ export default function HomeScreen() {
         )}
 
         {hasCards && searchQuery.length > 0 && !recommendation && !showSuggestions && (
-          <View style={styles.notFoundState}>
-            <Text style={styles.notFoundIcon}>🤔</Text>
-            <Text style={styles.notFoundTitle}>{t('home.storeNotFoundTitle')}</Text>
-            <Text style={styles.notFoundText}>{t('home.storeNotFoundText', { storeName: searchQuery })}</Text>
-          </View>
+          <EmptyState
+            icon="notFound"
+            title={t('home.storeNotFoundTitle')}
+            description={t('home.storeNotFoundText', { storeName: searchQuery })}
+            compact
+          />
         )}
       </ScrollView>
 
@@ -581,22 +566,9 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F2F2F7' },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
     margin: 16,
     marginBottom: 0,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
   },
-  searchInput: { flex: 1, paddingVertical: 14, fontSize: 16 },
-  clearButton: { padding: 8 },
-  clearButtonText: { fontSize: 16, color: '#8E8E93' },
   suggestionsContainer: {
     backgroundColor: '#fff',
     marginHorizontal: 16,
@@ -614,14 +586,6 @@ const styles = StyleSheet.create({
   suggestionCategory: { fontSize: 13, color: '#8E8E93', marginTop: 2, textTransform: 'capitalize' },
   resultsContainer: { flex: 1 },
   resultsContent: { padding: 16, paddingBottom: 40 },
-  emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
-  emptyStateIcon: { fontSize: 48, marginBottom: 16 },
-  emptyStateTitle: { fontSize: 20, fontWeight: '600', color: '#000', marginBottom: 8 },
-  emptyStateText: { fontSize: 15, color: '#666', textAlign: 'center', paddingHorizontal: 20 },
-  notFoundState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 40 },
-  notFoundIcon: { fontSize: 40, marginBottom: 12 },
-  notFoundTitle: { fontSize: 18, fontWeight: '600', color: '#000', marginBottom: 8 },
-  notFoundText: { fontSize: 14, color: '#666', textAlign: 'center', paddingHorizontal: 20 },
   storeHeader: { marginBottom: 16 },
   storeName: { fontSize: 24, fontWeight: 'bold', color: '#000' },
   storeCategory: { fontSize: 14, color: '#8E8E93', marginTop: 4, textTransform: 'capitalize' },
@@ -653,6 +617,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   rankBadge: {
     width: 28,
