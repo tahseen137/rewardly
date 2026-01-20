@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme, Theme } from '../theme';
+import { CardDetailModal, RewardBadge, BottomSheet } from '../components';
 
 import {
   Card,
@@ -50,55 +51,6 @@ function getRewardTypeLabelKey(type: RewardType): string {
   return keys[type] || type;
 }
 
-function CardDetailModal({
-  card,
-  visible,
-  onClose,
-  t,
-  theme,
-}: {
-  card: Card | null;
-  visible: boolean;
-  onClose: () => void;
-  t: (key: string) => string;
-  theme: Theme;
-}) {
-  const styles = useMemo(() => createStyles(theme), [theme]);
-
-  if (!card) return null;
-
-  const formatAnnualFee = (fee?: number) => (fee === undefined || fee === 0 ? t('cardDetail.noFee') : `$${fee}/year`);
-
-  return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>{card.name}</Text>
-          <TouchableOpacity onPress={onClose} accessibilityLabel={t('common.close')} accessibilityRole="button">
-            <Text style={styles.modalClose}>{t('common.done')}</Text>
-          </TouchableOpacity>
-        </View>
-        <ScrollView style={styles.modalContent}>
-          <View style={styles.cardDetailHeader}>
-            <Text style={styles.cardDetailIssuer}>{card.issuer}</Text>
-            <Text style={styles.cardDetailProgram}>{card.rewardProgram}</Text>
-            <Text style={styles.cardDetailAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
-          </View>
-          <View style={styles.detailSection}>
-            <Text style={styles.detailSectionTitle}>{t('cardDetail.baseReward')}</Text>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>{t('cardDetail.allPurchases')}</Text>
-              <Text style={styles.detailValue}>
-                {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.unit)}{' '}
-                {t(getRewardTypeLabelKey(card.baseRewardRate.type))}
-              </Text>
-            </View>
-          </View>
-        </ScrollView>
-      </View>
-    </Modal>
-  );
-}
 
 function StoreOptionItem({
   option,
@@ -305,7 +257,7 @@ export default function ProductSearchScreen() {
         )}
       </ScrollView>
 
-      <CardDetailModal card={selectedCard} visible={showCardDetail} onClose={() => setShowCardDetail(false)} t={t} theme={theme} />
+      <CardDetailModal card={selectedCard} visible={showCardDetail} onClose={() => setShowCardDetail(false)} />
     </KeyboardAvoidingView>
   );
 }

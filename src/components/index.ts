@@ -36,3 +36,10 @@ export {
   SkeletonListItem,
   SkeletonSearchResult,
 } from './SkeletonLoader';
+
+// Phase 2 Components - UI Redesign
+export { CardDetailModal } from './CardDetailModal';
+export { RewardBadge } from './RewardBadge';
+export { CardVisual } from './CardVisual';
+export { BottomSheet } from './BottomSheet';
+export { Toast } from './Toast';
