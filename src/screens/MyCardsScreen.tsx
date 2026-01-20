@@ -15,6 +15,8 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from 'react-native-reanimated';
 import { useTheme, Theme } from '../theme';
 import { CardVisual } from '../components';
 import { Card, UserCard, RewardType } from '../types';
@@ -44,6 +46,7 @@ function CardItem({
 }) {
   const styles = useMemo(() => createStyles(theme), [theme]);
   const card = getCardByIdSync(userCard.cardId);
+  const translateX = useSharedValue(0);
 
   if (!card) return null;
 
@@ -52,32 +55,55 @@ function CardItem({
     return `$${fee}/year`;
   };
 
+  const panGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      translateX.value = Math.min(0, event.translationX);
+    })
+    .onEnd(() => {
+      if (translateX.value < -80) {
+        runOnJS(onRemove)(card.id);
+      } else {
+        translateX.value = withSpring(0);
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
+
   return (
-    <View style={styles.cardItem}>
-      <CardVisual
-        name={card.name}
-        issuer={card.issuer}
-        size="medium"
-      />
-      <View style={styles.cardDetails}>
-        <Text style={styles.cardAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
-        <Text style={styles.cardReward}>
-          Base: {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.type, card.baseRewardRate.unit)}
-        </Text>
-        {card.categoryRewards.length > 0 && (
-          <Text style={styles.cardCategories}>
-            Bonus: {card.categoryRewards.length} categories
-          </Text>
-        )}
+    <View style={styles.cardItemContainer}>
+      <View style={styles.deleteBackground}>
+        <Text style={styles.deleteText}>Delete</Text>
       </View>
-      <TouchableOpacity
-        style={styles.removeButton}
-        onPress={() => onRemove(card.id)}
-        accessibilityLabel={`Remove ${card.name}`}
-        accessibilityRole="button"
-      >
-        <Text style={styles.removeButtonText}>Remove</Text>
-      </TouchableOpacity>
+      <GestureDetector gesture={panGesture}>
+        <Animated.View style={[styles.cardItem, animatedStyle]}>
+          <CardVisual
+            name={card.name}
+            issuer={card.issuer}
+            size="medium"
+          />
+          <View style={styles.cardDetails}>
+            <Text style={styles.cardAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
+            <Text style={styles.cardReward}>
+              Base: {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.type, card.baseRewardRate.unit)}
+            </Text>
+            {card.categoryRewards.length > 0 && (
+              <Text style={styles.cardCategories}>
+                Bonus: {card.categoryRewards.length} categories
+              </Text>
+            )}
+          </View>
+          <TouchableOpacity
+            style={styles.removeButton}
+            onPress={() => onRemove(card.id)}
+            accessibilityLabel={`Remove ${card.name}`}
+            accessibilityRole="button"
+          >
+            <Text style={styles.removeButtonText}>Remove</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 }
@@ -304,11 +330,31 @@ const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.colors.background.primary },
     listContent: { padding: theme.spacing.screenPadding, paddingBottom: 80 },
+    cardItemContainer: {
+      position: 'relative',
+      marginBottom: theme.spacing.lg,
+    },
+    deleteBackground: {
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      bottom: 0,
+      backgroundColor: theme.colors.error.main,
+      justifyContent: 'center',
+      alignItems: 'flex-end',
+      paddingRight: theme.spacing.lg,
+      borderRadius: theme.borderRadius.lg,
+      width: '100%',
+    },
+    deleteText: {
+      color: theme.colors.error.contrast,
+      fontWeight: '600',
+      fontSize: 16,
+    },
     cardItem: {
       backgroundColor: theme.colors.background.secondary,
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.lg,
-      marginBottom: theme.spacing.lg,
       alignItems: 'center',
       ...theme.shadows.card,
     },

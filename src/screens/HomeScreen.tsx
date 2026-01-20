@@ -15,6 +15,7 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { SearchInput, EmptyState, CardDetailModal, RewardBadge, CardVisual } from '../components';
 import { useTheme, Theme } from '../theme';
@@ -133,28 +134,29 @@ function CardsByTypeSection({
   const rankedCashBack = rankCards(cashBackCards);
   const rankedPoints = rankCards(pointsCards);
 
-  const renderCardItem = (rc: RankedCard & { sectionRank: number }) => (
-    <TouchableOpacity
-      key={rc.card.id}
-      style={styles.rankedCardItem}
-      onPress={() => onCardPress(rc)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.rankBadge}>
-        <Text style={styles.rankText}>#{rc.sectionRank}</Text>
-      </View>
-      <View style={styles.rankedCardInfo}>
-        <Text style={styles.rankedCardName}>{rc.card.name}</Text>
-        <Text style={styles.rankedCardIssuer}>{rc.card.issuer}</Text>
-      </View>
-      <View style={styles.rankedCardReward}>
-        <Text style={styles.rankedCardRewardValue}>
-          {formatRewardRate(rc.rewardRate.value, rc.rewardRate.unit)}
-        </Text>
-        <Text style={styles.rankedCardRewardType}>{t(getRewardTypeLabelKey(rc.rewardRate.type))}</Text>
-      </View>
-      <Text style={styles.chevron}>›</Text>
-    </TouchableOpacity>
+  const renderCardItem = (rc: RankedCard & { sectionRank: number }, index: number) => (
+    <Animated.View key={rc.card.id} entering={FadeInDown.delay(index * 100).springify()}>
+      <TouchableOpacity
+        style={styles.rankedCardItem}
+        onPress={() => onCardPress(rc)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.rankBadge}>
+          <Text style={styles.rankText}>#{rc.sectionRank}</Text>
+        </View>
+        <View style={styles.rankedCardInfo}>
+          <Text style={styles.rankedCardName}>{rc.card.name}</Text>
+          <Text style={styles.rankedCardIssuer}>{rc.card.issuer}</Text>
+        </View>
+        <View style={styles.rankedCardReward}>
+          <Text style={styles.rankedCardRewardValue}>
+            {formatRewardRate(rc.rewardRate.value, rc.rewardRate.unit)}
+          </Text>
+          <Text style={styles.rankedCardRewardType}>{t(getRewardTypeLabelKey(rc.rewardRate.type))}</Text>
+        </View>
+        <Text style={styles.chevron}>›</Text>
+      </TouchableOpacity>
+    </Animated.View>
   );
 
   return (
@@ -164,7 +166,7 @@ function CardsByTypeSection({
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionLabel}>{t('home.cashBackCards')}</Text>
           </View>
-          {rankedCashBack.map(renderCardItem)}
+          {rankedCashBack.map((rc, index) => renderCardItem(rc, index))}
         </View>
       )}
       {rankedPoints.length > 0 && (
@@ -172,7 +174,7 @@ function CardsByTypeSection({
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionLabel}>{t('home.pointsMilesCards')}</Text>
           </View>
-          {rankedPoints.map(renderCardItem)}
+          {rankedPoints.map((rc, index) => renderCardItem(rc, index))}
         </View>
       )}
     </>
