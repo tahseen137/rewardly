@@ -1,7 +1,7 @@
 /**
  * PriceComparisonService - Calculates effective prices with reward values
  * Combines price data with card rewards to find the best overall deal
- * 
+ *
  * Requirements: 6.1-6.6
  */
 
@@ -32,7 +32,7 @@ import { getAllStores } from './StoreDataService';
 
 /**
  * Calculate the reward value in CAD for a purchase
- * 
+ *
  * @param price - Purchase price in CAD
  * @param rewardRate - Reward rate (percentage)
  * @param rewardType - Type of reward
@@ -53,7 +53,7 @@ export function calculateRewardValue(
   };
 
   const pointValue = pointValues[rewardType];
-  
+
   // Calculate reward: price * (rate/100) * pointValue
   // For cashback: $100 * 3% * 1 = $3
   // For points: $100 * 5x * 0.01 = $5 (5 points per dollar, 1 cent per point)
@@ -63,7 +63,7 @@ export function calculateRewardValue(
 /**
  * Calculate effective price (price minus reward value)
  * Requirement 6.3, 6.4
- * 
+ *
  * @param price - Purchase price in CAD
  * @param rewardValue - Reward value in CAD
  * @returns Effective price in CAD
@@ -88,15 +88,15 @@ function buildPricedStoreOption(
   const price = storePrice.price;
   const priceAvailable = price !== null;
   const rewardRate = bestCard?.rewardRate.value ?? 0;
-  
+
   let rewardValue = 0;
   let effectivePrice: number | null = null;
-  
+
   if (priceAvailable && price !== null) {
     rewardValue = calculateRewardValue(price, rewardRate, rewardType);
     effectivePrice = calculateEffectivePrice(price, rewardValue);
   }
-  
+
   return {
     store,
     bestCard,
@@ -117,7 +117,7 @@ function sortStoreOptions(
   sortBy: PriceSortOption
 ): PricedStoreOption[] {
   const sorted = [...options];
-  
+
   switch (sortBy) {
     case PriceSortOption.LOWEST_PRICE:
       // Sort by price ascending, unavailable prices at the end
@@ -128,12 +128,12 @@ function sortStoreOptions(
         return (a.price ?? 0) - (b.price ?? 0);
       });
       break;
-      
+
     case PriceSortOption.HIGHEST_REWARDS:
       // Sort by reward rate descending
       sorted.sort((a, b) => b.rewardRate - a.rewardRate);
       break;
-      
+
     case PriceSortOption.LOWEST_EFFECTIVE_PRICE:
       // Sort by effective price ascending, unavailable at the end
       // Requirement 6.6: Rank by reward rate only when price unavailable
@@ -148,10 +148,9 @@ function sortStoreOptions(
       });
       break;
   }
-  
+
   return sorted;
 }
-
 
 /**
  * Find the best option for each criteria
@@ -162,27 +161,31 @@ function findBestOptions(options: PricedStoreOption[]): {
   lowestEffectivePrice: PricedStoreOption | null;
 } {
   const withPrices = options.filter((o) => o.priceAvailable);
-  
-  const lowestPrice = withPrices.length > 0
-    ? withPrices.reduce((min, o) => (o.price ?? Infinity) < (min.price ?? Infinity) ? o : min)
-    : null;
-    
-  const highestRewards = options.length > 0
-    ? options.reduce((max, o) => o.rewardRate > max.rewardRate ? o : max)
-    : null;
-    
-  const lowestEffectivePrice = withPrices.length > 0
-    ? withPrices.reduce((min, o) => 
-        (o.effectivePrice ?? Infinity) < (min.effectivePrice ?? Infinity) ? o : min)
-    : null;
-    
+
+  const lowestPrice =
+    withPrices.length > 0
+      ? withPrices.reduce((min, o) => ((o.price ?? Infinity) < (min.price ?? Infinity) ? o : min))
+      : null;
+
+  const highestRewards =
+    options.length > 0
+      ? options.reduce((max, o) => (o.rewardRate > max.rewardRate ? o : max))
+      : null;
+
+  const lowestEffectivePrice =
+    withPrices.length > 0
+      ? withPrices.reduce((min, o) =>
+          (o.effectivePrice ?? Infinity) < (min.effectivePrice ?? Infinity) ? o : min
+        )
+      : null;
+
   return { lowestPrice, highestRewards, lowestEffectivePrice };
 }
 
 /**
  * Get price comparison for a product across all stores that sell it
  * Requirements: 6.1-6.6
- * 
+ *
  * @param productName - Name of the product to search for
  * @param portfolio - User's card portfolio
  * @param preferences - User's preferences
@@ -197,39 +200,35 @@ export function getPriceComparison(
 ): Result<PriceComparisonResult, RecommendationError> {
   // Search for the product
   const productResult = searchProduct(productName);
-  
+
   if (!productResult.success) {
     return failure({ type: 'PRODUCT_NOT_FOUND', productName });
   }
-  
+
   const { product, stores } = productResult.value;
-  
+
   if (stores.length === 0) {
     return failure({ type: 'PRODUCT_NOT_FOUND', productName });
   }
-  
+
   // Get user's cards
   const userCards = portfolio
     .map((uc) => getCardByIdSync(uc.cardId))
     .filter((c): c is NonNullable<typeof c> => c !== null);
-  
+
   // Get store IDs
   const storeIds = stores.map((s) => s.id);
-  
+
   // Lookup prices for all stores
   const priceLookup = lookupPrices(product.id, storeIds);
   const priceMap = new Map(priceLookup.prices.map((p) => [p.storeId, p]));
-  
+
   // Build priced store options
   const storeOptions: PricedStoreOption[] = stores.map((store) => {
     // Rank cards for this store's category
-    const rankedCards = rankCardsForCategory(
-      store.category,
-      userCards,
-      preferences.rewardType
-    );
+    const rankedCards = rankCardsForCategory(store.category, userCards, preferences.rewardType);
     const bestCard = rankedCards.length > 0 ? rankedCards[0] : null;
-    
+
     // Get price for this store
     const storePrice = priceMap.get(store.id) ?? {
       storeId: store.id,
@@ -237,16 +236,16 @@ export function getPriceComparison(
       currency: 'CAD',
       lastUpdated: null,
     };
-    
+
     return buildPricedStoreOption(store, storePrice, bestCard, preferences.rewardType);
   });
-  
+
   // Sort options
   const sortedOptions = sortStoreOptions(storeOptions, sortBy);
-  
+
   // Find best options
   const bestOptions = findBestOptions(storeOptions);
-  
+
   return success({
     productName: product.name,
     productId: product.id,
@@ -257,11 +256,10 @@ export function getPriceComparison(
   });
 }
 
-
 /**
  * Get price comparison with a different sort order
  * Requirement 6.5: Allow sorting by different criteria
- * 
+ *
  * @param result - Existing price comparison result
  * @param sortBy - New sort order
  * @returns New PriceComparisonResult with updated sort order
@@ -271,7 +269,7 @@ export function resortPriceComparison(
   sortBy: PriceSortOption
 ): PriceComparisonResult {
   const sortedOptions = sortStoreOptions(result.storeOptions, sortBy);
-  
+
   return {
     ...result,
     storeOptions: sortedOptions,
@@ -281,7 +279,7 @@ export function resortPriceComparison(
 
 /**
  * Format price for display
- * 
+ *
  * @param price - Price in CAD
  * @returns Formatted price string
  */
@@ -294,7 +292,7 @@ export function formatPrice(price: number | null): string {
 
 /**
  * Format reward value for display
- * 
+ *
  * @param rewardValue - Reward value in CAD
  * @returns Formatted reward string
  */
@@ -308,7 +306,7 @@ export function formatRewardValue(rewardValue: number): string {
 /**
  * Format effective price for display
  * Requirement 6.4: Show effective price for comparison
- * 
+ *
  * @param effectivePrice - Effective price in CAD
  * @returns Formatted effective price string
  */
@@ -321,23 +319,22 @@ export function formatEffectivePrice(effectivePrice: number | null): string {
 
 /**
  * Get a summary of the best deal
- * 
+ *
  * @param result - Price comparison result
  * @returns Summary string describing the best deal
  */
 export function getBestDealSummary(result: PriceComparisonResult): string {
   const best = result.lowestEffectivePrice;
-  
+
   if (!best) {
     return 'No price data available for comparison.';
   }
-  
+
   const storeName = best.store.name;
   const cardName = best.bestCard?.card.name ?? 'any card';
   const effectivePrice = formatEffectivePrice(best.effectivePrice);
-  const savings = best.rewardValue > 0 
-    ? ` (save ${formatRewardValue(best.rewardValue)} in rewards)`
-    : '';
-  
+  const savings =
+    best.rewardValue > 0 ? ` (save ${formatRewardValue(best.rewardValue)} in rewards)` : '';
+
   return `Best deal: ${storeName} with ${cardName} for ${effectivePrice}${savings}`;
 }

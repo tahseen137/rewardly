@@ -31,13 +31,7 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
     Settings: 'settings',
   };
 
-  return (
-    <Icon
-      name={iconMap[name] || 'home'}
-      size={focused ? 26 : 24}
-      color={color}
-    />
-  );
+  return <Icon name={iconMap[name] || 'home'} size={focused ? 26 : 24} color={color} />;
 }
 
 /**

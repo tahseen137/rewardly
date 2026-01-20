@@ -71,7 +71,9 @@ export const GOOGLE_PLACES_CONFIG = {
  * Check if Google Places API is configured
  */
 export function isGooglePlacesConfigured(): boolean {
-  return Boolean(GOOGLE_PLACES_CONFIG.apiKey && GOOGLE_PLACES_CONFIG.apiKey !== 'your-google-places-api-key-here');
+  return Boolean(
+    GOOGLE_PLACES_CONFIG.apiKey && GOOGLE_PLACES_CONFIG.apiKey !== 'your-google-places-api-key-here'
+  );
 }
 
 /**

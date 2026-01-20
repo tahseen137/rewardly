@@ -5,10 +5,7 @@
 
 import * as fc from 'fast-check';
 import { getAllCardsSync } from '../../CardDataService';
-import {
-  rankCardsForCategory,
-  getRewardRateForCategory,
-} from '../../RecommendationEngine';
+import { rankCardsForCategory, getRewardRateForCategory } from '../../RecommendationEngine';
 import { SpendingCategory, RewardType, Card } from '../../../types';
 
 // Get all cards and categories for testing
@@ -126,7 +123,6 @@ describe('Property 5: Card Ranking by Reward Rate', () => {
   });
 });
 
-
 describe('Property 6: Reward Type Filtering', () => {
   /**
    * Feature: rewards-optimizer, Property 6: Reward Type Filtering
@@ -139,58 +135,54 @@ describe('Property 6: Reward Type Filtering', () => {
 
   it('should prefer matching reward type when rates are equal', () => {
     fc.assert(
-      fc.property(
-        categoryArbitrary,
-        rewardTypeArbitrary,
-        (category, preferredType) => {
-          // Find cards with the same reward rate but different types for this category
-          const cardsWithRates = allCards.map((card) => ({
-            card,
-            rate: getRewardRateForCategory(card, category),
-          }));
+      fc.property(categoryArbitrary, rewardTypeArbitrary, (category, preferredType) => {
+        // Find cards with the same reward rate but different types for this category
+        const cardsWithRates = allCards.map((card) => ({
+          card,
+          rate: getRewardRateForCategory(card, category),
+        }));
 
-          // Group cards by rate value
-          const rateGroups = new Map<number, typeof cardsWithRates>();
-          for (const item of cardsWithRates) {
-            const key = item.rate.value;
-            if (!rateGroups.has(key)) {
-              rateGroups.set(key, []);
-            }
-            rateGroups.get(key)!.push(item);
+        // Group cards by rate value
+        const rateGroups = new Map<number, typeof cardsWithRates>();
+        for (const item of cardsWithRates) {
+          const key = item.rate.value;
+          if (!rateGroups.has(key)) {
+            rateGroups.set(key, []);
           }
-
-          // Find a group with mixed reward types
-          for (const [, group] of rateGroups) {
-            const hasPreferred = group.some((item) => item.rate.type === preferredType);
-            const hasOther = group.some((item) => item.rate.type !== preferredType);
-
-            if (hasPreferred && hasOther && group.length >= 2) {
-              // Test with this group
-              const cards = group.map((item) => item.card);
-              const ranked = rankCardsForCategory(category, cards, preferredType);
-
-              // Find the boundary where preferred type cards end
-              let lastPreferredIndex = -1;
-              let firstNonPreferredIndex = ranked.length;
-
-              for (let i = 0; i < ranked.length; i++) {
-                if (ranked[i].rewardRate.type === preferredType) {
-                  lastPreferredIndex = i;
-                } else if (firstNonPreferredIndex === ranked.length) {
-                  firstNonPreferredIndex = i;
-                }
-              }
-
-              // All preferred type cards should come before non-preferred when rates are equal
-              if (lastPreferredIndex !== -1 && firstNonPreferredIndex !== ranked.length) {
-                expect(lastPreferredIndex).toBeLessThan(firstNonPreferredIndex);
-              }
-              return; // Found a valid test case
-            }
-          }
-          // If no mixed group found, test passes trivially
+          rateGroups.get(key)!.push(item);
         }
-      ),
+
+        // Find a group with mixed reward types
+        for (const [, group] of rateGroups) {
+          const hasPreferred = group.some((item) => item.rate.type === preferredType);
+          const hasOther = group.some((item) => item.rate.type !== preferredType);
+
+          if (hasPreferred && hasOther && group.length >= 2) {
+            // Test with this group
+            const cards = group.map((item) => item.card);
+            const ranked = rankCardsForCategory(category, cards, preferredType);
+
+            // Find the boundary where preferred type cards end
+            let lastPreferredIndex = -1;
+            let firstNonPreferredIndex = ranked.length;
+
+            for (let i = 0; i < ranked.length; i++) {
+              if (ranked[i].rewardRate.type === preferredType) {
+                lastPreferredIndex = i;
+              } else if (firstNonPreferredIndex === ranked.length) {
+                firstNonPreferredIndex = i;
+              }
+            }
+
+            // All preferred type cards should come before non-preferred when rates are equal
+            if (lastPreferredIndex !== -1 && firstNonPreferredIndex !== ranked.length) {
+              expect(lastPreferredIndex).toBeLessThan(firstNonPreferredIndex);
+            }
+            return; // Found a valid test case
+          }
+        }
+        // If no mixed group found, test passes trivially
+      }),
       { numRuns: 100 }
     );
   });
@@ -221,7 +213,6 @@ describe('Property 6: Reward Type Filtering', () => {
   });
 });
 
-
 describe('Property 7: Base Rate Fallback', () => {
   /**
    * Feature: rewards-optimizer, Property 7: Base Rate Fallback
@@ -233,9 +224,7 @@ describe('Property 7: Base Rate Fallback', () => {
 
   // Find cards that have no bonus for a specific category
   function getCardsWithoutCategoryBonus(cards: Card[], category: SpendingCategory): Card[] {
-    return cards.filter(
-      (card) => !card.categoryRewards.some((cr) => cr.category === category)
-    );
+    return cards.filter((card) => !card.categoryRewards.some((cr) => cr.category === category));
   }
 
   it('should use base rate when no category bonus exists', () => {

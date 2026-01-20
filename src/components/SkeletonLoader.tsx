@@ -18,12 +18,7 @@ interface SkeletonProps {
 /**
  * Skeleton - Basic skeleton placeholder with shimmer animation
  */
-export function Skeleton({
-  width = '100%',
-  height = 16,
-  borderRadius = 4,
-  style,
-}: SkeletonProps) {
+export function Skeleton({ width = '100%', height = 16, borderRadius = 4, style }: SkeletonProps) {
   const theme = useTheme();
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
@@ -164,12 +159,7 @@ export function SkeletonListItem({ hasAvatar = false, style }: SkeletonListItemP
       ]}
     >
       {hasAvatar && (
-        <Skeleton
-          width={40}
-          height={40}
-          borderRadius={20}
-          style={{ marginRight: 12 }}
-        />
+        <Skeleton width={40} height={40} borderRadius={20} style={{ marginRight: 12 }} />
       )}
       <View style={styles.listItemContent}>
         <Skeleton width="60%" height={16} style={{ marginBottom: 6 }} />

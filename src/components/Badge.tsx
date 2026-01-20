@@ -6,7 +6,14 @@ import React from 'react';
 import { View, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { useTheme } from '../theme';
 
-export type BadgeVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'neutral';
+export type BadgeVariant =
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'info'
+  | 'neutral';
 export type BadgeSize = 'small' | 'medium' | 'large';
 
 interface BadgeProps {

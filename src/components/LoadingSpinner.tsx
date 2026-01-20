@@ -3,14 +3,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Animated,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Animated, ViewStyle } from 'react-native';
 import { useTheme } from '../theme';
 
 interface LoadingSpinnerProps {
@@ -20,12 +13,7 @@ interface LoadingSpinnerProps {
   style?: ViewStyle;
 }
 
-export function LoadingSpinner({
-  size = 'large',
-  color,
-  message,
-  style,
-}: LoadingSpinnerProps) {
+export function LoadingSpinner({ size = 'large', color, message, style }: LoadingSpinnerProps) {
   const theme = useTheme();
   const spinnerColor = color || theme.colors.primary.main;
 
@@ -33,9 +21,7 @@ export function LoadingSpinner({
     <View style={[styles.container, style]}>
       <ActivityIndicator size={size} color={spinnerColor} />
       {message && (
-        <Text style={[styles.message, { color: theme.colors.text.secondary }]}>
-          {message}
-        </Text>
+        <Text style={[styles.message, { color: theme.colors.text.secondary }]}>{message}</Text>
       )}
     </View>
   );

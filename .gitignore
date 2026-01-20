@@ -70,3 +70,15 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
+
+# Claude Code
+.claude/
+
+# Temporary files
+nul
+*.tmp
+.temp/
+supabase/.temp/
+
+# SQL query files (development only)
+check_data.sql

@@ -15,6 +15,7 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { SearchInput, EmptyState, CardDetailModal, RewardBadge, CardVisual } from '../components';
 import { useTheme, Theme } from '../theme';
@@ -65,7 +66,6 @@ function formatSignupBonusCurrency(currency: RewardType): string {
   };
   return labels[currency] || currency;
 }
-
 
 // Best Card Section
 function BestCardSection({
@@ -121,9 +121,7 @@ function CardsByTypeSection({
   if (rankedCards.length <= 1) return null;
 
   const cashBackCards = rankedCards.filter((rc) => rc.rewardRate.type === RewardType.CASHBACK);
-  const pointsCards = rankedCards.filter(
-    (rc) => rc.rewardRate.type !== RewardType.CASHBACK
-  );
+  const pointsCards = rankedCards.filter((rc) => rc.rewardRate.type !== RewardType.CASHBACK);
 
   const rankCards = (cards: RankedCard[]) =>
     cards
@@ -133,28 +131,31 @@ function CardsByTypeSection({
   const rankedCashBack = rankCards(cashBackCards);
   const rankedPoints = rankCards(pointsCards);
 
-  const renderCardItem = (rc: RankedCard & { sectionRank: number }) => (
-    <TouchableOpacity
-      key={rc.card.id}
-      style={styles.rankedCardItem}
-      onPress={() => onCardPress(rc)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.rankBadge}>
-        <Text style={styles.rankText}>#{rc.sectionRank}</Text>
-      </View>
-      <View style={styles.rankedCardInfo}>
-        <Text style={styles.rankedCardName}>{rc.card.name}</Text>
-        <Text style={styles.rankedCardIssuer}>{rc.card.issuer}</Text>
-      </View>
-      <View style={styles.rankedCardReward}>
-        <Text style={styles.rankedCardRewardValue}>
-          {formatRewardRate(rc.rewardRate.value, rc.rewardRate.unit)}
-        </Text>
-        <Text style={styles.rankedCardRewardType}>{t(getRewardTypeLabelKey(rc.rewardRate.type))}</Text>
-      </View>
-      <Text style={styles.chevron}>›</Text>
-    </TouchableOpacity>
+  const renderCardItem = (rc: RankedCard & { sectionRank: number }, index: number) => (
+    <Animated.View key={rc.card.id} entering={FadeInDown.delay(index * 100).springify()}>
+      <TouchableOpacity
+        style={styles.rankedCardItem}
+        onPress={() => onCardPress(rc)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.rankBadge}>
+          <Text style={styles.rankText}>#{rc.sectionRank}</Text>
+        </View>
+        <View style={styles.rankedCardInfo}>
+          <Text style={styles.rankedCardName}>{rc.card.name}</Text>
+          <Text style={styles.rankedCardIssuer}>{rc.card.issuer}</Text>
+        </View>
+        <View style={styles.rankedCardReward}>
+          <Text style={styles.rankedCardRewardValue}>
+            {formatRewardRate(rc.rewardRate.value, rc.rewardRate.unit)}
+          </Text>
+          <Text style={styles.rankedCardRewardType}>
+            {t(getRewardTypeLabelKey(rc.rewardRate.type))}
+          </Text>
+        </View>
+        <Text style={styles.chevron}>›</Text>
+      </TouchableOpacity>
+    </Animated.View>
   );
 
   return (
@@ -164,7 +165,7 @@ function CardsByTypeSection({
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionLabel}>{t('home.cashBackCards')}</Text>
           </View>
-          {rankedCashBack.map(renderCardItem)}
+          {rankedCashBack.map((rc, index) => renderCardItem(rc, index))}
         </View>
       )}
       {rankedPoints.length > 0 && (
@@ -172,7 +173,7 @@ function CardsByTypeSection({
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionLabel}>{t('home.pointsMilesCards')}</Text>
           </View>
-          {rankedPoints.map(renderCardItem)}
+          {rankedPoints.map((rc, index) => renderCardItem(rc, index))}
         </View>
       )}
     </>
@@ -334,7 +335,10 @@ export default function HomeScreen() {
   const storeSuggestions = searchQuery.length >= 2 ? searchStores(searchQuery).slice(0, 5) : [];
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
       <SearchInput
         value={searchQuery}
         onChangeText={(text) => {
@@ -388,11 +392,19 @@ export default function HomeScreen() {
         keyboardShouldPersistTaps="handled"
       >
         {!hasCards && searchQuery.length > 0 && (
-          <EmptyState icon="cards" title={t('home.noCardsTitle')} description={t('home.noCardsText')} />
+          <EmptyState
+            icon="cards"
+            title={t('home.noCardsTitle')}
+            description={t('home.noCardsText')}
+          />
         )}
 
         {hasCards && !recommendation && !showSuggestions && (
-          <EmptyState icon="search" title={t('home.findBestCardTitle')} description={t('home.findBestCardText')} />
+          <EmptyState
+            icon="search"
+            title={t('home.findBestCardTitle')}
+            description={t('home.findBestCardText')}
+          />
         )}
 
         {recommendation && (
@@ -408,7 +420,12 @@ export default function HomeScreen() {
               <>
                 <BestCardSection
                   rankedCard={recommendation.bestCard}
-                  onPress={() => handleCardPress(recommendation.bestCard!.card, recommendation.bestCard!.rewardRate)}
+                  onPress={() =>
+                    handleCardPress(
+                      recommendation.bestCard!.card,
+                      recommendation.bestCard!.rewardRate
+                    )
+                  }
                   t={t}
                   theme={theme}
                 />
@@ -480,7 +497,11 @@ const createStyles = (theme: Theme) =>
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border.light,
     },
-    suggestionName: { ...theme.textStyles.body, fontWeight: '500', color: theme.colors.text.primary },
+    suggestionName: {
+      ...theme.textStyles.body,
+      fontWeight: '500',
+      color: theme.colors.text.primary,
+    },
     suggestionCategory: {
       ...theme.textStyles.caption,
       color: theme.colors.text.tertiary,
@@ -503,7 +524,11 @@ const createStyles = (theme: Theme) =>
       letterSpacing: 0.5,
       marginBottom: theme.spacing.sm,
     },
-    sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.sm },
+    sectionHeaderRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: theme.spacing.sm,
+    },
     bestCardSection: { marginBottom: theme.spacing.xl },
     bestCardContainer: { alignItems: 'center' },
     bestCardBadgeContainer: { marginTop: theme.spacing.md },
@@ -526,16 +551,32 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'center',
       marginRight: theme.spacing.md,
     },
-    rankText: { ...theme.textStyles.caption, fontWeight: '600', color: theme.colors.text.secondary },
+    rankText: {
+      ...theme.textStyles.caption,
+      fontWeight: '600',
+      color: theme.colors.text.secondary,
+    },
     rankedCardInfo: { flex: 1 },
-    rankedCardName: { ...theme.textStyles.body, fontWeight: '500', color: theme.colors.text.primary },
+    rankedCardName: {
+      ...theme.textStyles.body,
+      fontWeight: '500',
+      color: theme.colors.text.primary,
+    },
     rankedCardIssuer: { ...theme.textStyles.caption, color: theme.colors.text.tertiary },
     rankedCardReward: { alignItems: 'flex-end', marginRight: theme.spacing.sm },
-    rankedCardRewardValue: { ...theme.textStyles.body, fontWeight: '600', color: theme.colors.primary.main },
+    rankedCardRewardValue: {
+      ...theme.textStyles.body,
+      fontWeight: '600',
+      color: theme.colors.primary.main,
+    },
     rankedCardRewardType: { ...theme.textStyles.caption, color: theme.colors.text.tertiary },
     chevron: { fontSize: 20, color: theme.colors.text.disabled, fontWeight: '300' },
     suggestedSection: { marginBottom: theme.spacing.xl },
-    suggestedSubtitle: { ...theme.textStyles.bodySmall, color: theme.colors.text.secondary, marginBottom: theme.spacing.md },
+    suggestedSubtitle: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.text.secondary,
+      marginBottom: theme.spacing.md,
+    },
     suggestedCardItem: {
       backgroundColor: theme.colors.background.secondary,
       borderRadius: theme.borderRadius.md,
@@ -548,7 +589,11 @@ const createStyles = (theme: Theme) =>
       borderStyle: 'dashed',
     },
     suggestedCardInfo: { flex: 1 },
-    suggestedCardName: { ...theme.textStyles.body, fontWeight: '500', color: theme.colors.text.primary },
+    suggestedCardName: {
+      ...theme.textStyles.body,
+      fontWeight: '500',
+      color: theme.colors.text.primary,
+    },
     suggestedCardIssuer: { ...theme.textStyles.caption, color: theme.colors.text.tertiary },
     suggestedCardBonus: {
       ...theme.textStyles.caption,
@@ -570,7 +615,11 @@ const createStyles = (theme: Theme) =>
       padding: theme.spacing.xl,
       alignItems: 'center',
     },
-    noCardsText: { ...theme.textStyles.body, color: theme.colors.text.secondary, textAlign: 'center' },
+    noCardsText: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.secondary,
+      textAlign: 'center',
+    },
     optimalMessage: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -583,4 +632,3 @@ const createStyles = (theme: Theme) =>
     optimalIcon: { fontSize: 18, color: theme.colors.success.main, marginRight: theme.spacing.sm },
     optimalText: { ...theme.textStyles.body, color: theme.colors.success.dark, fontWeight: '500' },
   });
-

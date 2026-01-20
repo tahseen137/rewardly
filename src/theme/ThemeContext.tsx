@@ -66,7 +66,8 @@ export function ThemeProvider({ children, forcedColorScheme }: ThemeProviderProp
   const systemColorScheme = useColorScheme();
   const [manualColorScheme, setManualColorScheme] = React.useState<ColorScheme | null>(null);
 
-  const colorScheme: ColorScheme = forcedColorScheme ?? manualColorScheme ?? systemColorScheme ?? 'light';
+  const colorScheme: ColorScheme =
+    forcedColorScheme ?? manualColorScheme ?? systemColorScheme ?? 'light';
 
   const theme = useMemo(() => {
     return colorScheme === 'dark' ? darkTheme : lightTheme;

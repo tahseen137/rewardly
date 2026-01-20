@@ -3,14 +3,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ViewStyle } from 'react-native';
 import { useTheme } from '../theme';
 import { Icon } from './Icon';
 
@@ -65,10 +58,7 @@ export function ErrorBanner({
     }
   }, [autoDismiss, visible, onDismiss, autoDismissDelay]);
 
-  const variantConfig: Record<
-    BannerVariant,
-    { bg: string; text: string; icon: string }
-  > = {
+  const variantConfig: Record<BannerVariant, { bg: string; text: string; icon: string }> = {
     error: {
       bg: theme.colors.error.background,
       text: theme.colors.error.main,
@@ -121,9 +111,7 @@ export function ErrorBanner({
             style={styles.actionButton}
             accessibilityRole="button"
           >
-            <Text style={[styles.actionText, { color: config.text }]}>
-              {actionLabel}
-            </Text>
+            <Text style={[styles.actionText, { color: config.text }]}>{actionLabel}</Text>
           </TouchableOpacity>
         )}
         {onDismiss && (
@@ -157,11 +145,7 @@ export function OfflineBanner({ isOffline, onRetry, style }: OfflineBannerProps)
 
   return (
     <View
-      style={[
-        styles.offlineBanner,
-        { backgroundColor: theme.colors.neutral.gray700 },
-        style,
-      ]}
+      style={[styles.offlineBanner, { backgroundColor: theme.colors.neutral.gray700 }, style]}
       accessibilityRole="alert"
     >
       <Icon name="offline" size={16} color={theme.colors.neutral.white} />
@@ -170,9 +154,7 @@ export function OfflineBanner({ isOffline, onRetry, style }: OfflineBannerProps)
       </Text>
       {onRetry && (
         <TouchableOpacity onPress={onRetry} accessibilityRole="button">
-          <Text style={[styles.offlineRetry, { color: theme.colors.primary.light }]}>
-            Retry
-          </Text>
+          <Text style={[styles.offlineRetry, { color: theme.colors.primary.light }]}>Retry</Text>
         </TouchableOpacity>
       )}
     </View>

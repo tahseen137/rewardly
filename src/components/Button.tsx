@@ -4,14 +4,16 @@
 
 import React from 'react';
 import {
-  TouchableOpacity,
   Text,
   StyleSheet,
   ActivityIndicator,
   ViewStyle,
   TextStyle,
   TouchableOpacityProps,
+  Pressable,
 } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import { useTheme } from '../theme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -41,9 +43,28 @@ export function Button({
   rightIcon,
   style,
   textStyle,
+  onPress,
   ...props
 }: ButtonProps) {
   const theme = useTheme();
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 15, stiffness: 400 });
+  };
+
+  const handlePress = async (event: any) => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress?.(event);
+  };
 
   const getContainerStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
@@ -165,26 +186,36 @@ export function Button({
       : theme.colors.primary.contrast;
 
   return (
-    <TouchableOpacity
-      style={[getContainerStyle(), style]}
+    <Pressable
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      onPress={handlePress}
       disabled={disabled || loading}
-      activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityState={{ disabled: disabled || loading }}
       {...props}
     >
-      {loading ? (
-        <ActivityIndicator color={spinnerColor} size="small" />
-      ) : (
-        <>
-          {leftIcon && <>{leftIcon}</>}
-          <Text style={[getTextStyle(), leftIcon ? styles.textWithLeftIcon : null, rightIcon ? styles.textWithRightIcon : null, textStyle]}>
-            {title}
-          </Text>
-          {rightIcon && <>{rightIcon}</>}
-        </>
-      )}
-    </TouchableOpacity>
+      <Animated.View style={[getContainerStyle(), style, animatedStyle]}>
+        {loading ? (
+          <ActivityIndicator color={spinnerColor} size="small" />
+        ) : (
+          <>
+            {leftIcon && <>{leftIcon}</>}
+            <Text
+              style={[
+                getTextStyle(),
+                leftIcon ? styles.textWithLeftIcon : null,
+                rightIcon ? styles.textWithRightIcon : null,
+                textStyle,
+              ]}
+            >
+              {title}
+            </Text>
+            {rightIcon && <>{rightIcon}</>}
+          </>
+        )}
+      </Animated.View>
+    </Pressable>
   );
 }
 

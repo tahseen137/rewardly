@@ -3,14 +3,7 @@
  */
 
 import React, { useMemo } from 'react';
-import {
-  View,
-  Text,
-  Modal,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, Modal, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme, Theme } from '../theme';
 import { Button } from './Button';
@@ -61,7 +54,10 @@ export function CardDetailModal({
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t('cardDetail.title')}</Text>
-          <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <TouchableOpacity
+            onPress={onClose}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
             <Text style={styles.doneButton}>{t('common.done')}</Text>
           </TouchableOpacity>
         </View>
@@ -118,7 +114,7 @@ export function CardDetailModal({
               {card.categoryRewards.map((cr, index) => (
                 <View key={index} style={styles.rewardRow}>
                   <Text style={styles.rewardCategory}>
-                    {cr.category.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                    {cr.category.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
                   </Text>
                   <Text style={[styles.rewardValue, styles.rewardValueHighlight]}>
                     {cr.rewardRate.unit === 'percent'
@@ -170,149 +166,150 @@ export function CardDetailModal({
   );
 }
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: theme.spacing.screenPadding,
-    paddingVertical: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border.light,
-    backgroundColor: theme.colors.background.secondary,
-  },
-  headerTitle: {
-    ...theme.textStyles.h3,
-    color: theme.colors.text.primary,
-  },
-  doneButton: {
-    ...theme.textStyles.button,
-    color: theme.colors.primary.main,
-  },
-  content: {
-    flex: 1,
-    padding: theme.spacing.screenPadding,
-  },
-  cardHeader: {
-    alignItems: 'center',
-    paddingVertical: theme.spacing.xl,
-    marginBottom: theme.spacing.lg,
-  },
-  cardName: {
-    ...theme.textStyles.h2,
-    color: theme.colors.text.primary,
-    textAlign: 'center',
-    marginBottom: theme.spacing.xs,
-  },
-  cardIssuer: {
-    ...theme.textStyles.body,
-    color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.xs,
-  },
-  cardProgram: {
-    ...theme.textStyles.label,
-    color: theme.colors.primary.main,
-    marginBottom: theme.spacing.md,
-  },
-  feeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-  },
-  feeLabel: {
-    ...theme.textStyles.bodySmall,
-    color: theme.colors.text.tertiary,
-  },
-  feeValue: {
-    ...theme.textStyles.label,
-    color: theme.colors.text.primary,
-  },
-  highlightSection: {
-    backgroundColor: theme.colors.primary.main + '10', // 10% opacity
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
-    alignItems: 'center',
-  },
-  highlightLabel: {
-    ...theme.textStyles.label,
-    color: theme.colors.primary.main,
-    marginBottom: theme.spacing.sm,
-  },
-  highlightBox: {
-    alignItems: 'center',
-  },
-  highlightValue: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: theme.colors.primary.main,
-  },
-  highlightType: {
-    ...theme.textStyles.bodySmall,
-    color: theme.colors.primary.dark,
-    marginTop: theme.spacing.xs,
-  },
-  section: {
-    marginBottom: theme.spacing.xl,
-  },
-  sectionTitle: {
-    ...theme.textStyles.h4,
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.md,
-  },
-  rewardRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border.light,
-  },
-  rewardCategory: {
-    ...theme.textStyles.body,
-    color: theme.colors.text.primary,
-    flex: 1,
-  },
-  rewardValue: {
-    ...theme.textStyles.label,
-    color: theme.colors.text.secondary,
-  },
-  rewardValueHighlight: {
-    color: theme.colors.success.main,
-    fontWeight: '600',
-  },
-  bonusBox: {
-    backgroundColor: theme.colors.success.background,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.lg,
-    alignItems: 'center',
-  },
-  bonusAmount: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: theme.colors.success.dark,
-    marginBottom: theme.spacing.sm,
-  },
-  bonusRequirement: {
-    ...theme.textStyles.bodySmall,
-    color: theme.colors.success.dark,
-    textAlign: 'center',
-  },
-  actionContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: theme.spacing.screenPadding,
-    paddingBottom: theme.spacing.xl,
-    backgroundColor: theme.colors.background.secondary,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border.light,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background.primary,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.screenPadding,
+      paddingVertical: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.light,
+      backgroundColor: theme.colors.background.secondary,
+    },
+    headerTitle: {
+      ...theme.textStyles.h3,
+      color: theme.colors.text.primary,
+    },
+    doneButton: {
+      ...theme.textStyles.button,
+      color: theme.colors.primary.main,
+    },
+    content: {
+      flex: 1,
+      padding: theme.spacing.screenPadding,
+    },
+    cardHeader: {
+      alignItems: 'center',
+      paddingVertical: theme.spacing.xl,
+      marginBottom: theme.spacing.lg,
+    },
+    cardName: {
+      ...theme.textStyles.h2,
+      color: theme.colors.text.primary,
+      textAlign: 'center',
+      marginBottom: theme.spacing.xs,
+    },
+    cardIssuer: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.secondary,
+      marginBottom: theme.spacing.xs,
+    },
+    cardProgram: {
+      ...theme.textStyles.label,
+      color: theme.colors.primary.main,
+      marginBottom: theme.spacing.md,
+    },
+    feeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.xs,
+    },
+    feeLabel: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.text.tertiary,
+    },
+    feeValue: {
+      ...theme.textStyles.label,
+      color: theme.colors.text.primary,
+    },
+    highlightSection: {
+      backgroundColor: theme.colors.primary.main + '10', // 10% opacity
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      marginBottom: theme.spacing.lg,
+      alignItems: 'center',
+    },
+    highlightLabel: {
+      ...theme.textStyles.label,
+      color: theme.colors.primary.main,
+      marginBottom: theme.spacing.sm,
+    },
+    highlightBox: {
+      alignItems: 'center',
+    },
+    highlightValue: {
+      fontSize: 36,
+      fontWeight: '700',
+      color: theme.colors.primary.main,
+    },
+    highlightType: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.primary.dark,
+      marginTop: theme.spacing.xs,
+    },
+    section: {
+      marginBottom: theme.spacing.xl,
+    },
+    sectionTitle: {
+      ...theme.textStyles.h4,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.md,
+    },
+    rewardRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.light,
+    },
+    rewardCategory: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.primary,
+      flex: 1,
+    },
+    rewardValue: {
+      ...theme.textStyles.label,
+      color: theme.colors.text.secondary,
+    },
+    rewardValueHighlight: {
+      color: theme.colors.success.main,
+      fontWeight: '600',
+    },
+    bonusBox: {
+      backgroundColor: theme.colors.success.background,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.lg,
+      alignItems: 'center',
+    },
+    bonusAmount: {
+      fontSize: 28,
+      fontWeight: '700',
+      color: theme.colors.success.dark,
+      marginBottom: theme.spacing.sm,
+    },
+    bonusRequirement: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.success.dark,
+      textAlign: 'center',
+    },
+    actionContainer: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      padding: theme.spacing.screenPadding,
+      paddingBottom: theme.spacing.xl,
+      backgroundColor: theme.colors.background.secondary,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.border.light,
+    },
+  });
 
 export default CardDetailModal;

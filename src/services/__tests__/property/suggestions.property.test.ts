@@ -104,7 +104,6 @@ describe('Property 8: New Card Suggestions Are Superior', () => {
   });
 });
 
-
 describe('Property 9: No Suggestions When Optimal', () => {
   /**
    * Feature: rewards-optimizer, Property 9: No Suggestions When Optimal
@@ -179,7 +178,6 @@ describe('Property 9: No Suggestions When Optimal', () => {
     );
   });
 });
-
 
 describe('Property 10: New Card Toggle Control', () => {
   /**
@@ -257,7 +255,6 @@ describe('Property 10: New Card Toggle Control', () => {
     );
   });
 });
-
 
 describe('Property 2: Card Removal Excludes from Recommendations', () => {
   /**

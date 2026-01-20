@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import './src/i18n'; // Initialize i18n
 import i18n from './src/i18n';
@@ -106,8 +107,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

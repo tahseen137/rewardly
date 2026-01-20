@@ -81,7 +81,10 @@ export async function searchMerchant(
     }
 
     if (data.status !== 'OK') {
-      return failure({ type: 'API_ERROR', message: data.error_message || `Unknown status: ${data.status}` });
+      return failure({
+        type: 'API_ERROR',
+        message: data.error_message || `Unknown status: ${data.status}`,
+      });
     }
 
     const merchants = data.results.map((place) => mapPlaceToMerchant(place));
@@ -158,7 +161,10 @@ export async function getNearbyMerchants(
     }
 
     if (data.status !== 'OK') {
-      return failure({ type: 'API_ERROR', message: data.error_message || `Unknown status: ${data.status}` });
+      return failure({
+        type: 'API_ERROR',
+        message: data.error_message || `Unknown status: ${data.status}`,
+      });
     }
 
     const merchants = data.results.map((place) => mapPlaceToMerchant(place));
@@ -217,7 +223,10 @@ export async function getAutocompleteSuggestions(
     }
 
     if (data.status !== 'OK') {
-      return failure({ type: 'API_ERROR', message: data.error_message || `Unknown status: ${data.status}` });
+      return failure({
+        type: 'API_ERROR',
+        message: data.error_message || `Unknown status: ${data.status}`,
+      });
     }
 
     const suggestions: AutocompleteSuggestion[] = data.predictions.map((prediction) => ({

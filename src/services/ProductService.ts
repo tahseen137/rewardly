@@ -1,7 +1,7 @@
 /**
  * ProductService - Manages product search and store mapping
  * Supports fuzzy matching on product names and aliases
- * 
+ *
  * Requirements: 4.1, 4.2
  */
 
@@ -126,22 +126,20 @@ function calculateSimilarity(query: string, target: string): number {
 /**
  * Search for a product by name
  * Returns the best matching product with its available stores
- * 
+ *
  * Requirements: 4.1 - Identify stores that sell a product
- * 
+ *
  * @param query - Product name to search for
  * @returns Result with ProductSearchResult or error if not found
  */
-export function searchProduct(
-  query: string
-): Result<ProductSearchResult, RecommendationError> {
+export function searchProduct(query: string): Result<ProductSearchResult, RecommendationError> {
   if (!query || query.trim() === '') {
     return failure({ type: 'PRODUCT_NOT_FOUND', productName: query });
   }
 
   const products = getAllProducts();
   const allStores = getAllStores();
-  
+
   let bestMatch: Product | null = null;
   let bestScore = 0;
   const threshold = 0.5;
@@ -191,7 +189,7 @@ export function searchProduct(
 /**
  * Search for products matching a query
  * Returns all products above the threshold, sorted by match score
- * 
+ *
  * @param query - Product name to search for
  * @returns Array of ProductSearchResult sorted by match score
  */
@@ -247,9 +245,9 @@ export function searchProducts(query: string): ProductSearchResult[] {
 
 /**
  * Get stores that sell a specific product
- * 
+ *
  * Requirements: 4.1, 4.2 - Map products to stores
- * 
+ *
  * @param productId - Product ID to look up
  * @returns Array of stores that sell the product
  */
@@ -267,7 +265,7 @@ export function getStoresForProduct(productId: string): Store[] {
 
 /**
  * Get products available at a specific store
- * 
+ *
  * @param storeId - Store ID to look up
  * @returns Array of products available at the store
  */
@@ -278,7 +276,7 @@ export function getProductsForStore(storeId: string): Product[] {
 
 /**
  * Get products by spending category
- * 
+ *
  * @param category - Spending category to filter by
  * @returns Array of products in the category
  */

@@ -34,14 +34,14 @@ const SIZES = {
 
 // Issuer color schemes
 const ISSUER_COLORS: Record<string, { primary: string; secondary: string }> = {
-  'TD': { primary: '#008A4B', secondary: '#00A85A' },
-  'RBC': { primary: '#003168', secondary: '#0051A8' },
-  'BMO': { primary: '#0075BE', secondary: '#00A0DF' },
-  'CIBC': { primary: '#C41F3E', secondary: '#E8315B' },
-  'Scotiabank': { primary: '#C41F3E', secondary: '#FF3B5C' },
+  TD: { primary: '#008A4B', secondary: '#00A85A' },
+  RBC: { primary: '#003168', secondary: '#0051A8' },
+  BMO: { primary: '#0075BE', secondary: '#00A0DF' },
+  CIBC: { primary: '#C41F3E', secondary: '#E8315B' },
+  Scotiabank: { primary: '#C41F3E', secondary: '#FF3B5C' },
   'American Express': { primary: '#006FCF', secondary: '#00A0E9' },
-  'Tangerine': { primary: '#FF8300', secondary: '#FFA640' },
-  'default': { primary: '#1C1C1E', secondary: '#3A3A3C' },
+  Tangerine: { primary: '#FF8300', secondary: '#FFA640' },
+  default: { primary: '#1C1C1E', secondary: '#3A3A3C' },
 };
 
 export function CardVisual({
@@ -85,9 +85,7 @@ export function CardVisual({
       </View>
 
       {/* Card Number */}
-      {lastFour && (
-        <Text style={styles.cardNumber}>•••• •••• •••• {lastFour}</Text>
-      )}
+      {lastFour && <Text style={styles.cardNumber}>•••• •••• •••• {lastFour}</Text>}
 
       {/* Card Name */}
       <View style={styles.cardInfo}>
@@ -117,83 +115,84 @@ export function CardVisual({
   return content;
 }
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  card: {
-    borderRadius: 12,
-    padding: 16,
-    position: 'relative',
-    overflow: 'hidden',
-    ...theme.shadows.card,
-  },
-  cardSelected: {
-    borderWidth: 3,
-    borderColor: theme.colors.primary.main,
-  },
-  gradientOverlay: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    width: '60%',
-    height: '100%',
-    opacity: 0.3,
-    transform: [{ skewX: '-20deg' }, { translateX: 50 }],
-  },
-  chip: {
-    width: 40,
-    height: 30,
-    backgroundColor: '#D4AF37',
-    borderRadius: 4,
-    marginBottom: 16,
-    padding: 4,
-    justifyContent: 'space-between',
-  },
-  chipLine: {
-    height: 4,
-    backgroundColor: '#B8962E',
-    borderRadius: 1,
-  },
-  cardNumber: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 16,
-    fontFamily: 'Courier',
-    fontWeight: '600',
-    letterSpacing: 2,
-    marginBottom: 16,
-  },
-  cardInfo: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-    right: 60,
-  },
-  cardName: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  issuerName: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 11,
-    fontWeight: '500',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  networkLogo: {
-    position: 'absolute',
-    bottom: 16,
-    right: 16,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  networkText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    card: {
+      borderRadius: 12,
+      padding: 16,
+      position: 'relative',
+      overflow: 'hidden',
+      ...theme.shadows.card,
+    },
+    cardSelected: {
+      borderWidth: 3,
+      borderColor: theme.colors.primary.main,
+    },
+    gradientOverlay: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      width: '60%',
+      height: '100%',
+      opacity: 0.3,
+      transform: [{ skewX: '-20deg' }, { translateX: 50 }],
+    },
+    chip: {
+      width: 40,
+      height: 30,
+      backgroundColor: '#D4AF37',
+      borderRadius: 4,
+      marginBottom: 16,
+      padding: 4,
+      justifyContent: 'space-between',
+    },
+    chipLine: {
+      height: 4,
+      backgroundColor: '#B8962E',
+      borderRadius: 1,
+    },
+    cardNumber: {
+      color: 'rgba(255,255,255,0.9)',
+      fontSize: 16,
+      fontFamily: 'Courier',
+      fontWeight: '600',
+      letterSpacing: 2,
+      marginBottom: 16,
+    },
+    cardInfo: {
+      position: 'absolute',
+      bottom: 16,
+      left: 16,
+      right: 60,
+    },
+    cardName: {
+      color: '#FFFFFF',
+      fontSize: 14,
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    issuerName: {
+      color: 'rgba(255,255,255,0.7)',
+      fontSize: 11,
+      fontWeight: '500',
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+    },
+    networkLogo: {
+      position: 'absolute',
+      bottom: 16,
+      right: 16,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 4,
+    },
+    networkText: {
+      color: '#FFFFFF',
+      fontSize: 10,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+    },
+  });
 
 export default CardVisual;

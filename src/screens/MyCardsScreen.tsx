@@ -15,6 +15,13 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  runOnJS,
+} from 'react-native-reanimated';
 import { useTheme, Theme } from '../theme';
 import { CardVisual } from '../components';
 import { Card, UserCard, RewardType } from '../types';
@@ -44,6 +51,7 @@ function CardItem({
 }) {
   const styles = useMemo(() => createStyles(theme), [theme]);
   const card = getCardByIdSync(userCard.cardId);
+  const translateX = useSharedValue(0);
 
   if (!card) return null;
 
@@ -52,32 +60,56 @@ function CardItem({
     return `$${fee}/year`;
   };
 
+  const panGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      translateX.value = Math.min(0, event.translationX);
+    })
+    .onEnd(() => {
+      if (translateX.value < -80) {
+        runOnJS(onRemove)(card.id);
+      } else {
+        translateX.value = withSpring(0);
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
+
   return (
-    <View style={styles.cardItem}>
-      <CardVisual
-        name={card.name}
-        issuer={card.issuer}
-        size="medium"
-      />
-      <View style={styles.cardDetails}>
-        <Text style={styles.cardAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
-        <Text style={styles.cardReward}>
-          Base: {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.type, card.baseRewardRate.unit)}
-        </Text>
-        {card.categoryRewards.length > 0 && (
-          <Text style={styles.cardCategories}>
-            Bonus: {card.categoryRewards.length} categories
-          </Text>
-        )}
+    <View style={styles.cardItemContainer}>
+      <View style={styles.deleteBackground}>
+        <Text style={styles.deleteText}>Delete</Text>
       </View>
-      <TouchableOpacity
-        style={styles.removeButton}
-        onPress={() => onRemove(card.id)}
-        accessibilityLabel={`Remove ${card.name}`}
-        accessibilityRole="button"
-      >
-        <Text style={styles.removeButtonText}>Remove</Text>
-      </TouchableOpacity>
+      <GestureDetector gesture={panGesture}>
+        <Animated.View style={[styles.cardItem, animatedStyle]}>
+          <CardVisual name={card.name} issuer={card.issuer} size="medium" />
+          <View style={styles.cardDetails}>
+            <Text style={styles.cardAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
+            <Text style={styles.cardReward}>
+              Base:{' '}
+              {formatRewardRate(
+                card.baseRewardRate.value,
+                card.baseRewardRate.type,
+                card.baseRewardRate.unit
+              )}
+            </Text>
+            {card.categoryRewards.length > 0 && (
+              <Text style={styles.cardCategories}>
+                Bonus: {card.categoryRewards.length} categories
+              </Text>
+            )}
+          </View>
+          <TouchableOpacity
+            style={styles.removeButton}
+            onPress={() => onRemove(card.id)}
+            accessibilityLabel={`Remove ${card.name}`}
+            accessibilityRole="button"
+          >
+            <Text style={styles.removeButtonText}>Remove</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 }
@@ -109,13 +141,21 @@ function CardPickerItem({
       accessibilityRole="button"
     >
       <View style={styles.pickerItemInfo}>
-        <Text style={[styles.pickerItemName, isOwned && styles.pickerItemTextDisabled]}>{card.name}</Text>
-        <Text style={[styles.pickerItemIssuer, isOwned && styles.pickerItemTextDisabled]}>{card.issuer}</Text>
+        <Text style={[styles.pickerItemName, isOwned && styles.pickerItemTextDisabled]}>
+          {card.name}
+        </Text>
+        <Text style={[styles.pickerItemIssuer, isOwned && styles.pickerItemTextDisabled]}>
+          {card.issuer}
+        </Text>
         <Text style={[styles.pickerItemAnnualFee, isOwned && styles.pickerItemTextDisabled]}>
           {formatAnnualFee(card.annualFee)}
         </Text>
         <Text style={[styles.pickerItemReward, isOwned && styles.pickerItemTextDisabled]}>
-          {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.type, card.baseRewardRate.unit)}
+          {formatRewardRate(
+            card.baseRewardRate.value,
+            card.baseRewardRate.type,
+            card.baseRewardRate.unit
+          )}
         </Text>
       </View>
       {isOwned && <Text style={styles.ownedBadge}>Owned</Text>}
@@ -193,18 +233,22 @@ export default function MyCardsScreen() {
         });
       }
     } else {
-      Alert.alert('Remove Card', `Are you sure you want to remove ${cardName} from your portfolio?`, [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            const result = await removeCard(cardId);
-            if (result.success) setPortfolio(getCards());
-            else Alert.alert('Error', 'Failed to remove card. Please try again.');
+      Alert.alert(
+        'Remove Card',
+        `Are you sure you want to remove ${cardName} from your portfolio?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Remove',
+            style: 'destructive',
+            onPress: async () => {
+              const result = await removeCard(cardId);
+              if (result.success) setPortfolio(getCards());
+              else Alert.alert('Error', 'Failed to remove card. Please try again.');
+            },
           },
-        },
-      ]);
+        ]
+      );
     }
   };
 
@@ -233,7 +277,9 @@ export default function MyCardsScreen() {
           <FlatList
             data={portfolio}
             keyExtractor={(item) => item.cardId}
-            renderItem={({ item }) => <CardItem userCard={item} onRemove={handleRemoveCard} theme={theme} />}
+            renderItem={({ item }) => (
+              <CardItem userCard={item} onRemove={handleRemoveCard} theme={theme} />
+            )}
             contentContainerStyle={styles.listContent}
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           />
@@ -289,7 +335,12 @@ export default function MyCardsScreen() {
               data={availableCards}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <CardPickerItem card={item} isOwned={ownedCardIds.has(item.id)} onSelect={handleAddCard} theme={theme} />
+                <CardPickerItem
+                  card={item}
+                  isOwned={ownedCardIds.has(item.id)}
+                  onSelect={handleAddCard}
+                  theme={theme}
+                />
               )}
               contentContainerStyle={styles.pickerListContent}
             />
@@ -304,17 +355,49 @@ const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.colors.background.primary },
     listContent: { padding: theme.spacing.screenPadding, paddingBottom: 80 },
+    cardItemContainer: {
+      position: 'relative',
+      marginBottom: theme.spacing.lg,
+    },
+    deleteBackground: {
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      bottom: 0,
+      backgroundColor: theme.colors.error.main,
+      justifyContent: 'center',
+      alignItems: 'flex-end',
+      paddingRight: theme.spacing.lg,
+      borderRadius: theme.borderRadius.lg,
+      width: '100%',
+    },
+    deleteText: {
+      color: theme.colors.error.contrast,
+      fontWeight: '600',
+      fontSize: 16,
+    },
     cardItem: {
       backgroundColor: theme.colors.background.secondary,
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.lg,
-      marginBottom: theme.spacing.lg,
       alignItems: 'center',
       ...theme.shadows.card,
     },
-    cardDetails: { alignItems: 'center', marginTop: theme.spacing.md, marginBottom: theme.spacing.md },
-    cardReward: { ...theme.textStyles.bodySmall, color: theme.colors.primary.main, marginBottom: 4 },
-    cardAnnualFee: { ...theme.textStyles.caption, color: theme.colors.text.tertiary, marginBottom: 4 },
+    cardDetails: {
+      alignItems: 'center',
+      marginTop: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+    },
+    cardReward: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.primary.main,
+      marginBottom: 4,
+    },
+    cardAnnualFee: {
+      ...theme.textStyles.caption,
+      color: theme.colors.text.tertiary,
+      marginBottom: 4,
+    },
     cardCategories: { ...theme.textStyles.caption, color: theme.colors.text.tertiary },
     removeButton: {
       backgroundColor: theme.colors.error.background,
@@ -327,7 +410,11 @@ const createStyles = (theme: Theme) =>
     removeButtonText: { color: theme.colors.error.main, fontSize: 14, fontWeight: '600' },
     emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
     emptyStateIcon: { fontSize: 64, marginBottom: theme.spacing.lg },
-    emptyStateTitle: { ...theme.textStyles.h2, color: theme.colors.text.primary, marginBottom: theme.spacing.sm },
+    emptyStateTitle: {
+      ...theme.textStyles.h2,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.sm,
+    },
     emptyStateText: {
       ...theme.textStyles.body,
       color: theme.colors.text.secondary,
@@ -353,7 +440,12 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'center',
       ...theme.shadows.md,
     },
-    fabText: { color: theme.colors.primary.contrast, fontSize: 28, fontWeight: '400', marginTop: -2 },
+    fabText: {
+      color: theme.colors.primary.contrast,
+      fontSize: 28,
+      fontWeight: '400',
+      marginTop: -2,
+    },
     modalContainer: { flex: 1, backgroundColor: theme.colors.background.primary },
     modalHeader: {
       flexDirection: 'row',
@@ -387,12 +479,30 @@ const createStyles = (theme: Theme) =>
     },
     pickerItemDisabled: { opacity: 0.6 },
     pickerItemInfo: { flex: 1 },
-    pickerItemName: { ...theme.textStyles.body, fontWeight: '500', color: theme.colors.text.primary, marginBottom: 2 },
-    pickerItemIssuer: { ...theme.textStyles.bodySmall, color: theme.colors.text.secondary, marginBottom: 2 },
+    pickerItemName: {
+      ...theme.textStyles.body,
+      fontWeight: '500',
+      color: theme.colors.text.primary,
+      marginBottom: 2,
+    },
+    pickerItemIssuer: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.text.secondary,
+      marginBottom: 2,
+    },
     pickerItemReward: { ...theme.textStyles.caption, color: theme.colors.primary.main },
-    pickerItemAnnualFee: { ...theme.textStyles.caption, color: theme.colors.success.main, marginBottom: 2 },
+    pickerItemAnnualFee: {
+      ...theme.textStyles.caption,
+      color: theme.colors.success.main,
+      marginBottom: 2,
+    },
     pickerItemTextDisabled: { color: theme.colors.text.tertiary },
-    ownedBadge: { ...theme.textStyles.caption, color: theme.colors.success.main, fontWeight: '600', marginLeft: theme.spacing.sm },
+    ownedBadge: {
+      ...theme.textStyles.caption,
+      color: theme.colors.success.main,
+      fontWeight: '600',
+      marginLeft: theme.spacing.sm,
+    },
     loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
     loadingText: { ...theme.textStyles.body, color: theme.colors.text.secondary },
   });

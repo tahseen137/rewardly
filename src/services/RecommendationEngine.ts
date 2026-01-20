@@ -51,7 +51,7 @@ function matchesPreferredType(rate: RewardRate, preferredType: RewardType): bool
 /**
  * Rank cards for a specific spending category
  * Sorts by reward rate descending, with preference for matching reward type
- * 
+ *
  * @param category - The spending category to rank for
  * @param cards - Array of cards to rank
  * @param rewardType - User's preferred reward type
@@ -77,17 +77,17 @@ export function rankCardsForCategory(
   // 2. Reward rate value descending
   cardsWithRates.sort((a, b) => {
     const rateComparison = compareRewardRates(a.rewardRate, b.rewardRate);
-    
+
     // If rates are equal, prefer matching reward type
     if (rateComparison === 0) {
       const aMatches = matchesPreferredType(a.rewardRate, rewardType);
       const bMatches = matchesPreferredType(b.rewardRate, rewardType);
-      
+
       if (aMatches && !bMatches) return -1;
       if (!aMatches && bMatches) return 1;
       return 0;
     }
-    
+
     return rateComparison;
   });
 
@@ -99,10 +99,9 @@ export function rankCardsForCategory(
   }));
 }
 
-
 /**
  * Find cards from the database that offer better rewards than the user's best card
- * 
+ *
  * @param category - The spending category to compare
  * @param userBestCard - The user's best card for this category (or null if no cards)
  * @param rewardType - User's preferred reward type
@@ -116,10 +115,10 @@ export function findBetterCards(
   userCardIds: Set<string>
 ): Card[] {
   const allCards = getAllCardsSync();
-  
+
   // Filter out cards the user already owns
   const availableCards = allCards.filter((card) => !userCardIds.has(card.id));
-  
+
   if (availableCards.length === 0) {
     return [];
   }
@@ -145,7 +144,7 @@ export function findBetterCards(
 
 /**
  * Get a complete store recommendation including best card and suggestions
- * 
+ *
  * @param storeName - Name of the store to get recommendations for
  * @param portfolio - User's card portfolio
  * @param preferences - User's preferences
@@ -165,7 +164,7 @@ export function getStoreRecommendation(
   // Get full card objects for user's portfolio
   const userCards: Card[] = [];
   const userCardIds = new Set<string>();
-  
+
   for (const userCard of portfolio) {
     const card = getCardByIdSync(userCard.cardId);
     if (card) {
@@ -176,7 +175,7 @@ export function getStoreRecommendation(
 
   // Rank user's cards for this store's category
   const rankedCards = rankCardsForCategory(store.category, userCards, preferences.rewardType);
-  
+
   // Get the best card (first in ranked list)
   const bestCard = rankedCards.length > 0 ? rankedCards[0] : null;
 
@@ -199,15 +198,14 @@ export function getStoreRecommendation(
   };
 }
 
-
 /**
  * Get the best card-store combination for a product
- * 
+ *
  * Requirements:
  * - 4.3: Display recommended store, card to use, and expected reward rate
  * - 4.4: Rank by highest absolute reward value when rates are similar
  * - 4.5: Notify user if product not found
- * 
+ *
  * @param productName - Name of the product to search for
  * @param portfolio - User's card portfolio
  * @param preferences - User's preferences
@@ -220,7 +218,7 @@ export function getProductRecommendation(
 ): Result<ProductRecommendation, RecommendationError> {
   // Search for the product
   const productResult = searchProduct(productName);
-  
+
   if (!productResult.success) {
     // Requirement 4.5: Notify user if product not found
     return failure({ type: 'PRODUCT_NOT_FOUND', productName });
@@ -244,12 +242,8 @@ export function getProductRecommendation(
   // Calculate best card for each store
   // Requirement 4.2: Calculate best card-store combination
   const storeOptions: StoreCardCombination[] = stores.map((store) => {
-    const rankedCards = rankCardsForCategory(
-      store.category,
-      userCards,
-      preferences.rewardType
-    );
-    
+    const rankedCards = rankCardsForCategory(store.category, userCards, preferences.rewardType);
+
     const bestCard = rankedCards.length > 0 ? rankedCards[0] : null;
     const rewardRate = bestCard?.rewardRate.value ?? 0;
 
@@ -278,7 +272,7 @@ export function getProductRecommendation(
 /**
  * Get product recommendations for multiple stores
  * Useful for comparing options across different retailers
- * 
+ *
  * @param productName - Name of the product to search for
  * @param portfolio - User's card portfolio
  * @param preferences - User's preferences
@@ -292,7 +286,7 @@ export function getProductStoreOptions(
   limit: number = 5
 ): Result<StoreCardCombination[], RecommendationError> {
   const result = getProductRecommendation(productName, portfolio, preferences);
-  
+
   if (!result.success) {
     return result;
   }

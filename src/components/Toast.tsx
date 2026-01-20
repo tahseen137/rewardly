@@ -98,10 +98,7 @@ export function Toast({
 
   return (
     <Animated.View
-      style={[
-        styles.container,
-        { backgroundColor, opacity, transform: [{ translateY }] },
-      ]}
+      style={[styles.container, { backgroundColor, opacity, transform: [{ translateY }] }]}
     >
       <View style={styles.iconContainer}>
         <Text style={styles.icon}>{ICONS[type]}</Text>
@@ -118,49 +115,50 @@ export function Toast({
   );
 }
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 60,
-    left: theme.spacing.screenPadding,
-    right: theme.spacing.screenPadding,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.md,
-    ...theme.shadows.md,
-  },
-  iconContainer: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: theme.spacing.sm,
-  },
-  icon: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  message: {
-    flex: 1,
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  actionButton: {
-    marginLeft: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.sm,
-  },
-  actionText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
-    textDecorationLine: 'underline',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      position: 'absolute',
+      top: 60,
+      left: theme.spacing.screenPadding,
+      right: theme.spacing.screenPadding,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.lg,
+      borderRadius: theme.borderRadius.md,
+      ...theme.shadows.md,
+    },
+    iconContainer: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: theme.spacing.sm,
+    },
+    icon: {
+      color: '#FFFFFF',
+      fontSize: 14,
+      fontWeight: '700',
+    },
+    message: {
+      flex: 1,
+      color: '#FFFFFF',
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    actionButton: {
+      marginLeft: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.sm,
+    },
+    actionText: {
+      color: '#FFFFFF',
+      fontSize: 14,
+      fontWeight: '700',
+      textDecorationLine: 'underline',
+    },
+  });
 
 export default Toast;

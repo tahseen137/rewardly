@@ -44,9 +44,7 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <View style={styles.container}>
           <Text style={styles.icon}>⚠️</Text>
-          <Text style={styles.title}>
-            {fallbackTitle || 'Something went wrong'}
-          </Text>
+          <Text style={styles.title}>{fallbackTitle || 'Something went wrong'}</Text>
           <Text style={styles.message}>
             {fallbackMessage || 'An unexpected error occurred. Please try again.'}
           </Text>

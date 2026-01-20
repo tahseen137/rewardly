@@ -4,12 +4,7 @@
  * Validates: Requirements 2.1 (store identification)
  */
 
-import {
-  getAllStores,
-  findStore,
-  searchStores,
-  getStoreCategory,
-} from '../StoreDataService';
+import { getAllStores, findStore, searchStores, getStoreCategory } from '../StoreDataService';
 import { SpendingCategory } from '../../types';
 
 describe('StoreDataService', () => {
