@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme, Theme } from '../theme';
+import { Toast } from '../components';
 
 import { RewardType } from '../types';
 import {

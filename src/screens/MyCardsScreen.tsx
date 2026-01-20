@@ -16,7 +16,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useTheme, Theme } from '../theme';
-
+import { CardVisual } from '../components';
 import { Card, UserCard, RewardType } from '../types';
 import {
   getCards,
@@ -54,16 +54,19 @@ function CardItem({
 
   return (
     <View style={styles.cardItem}>
-      <View style={styles.cardInfo}>
-        <Text style={styles.cardName}>{card.name}</Text>
-        <Text style={styles.cardIssuer}>{card.issuer}</Text>
+      <CardVisual
+        name={card.name}
+        issuer={card.issuer}
+        size="medium"
+      />
+      <View style={styles.cardDetails}>
         <Text style={styles.cardAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
         <Text style={styles.cardReward}>
           Base: {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.type, card.baseRewardRate.unit)}
         </Text>
         {card.categoryRewards.length > 0 && (
           <Text style={styles.cardCategories}>
-            Bonus categories: {card.categoryRewards.map((cr) => cr.category).join(', ')}
+            Bonus: {card.categoryRewards.length} categories
           </Text>
         )}
       </View>
@@ -73,7 +76,7 @@ function CardItem({
         accessibilityLabel={`Remove ${card.name}`}
         accessibilityRole="button"
       >
-        <Text style={styles.removeButtonText}>✕</Text>
+        <Text style={styles.removeButtonText}>Remove</Text>
       </TouchableOpacity>
     </View>
   );
@@ -303,29 +306,25 @@ const createStyles = (theme: Theme) =>
     listContent: { padding: theme.spacing.screenPadding, paddingBottom: 80 },
     cardItem: {
       backgroundColor: theme.colors.background.secondary,
-      borderRadius: theme.borderRadius.md,
-      padding: theme.spacing.cardPadding,
-      marginBottom: theme.spacing.md,
-      flexDirection: 'row',
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      marginBottom: theme.spacing.lg,
       alignItems: 'center',
-      ...theme.shadows.xs,
+      ...theme.shadows.card,
     },
-    cardInfo: { flex: 1 },
-    cardName: { ...theme.textStyles.h4, color: theme.colors.text.primary, marginBottom: theme.spacing.xs },
-    cardIssuer: { ...theme.textStyles.bodySmall, color: theme.colors.text.secondary, marginBottom: theme.spacing.xs },
-    cardReward: { ...theme.textStyles.bodySmall, color: theme.colors.primary.main, marginBottom: 2 },
-    cardAnnualFee: { ...theme.textStyles.caption, color: theme.colors.success.main, marginBottom: theme.spacing.xs },
+    cardDetails: { alignItems: 'center', marginTop: theme.spacing.md, marginBottom: theme.spacing.md },
+    cardReward: { ...theme.textStyles.bodySmall, color: theme.colors.primary.main, marginBottom: 4 },
+    cardAnnualFee: { ...theme.textStyles.caption, color: theme.colors.text.tertiary, marginBottom: 4 },
     cardCategories: { ...theme.textStyles.caption, color: theme.colors.text.tertiary },
     removeButton: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
-      backgroundColor: theme.colors.error.main,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginLeft: theme.spacing.md,
+      backgroundColor: theme.colors.error.background,
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.borderRadius.md,
+      borderWidth: 1,
+      borderColor: theme.colors.error.main,
     },
-    removeButtonText: { color: theme.colors.error.contrast, fontSize: 16, fontWeight: '700' },
+    removeButtonText: { color: theme.colors.error.main, fontSize: 14, fontWeight: '600' },
     emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
     emptyStateIcon: { fontSize: 64, marginBottom: theme.spacing.lg },
     emptyStateTitle: { ...theme.textStyles.h2, color: theme.colors.text.primary, marginBottom: theme.spacing.sm },

@@ -16,7 +16,7 @@ import {
   Modal,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { SearchInput, EmptyState } from '../components';
+import { SearchInput, EmptyState, CardDetailModal, RewardBadge, CardVisual } from '../components';
 import { useTheme, Theme } from '../theme';
 
 import {
@@ -66,110 +66,6 @@ function formatSignupBonusCurrency(currency: RewardType): string {
   return labels[currency] || currency;
 }
 
-// Card Detail Modal Component
-function CardDetailModal({
-  card,
-  visible,
-  onClose,
-  currentRewardRate,
-  t,
-  theme,
-}: {
-  card: Card | null;
-  visible: boolean;
-  onClose: () => void;
-  currentRewardRate?: { value: number; type: RewardType; unit: 'percent' | 'multiplier' };
-  t: (key: string, options?: Record<string, string | number>) => string;
-  theme: Theme;
-}) {
-  const modalStyles = useMemo(() => createModalStyles(theme), [theme]);
-
-  if (!card) return null;
-
-  const formatAnnualFee = (fee?: number) => {
-    if (fee === undefined || fee === 0) return t('cardDetail.noFee');
-    return `$${fee}/year`;
-  };
-
-  return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
-      <View style={modalStyles.container}>
-        <View style={modalStyles.header}>
-          <Text style={modalStyles.title}>{t('cardDetail.title')}</Text>
-          <TouchableOpacity onPress={onClose} accessibilityLabel={t('common.close')} accessibilityRole="button">
-            <Text style={modalStyles.closeButton}>{t('common.done')}</Text>
-          </TouchableOpacity>
-        </View>
-
-        <ScrollView style={modalStyles.content}>
-          <View style={modalStyles.cardHeader}>
-            <Text style={modalStyles.cardName}>{card.name}</Text>
-            <Text style={modalStyles.cardIssuer}>{card.issuer}</Text>
-            <Text style={modalStyles.cardProgram}>{card.rewardProgram}</Text>
-            <Text style={modalStyles.annualFee}>{formatAnnualFee(card.annualFee)}</Text>
-          </View>
-
-          {currentRewardRate && (
-            <View style={modalStyles.rateSection}>
-              <Text style={modalStyles.rateLabel}>{t('cardDetail.rewardAtThisStore')}</Text>
-              <View style={modalStyles.rateBox}>
-                <Text style={modalStyles.rateValue}>
-                  {formatRewardRate(currentRewardRate.value, currentRewardRate.unit)}
-                </Text>
-                <Text style={modalStyles.rateType}>{t(getRewardTypeLabelKey(currentRewardRate.type))}</Text>
-              </View>
-            </View>
-          )}
-
-          <View style={modalStyles.section}>
-            <Text style={modalStyles.sectionTitle}>{t('cardDetail.baseReward')}</Text>
-            <View style={modalStyles.row}>
-              <Text style={modalStyles.rowLabel}>{t('cardDetail.allPurchases')}</Text>
-              <Text style={modalStyles.rowValue}>
-                {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.unit)}{' '}
-                {t(getRewardTypeLabelKey(card.baseRewardRate.type))}
-              </Text>
-            </View>
-          </View>
-
-          {card.categoryRewards.length > 0 && (
-            <View style={modalStyles.section}>
-              <Text style={modalStyles.sectionTitle}>{t('cardDetail.bonusCategories')}</Text>
-              {card.categoryRewards.map((cr, index) => (
-                <View key={index} style={modalStyles.row}>
-                  <Text style={modalStyles.rowLabel}>{formatCategory(cr.category)}</Text>
-                  <Text style={modalStyles.rowValueHighlight}>
-                    {formatRewardRate(cr.rewardRate.value, cr.rewardRate.unit)}{' '}
-                    {t(getRewardTypeLabelKey(cr.rewardRate.type))}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {card.signupBonus && (
-            <View style={modalStyles.section}>
-              <Text style={modalStyles.sectionTitle}>{t('cardDetail.signupBonus')}</Text>
-              <View style={modalStyles.bonusBox}>
-                <Text style={modalStyles.bonusAmount}>
-                  {card.signupBonus.currency === RewardType.CASHBACK ? '$' : ''}
-                  {card.signupBonus.amount.toLocaleString()}
-                  {card.signupBonus.currency !== RewardType.CASHBACK ? ` ${formatSignupBonusCurrency(card.signupBonus.currency)}` : ''}
-                </Text>
-                <Text style={modalStyles.bonusDetails}>
-                  {t('cardDetail.signupBonusDetails', {
-                    spendRequirement: `$${card.signupBonus.spendRequirement.toLocaleString()}`,
-                    timeframeDays: card.signupBonus.timeframeDays,
-                  })}
-                </Text>
-              </View>
-            </View>
-          )}
-        </ScrollView>
-      </View>
-    </Modal>
-  );
-}
 
 // Best Card Section
 function BestCardSection({
@@ -188,20 +84,22 @@ function BestCardSection({
   return (
     <View style={styles.bestCardSection}>
       <Text style={styles.sectionLabel}>{t('home.bestCardToUse')}</Text>
-      <TouchableOpacity style={styles.bestCard} onPress={onPress} activeOpacity={0.8}>
-        <View style={styles.bestCardBadge}>
-          <Text style={styles.bestCardBadgeText}>#1</Text>
+      <View style={styles.bestCardContainer}>
+        <CardVisual
+          name={rankedCard.card.name}
+          issuer={rankedCard.card.issuer}
+          size="large"
+          onPress={onPress}
+        />
+        <View style={styles.bestCardBadgeContainer}>
+          <RewardBadge
+            type={rankedCard.rewardRate.type}
+            value={rankedCard.rewardRate.value}
+            unit={rankedCard.rewardRate.unit}
+            size="large"
+          />
         </View>
-        <Text style={styles.bestCardName}>{rankedCard.card.name}</Text>
-        <Text style={styles.bestCardIssuer}>{rankedCard.card.issuer}</Text>
-        <View style={styles.bestCardRewardContainer}>
-          <Text style={styles.bestCardRewardValue}>
-            {formatRewardRate(rankedCard.rewardRate.value, rankedCard.rewardRate.unit)}
-          </Text>
-          <Text style={styles.bestCardRewardType}>{t(getRewardTypeLabelKey(rankedCard.rewardRate.type))}</Text>
-        </View>
-        <Text style={styles.tapHint}>{t('home.tapForDetails')}</Text>
-      </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -559,8 +457,6 @@ export default function HomeScreen() {
         visible={showCardDetail}
         onClose={() => setShowCardDetail(false)}
         currentRewardRate={selectedRewardRate}
-        t={t}
-        theme={theme}
       />
     </KeyboardAvoidingView>
   );
@@ -609,35 +505,8 @@ const createStyles = (theme: Theme) =>
     },
     sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.sm },
     bestCardSection: { marginBottom: theme.spacing.xl },
-    bestCard: {
-      backgroundColor: theme.colors.primary.main,
-      borderRadius: theme.borderRadius.lg,
-      padding: theme.spacing.xl,
-    },
-    bestCardBadge: {
-      backgroundColor: 'rgba(255,255,255,0.2)',
-      alignSelf: 'flex-start',
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: theme.borderRadius.full,
-      marginBottom: theme.spacing.md,
-    },
-    bestCardBadgeText: { color: theme.colors.primary.contrast, fontSize: 13, fontWeight: '600' },
-    bestCardName: { ...theme.textStyles.h3, color: theme.colors.primary.contrast, marginBottom: theme.spacing.xs },
-    bestCardIssuer: {
-      ...theme.textStyles.bodySmall,
-      color: 'rgba(255,255,255,0.8)',
-      marginBottom: theme.spacing.lg,
-    },
-    bestCardRewardContainer: { flexDirection: 'row', alignItems: 'baseline' },
-    bestCardRewardValue: { fontSize: 36, fontWeight: '700', color: theme.colors.primary.contrast, marginRight: 8 },
-    bestCardRewardType: { ...theme.textStyles.body, color: 'rgba(255,255,255,0.9)' },
-    tapHint: {
-      ...theme.textStyles.caption,
-      color: 'rgba(255,255,255,0.6)',
-      marginTop: theme.spacing.md,
-      textAlign: 'center',
-    },
+    bestCardContainer: { alignItems: 'center' },
+    bestCardBadgeContainer: { marginTop: theme.spacing.md },
     allCardsSection: { marginBottom: theme.spacing.xl },
     rankedCardItem: {
       backgroundColor: theme.colors.background.secondary,
@@ -715,68 +584,3 @@ const createStyles = (theme: Theme) =>
     optimalText: { ...theme.textStyles.body, color: theme.colors.success.dark, fontWeight: '500' },
   });
 
-// Modal styles
-const createModalStyles = (theme: Theme) =>
-  StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.colors.background.primary },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: theme.spacing.screenPadding,
-      backgroundColor: theme.colors.background.secondary,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.light,
-    },
-    title: { ...theme.textStyles.h4, color: theme.colors.text.primary },
-    closeButton: { ...theme.textStyles.button, color: theme.colors.primary.main },
-    content: { flex: 1 },
-    cardHeader: { backgroundColor: theme.colors.primary.main, padding: theme.spacing.xl, alignItems: 'center' },
-    cardName: { ...theme.textStyles.h2, color: theme.colors.primary.contrast, textAlign: 'center', marginBottom: theme.spacing.xs },
-    cardIssuer: { ...theme.textStyles.body, color: 'rgba(255,255,255,0.9)', marginBottom: theme.spacing.xs },
-    cardProgram: { ...theme.textStyles.bodySmall, color: 'rgba(255,255,255,0.7)' },
-    annualFee: { ...theme.textStyles.bodySmall, color: theme.colors.success.light, marginTop: theme.spacing.sm, fontWeight: '600' },
-    rateSection: { padding: theme.spacing.screenPadding },
-    rateLabel: { ...theme.textStyles.label, color: theme.colors.text.tertiary, letterSpacing: 0.5, marginBottom: theme.spacing.sm },
-    rateBox: { backgroundColor: theme.colors.success.main, borderRadius: theme.borderRadius.md, padding: theme.spacing.xl, alignItems: 'center' },
-    rateValue: { fontSize: 42, fontWeight: '700', color: theme.colors.success.contrast },
-    rateType: { ...theme.textStyles.body, color: 'rgba(255,255,255,0.9)', marginTop: theme.spacing.xs },
-    section: {
-      backgroundColor: theme.colors.background.secondary,
-      marginHorizontal: theme.spacing.screenPadding,
-      marginBottom: theme.spacing.lg,
-      borderRadius: theme.borderRadius.md,
-      overflow: 'hidden',
-    },
-    sectionTitle: {
-      ...theme.textStyles.label,
-      color: theme.colors.text.tertiary,
-      letterSpacing: 0.5,
-      padding: theme.spacing.screenPadding,
-      paddingBottom: theme.spacing.sm,
-    },
-    row: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: theme.spacing.screenPadding,
-      paddingVertical: theme.spacing.md,
-      borderTopWidth: 1,
-      borderTopColor: theme.colors.border.light,
-    },
-    rowLabel: { ...theme.textStyles.body, color: theme.colors.text.primary },
-    rowValue: { ...theme.textStyles.body, color: theme.colors.text.tertiary },
-    rowValueHighlight: { ...theme.textStyles.body, color: theme.colors.primary.main, fontWeight: '600' },
-    bonusBox: {
-      backgroundColor: theme.colors.warning.background,
-      borderRadius: theme.borderRadius.md,
-      padding: theme.spacing.lg,
-      margin: theme.spacing.screenPadding,
-      marginTop: theme.spacing.sm,
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: theme.colors.rewards.points,
-    },
-    bonusAmount: { fontSize: 24, fontWeight: '700', color: theme.colors.warning.dark, marginBottom: theme.spacing.xs },
-    bonusDetails: { ...theme.textStyles.bodySmall, color: theme.colors.warning.dark, textAlign: 'center' },
-  });
