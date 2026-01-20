@@ -157,11 +157,7 @@ export function CircleIcon({
         style,
       ]}
     >
-      <Icon
-        name={name}
-        size={size * 0.5}
-        color={iconColor || theme.colors.primary.main}
-      />
+      <Icon name={name} size={size * 0.5} color={iconColor || theme.colors.primary.main} />
     </View>
   );
 }

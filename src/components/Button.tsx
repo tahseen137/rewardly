@@ -201,7 +201,14 @@ export function Button({
         ) : (
           <>
             {leftIcon && <>{leftIcon}</>}
-            <Text style={[getTextStyle(), leftIcon ? styles.textWithLeftIcon : null, rightIcon ? styles.textWithRightIcon : null, textStyle]}>
+            <Text
+              style={[
+                getTextStyle(),
+                leftIcon ? styles.textWithLeftIcon : null,
+                rightIcon ? styles.textWithRightIcon : null,
+                textStyle,
+              ]}
+            >
               {title}
             </Text>
             {rightIcon && <>{rightIcon}</>}

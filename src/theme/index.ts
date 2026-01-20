@@ -9,7 +9,14 @@ export type { Colors, ColorScheme } from './colors';
 export { spacing, layout } from './spacing';
 export type { Spacing, Layout } from './spacing';
 
-export { fontFamily, fontSize, lineHeight, fontWeight, letterSpacing, textStyles } from './typography';
+export {
+  fontFamily,
+  fontSize,
+  lineHeight,
+  fontWeight,
+  letterSpacing,
+  textStyles,
+} from './typography';
 export type { TextStyles } from './typography';
 
 export { borderRadius, borderWidth } from './borders';

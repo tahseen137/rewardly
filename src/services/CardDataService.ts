@@ -232,12 +232,8 @@ async function fetchCardsFromSupabase(): Promise<Card[]> {
   const typedSignupBonuses = (signupBonusRows || []) as SignupBonusRow[];
 
   const cards: Card[] = typedCardsRows.map((cardRow) => {
-    const cardCategoryRewards = typedCategoryRewards.filter(
-      (cr) => cr.card_id === cardRow.id
-    );
-    const cardSignupBonus = typedSignupBonuses.find(
-      (sb) => sb.card_id === cardRow.id
-    );
+    const cardCategoryRewards = typedCategoryRewards.filter((cr) => cr.card_id === cardRow.id);
+    const cardSignupBonus = typedSignupBonuses.find((sb) => sb.card_id === cardRow.id);
     return transformCardRow(cardRow, cardCategoryRewards, cardSignupBonus);
   });
 

@@ -38,31 +38,17 @@ export function EmptyState({
   const theme = useTheme();
 
   return (
-    <View
-      style={[
-        styles.container,
-        compact && styles.containerCompact,
-        style,
-      ]}
-    >
+    <View style={[styles.container, compact && styles.containerCompact, style]}>
       {(icon || customIcon) && (
         <View style={styles.iconContainer}>
           {customIcon || (
-            <Icon
-              name={icon!}
-              size={compact ? 40 : 48}
-              color={theme.colors.text.tertiary}
-            />
+            <Icon name={icon!} size={compact ? 40 : 48} color={theme.colors.text.tertiary} />
           )}
         </View>
       )}
 
       <Text
-        style={[
-          styles.title,
-          compact && styles.titleCompact,
-          { color: theme.colors.text.primary },
-        ]}
+        style={[styles.title, compact && styles.titleCompact, { color: theme.colors.text.primary }]}
         accessibilityRole="header"
       >
         {title}

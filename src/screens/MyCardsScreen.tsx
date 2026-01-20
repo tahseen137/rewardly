@@ -16,7 +16,12 @@ import {
   RefreshControl,
 } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  runOnJS,
+} from 'react-native-reanimated';
 import { useTheme, Theme } from '../theme';
 import { CardVisual } from '../components';
 import { Card, UserCard, RewardType } from '../types';
@@ -78,15 +83,16 @@ function CardItem({
       </View>
       <GestureDetector gesture={panGesture}>
         <Animated.View style={[styles.cardItem, animatedStyle]}>
-          <CardVisual
-            name={card.name}
-            issuer={card.issuer}
-            size="medium"
-          />
+          <CardVisual name={card.name} issuer={card.issuer} size="medium" />
           <View style={styles.cardDetails}>
             <Text style={styles.cardAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
             <Text style={styles.cardReward}>
-              Base: {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.type, card.baseRewardRate.unit)}
+              Base:{' '}
+              {formatRewardRate(
+                card.baseRewardRate.value,
+                card.baseRewardRate.type,
+                card.baseRewardRate.unit
+              )}
             </Text>
             {card.categoryRewards.length > 0 && (
               <Text style={styles.cardCategories}>
@@ -135,13 +141,21 @@ function CardPickerItem({
       accessibilityRole="button"
     >
       <View style={styles.pickerItemInfo}>
-        <Text style={[styles.pickerItemName, isOwned && styles.pickerItemTextDisabled]}>{card.name}</Text>
-        <Text style={[styles.pickerItemIssuer, isOwned && styles.pickerItemTextDisabled]}>{card.issuer}</Text>
+        <Text style={[styles.pickerItemName, isOwned && styles.pickerItemTextDisabled]}>
+          {card.name}
+        </Text>
+        <Text style={[styles.pickerItemIssuer, isOwned && styles.pickerItemTextDisabled]}>
+          {card.issuer}
+        </Text>
         <Text style={[styles.pickerItemAnnualFee, isOwned && styles.pickerItemTextDisabled]}>
           {formatAnnualFee(card.annualFee)}
         </Text>
         <Text style={[styles.pickerItemReward, isOwned && styles.pickerItemTextDisabled]}>
-          {formatRewardRate(card.baseRewardRate.value, card.baseRewardRate.type, card.baseRewardRate.unit)}
+          {formatRewardRate(
+            card.baseRewardRate.value,
+            card.baseRewardRate.type,
+            card.baseRewardRate.unit
+          )}
         </Text>
       </View>
       {isOwned && <Text style={styles.ownedBadge}>Owned</Text>}
@@ -219,18 +233,22 @@ export default function MyCardsScreen() {
         });
       }
     } else {
-      Alert.alert('Remove Card', `Are you sure you want to remove ${cardName} from your portfolio?`, [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            const result = await removeCard(cardId);
-            if (result.success) setPortfolio(getCards());
-            else Alert.alert('Error', 'Failed to remove card. Please try again.');
+      Alert.alert(
+        'Remove Card',
+        `Are you sure you want to remove ${cardName} from your portfolio?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Remove',
+            style: 'destructive',
+            onPress: async () => {
+              const result = await removeCard(cardId);
+              if (result.success) setPortfolio(getCards());
+              else Alert.alert('Error', 'Failed to remove card. Please try again.');
+            },
           },
-        },
-      ]);
+        ]
+      );
     }
   };
 
@@ -259,7 +277,9 @@ export default function MyCardsScreen() {
           <FlatList
             data={portfolio}
             keyExtractor={(item) => item.cardId}
-            renderItem={({ item }) => <CardItem userCard={item} onRemove={handleRemoveCard} theme={theme} />}
+            renderItem={({ item }) => (
+              <CardItem userCard={item} onRemove={handleRemoveCard} theme={theme} />
+            )}
             contentContainerStyle={styles.listContent}
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           />
@@ -315,7 +335,12 @@ export default function MyCardsScreen() {
               data={availableCards}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <CardPickerItem card={item} isOwned={ownedCardIds.has(item.id)} onSelect={handleAddCard} theme={theme} />
+                <CardPickerItem
+                  card={item}
+                  isOwned={ownedCardIds.has(item.id)}
+                  onSelect={handleAddCard}
+                  theme={theme}
+                />
               )}
               contentContainerStyle={styles.pickerListContent}
             />
@@ -358,9 +383,21 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       ...theme.shadows.card,
     },
-    cardDetails: { alignItems: 'center', marginTop: theme.spacing.md, marginBottom: theme.spacing.md },
-    cardReward: { ...theme.textStyles.bodySmall, color: theme.colors.primary.main, marginBottom: 4 },
-    cardAnnualFee: { ...theme.textStyles.caption, color: theme.colors.text.tertiary, marginBottom: 4 },
+    cardDetails: {
+      alignItems: 'center',
+      marginTop: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+    },
+    cardReward: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.primary.main,
+      marginBottom: 4,
+    },
+    cardAnnualFee: {
+      ...theme.textStyles.caption,
+      color: theme.colors.text.tertiary,
+      marginBottom: 4,
+    },
     cardCategories: { ...theme.textStyles.caption, color: theme.colors.text.tertiary },
     removeButton: {
       backgroundColor: theme.colors.error.background,
@@ -373,7 +410,11 @@ const createStyles = (theme: Theme) =>
     removeButtonText: { color: theme.colors.error.main, fontSize: 14, fontWeight: '600' },
     emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
     emptyStateIcon: { fontSize: 64, marginBottom: theme.spacing.lg },
-    emptyStateTitle: { ...theme.textStyles.h2, color: theme.colors.text.primary, marginBottom: theme.spacing.sm },
+    emptyStateTitle: {
+      ...theme.textStyles.h2,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.sm,
+    },
     emptyStateText: {
       ...theme.textStyles.body,
       color: theme.colors.text.secondary,
@@ -399,7 +440,12 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'center',
       ...theme.shadows.md,
     },
-    fabText: { color: theme.colors.primary.contrast, fontSize: 28, fontWeight: '400', marginTop: -2 },
+    fabText: {
+      color: theme.colors.primary.contrast,
+      fontSize: 28,
+      fontWeight: '400',
+      marginTop: -2,
+    },
     modalContainer: { flex: 1, backgroundColor: theme.colors.background.primary },
     modalHeader: {
       flexDirection: 'row',
@@ -433,12 +479,30 @@ const createStyles = (theme: Theme) =>
     },
     pickerItemDisabled: { opacity: 0.6 },
     pickerItemInfo: { flex: 1 },
-    pickerItemName: { ...theme.textStyles.body, fontWeight: '500', color: theme.colors.text.primary, marginBottom: 2 },
-    pickerItemIssuer: { ...theme.textStyles.bodySmall, color: theme.colors.text.secondary, marginBottom: 2 },
+    pickerItemName: {
+      ...theme.textStyles.body,
+      fontWeight: '500',
+      color: theme.colors.text.primary,
+      marginBottom: 2,
+    },
+    pickerItemIssuer: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.text.secondary,
+      marginBottom: 2,
+    },
     pickerItemReward: { ...theme.textStyles.caption, color: theme.colors.primary.main },
-    pickerItemAnnualFee: { ...theme.textStyles.caption, color: theme.colors.success.main, marginBottom: 2 },
+    pickerItemAnnualFee: {
+      ...theme.textStyles.caption,
+      color: theme.colors.success.main,
+      marginBottom: 2,
+    },
     pickerItemTextDisabled: { color: theme.colors.text.tertiary },
-    ownedBadge: { ...theme.textStyles.caption, color: theme.colors.success.main, fontWeight: '600', marginLeft: theme.spacing.sm },
+    ownedBadge: {
+      ...theme.textStyles.caption,
+      color: theme.colors.success.main,
+      fontWeight: '600',
+      marginLeft: theme.spacing.sm,
+    },
     loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
     loadingText: { ...theme.textStyles.body, color: theme.colors.text.secondary },
   });

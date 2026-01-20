@@ -65,10 +65,7 @@ export function Modal({
       onRequestClose={onClose}
     >
       <SafeAreaView
-        style={[
-          styles.container,
-          { backgroundColor: theme.colors.background.primary },
-        ]}
+        style={[styles.container, { backgroundColor: theme.colors.background.primary }]}
       >
         <KeyboardAvoidingView
           style={styles.keyboardView}

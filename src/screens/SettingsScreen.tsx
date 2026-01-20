@@ -110,9 +110,7 @@ function RewardTypeOption({
     >
       <Text style={styles.optionIcon}>{icon}</Text>
       <View style={styles.optionInfo}>
-        <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
-          {label}
-        </Text>
+        <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>{label}</Text>
         <Text style={styles.optionDescription}>{description}</Text>
       </View>
       <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
@@ -154,9 +152,7 @@ function LanguageOption({
     >
       <Text style={styles.optionIcon}>{icon}</Text>
       <View style={styles.optionInfo}>
-        <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
-          {label}
-        </Text>
+        <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>{label}</Text>
       </View>
       <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
         {isSelected && <View style={styles.radioInner} />}
@@ -194,13 +190,13 @@ export default function SettingsScreen() {
     setRewardType(getRewardTypePreference());
     setNewCardSuggestions(isNewCardSuggestionsEnabled());
     setCurrentLanguage(getLanguage());
-    
+
     // Load card count and last sync time
     const cards = await getAllCards();
     setCardCount(cards.length);
     const syncTime = await getLastSyncTime();
     setLastSync(syncTime);
-    
+
     setIsLoading(false);
   }, []);
 
@@ -226,11 +222,9 @@ export default function SettingsScreen() {
 
   const handleRefreshCards = async () => {
     if (!isSupabaseConfigured()) {
-      Alert.alert(
-        t('settings.refreshCards'),
-        t('settings.supabaseNotConfigured'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('settings.refreshCards'), t('settings.supabaseNotConfigured'), [
+        { text: t('common.ok') },
+      ]);
       return;
     }
 
@@ -240,18 +234,16 @@ export default function SettingsScreen() {
       setCardCount(cards.length);
       const syncTime = await getLastSyncTime();
       setLastSync(syncTime);
-      
+
       Alert.alert(
         t('settings.refreshSuccess'),
         t('settings.refreshSuccessMessage', { count: cards.length }),
         [{ text: t('common.ok') }]
       );
     } catch (error) {
-      Alert.alert(
-        t('settings.refreshError'),
-        t('settings.refreshErrorMessage'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('settings.refreshError'), t('settings.refreshErrorMessage'), [
+        { text: t('common.ok') },
+      ]);
     } finally {
       setIsRefreshing(false);
     }
@@ -269,9 +261,7 @@ export default function SettingsScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <SectionHeader title={t('settings.rewardPreference')} theme={theme} />
       <View style={styles.section}>
-        <Text style={styles.sectionDescription}>
-          {t('settings.rewardPreferenceDescription')}
-        </Text>
+        <Text style={styles.sectionDescription}>{t('settings.rewardPreferenceDescription')}</Text>
         <View style={styles.optionsContainer}>
           {REWARD_TYPE_OPTIONS.map((option) => (
             <RewardTypeOption
@@ -310,9 +300,7 @@ export default function SettingsScreen() {
 
       <SectionHeader title={t('settings.language')} theme={theme} />
       <View style={styles.section}>
-        <Text style={styles.sectionDescription}>
-          {t('settings.languageDescription')}
-        </Text>
+        <Text style={styles.sectionDescription}>{t('settings.languageDescription')}</Text>
         <View style={styles.optionsContainer}>
           {LANGUAGE_OPTIONS.map((option) => (
             <LanguageOption
@@ -372,14 +360,11 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          {t('settings.footerText')}
-        </Text>
+        <Text style={styles.footerText}>{t('settings.footerText')}</Text>
       </View>
     </ScrollView>
   );
 }
-
 
 const createStyles = (theme: Theme) =>
   StyleSheet.create({

@@ -91,12 +91,7 @@ export function BottomSheet({
   ).current;
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="none"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={styles.backdrop} />
@@ -123,7 +118,10 @@ export function BottomSheet({
           {title && (
             <View style={styles.header}>
               <Text style={styles.title}>{title}</Text>
-              <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+              <TouchableOpacity
+                onPress={onClose}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
                 <Text style={styles.closeButton}>Done</Text>
               </TouchableOpacity>
             </View>
@@ -137,51 +135,52 @@ export function BottomSheet({
   );
 }
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: theme.colors.overlay.dark,
-  },
-  sheet: {
-    backgroundColor: theme.colors.background.secondary,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    overflow: 'hidden',
-  },
-  handleContainer: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  handle: {
-    width: 36,
-    height: 5,
-    backgroundColor: theme.colors.neutral.gray300,
-    borderRadius: 2.5,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: theme.spacing.screenPadding,
-    paddingVertical: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border.light,
-  },
-  title: {
-    ...theme.textStyles.h3,
-    color: theme.colors.text.primary,
-  },
-  closeButton: {
-    ...theme.textStyles.button,
-    color: theme.colors.primary.main,
-  },
-  content: {
-    flex: 1,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      justifyContent: 'flex-end',
+    },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: theme.colors.overlay.dark,
+    },
+    sheet: {
+      backgroundColor: theme.colors.background.secondary,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      overflow: 'hidden',
+    },
+    handleContainer: {
+      alignItems: 'center',
+      paddingVertical: 8,
+    },
+    handle: {
+      width: 36,
+      height: 5,
+      backgroundColor: theme.colors.neutral.gray300,
+      borderRadius: 2.5,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.screenPadding,
+      paddingVertical: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.light,
+    },
+    title: {
+      ...theme.textStyles.h3,
+      color: theme.colors.text.primary,
+    },
+    closeButton: {
+      ...theme.textStyles.button,
+      color: theme.colors.primary.main,
+    },
+    content: {
+      flex: 1,
+    },
+  });
 
 export default BottomSheet;
