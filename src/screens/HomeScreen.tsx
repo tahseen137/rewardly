@@ -11,7 +11,6 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  TouchableOpacity,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
@@ -24,7 +23,7 @@ import {
 import { useTheme, Theme } from '../theme';
 import { Store, SpendingCategory } from '../types';
 import { getCards } from '../services/CardPortfolioManager';
-import { getAllCardsSync, initializeMemoryCacheSync } from '../services/CardDataService';
+import { getAllCardsSync, getAllCards } from '../services/CardDataService';
 import {
   calculateRewards,
   CalculatorInput,
@@ -42,8 +41,8 @@ interface CalculatorState {
   amountError: string | null;
   results: CalculatorOutput | null;
   isCalculating: boolean;
-  showCategoryPicker: boolean;
-  mode: 'store' | 'manual'; // Store selection or manual category
+  isLoading: boolean;
+  loadError: string | null;
 }
 
 // ============================================================================
@@ -63,37 +62,42 @@ export default function HomeScreen() {
     amountError: null,
     results: null,
     isCalculating: false,
-    showCategoryPicker: false,
-    mode: 'store',
+    isLoading: true,
+    loadError: null,
   });
 
   const [hasCards, setHasCards] = useState(false);
 
-  // Initialize data on mount
+  // Initialize data on mount - fetch cards from database
   useEffect(() => {
-    initializeMemoryCacheSync();
-    const portfolio = getCards();
-    setHasCards(portfolio.length > 0);
+    const initializeData = async () => {
+      try {
+        await getAllCards();
+        const portfolio = getCards();
+        setHasCards(portfolio.length > 0);
+        setState((prev) => ({ ...prev, isLoading: false, loadError: null }));
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load card data';
+        setState((prev) => ({ ...prev, isLoading: false, loadError: errorMessage }));
+      }
+    };
+    initializeData();
   }, []);
 
-  // Handle store selection
+  // Handle store selection - auto-set category from store
   const handleStoreSelect = useCallback((store: Store) => {
     setState((prev) => ({
       ...prev,
       selectedStore: store,
       selectedCategory: store.category,
-      showCategoryPicker: false,
-      mode: 'store',
     }));
   }, []);
 
-  // Handle manual category selection
+  // Handle category selection (manual override or when no store selected)
   const handleCategorySelect = useCallback((category: SpendingCategory) => {
     setState((prev) => ({
       ...prev,
       selectedCategory: category,
-      selectedStore: null,
-      mode: 'manual',
     }));
   }, []);
 
@@ -162,14 +166,24 @@ export default function HomeScreen() {
     }
   }, [state.selectedCategory, state.amount]);
 
-  // Toggle between store and manual mode
-  const handleToggleMode = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      mode: prev.mode === 'store' ? 'manual' : 'store',
-      showCategoryPicker: prev.mode === 'store',
-    }));
-  }, []);
+  // Show loading state
+  if (state.isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={styles.subtitle}>{t('common.loading') || 'Loading...'}</Text>
+      </View>
+    );
+  }
+
+  // Show error state if database failed to load
+  if (state.loadError) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+        <Text style={[styles.title, { marginBottom: 10 }]}>Unable to Load Data</Text>
+        <Text style={[styles.subtitle, { textAlign: 'center' }]}>{state.loadError}</Text>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -189,71 +203,26 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* Mode Toggle */}
-        <View style={styles.modeToggle}>
-          <TouchableOpacity
-            style={[
-              styles.modeButton,
-              state.mode === 'store' && styles.modeButtonActive,
-              { borderColor: theme.colors.border.light },
-              state.mode === 'store' && { backgroundColor: theme.colors.primary.main },
-            ]}
-            onPress={() => {
-              setState((prev) => ({ ...prev, mode: 'store', showCategoryPicker: false }));
-            }}
-          >
-            <Text
-              style={[
-                styles.modeButtonText,
-                { color: theme.colors.text.secondary },
-                state.mode === 'store' && { color: theme.colors.primary.contrast },
-              ]}
-            >
-              🏪 Store
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.modeButton,
-              state.mode === 'manual' && styles.modeButtonActive,
-              { borderColor: theme.colors.border.light },
-              state.mode === 'manual' && { backgroundColor: theme.colors.primary.main },
-            ]}
-            onPress={() => {
-              setState((prev) => ({ ...prev, mode: 'manual', showCategoryPicker: true }));
-            }}
-          >
-            <Text
-              style={[
-                styles.modeButtonText,
-                { color: theme.colors.text.secondary },
-                state.mode === 'manual' && { color: theme.colors.primary.contrast },
-              ]}
-            >
-              📂 Category
-            </Text>
-          </TouchableOpacity>
+        {/* Store Selector */}
+        <View style={styles.section}>
+          <StoreSelector
+            onStoreSelect={handleStoreSelect}
+            onCategorySelect={handleCategorySelect}
+            selectedStore={state.selectedStore}
+            selectedCategory={state.selectedCategory}
+          />
         </View>
 
-        {/* Store Selector or Category Picker */}
-        {state.mode === 'store' ? (
-          <View style={styles.section}>
-            <StoreSelector
-              onStoreSelect={handleStoreSelect}
-              onCategorySelect={handleCategorySelect}
-              selectedStore={state.selectedStore}
-              selectedCategory={state.selectedCategory}
-            />
-          </View>
-        ) : (
-          <View style={styles.section}>
-            <CategoryPicker
-              onCategorySelect={handleCategorySelect}
-              selectedCategory={state.selectedCategory}
-              label={t('home.selectCategory') || 'Select Category'}
-            />
-          </View>
-        )}
+        {/* Category Picker - shows auto-filled category or allows manual override */}
+        <View style={styles.section}>
+          <CategoryPicker
+            onCategorySelect={handleCategorySelect}
+            selectedCategory={state.selectedCategory}
+            label={state.selectedStore
+              ? (t('home.categoryFromStore') || 'Category (from store)')
+              : (t('home.selectCategory') || 'Select Category')}
+          />
+        </View>
 
         {/* Amount Input */}
         <View style={styles.section}>
@@ -271,7 +240,7 @@ export default function HomeScreen() {
           <EmptyState
             icon="💳"
             title={t('home.noCardsTitle') || 'No Cards in Portfolio'}
-            message={
+            description={
               t('home.noCardsMessage') || 'Add cards to your portfolio to see rewards'
             }
           />
@@ -296,7 +265,7 @@ export default function HomeScreen() {
           <EmptyState
             icon="🔍"
             title={t('home.getStartedTitle') || 'Get Started'}
-            message={
+            description={
               t('home.getStartedMessage') ||
               'Select a store or category and enter an amount to see rewards'
             }
@@ -335,27 +304,6 @@ const createStyles = (theme: Theme) =>
     subtitle: {
       ...theme.textStyles.body,
       color: theme.colors.text.secondary,
-    },
-    modeToggle: {
-      flexDirection: 'row',
-      marginBottom: theme.spacing.lg,
-      gap: theme.spacing.sm,
-    },
-    modeButton: {
-      flex: 1,
-      paddingVertical: theme.spacing.md,
-      paddingHorizontal: theme.spacing.lg,
-      borderRadius: theme.borderRadius.md,
-      borderWidth: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    modeButtonActive: {
-      borderWidth: 0,
-    },
-    modeButtonText: {
-      fontSize: 16,
-      fontWeight: '600',
     },
     section: {
       marginBottom: theme.spacing.lg,

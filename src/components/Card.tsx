@@ -13,7 +13,7 @@ interface CardProps {
   variant?: CardVariant;
   padding?: 'none' | 'small' | 'medium' | 'large';
   onPress?: () => void;
-  style?: ViewStyle;
+  style?: ViewStyle | ViewStyle[];
   accessibilityLabel?: string;
 }
 

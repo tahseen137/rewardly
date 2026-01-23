@@ -45,6 +45,7 @@ const categoryRewardArb = fc.record({
 
 /**
  * Generate a card with optional category rewards
+ * Note: pointValuation is required for non-cashback cards to be included in results
  */
 const cardArb = fc.record({
   id: fc.uuid(),
@@ -58,6 +59,7 @@ const cardArb = fc.record({
   }),
   categoryRewards: fc.array(categoryRewardArb, { maxLength: 5 }),
   annualFee: fc.option(fc.nat({ max: 1000 }), { nil: undefined }),
+  pointValuation: fc.double({ min: 0.5, max: 5, noNaN: true }), // Required for non-cashback cards
 });
 
 /**
@@ -241,16 +243,20 @@ describe('RewardsCalculatorService - Property Tests', () => {
      * For any points earned and point valuation (in cents), the CAD value should equal:
      * points × (point_valuation / 100).
      */
-    it('should calculate CAD value as points × (valuation / 100)', () => {
+    it('should calculate CAD value as points × (valuation / 100) for non-cashback cards', () => {
       fc.assert(
         fc.property(
           fc.double({ min: 0, max: 100000, noNaN: true }),
           pointValuationArb,
           cardArb,
           (points: number, pointValuation: number, card: Card) => {
-            // Create card without program details to use fallback
-            const cardWithoutProgram = { ...card, programDetails: undefined };
-            const cadValue = pointsToCad(points, cardWithoutProgram, pointValuation);
+            // Skip cashback cards - they return points directly
+            if (card.baseRewardRate.type === RewardType.CASHBACK) {
+              return;
+            }
+            // Create card without program details and pointValuation to use fallback
+            const cardWithoutValuation = { ...card, programDetails: undefined, pointValuation: undefined };
+            const cadValue = pointsToCad(points, cardWithoutValuation, pointValuation);
             const expectedValue = points * (pointValuation / 100);
             expect(cadValue).toBeCloseTo(expectedValue, 10);
           }
@@ -281,11 +287,14 @@ describe('RewardsCalculatorService - Property Tests', () => {
             expect(output.results).toHaveLength(1);
             const result = output.results[0];
 
-            // Calculate expected CAD value
-            const expectedCadValue = result.pointsEarned * (pointValuation / 100);
-
-            // Verify CAD value calculation
-            expect(result.cadValue).toBeCloseTo(expectedCadValue, 10);
+            if (result.isCashback) {
+              // For cashback, CAD value equals points earned (no conversion)
+              expect(result.cadValue).toBeCloseTo(result.pointsEarned, 10);
+            } else {
+              // For points/miles, use card's pointValuation (since our cardArb includes it)
+              const expectedCadValue = result.pointsEarned * (result.pointValuation / 100);
+              expect(result.cadValue).toBeCloseTo(expectedCadValue, 10);
+            }
           }
         ),
         { numRuns: 100 }
@@ -307,19 +316,48 @@ describe('RewardsCalculatorService - Property Tests', () => {
       );
     });
 
-    it('should scale CAD value linearly with point valuation', () => {
+    it('should scale CAD value linearly with point valuation for points/miles cards', () => {
       fc.assert(
         fc.property(
           fc.double({ min: 1, max: 10000, noNaN: true }),
           pointValuationArb,
           cardArb,
           (points: number, pointValuation: number, card: Card) => {
-            const cardWithoutProgram = { ...card, programDetails: undefined };
-            const cadValue1 = pointsToCad(points, cardWithoutProgram, pointValuation);
-            const cadValue2 = pointsToCad(points, cardWithoutProgram, pointValuation * 2);
+            // Only test non-cashback cards (cashback doesn't use point valuation)
+            if (card.baseRewardRate.type === RewardType.CASHBACK) {
+              return; // Skip cashback cards
+            }
+            // Remove card's pointValuation and programDetails to test fallback behavior
+            const cardWithoutValuation = { ...card, programDetails: undefined, pointValuation: undefined };
+            const cadValue1 = pointsToCad(points, cardWithoutValuation, pointValuation);
+            const cadValue2 = pointsToCad(points, cardWithoutValuation, pointValuation * 2);
 
-            // CAD value should double when valuation doubles
+            // CAD value should double when valuation doubles for points/miles cards
             expect(cadValue2).toBeCloseTo(cadValue1 * 2, 10);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should return points directly as CAD value for cashback cards', () => {
+      fc.assert(
+        fc.property(
+          fc.double({ min: 1, max: 10000, noNaN: true }),
+          pointValuationArb,
+          (points: number, pointValuation: number) => {
+            const cashbackCard: Card = {
+              id: 'test-cashback',
+              name: 'Test Cashback Card',
+              issuer: 'Test Bank',
+              rewardProgram: 'Cash Back',
+              baseRewardRate: { value: 1, type: RewardType.CASHBACK, unit: 'percent' },
+              categoryRewards: [],
+            };
+            const cadValue = pointsToCad(points, cashbackCard, pointValuation);
+
+            // For cashback, points ARE the CAD value (no conversion)
+            expect(cadValue).toBe(points);
           }
         ),
         { numRuns: 100 }

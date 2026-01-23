@@ -21,11 +21,14 @@ export interface RewardCalculationResult {
   rewardProgram: string;
   rewardCurrency: RewardType;
   pointsEarned: number;
-  cadValue: number;
+  cadValue: number;           // Converted value in CAD
+  originalPrice: number;      // Purchase amount
+  effectivePrice: number;     // originalPrice - cadValue
   multiplierUsed: number;
   isBaseRate: boolean;
+  isCashback: boolean;        // true if cashback (no conversion)
   annualFee: number;
-  pointValuation: number; // in CAD cents
+  pointValuation: number;     // in CAD cents
 }
 
 /**
@@ -74,18 +77,24 @@ export function getApplicableMultiplier(card: Card, category: SpendingCategory):
 /**
  * Convert reward points to CAD value
  * Uses optimal rate from program details if available
+ * For cashback cards, returns the points value directly (cashback is already in dollars)
  *
- * @param points - Number of points earned
- * @param card - The credit card (to check for program details)
+ * @param points - Number of points earned (or cashback dollars for cashback cards)
+ * @param card - The credit card (to check for program details and reward type)
  * @param fallbackValuation - Fallback value of one point in CAD cents
- * @returns CAD value of the points
+ * @returns CAD value of the points/cashback
  */
 export function pointsToCad(points: number, card: Card, fallbackValuation: number): number {
-  // Use optimal rate from program details if available
-  const pointValuation = card.programDetails?.optimalRateCents 
-    ? card.programDetails.optimalRateCents
-    : fallbackValuation;
-    
+  // For cashback cards, the "points" are already in dollars (percentage of purchase)
+  if (card.baseRewardRate.type === RewardType.CASHBACK) {
+    return points; // Already in CAD
+  }
+
+  // For points/miles cards, use optimal rate from program details if available
+  const pointValuation = card.programDetails?.optimalRateCents
+    ?? card.pointValuation
+    ?? fallbackValuation;
+
   return points * (pointValuation / 100);
 }
 
@@ -117,10 +126,18 @@ export function calculateRewards(
         return null;
       }
 
-      // Get point valuation - use optimal rate from program if available
-      const pointValuation = card.programDetails?.optimalRateCents 
-        ? card.programDetails.optimalRateCents
-        : (pointValuations.get(cardId) || card.pointValuation || 1);
+      // Check if this is a cashback card
+      const isCashback = card.baseRewardRate.type === RewardType.CASHBACK;
+
+      // Get point valuation - require database value for non-cashback cards
+      const pointValuation = card.programDetails?.optimalRateCents
+        ?? card.pointValuation
+        ?? (isCashback ? 100 : null); // For cashback, 100 cents = $1
+
+      // Skip cards without valid point valuation (except cashback)
+      if (pointValuation === null) {
+        return null;
+      }
 
       // Get applicable multiplier
       const multiplier = getApplicableMultiplier(card, category);
@@ -135,6 +152,9 @@ export function calculateRewards(
       // Calculate CAD value using the card object
       const cadValue = pointsToCad(pointsEarned, card, pointValuation);
 
+      // Calculate effective price
+      const effectivePrice = amount - cadValue;
+
       // Build result
       const result: RewardCalculationResult = {
         cardId: card.id,
@@ -144,8 +164,11 @@ export function calculateRewards(
         rewardCurrency: card.baseRewardRate.type,
         pointsEarned,
         cadValue,
+        originalPrice: amount,
+        effectivePrice,
         multiplierUsed: multiplier,
         isBaseRate,
+        isCashback,
         annualFee: card.annualFee || 0,
         pointValuation,
       };
