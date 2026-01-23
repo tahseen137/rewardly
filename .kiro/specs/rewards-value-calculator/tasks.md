@@ -60,7 +60,7 @@ Each task group follows this workflow:
   - Ensure all tests pass, ask the user if questions arise.
   - Merge to main: `git checkout main && git merge feature/rewards-calculator-service && git push origin main`
 
-- [-] 3. Create Amount Input Utilities
+- [x] 3. Create Amount Input Utilities
   - [x] 3.0 Git setup for amount utilities
     - Run: `git checkout main && git pull origin main`
     - Run: `git checkout -b feature/amount-utilities`
@@ -88,7 +88,7 @@ Each task group follows this workflow:
     - **Property 13: CAD Value Formatting**
     - **Validates: Requirements 5.3**
 
-  - [-] 3.6 Push amount utilities to GitHub
+  - [x] 3.6 Push amount utilities to GitHub
     - Run: `git add . && git commit -m "feat: add amount validation and formatting utilities"`
     - Run: `git push origin feature/amount-utilities`
 

@@ -29,6 +29,24 @@ export function validateAmount(input: string | number | null | undefined): Amoun
     };
   }
 
+  // If string, validate it's purely numeric (with optional decimal point)
+  if (typeof input === 'string') {
+    // Trim whitespace
+    const trimmed = input.trim();
+    
+    // Check if string is purely numeric (allows optional decimal point and digits)
+    // This regex matches: optional minus, digits, optional decimal point with digits
+    const numericRegex = /^-?\d+(\.\d+)?$/;
+    
+    if (!numericRegex.test(trimmed)) {
+      return {
+        isValid: false,
+        error: 'Please enter a valid number',
+        value: null,
+      };
+    }
+  }
+
   // Convert to number if string
   const numValue = typeof input === 'string' ? parseFloat(input) : input;
 
