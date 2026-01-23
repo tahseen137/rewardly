@@ -1,6 +1,6 @@
 /**
  * StoreSelector - Searchable dropdown for store selection
- * Requirements: 1.1, 1.2, 1.4
+ * Requirements: 1.1, 1.2, 1.4, 1.5
  */
 
 import React, { useState, useEffect } from 'react';
@@ -15,20 +15,25 @@ import {
 } from 'react-native';
 import { SearchInput } from './SearchInput';
 import { Card } from './Card';
+import { Button } from './Button';
 import { useTheme } from '../theme';
 import { Store, SpendingCategory } from '../types';
 import { searchStores } from '../services/StoreDataService';
 
 interface StoreSelectorProps {
   onStoreSelect: (store: Store) => void;
+  onCategorySelect: (category: SpendingCategory) => void;
   selectedStore: Store | null;
+  selectedCategory: SpendingCategory | null;
   label?: string;
   placeholder?: string;
 }
 
 export function StoreSelector({
   onStoreSelect,
+  onCategorySelect,
   selectedStore,
+  selectedCategory,
   label = 'Select Store',
   placeholder = 'Search for a store...',
 }: StoreSelectorProps) {
@@ -36,14 +41,19 @@ export function StoreSelector({
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<Store[]>([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [showNoResults, setShowNoResults] = useState(false);
 
   // Update suggestions when search query changes
   useEffect(() => {
     if (searchQuery.trim() === '') {
       setSuggestions([]);
+      setShowNoResults(false);
     } else {
       const results = searchStores(searchQuery);
       setSuggestions(results.slice(0, 10)); // Limit to 10 suggestions
+      
+      // Show "no results" if user has typed enough and no matches
+      setShowNoResults(searchQuery.length >= 3 && results.length === 0);
     }
   }, [searchQuery]);
 
@@ -52,11 +62,18 @@ export function StoreSelector({
     setSearchQuery('');
     setSuggestions([]);
     setIsDropdownVisible(false);
+    setShowNoResults(false);
   };
 
   const handleClear = () => {
     setSearchQuery('');
     setSuggestions([]);
+    setShowNoResults(false);
+  };
+
+  const handleClearSelection = () => {
+    onStoreSelect(null as any);
+    setSearchQuery('');
   };
 
   const getCategoryLabel = (category: SpendingCategory): string => {
@@ -103,7 +120,7 @@ export function StoreSelector({
               </View>
             </View>
             <TouchableOpacity
-              onPress={() => onStoreSelect(null as any)}
+              onPress={handleClearSelection}
               style={styles.clearButton}
               accessibilityLabel="Clear store selection"
               accessibilityRole="button"
@@ -124,7 +141,7 @@ export function StoreSelector({
           />
 
           {/* Suggestions Dropdown */}
-          {isDropdownVisible && suggestions.length > 0 && (
+          {isDropdownVisible && (suggestions.length > 0 || showNoResults) && (
             <Modal
               visible={isDropdownVisible}
               transparent
@@ -145,35 +162,46 @@ export function StoreSelector({
                     },
                   ]}
                 >
-                  <FlatList
-                    data={suggestions}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                      <TouchableOpacity
-                        style={[
-                          styles.suggestionItem,
-                          { borderBottomColor: theme.colors.border.light },
-                        ]}
-                        onPress={() => handleStoreSelect(item)}
-                        accessibilityLabel={`Select ${item.name}`}
-                        accessibilityRole="button"
-                      >
-                        <View style={styles.suggestionContent}>
-                          <Text style={[styles.storeName, { color: theme.colors.text.primary }]}>
-                            {item.name}
-                          </Text>
-                          <View style={styles.categoryBadge}>
-                            <Text style={styles.categoryIcon}>{getCategoryIcon(item.category)}</Text>
-                            <Text style={[styles.categoryText, { color: theme.colors.text.secondary }]}>
-                              {getCategoryLabel(item.category)}
+                  {suggestions.length > 0 ? (
+                    <FlatList
+                      data={suggestions}
+                      keyExtractor={(item) => item.id}
+                      renderItem={({ item }) => (
+                        <TouchableOpacity
+                          style={[
+                            styles.suggestionItem,
+                            { borderBottomColor: theme.colors.border.light },
+                          ]}
+                          onPress={() => handleStoreSelect(item)}
+                          accessibilityLabel={`Select ${item.name}`}
+                          accessibilityRole="button"
+                        >
+                          <View style={styles.suggestionContent}>
+                            <Text style={[styles.storeName, { color: theme.colors.text.primary }]}>
+                              {item.name}
                             </Text>
+                            <View style={styles.categoryBadge}>
+                              <Text style={styles.categoryIcon}>{getCategoryIcon(item.category)}</Text>
+                              <Text style={[styles.categoryText, { color: theme.colors.text.secondary }]}>
+                                {getCategoryLabel(item.category)}
+                              </Text>
+                            </View>
                           </View>
-                        </View>
-                      </TouchableOpacity>
-                    )}
-                    style={styles.suggestionsList}
-                    keyboardShouldPersistTaps="handled"
-                  />
+                        </TouchableOpacity>
+                      )}
+                      style={styles.suggestionsList}
+                      keyboardShouldPersistTaps="handled"
+                    />
+                  ) : showNoResults ? (
+                    <View style={styles.noResultsContainer}>
+                      <Text style={[styles.noResultsText, { color: theme.colors.text.secondary }]}>
+                        Store not found
+                      </Text>
+                      <Text style={[styles.noResultsSubtext, { color: theme.colors.text.tertiary }]}>
+                        Try selecting a category manually instead
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
               </Pressable>
             </Modal>
@@ -255,6 +283,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 4,
+  },
+  noResultsContainer: {
+    padding: 24,
+    alignItems: 'center',
+  },
+  noResultsText: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  noResultsSubtext: {
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
 

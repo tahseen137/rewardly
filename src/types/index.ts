@@ -74,6 +74,7 @@ export interface Card {
   categoryRewards: CategoryReward[];
   annualFee?: number; // Annual fee in CAD
   signupBonus?: SignupBonus; // Signup bonus details
+  pointValuation?: number; // Value of one point in CAD cents
 }
 
 /**

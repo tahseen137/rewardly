@@ -51,6 +51,7 @@ function transformCardRow(
     issuer: row.issuer,
     rewardProgram: row.reward_program,
     annualFee: row.annual_fee,
+    pointValuation: row.point_valuation,
     baseRewardRate: {
       value: row.base_reward_rate,
       type: mapRewardCurrency(row.reward_currency),

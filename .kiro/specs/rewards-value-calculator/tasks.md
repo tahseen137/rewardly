@@ -176,36 +176,36 @@ Each task group follows this workflow:
   - Ensure all tests pass, ask the user if questions arise.
   - Merge to main: `git checkout main && git merge feature/calculator-ui-components && git push origin main`
 
-- [ ] 8. Refactor HomeScreen
-  - [ ] 8.0 Git setup for HomeScreen refactor
+- [x] 8. Refactor HomeScreen
+  - [x] 8.0 Git setup for HomeScreen refactor
     - Run: `git checkout main && git pull origin main`
     - Run: `git checkout -b feature/simplified-homescreen`
 
-  - [ ] 8.1 Simplify HomeScreen to calculator-only view
+  - [x] 8.1 Simplify HomeScreen to calculator-only view
     - Remove complex recommendation engine imports and logic
     - Add calculator state management (store, category, amount, results)
     - Integrate StoreSelector, AmountInput, RewardsDisplay components
     - Wire up calculation flow: store/category + amount → calculateRewards
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-  - [ ] 8.2 Add manual category fallback
+  - [x] 8.2 Add manual category fallback
     - Show CategoryPicker when store not found
     - Allow switching between store and manual category modes
     - _Requirements: 1.5, 2.1, 2.2_
 
-  - [ ] 8.3 Write property test for store search results
+  - [x] 8.3 Write property test for store search results
     - **Property 1: Store Search Returns Matching Results**
     - **Validates: Requirements 1.2**
 
-  - [ ] 8.4 Write property test for store category retrieval
+  - [x] 8.4 Write property test for store category retrieval
     - **Property 2: Store Selection Yields Correct Category**
     - **Validates: Requirements 1.3**
 
-  - [ ] 8.5 Write property test for manual category in calculations
+  - [x] 8.5 Write property test for manual category in calculations
     - **Property 3: Manual Category Selection Used in Calculations**
     - **Validates: Requirements 2.2**
 
-  - [ ] 8.6 Push HomeScreen refactor to GitHub
+  - [x] 8.6 Push HomeScreen refactor to GitHub
     - Run: `git add . && git commit -m "feat: simplify HomeScreen to rewards calculator"`
     - Run: `git push origin feature/simplified-homescreen`
 
