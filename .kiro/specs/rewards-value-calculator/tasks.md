@@ -56,39 +56,39 @@ Each task group follows this workflow:
     - Run: `git add . && git commit -m "feat: add RewardsCalculatorService with property tests"`
     - Run: `git push origin feature/rewards-calculator-service`
 
-- [-] 2. Checkpoint - Ensure calculator service tests pass
+- [x] 2. Checkpoint - Ensure calculator service tests pass
   - Ensure all tests pass, ask the user if questions arise.
   - Merge to main: `git checkout main && git merge feature/rewards-calculator-service && git push origin main`
 
-- [ ] 3. Create Amount Input Utilities
-  - [ ] 3.0 Git setup for amount utilities
+- [-] 3. Create Amount Input Utilities
+  - [x] 3.0 Git setup for amount utilities
     - Run: `git checkout main && git pull origin main`
     - Run: `git checkout -b feature/amount-utilities`
 
-  - [ ] 3.1 Create amount validation and formatting utilities
+  - [x] 3.1 Create amount validation and formatting utilities
     - Create `src/utils/amountUtils.ts`
     - Implement `validateAmount(input)` returning validation result
     - Implement `formatCurrency(amount)` returning "$X.XX" format
     - Implement `formatCadValue(amount)` returning "$X.XX CAD" format
     - _Requirements: 3.1, 3.2, 3.3, 5.3_
 
-  - [ ] 3.2 Write property test for valid amount acceptance
+  - [x] 3.2 Write property test for valid amount acceptance
     - **Property 4: Valid Amount Acceptance**
     - **Validates: Requirements 3.1**
 
-  - [ ] 3.3 Write property test for invalid amount rejection
+  - [x] 3.3 Write property test for invalid amount rejection
     - **Property 6: Invalid Amount Rejection**
     - **Validates: Requirements 3.3**
 
-  - [ ] 3.4 Write property test for currency formatting
+  - [x] 3.4 Write property test for currency formatting
     - **Property 5: Currency Formatting**
     - **Validates: Requirements 3.2**
 
-  - [ ] 3.5 Write property test for CAD value formatting
+  - [x] 3.5 Write property test for CAD value formatting
     - **Property 13: CAD Value Formatting**
     - **Validates: Requirements 5.3**
 
-  - [ ] 3.6 Push amount utilities to GitHub
+  - [-] 3.6 Push amount utilities to GitHub
     - Run: `git add . && git commit -m "feat: add amount validation and formatting utilities"`
     - Run: `git push origin feature/amount-utilities`
 
