@@ -209,7 +209,7 @@ Each task group follows this workflow:
     - Run: `git add . && git commit -m "feat: simplify HomeScreen to rewards calculator"`
     - Run: `git push origin feature/simplified-homescreen`
 
-- [ ] 9. Update Component Exports
+- [x] 9. Update Component Exports
   - [x] 9.0 Git setup for exports update
     - Run: `git checkout main && git pull origin main`
     - Run: `git checkout -b feature/update-exports`
@@ -220,11 +220,11 @@ Each task group follows this workflow:
     - Ensure all new components are properly exported
     - _Requirements: N/A (housekeeping)_
 
-  - [-] 9.2 Push exports update to GitHub
+  - [x] 9.2 Push exports update to GitHub
     - Run: `git add . && git commit -m "chore: update component and utility exports"`
     - Run: `git push origin feature/update-exports`
 
-- [ ] 10. Final Checkpoint - Full integration test
+- [-] 10. Final Checkpoint - Full integration test
   - Ensure all tests pass, ask the user if questions arise.
   - Merge remaining branches: `git checkout main && git merge feature/simplified-homescreen && git merge feature/update-exports && git push origin main`
   - Tag release: `git tag v2.0.0-calculator && git push origin v2.0.0-calculator`
