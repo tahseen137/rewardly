@@ -14,7 +14,10 @@ import {
   resetCache,
   initializePortfolio,
 } from '../../CardPortfolioManager';
-import { getAllCardsSync } from '../../CardDataService';
+import { getAllCardsSync, initializeMemoryCacheSync } from '../../CardDataService';
+
+// Initialize memory cache with bundled cards for testing
+initializeMemoryCacheSync();
 
 // Get all valid card IDs from the database
 const allCards = getAllCardsSync();

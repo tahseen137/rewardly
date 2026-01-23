@@ -306,6 +306,16 @@ export function getAllCardsSync(): Card[] {
 }
 
 /**
+ * Initialize memory cache with bundled cards (for testing)
+ * This allows synchronous access to cards without async initialization
+ */
+export function initializeMemoryCacheSync(): void {
+  if (!memoryCache) {
+    memoryCache = getBundledCards();
+  }
+}
+
+/**
  * Get a card by its ID
  */
 export async function getCardById(id: string): Promise<Card | null> {

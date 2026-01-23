@@ -4,7 +4,7 @@
  */
 
 import * as fc from 'fast-check';
-import { getAllCardsSync } from '../../CardDataService';
+import { getAllCardsSync, initializeMemoryCacheSync } from '../../CardDataService';
 import {
   findBetterCards,
   getRewardRateForCategory,
@@ -12,6 +12,9 @@ import {
 } from '../../RecommendationEngine';
 import { getAllStores } from '../../StoreDataService';
 import { SpendingCategory, RewardType, Card, UserCard, UserPreferences } from '../../../types';
+
+// Initialize memory cache with bundled cards for testing
+initializeMemoryCacheSync();
 
 // Get all cards, stores, and categories for testing
 const allCards = getAllCardsSync();

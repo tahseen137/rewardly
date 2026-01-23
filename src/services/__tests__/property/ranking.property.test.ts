@@ -4,9 +4,12 @@
  */
 
 import * as fc from 'fast-check';
-import { getAllCardsSync } from '../../CardDataService';
+import { getAllCardsSync, initializeMemoryCacheSync } from '../../CardDataService';
 import { rankCardsForCategory, getRewardRateForCategory } from '../../RecommendationEngine';
 import { SpendingCategory, RewardType, Card } from '../../../types';
+
+// Initialize memory cache with bundled cards for testing
+initializeMemoryCacheSync();
 
 // Get all cards and categories for testing
 const allCards = getAllCardsSync();
