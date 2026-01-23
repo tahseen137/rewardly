@@ -1,0 +1,57 @@
+program_name,category,redemption_type,cents_per_point,minimum_redemption,notes
+Air Miles - Cash Miles,Airline Miles,Cash Miles,10.53,95,Direct cash conversion: 95 miles = $10 CAD
+Air Miles - Cash Miles,Airline Miles,Dream Miles - Flights,16.07,,Average redemption value on flight bookings
+Air Miles - Cash Miles,Airline Miles,Dream Miles - Merchandise,9.0,,Merchandise and shopping redemptions
+Air Miles - Dream Miles,Airline Miles,Flights,16.07,,Flight redemptions average value
+Air Miles - Dream Miles,Airline Miles,Hotels,12.0,,Hotel stay redemptions
+Air Miles - Dream Miles,Airline Miles,Merchandise,9.0,,Merchandise redemptions
+Accor Live Limitless (ALL),Hotel Points,Hotel Stays (Fixed),2.7,2000,Fixed value: 2000 points = €40 CAD (~$59 CAD)
+Accor Live Limitless (ALL),Hotel Points,Airline Transfer,2.7,,Transfer to 30+ airline partners at 1:1 ratio
+World of Hyatt,Hotel Points,Hotel Stays,2.2,,Dynamic pricing - varies by property and season
+World of Hyatt,Hotel Points,Suite Upgrades,2.2,,Suite upgrade redemptions
+American Express Membership Rewards,Credit Card Points,Statement Credit,1.0,1000,1000 points = $10 statement credit
+American Express Membership Rewards,Credit Card Points,Transfer to Aeroplan,2.1,,1:1 transfer to Aeroplan valued at ~2.1 cents
+American Express Membership Rewards,Credit Card Points,Amazon,0.7,1000,1000 points = $7 Amazon credit
+American Express Membership Rewards,Credit Card Points,PayPal,0.7,1000,1000 points = $7 PayPal credit
+RBC Avion Rewards,Credit Card Points,Statement Credit (Premium),1.0,100,100 points = $1 CAD
+RBC Avion Rewards,Credit Card Points,Statement Credit (Elite),1.0,,1 point = 1 cent CAD
+RBC Avion Rewards,Credit Card Points,Flight Redemptions,1.14,,Average value on flight bookings
+RBC Avion Rewards,Credit Card Points,Hotels,1.0,,Hotel booking redemptions
+Aeroplan,Airline Miles,Statement Credit,1.0,,Direct cash conversion to statement
+Aeroplan,Airline Miles,Points Only Flights,1.0,,Flight redemption baseline value
+Aeroplan,Airline Miles,Points + Cash (80% Points),2.0,,Hybrid booking at 80% points tier
+Aeroplan,Airline Miles,Points + Cash (60% Points),2.0,,Hybrid booking at 60% points tier
+CIBC Aventura Points,Credit Card Points,Travel Purchases,1.0,,Travel redemptions at 1 cent per point
+CIBC Aventura Points,Credit Card Points,Financial Products,0.83,,Financial product redemptions
+CIBC Aventura Points,Credit Card Points,Gift Cards,0.71,,Gift card redemptions
+CIBC Aventura Points,Credit Card Points,Statement Credit,0.62,,Direct statement credit conversion
+WestJet Rewards,Airline Miles,Flight Redemptions,1.0,2500,Minimum 2500 points = $25 off
+WestJet Rewards,Airline Miles,Taxes and Fees,0.91,,Offset against booking taxes/fees
+WestJet Rewards,Airline Miles,Gift Cards,0.5,,Gift card redemption value
+Scotiabank Scene+ Points,Credit Card Points,Travel,1.0,,Travel bookings redemption
+Scotiabank Scene+ Points,Credit Card Points,Entertainment/Movies,0.75,,Entertainment redemptions
+Scotiabank Scene+ Points,Credit Card Points,Statement Credit,0.67,,Direct statement credit
+BMO Rewards Points,Credit Card Points,Travel,0.67,150,150 points = $1 on travel
+BMO Rewards Points,Credit Card Points,Investment Deposits,0.67,150,150 points = $1 investment deposit
+BMO Rewards Points,Credit Card Points,Gift Cards,0.5,180,180-220 points = $1 gift card
+BMO Rewards Points,Credit Card Points,Statement Credit,0.67,,Fixed statement credit rate
+Capital One Miles,Airline Miles,Statement Credit,0.75,,Cash back as statement credit (0.5-1 cent range)
+Capital One Miles,Airline Miles,Travel Portal,1.0,,Capital One travel portal redemption
+Capital One Miles,Airline Miles,Transfer Partners,2.0,,Transfer to airline partners (up to 2 cents)
+Capital One Miles,Airline Miles,Amazon,0.8,,Amazon redemption value
+Marriott Bonvoy,Hotel Points,Hotel Stays (Dynamic),0.74,,Average dynamic pricing across properties
+Marriott Bonvoy,Hotel Points,Cash + Points (Standard),2.2,,Hybrid booking implicit rate
+Marriott Bonvoy,Hotel Points,Cash + Points (Premium),2.2,,Cash + Points on luxury properties
+IHG One Rewards,Hotel Points,Hotel Stays,0.7,5000,Minimum 5000 points for entry-level properties
+IHG One Rewards,Hotel Points,Points & Cash,0.7,,Hybrid booking combining points and cash
+Best Western Rewards,Hotel Points,Hotel Stays,0.65,,Average redemption (0.5-0.8 range)
+Best Western Rewards,Hotel Points,Elite Bonus (Platinum),0.75,,With Platinum elite status (+15% bonus)
+Best Western Rewards,Hotel Points,Elite Bonus (Diamond),0.85,,With Diamond elite status (+30% bonus)
+Best Western Rewards,Hotel Points,Gift Cards,0.5,,Gift card redemption (16000 points = $50)
+Hilton Honors,Hotel Points,Hotel Stays (Dynamic),0.48,,Dynamic pricing average (0.0063-0.0104 range)
+Hilton Honors,Hotel Points,Experiences,0.48,,Experience redemptions
+TD Rewards Points,Credit Card Points,Expedia Travel Portal,0.5,200,200-250 points = $1 travel
+TD Rewards Points,Credit Card Points,Statement Credit,0.25,400,400 points = $1 statement credit
+TD Rewards Points,Credit Card Points,Gift Cards,0.25,,0.25 cents per point on gift cards
+Tangerine Money-Back Rewards,Cashback,Direct Deposit (2%),2.0,,Automatic 2% cashback in 2 categories
+Tangerine Money-Back Rewards,Cashback,Direct Deposit (3%),2.5,,3% with linked savings account
