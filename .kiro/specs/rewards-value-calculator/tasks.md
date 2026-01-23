@@ -176,7 +176,7 @@ Each task group follows this workflow:
   - Ensure all tests pass, ask the user if questions arise.
   - Merge to main: `git checkout main && git merge feature/calculator-ui-components && git push origin main`
 
-- [-] 8. Refactor HomeScreen
+- [x] 8. Refactor HomeScreen
   - [x] 8.0 Git setup for HomeScreen refactor
     - Run: `git checkout main && git pull origin main`
     - Run: `git checkout -b feature/simplified-homescreen`
@@ -205,7 +205,7 @@ Each task group follows this workflow:
     - **Property 3: Manual Category Selection Used in Calculations**
     - **Validates: Requirements 2.2**
 
-  - [-] 8.6 Push HomeScreen refactor to GitHub
+  - [x] 8.6 Push HomeScreen refactor to GitHub
     - Run: `git add . && git commit -m "feat: simplify HomeScreen to rewards calculator"`
     - Run: `git push origin feature/simplified-homescreen`
 
