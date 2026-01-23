@@ -1,0 +1,515 @@
+{
+  "cards": [
+    {
+      "id": "amex-cobalt-card",
+      "name": "American Express Cobalt Card",
+      "issuer": "American Express",
+      "rewardProgram": "Membership Rewards",
+      "annualFee": 156,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "dining", "rewardRate": {"value": 5, "type": "points", "unit": "multiplier"}},
+        {"category": "groceries", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "travel", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "amex-platinum-card",
+      "name": "American Express Platinum Card",
+      "issuer": "American Express",
+      "rewardProgram": "Membership Rewards",
+      "annualFee": 799,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "amex-gold-rewards",
+      "name": "American Express Gold Rewards Card",
+      "issuer": "American Express",
+      "rewardProgram": "Membership Rewards",
+      "annualFee": 250,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "groceries", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "amex-simplycash-preferred",
+      "name": "SimplyCash Preferred Card from American Express",
+      "issuer": "American Express",
+      "rewardProgram": "Cash Back",
+      "annualFee": 99,
+      "baseRewardRate": {"value": 1.25, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "gas", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}},
+        {"category": "groceries", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}},
+        {"category": "dining", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "amex-simplycash",
+      "name": "SimplyCash Card from American Express",
+      "issuer": "American Express",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 1.25, "type": "cashback", "unit": "percent"},
+      "categoryRewards": []
+    },
+    {
+      "id": "amex-aeroplan-card",
+      "name": "American Express Aeroplan Card",
+      "issuer": "American Express",
+      "rewardProgram": "Aeroplan",
+      "annualFee": 120,
+      "baseRewardRate": {"value": 1, "type": "airline_miles", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 1.5, "type": "airline_miles", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "amex-aeroplan-reserve",
+      "name": "American Express Aeroplan Reserve Card",
+      "issuer": "American Express",
+      "rewardProgram": "Aeroplan",
+      "annualFee": 599,
+      "baseRewardRate": {"value": 1.25, "type": "airline_miles", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 3, "type": "airline_miles", "unit": "multiplier"}},
+        {"category": "dining", "rewardRate": {"value": 2, "type": "airline_miles", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "amex-marriott-bonvoy",
+      "name": "Marriott Bonvoy American Express Card",
+      "issuer": "American Express",
+      "rewardProgram": "Marriott Bonvoy",
+      "annualFee": 120,
+      "baseRewardRate": {"value": 2, "type": "hotel_points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 5, "type": "hotel_points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "td-first-class-travel",
+      "name": "TD First Class Travel Visa Infinite Card",
+      "issuer": "TD",
+      "rewardProgram": "TD Rewards",
+      "annualFee": 139,
+      "baseRewardRate": {"value": 1.5, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 3, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "td-aeroplan-visa-infinite",
+      "name": "TD Aeroplan Visa Infinite Card",
+      "issuer": "TD",
+      "rewardProgram": "Aeroplan",
+      "annualFee": 139,
+      "baseRewardRate": {"value": 1, "type": "airline_miles", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 1.5, "type": "airline_miles", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 1.5, "type": "airline_miles", "unit": "multiplier"}},
+        {"category": "groceries", "rewardRate": {"value": 1.5, "type": "airline_miles", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "td-aeroplan-visa-infinite-privilege",
+      "name": "TD Aeroplan Visa Infinite Privilege Card",
+      "issuer": "TD",
+      "rewardProgram": "Aeroplan",
+      "annualFee": 599,
+      "baseRewardRate": {"value": 1.5, "type": "airline_miles", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 2, "type": "airline_miles", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 2, "type": "airline_miles", "unit": "multiplier"}},
+        {"category": "groceries", "rewardRate": {"value": 2, "type": "airline_miles", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "td-cash-back-visa-infinite",
+      "name": "TD Cash Back Visa Infinite Card",
+      "issuer": "TD",
+      "rewardProgram": "Cash Back",
+      "annualFee": 139,
+      "baseRewardRate": {"value": 1, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 3, "type": "cashback", "unit": "percent"}},
+        {"category": "gas", "rewardRate": {"value": 3, "type": "cashback", "unit": "percent"}},
+        {"category": "dining", "rewardRate": {"value": 3, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "rbc-avion-visa-infinite",
+      "name": "RBC Avion Visa Infinite Card",
+      "issuer": "RBC",
+      "rewardProgram": "Avion Rewards",
+      "annualFee": 139,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 1.25, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "rbc-avion-visa-infinite-privilege",
+      "name": "RBC Avion Visa Infinite Privilege Card",
+      "issuer": "RBC",
+      "rewardProgram": "Avion Rewards",
+      "annualFee": 399,
+      "baseRewardRate": {"value": 1.25, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 1.5, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "rbc-ion-visa",
+      "name": "RBC ION Visa Card",
+      "issuer": "RBC",
+      "rewardProgram": "Avion Rewards",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": []
+    },
+    {
+      "id": "rbc-cash-back-preferred",
+      "name": "RBC Cash Back Preferred World Elite Mastercard",
+      "issuer": "RBC",
+      "rewardProgram": "Cash Back",
+      "annualFee": 39,
+      "baseRewardRate": {"value": 1, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}},
+        {"category": "gas", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "cibc-aventura-visa-infinite",
+      "name": "CIBC Aventura Visa Infinite Card",
+      "issuer": "CIBC",
+      "rewardProgram": "Aventura",
+      "annualFee": 139,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 1.5, "type": "points", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 1.5, "type": "points", "unit": "multiplier"}},
+        {"category": "groceries", "rewardRate": {"value": 1.5, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "cibc-aeroplan-visa-infinite",
+      "name": "CIBC Aeroplan Visa Infinite",
+      "issuer": "CIBC",
+      "rewardProgram": "Aeroplan",
+      "annualFee": 139,
+      "baseRewardRate": {"value": 1, "type": "airline_miles", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 1.5, "type": "airline_miles", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 1.5, "type": "airline_miles", "unit": "multiplier"}},
+        {"category": "groceries", "rewardRate": {"value": 1.5, "type": "airline_miles", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "cibc-dividend-visa-infinite",
+      "name": "CIBC Dividend Visa Infinite",
+      "issuer": "CIBC",
+      "rewardProgram": "Cash Back",
+      "annualFee": 120,
+      "baseRewardRate": {"value": 1, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 4, "type": "cashback", "unit": "percent"}},
+        {"category": "gas", "rewardRate": {"value": 4, "type": "cashback", "unit": "percent"}},
+        {"category": "dining", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "cibc-costco-world-elite",
+      "name": "CIBC Costco World Elite Mastercard",
+      "issuer": "CIBC",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 1, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "gas", "rewardRate": {"value": 3, "type": "cashback", "unit": "percent"}},
+        {"category": "dining", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}},
+        {"category": "travel", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "scotiabank-passport-visa-infinite",
+      "name": "Scotiabank Passport Visa Infinite Card",
+      "issuer": "Scotiabank",
+      "rewardProgram": "Scene+",
+      "annualFee": 139,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "dining", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "entertainment", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "scotiabank-momentum-visa-infinite",
+      "name": "Scotia Momentum Visa Infinite Card",
+      "issuer": "Scotiabank",
+      "rewardProgram": "Cash Back",
+      "annualFee": 139,
+      "baseRewardRate": {"value": 1, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 4, "type": "cashback", "unit": "percent"}},
+        {"category": "gas", "rewardRate": {"value": 4, "type": "cashback", "unit": "percent"}},
+        {"category": "dining", "rewardRate": {"value": 4, "type": "cashback", "unit": "percent"}},
+        {"category": "drugstores", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "scotiabank-gold-amex",
+      "name": "Scotiabank Gold American Express Card",
+      "issuer": "Scotiabank",
+      "rewardProgram": "Scene+",
+      "annualFee": 150,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 5, "type": "points", "unit": "multiplier"}},
+        {"category": "dining", "rewardRate": {"value": 5, "type": "points", "unit": "multiplier"}},
+        {"category": "entertainment", "rewardRate": {"value": 3, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "scotiabank-scene-visa",
+      "name": "Scotiabank Scene+ Visa Card",
+      "issuer": "Scotiabank",
+      "rewardProgram": "Scene+",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "dining", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "entertainment", "rewardRate": {"value": 5, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "bmo-eclipse-visa-infinite",
+      "name": "BMO eclipse Visa Infinite Card",
+      "issuer": "BMO",
+      "rewardProgram": "BMO Rewards",
+      "annualFee": 120,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 5, "type": "points", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 3, "type": "points", "unit": "multiplier"}},
+        {"category": "groceries", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "dining", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "drugstores", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "bmo-air-miles-world-elite",
+      "name": "BMO AIR MILES World Elite Mastercard",
+      "issuer": "BMO",
+      "rewardProgram": "AIR MILES",
+      "annualFee": 120,
+      "baseRewardRate": {"value": 1, "type": "airline_miles", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 3, "type": "airline_miles", "unit": "multiplier"}},
+        {"category": "drugstores", "rewardRate": {"value": 3, "type": "airline_miles", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "bmo-cashback-world-elite",
+      "name": "BMO CashBack World Elite Mastercard",
+      "issuer": "BMO",
+      "rewardProgram": "Cash Back",
+      "annualFee": 120,
+      "baseRewardRate": {"value": 1, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 5, "type": "cashback", "unit": "percent"}},
+        {"category": "gas", "rewardRate": {"value": 3, "type": "cashback", "unit": "percent"}},
+        {"category": "dining", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}},
+        {"category": "drugstores", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "bmo-ascend-world-elite",
+      "name": "BMO Ascend World Elite Mastercard",
+      "issuer": "BMO",
+      "rewardProgram": "BMO Rewards",
+      "annualFee": 150,
+      "baseRewardRate": {"value": 5, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 5, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "tangerine-money-back",
+      "name": "Tangerine Money-Back Credit Card",
+      "issuer": "Tangerine",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 0.5, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}},
+        {"category": "gas", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}},
+        {"category": "dining", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "tangerine-money-back-world-elite",
+      "name": "Tangerine Money-Back World Elite Mastercard",
+      "issuer": "Tangerine",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 0.5, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 4, "type": "cashback", "unit": "percent"}},
+        {"category": "gas", "rewardRate": {"value": 4, "type": "cashback", "unit": "percent"}},
+        {"category": "dining", "rewardRate": {"value": 4, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "neo-financial-mastercard",
+      "name": "Neo Mastercard",
+      "issuer": "Neo Financial",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 1, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 5, "type": "cashback", "unit": "percent"}},
+        {"category": "dining", "rewardRate": {"value": 5, "type": "cashback", "unit": "percent"}},
+        {"category": "gas", "rewardRate": {"value": 5, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "triangle-world-elite",
+      "name": "Canadian Tire Triangle World Elite Mastercard",
+      "issuer": "Canadian Tire",
+      "rewardProgram": "Triangle Rewards",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 1.5, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "gas", "rewardRate": {"value": 5, "type": "points", "unit": "multiplier"}},
+        {"category": "groceries", "rewardRate": {"value": 4, "type": "points", "unit": "multiplier"}},
+        {"category": "home_improvement", "rewardRate": {"value": 5, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "rogers-world-elite-mastercard",
+      "name": "Rogers Red World Elite Mastercard",
+      "issuer": "Rogers Bank",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 1.5, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "online_shopping", "rewardRate": {"value": 3, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "pc-financial-world-elite",
+      "name": "PC Financial World Elite Mastercard",
+      "issuer": "PC Financial",
+      "rewardProgram": "PC Optimum",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 10, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 30, "type": "points", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 25, "type": "points", "unit": "multiplier"}},
+        {"category": "drugstores", "rewardRate": {"value": 25, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "simplii-cash-back-visa",
+      "name": "Simplii Financial Cash Back Visa",
+      "issuer": "Simplii Financial",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 0.5, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "dining", "rewardRate": {"value": 4, "type": "cashback", "unit": "percent"}},
+        {"category": "groceries", "rewardRate": {"value": 1.5, "type": "cashback", "unit": "percent"}},
+        {"category": "gas", "rewardRate": {"value": 1.5, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "national-bank-world-elite",
+      "name": "National Bank World Elite Mastercard",
+      "issuer": "National Bank",
+      "rewardProgram": "National Bank Rewards",
+      "annualFee": 150,
+      "baseRewardRate": {"value": 2, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 5, "type": "points", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 4, "type": "points", "unit": "multiplier"}},
+        {"category": "groceries", "rewardRate": {"value": 4, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "mbna-rewards-world-elite",
+      "name": "MBNA World Elite Mastercard",
+      "issuer": "MBNA",
+      "rewardProgram": "MBNA Rewards",
+      "annualFee": 89,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "groceries", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "capital-one-aspire-cash",
+      "name": "Capital One Aspire Cash Platinum Mastercard",
+      "issuer": "Capital One",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "baseRewardRate": {"value": 1, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}},
+        {"category": "gas", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "desjardins-odyssey-world-elite",
+      "name": "Desjardins Odyssey World Elite Mastercard",
+      "issuer": "Desjardins",
+      "rewardProgram": "Desjardins Rewards",
+      "annualFee": 120,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "gas", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}},
+        {"category": "groceries", "rewardRate": {"value": 2, "type": "points", "unit": "multiplier"}}
+      ]
+    },
+    {
+      "id": "desjardins-cash-back-world-elite",
+      "name": "Desjardins Cash Back World Elite Mastercard",
+      "issuer": "Desjardins",
+      "rewardProgram": "Cash Back",
+      "annualFee": 120,
+      "baseRewardRate": {"value": 1, "type": "cashback", "unit": "percent"},
+      "categoryRewards": [
+        {"category": "groceries", "rewardRate": {"value": 3, "type": "cashback", "unit": "percent"}},
+        {"category": "gas", "rewardRate": {"value": 3, "type": "cashback", "unit": "percent"}},
+        {"category": "dining", "rewardRate": {"value": 2, "type": "cashback", "unit": "percent"}}
+      ]
+    },
+    {
+      "id": "hsbc-world-elite",
+      "name": "HSBC World Elite Mastercard",
+      "issuer": "HSBC",
+      "rewardProgram": "HSBC Rewards",
+      "annualFee": 149,
+      "baseRewardRate": {"value": 1, "type": "points", "unit": "multiplier"},
+      "categoryRewards": [
+        {"category": "travel", "rewardRate": {"value": 6, "type": "points", "unit": "multiplier"}},
+        {"category": "dining", "rewardRate": {"value": 6, "type": "points", "unit": "multiplier"}},
+        {"category": "entertainment", "rewardRate": {"value": 6, "type": "points", "unit": "multiplier"}}
+      ]
+    }
+  ]
+}
