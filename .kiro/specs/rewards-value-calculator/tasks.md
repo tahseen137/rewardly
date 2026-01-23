@@ -116,36 +116,36 @@ Each task group follows this workflow:
     - Run: `git add . && git commit -m "feat: add reward formatting utilities"`
     - Run: `git push origin feature/reward-formatting`
 
-- [-] 5. Checkpoint - Ensure utility tests pass
+- [x] 5. Checkpoint - Ensure utility tests pass
   - Ensure all tests pass, ask the user if questions arise.
   - Merge branches: `git checkout main && git merge feature/amount-utilities && git merge feature/reward-formatting && git push origin main`
 
-- [ ] 6. Create UI Components
-  - [ ] 6.0 Git setup for UI components
+- [-] 6. Create UI Components
+  - [x] 6.0 Git setup for UI components
     - Run: `git checkout main && git pull origin main`
     - Run: `git checkout -b feature/calculator-ui-components`
 
-  - [ ] 6.1 Create AmountInput component
+  - [x] 6.1 Create AmountInput component
     - Create `src/components/AmountInput.tsx`
     - Implement numeric input with currency formatting
     - Display validation errors
     - Handle onChange with debouncing
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-  - [ ] 6.2 Create StoreSelector component
+  - [x] 6.2 Create StoreSelector component
     - Create `src/components/StoreSelector.tsx`
     - Implement searchable dropdown using existing SearchInput
     - Display store suggestions from StoreDataService
     - Show selected store name and category
     - _Requirements: 1.1, 1.2, 1.4_
 
-  - [ ] 6.3 Create CategoryPicker component
+  - [x] 6.3 Create CategoryPicker component
     - Create `src/components/CategoryPicker.tsx`
     - Display all spending categories with icons
     - Handle category selection
     - _Requirements: 2.1, 2.3_
 
-  - [ ] 6.4 Create CardRewardItem component
+  - [x] 6.4 Create CardRewardItem component
     - Create `src/components/CardRewardItem.tsx`
     - Display card name, issuer, reward earned, CAD value
     - Show reward type icon
@@ -153,22 +153,22 @@ Each task group follows this workflow:
     - Show annual fee
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 6.1, 6.2_
 
-  - [ ] 6.5 Create RewardsDisplay component
+  - [x] 6.5 Create RewardsDisplay component
     - Create `src/components/RewardsDisplay.tsx`
     - Render list of CardRewardItem components
     - Handle empty state when no cards in portfolio
     - Show loading state during calculation
     - _Requirements: 5.1, 5.6_
 
-  - [ ] 6.6 Write property test for reward display fields
+  - [x] 6.6 Write property test for reward display fields
     - **Property 11: Reward Display Contains Required Fields**
     - **Validates: Requirements 5.1**
 
-  - [ ] 6.7 Write property test for best value badge
+  - [x] 6.7 Write property test for best value badge
     - **Property 14: Best Value Badge Assignment**
     - **Validates: Requirements 5.5**
 
-  - [ ] 6.8 Push UI components to GitHub
+  - [-] 6.8 Push UI components to GitHub
     - Run: `git add . && git commit -m "feat: add calculator UI components"`
     - Run: `git push origin feature/calculator-ui-components`
 
