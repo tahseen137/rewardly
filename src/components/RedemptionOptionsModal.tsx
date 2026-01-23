@@ -8,7 +8,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, ScrollView, TouchableOpacity } from 'react-native';
 import { Card, RedemptionOption } from '../types';
-import { colors, spacing, typography } from '../theme';
+import { useTheme, Theme } from '../theme';
 import { formatCadValue } from '../utils/amountUtils';
 
 // ============================================================================
@@ -38,6 +38,9 @@ export const RedemptionOptionsModal: React.FC<RedemptionOptionsModalProps> = ({
   card,
   amount,
 }) => {
+  const theme = useTheme();
+  const styles = createStyles(theme);
+  
   // Calculate rewards for each redemption option
   const calculateRedemptions = (): CalculatedRedemption[] => {
     if (!card.programDetails?.redemptionOptions) {
@@ -179,174 +182,174 @@ export const RedemptionOptionsModal: React.FC<RedemptionOptionsModalProps> = ({
 // Styles
 // ============================================================================
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background.primary,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '90%',
-    paddingBottom: spacing.lg,
+    paddingBottom: theme.spacing.lg,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    padding: spacing.lg,
+    padding: theme.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: theme.colors.border.light,
   },
   headerContent: {
     flex: 1,
   },
   title: {
-    ...typography.h3,
-    color: colors.text,
-    marginBottom: spacing.xs,
+    ...theme.textStyles.h3,
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.xs,
   },
   subtitle: {
-    ...typography.body,
-    color: colors.textSecondary,
+    ...theme.textStyles.body,
+    color: theme.colors.text.secondary,
   },
   closeButton: {
-    padding: spacing.sm,
+    padding: theme.spacing.sm,
   },
   closeButtonText: {
     fontSize: 24,
-    color: colors.textSecondary,
+    color: theme.colors.text.secondary,
   },
   purchaseInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: spacing.lg,
-    backgroundColor: colors.cardBackground,
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.md,
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.background.secondary,
+    marginHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.md,
     borderRadius: 12,
   },
   purchaseLabel: {
-    ...typography.body,
-    color: colors.textSecondary,
+    ...theme.textStyles.body,
+    color: theme.colors.text.secondary,
   },
   purchaseAmount: {
-    ...typography.h3,
-    color: colors.primary,
+    ...theme.textStyles.h3,
+    color: theme.colors.primary.main,
   },
   optionsList: {
     flex: 1,
-    padding: spacing.lg,
+    padding: theme.spacing.lg,
   },
   sectionTitle: {
-    ...typography.h4,
-    color: colors.text,
-    marginBottom: spacing.md,
+    ...theme.textStyles.h4,
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.md,
   },
   optionCard: {
-    backgroundColor: colors.cardBackground,
+    backgroundColor: theme.colors.background.secondary,
     borderRadius: 12,
-    padding: spacing.md,
-    marginBottom: spacing.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border.light,
   },
   optionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: theme.spacing.sm,
   },
   optionType: {
-    ...typography.h4,
-    color: colors.text,
+    ...theme.textStyles.h4,
+    color: theme.colors.text.primary,
     flex: 1,
   },
   bestBadge: {
-    backgroundColor: colors.success,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    backgroundColor: theme.colors.success.main,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
     borderRadius: 6,
   },
   bestBadgeText: {
-    ...typography.caption,
-    color: colors.background,
+    ...theme.textStyles.caption,
+    color: theme.colors.background.primary,
     fontWeight: '700',
   },
   valueRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: spacing.sm,
+    marginBottom: theme.spacing.sm,
   },
   valueItem: {
     flex: 1,
   },
   valueLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
+    ...theme.textStyles.caption,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.xs,
   },
   valueAmount: {
-    ...typography.h4,
-    color: colors.text,
+    ...theme.textStyles.h4,
+    color: theme.colors.text.primary,
   },
   cadValue: {
-    color: colors.primary,
+    color: theme.colors.primary.main,
   },
   rateText: {
-    ...typography.body,
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
+    ...theme.textStyles.body,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.xs,
   },
   minimumText: {
-    ...typography.caption,
-    color: colors.warning,
-    marginBottom: spacing.xs,
+    ...theme.textStyles.caption,
+    color: theme.colors.warning.main,
+    marginBottom: theme.spacing.xs,
   },
   notesText: {
-    ...typography.caption,
-    color: colors.textSecondary,
+    ...theme.textStyles.caption,
+    color: theme.colors.text.secondary,
     fontStyle: 'italic',
   },
   tipCard: {
-    backgroundColor: colors.info + '20',
+    backgroundColor: theme.colors.info.main + '20',
     borderRadius: 12,
-    padding: spacing.md,
-    marginTop: spacing.md,
+    padding: theme.spacing.md,
+    marginTop: theme.spacing.md,
     borderWidth: 1,
-    borderColor: colors.info,
+    borderColor: theme.colors.info.main,
   },
   tipTitle: {
-    ...typography.h4,
-    color: colors.text,
-    marginBottom: spacing.xs,
+    ...theme.textStyles.h4,
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.xs,
   },
   tipText: {
-    ...typography.body,
-    color: colors.text,
+    ...theme.textStyles.body,
+    color: theme.colors.text.primary,
   },
   emptyState: {
-    padding: spacing.xl,
+    padding: theme.spacing.xl,
     alignItems: 'center',
   },
   emptyText: {
-    ...typography.body,
-    color: colors.textSecondary,
+    ...theme.textStyles.body,
+    color: theme.colors.text.secondary,
     textAlign: 'center',
   },
   closeButtonBottom: {
-    backgroundColor: colors.primary,
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.md,
-    padding: spacing.md,
+    backgroundColor: theme.colors.primary.main,
+    marginHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.md,
+    padding: theme.spacing.md,
     borderRadius: 12,
     alignItems: 'center',
   },
   closeButtonBottomText: {
-    ...typography.button,
-    color: colors.background,
+    ...theme.textStyles.button,
+    color: theme.colors.primary.contrast,
   },
 });
