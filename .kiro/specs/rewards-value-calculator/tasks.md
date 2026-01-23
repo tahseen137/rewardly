@@ -172,7 +172,7 @@ Each task group follows this workflow:
     - Run: `git add . && git commit -m "feat: add calculator UI components"`
     - Run: `git push origin feature/calculator-ui-components`
 
-- [-] 7. Checkpoint - Ensure component tests pass
+- [x] 7. Checkpoint - Ensure component tests pass
   - Ensure all tests pass, ask the user if questions arise.
   - Merge to main: `git checkout main && git merge feature/calculator-ui-components && git push origin main`
 
