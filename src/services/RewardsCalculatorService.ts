@@ -73,12 +73,19 @@ export function getApplicableMultiplier(card: Card, category: SpendingCategory):
 
 /**
  * Convert reward points to CAD value
+ * Uses optimal rate from program details if available
  *
  * @param points - Number of points earned
- * @param pointValuation - Value of one point in CAD cents
+ * @param card - The credit card (to check for program details)
+ * @param fallbackValuation - Fallback value of one point in CAD cents
  * @returns CAD value of the points
  */
-export function pointsToCad(points: number, pointValuation: number): number {
+export function pointsToCad(points: number, card: Card, fallbackValuation: number): number {
+  // Use optimal rate from program details if available
+  const pointValuation = card.programDetails?.optimalRateCents 
+    ? card.programDetails.optimalRateCents
+    : fallbackValuation;
+    
   return points * (pointValuation / 100);
 }
 
@@ -110,8 +117,10 @@ export function calculateRewards(
         return null;
       }
 
-      // Get point valuation (default to 1 cent if not found)
-      const pointValuation = pointValuations.get(cardId) || 1;
+      // Get point valuation - use optimal rate from program if available
+      const pointValuation = card.programDetails?.optimalRateCents 
+        ? card.programDetails.optimalRateCents
+        : (pointValuations.get(cardId) || card.pointValuation || 1);
 
       // Get applicable multiplier
       const multiplier = getApplicableMultiplier(card, category);
@@ -123,8 +132,8 @@ export function calculateRewards(
       // Calculate points earned
       const pointsEarned = amount * multiplier;
 
-      // Calculate CAD value
-      const cadValue = pointsToCad(pointsEarned, pointValuation);
+      // Calculate CAD value using the card object
+      const cadValue = pointsToCad(pointsEarned, card, pointValuation);
 
       // Build result
       const result: RewardCalculationResult = {

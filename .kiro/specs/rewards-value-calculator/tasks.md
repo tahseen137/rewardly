@@ -224,7 +224,7 @@ Each task group follows this workflow:
     - Run: `git add . && git commit -m "chore: update component and utility exports"`
     - Run: `git push origin feature/update-exports`
 
-- [-] 10. Final Checkpoint - Full integration test
+- [x] 10. Final Checkpoint - Full integration test
   - Ensure all tests pass, ask the user if questions arise.
   - Merge remaining branches: `git checkout main && git merge feature/simplified-homescreen && git merge feature/update-exports && git push origin main`
   - Tag release: `git tag v2.0.0-calculator && git push origin v2.0.0-calculator`

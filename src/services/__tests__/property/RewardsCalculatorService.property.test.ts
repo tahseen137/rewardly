@@ -246,8 +246,11 @@ describe('RewardsCalculatorService - Property Tests', () => {
         fc.property(
           fc.double({ min: 0, max: 100000, noNaN: true }),
           pointValuationArb,
-          (points: number, pointValuation: number) => {
-            const cadValue = pointsToCad(points, pointValuation);
+          cardArb,
+          (points: number, pointValuation: number, card: Card) => {
+            // Create card without program details to use fallback
+            const cardWithoutProgram = { ...card, programDetails: undefined };
+            const cadValue = pointsToCad(points, cardWithoutProgram, pointValuation);
             const expectedValue = points * (pointValuation / 100);
             expect(cadValue).toBeCloseTo(expectedValue, 10);
           }
@@ -291,10 +294,15 @@ describe('RewardsCalculatorService - Property Tests', () => {
 
     it('should return zero CAD value for zero points', () => {
       fc.assert(
-        fc.property(pointValuationArb, (pointValuation: number) => {
-          const cadValue = pointsToCad(0, pointValuation);
-          expect(cadValue).toBe(0);
-        }),
+        fc.property(
+          pointValuationArb,
+          cardArb,
+          (pointValuation: number, card: Card) => {
+            const cardWithoutProgram = { ...card, programDetails: undefined };
+            const cadValue = pointsToCad(0, cardWithoutProgram, pointValuation);
+            expect(cadValue).toBe(0);
+          }
+        ),
         { numRuns: 100 }
       );
     });
@@ -304,9 +312,11 @@ describe('RewardsCalculatorService - Property Tests', () => {
         fc.property(
           fc.double({ min: 1, max: 10000, noNaN: true }),
           pointValuationArb,
-          (points: number, pointValuation: number) => {
-            const cadValue1 = pointsToCad(points, pointValuation);
-            const cadValue2 = pointsToCad(points, pointValuation * 2);
+          cardArb,
+          (points: number, pointValuation: number, card: Card) => {
+            const cardWithoutProgram = { ...card, programDetails: undefined };
+            const cadValue1 = pointsToCad(points, cardWithoutProgram, pointValuation);
+            const cadValue2 = pointsToCad(points, cardWithoutProgram, pointValuation * 2);
 
             // CAD value should double when valuation doubles
             expect(cadValue2).toBeCloseTo(cadValue1 * 2, 10);

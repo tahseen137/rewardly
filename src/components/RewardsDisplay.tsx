@@ -3,18 +3,22 @@
  * Requirements: 5.1, 5.6
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { CardRewardItem } from './CardRewardItem';
+import { RedemptionOptionsModal } from './RedemptionOptionsModal';
 import { EmptyState } from './EmptyState';
 import { useTheme } from '../theme';
 import { RewardCalculationResult } from '../services/RewardsCalculatorService';
+import { Card } from '../types';
 
 interface RewardsDisplayProps {
   results: RewardCalculationResult[];
   bestCard: RewardCalculationResult | null;
   isLoading: boolean;
   isEmpty: boolean;
+  amount: number;
+  cards: Card[];
   onCardPress?: (result: RewardCalculationResult) => void;
 }
 
@@ -23,9 +27,21 @@ export function RewardsDisplay({
   bestCard,
   isLoading,
   isEmpty,
+  amount,
+  cards,
   onCardPress,
 }: RewardsDisplayProps) {
   const theme = useTheme();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+
+  const handleViewOptions = (cardId: string) => {
+    const card = cards.find((c) => c.id === cardId);
+    if (card) {
+      setSelectedCard(card);
+      setModalVisible(true);
+    }
+  };
 
   // Loading state
   if (isLoading) {
@@ -79,16 +95,31 @@ export function RewardsDisplay({
       <FlatList
         data={results}
         keyExtractor={(item) => item.cardId}
-        renderItem={({ item }) => (
-          <CardRewardItem
-            result={item}
-            isBestValue={bestCard?.cardId === item.cardId}
-            onPress={onCardPress ? () => onCardPress(item) : undefined}
-          />
-        )}
+        renderItem={({ item }) => {
+          const card = cards.find((c) => c.id === item.cardId);
+          return (
+            <CardRewardItem
+              result={item}
+              isBestValue={bestCard?.cardId === item.cardId}
+              card={card}
+              onPress={onCardPress ? () => onCardPress(item) : undefined}
+              onViewOptions={() => handleViewOptions(item.cardId)}
+            />
+          );
+        }}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
+
+      {/* Redemption Options Modal */}
+      {selectedCard && (
+        <RedemptionOptionsModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          card={selectedCard}
+          amount={amount}
+        />
+      )}
     </View>
   );
 }

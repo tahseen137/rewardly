@@ -28,6 +28,16 @@ export interface Database {
         Insert: SpendingCategoryInsert;
         Update: SpendingCategoryUpdate;
       };
+      reward_programs: {
+        Row: RewardProgramRow;
+        Insert: RewardProgramInsert;
+        Update: RewardProgramUpdate;
+      };
+      point_valuations: {
+        Row: PointValuationRow;
+        Insert: PointValuationInsert;
+        Update: PointValuationUpdate;
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -54,6 +64,7 @@ export interface CardRow {
   image_url: string | null;
   apply_url: string | null;
   is_active: boolean;
+  reward_program_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -92,6 +103,7 @@ export interface CardUpdate {
   image_url?: string | null;
   apply_url?: string | null;
   is_active?: boolean;
+  reward_program_id?: string | null;
   updated_at?: string;
 }
 
@@ -241,4 +253,129 @@ export interface SpendingCategoryUpdate {
 export interface CardWithRelations extends CardRow {
   category_rewards: CategoryRewardRow[];
   signup_bonuses: SignupBonusRow[];
+}
+
+// ============================================================================
+// Reward Programs Table
+// ============================================================================
+
+export interface RewardProgramRow {
+  id: string;
+  program_name: string;
+  program_key: string;
+  program_category: string;
+  program_type: string;
+  unit: string;
+  direct_rate_cents: number | null;
+  optimal_rate_cents: number | null;
+  optimal_method: string | null;
+  issuer: string | null;
+  country: string;
+  redemption_methods: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RewardProgramInsert {
+  id?: string;
+  program_name: string;
+  program_key: string;
+  program_category: string;
+  program_type: string;
+  unit: string;
+  direct_rate_cents?: number | null;
+  optimal_rate_cents?: number | null;
+  optimal_method?: string | null;
+  issuer?: string | null;
+  country?: string;
+  redemption_methods?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface RewardProgramUpdate {
+  id?: string;
+  program_name?: string;
+  program_key?: string;
+  program_category?: string;
+  program_type?: string;
+  unit?: string;
+  direct_rate_cents?: number | null;
+  optimal_rate_cents?: number | null;
+  optimal_method?: string | null;
+  issuer?: string | null;
+  country?: string;
+  redemption_methods?: string | null;
+  updated_at?: string;
+}
+
+// ============================================================================
+// Point Valuations Table
+// ============================================================================
+
+export interface PointValuationRow {
+  id: string;
+  program_id: string;
+  redemption_type: string;
+  cents_per_point: number;
+  minimum_redemption: number | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface PointValuationInsert {
+  id?: string;
+  program_id: string;
+  redemption_type: string;
+  cents_per_point: number;
+  minimum_redemption?: number | null;
+  notes?: string | null;
+  created_at?: string;
+}
+
+export interface PointValuationUpdate {
+  id?: string;
+  program_id?: string;
+  redemption_type?: string;
+  cents_per_point?: number;
+  minimum_redemption?: number | null;
+  notes?: string | null;
+}
+
+// ============================================================================
+// Extended Types with Program Data
+// ============================================================================
+
+/**
+ * Redemption option for a reward program
+ */
+export interface RedemptionOption {
+  redemption_type: string;
+  cents_per_point: number;
+  minimum_redemption: number | null;
+  notes: string | null;
+}
+
+/**
+ * Card with reward program details and redemption options
+ */
+export interface CardWithProgramDetails extends CardRow {
+  program_name: string | null;
+  program_category: string | null;
+  program_type: string | null;
+  unit: string | null;
+  direct_rate_cents: number | null;
+  optimal_rate_cents: number | null;
+  optimal_method: string | null;
+  redemption_methods: string | null;
+  redemption_options: RedemptionOption[] | null;
+  category_rewards?: CategoryRewardRow[];
+  signup_bonuses?: SignupBonusRow[];
+}
+
+/**
+ * Reward program with all its point valuations
+ */
+export interface RewardProgramWithValuations extends RewardProgramRow {
+  point_valuations: PointValuationRow[];
 }

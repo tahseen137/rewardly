@@ -16,9 +16,11 @@ interface CardRewardItemProps {
   result: RewardCalculationResult;
   isBestValue: boolean;
   onPress?: () => void;
+  onViewOptions?: () => void;
+  card?: Card;
 }
 
-export function CardRewardItem({ result, isBestValue, onPress }: CardRewardItemProps) {
+export function CardRewardItem({ result, isBestValue, onPress, onViewOptions, card }: CardRewardItemProps) {
   const theme = useTheme();
 
   const rewardIcon = REWARD_TYPE_ICONS[result.rewardCurrency];
@@ -79,6 +81,13 @@ export function CardRewardItem({ result, isBestValue, onPress }: CardRewardItemP
           <Text style={[styles.baseRateNote, { color: theme.colors.text.tertiary }]}>
             Base rate
           </Text>
+        )}
+        {card?.programDetails && onViewOptions && (
+          <TouchableOpacity onPress={onViewOptions} style={styles.viewOptionsButton}>
+            <Text style={[styles.viewOptionsText, { color: theme.colors.primary.main }]}>
+              View Options
+            </Text>
+          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -165,6 +174,8 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0, 0, 0, 0.1)',
+    flexWrap: 'wrap',
+    gap: 8,
   },
   annualFee: {
     fontSize: 12,
@@ -172,6 +183,14 @@ const styles = StyleSheet.create({
   baseRateNote: {
     fontSize: 12,
     fontStyle: 'italic',
+  },
+  viewOptionsButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  viewOptionsText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
 

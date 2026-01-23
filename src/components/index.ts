@@ -50,3 +50,4 @@ export { CardRewardItem } from './CardRewardItem';
 export { CategoryPicker } from './CategoryPicker';
 export { RewardsDisplay } from './RewardsDisplay';
 export { StoreSelector } from './StoreSelector';
+export { RedemptionOptionsModal } from './RedemptionOptionsModal';

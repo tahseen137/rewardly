@@ -8,7 +8,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card, SpendingCategory, RewardType, CategoryReward, SignupBonus } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
-import type { CardRow, CategoryRewardRow, SignupBonusRow } from './supabase';
+import type { CardRow, CategoryRewardRow, SignupBonusRow, CardWithProgramDetails, RedemptionOption } from './supabase';
 import cardsData from '../data/cards.json';
 
 // ============================================================================
@@ -60,6 +60,58 @@ function transformCardRow(
     categoryRewards: categoryRewards
       .filter((cr) => cr.card_id === row.id)
       .map((cr) => transformCategoryReward(cr)),
+  };
+
+  if (signupBonus) {
+    card.signupBonus = {
+      amount: signupBonus.bonus_amount,
+      currency: mapRewardCurrency(signupBonus.bonus_currency),
+      spendRequirement: signupBonus.spend_requirement,
+      timeframeDays: signupBonus.timeframe_days,
+    };
+  }
+
+  return card;
+}
+
+/**
+ * Convert card with program details to app Card type
+ * Uses optimal_rate_cents from reward program if available
+ */
+function transformCardWithProgramDetails(
+  row: CardWithProgramDetails,
+  categoryRewards: CategoryRewardRow[],
+  signupBonus?: SignupBonusRow
+): Card {
+  // Use optimal rate from program if available, otherwise fall back to card's point_valuation
+  const pointValuation = row.optimal_rate_cents 
+    ? row.optimal_rate_cents / 100  // Convert cents to dollars
+    : row.point_valuation;
+
+  const card: Card = {
+    id: row.card_key,
+    name: row.name,
+    issuer: row.issuer,
+    rewardProgram: row.reward_program,
+    annualFee: row.annual_fee,
+    pointValuation: pointValuation,
+    baseRewardRate: {
+      value: row.base_reward_rate,
+      type: mapRewardCurrency(row.reward_currency),
+      unit: row.base_reward_unit as 'percent' | 'multiplier',
+    },
+    categoryRewards: categoryRewards
+      .filter((cr) => cr.card_id === row.id)
+      .map((cr) => transformCategoryReward(cr)),
+    // Add program details if available
+    programDetails: row.program_name ? {
+      programName: row.program_name,
+      programCategory: row.program_category || undefined,
+      directRateCents: row.direct_rate_cents || undefined,
+      optimalRateCents: row.optimal_rate_cents || undefined,
+      optimalMethod: row.optimal_method || undefined,
+      redemptionOptions: row.redemption_options || undefined,
+    } : undefined,
   };
 
   if (signupBonus) {
@@ -186,7 +238,7 @@ async function getLastSyncTime(): Promise<Date | null> {
 // ============================================================================
 
 /**
- * Fetch cards from Supabase
+ * Fetch cards from Supabase with program details
  */
 async function fetchCardsFromSupabase(): Promise<Card[]> {
   // Check if Supabase client is available
@@ -194,7 +246,48 @@ async function fetchCardsFromSupabase(): Promise<Card[]> {
     throw new Error('Supabase client not configured');
   }
 
-  // Fetch all cards
+  // Try to fetch from cards_with_program_details view first
+  try {
+    const { data: cardsWithPrograms, error: viewError } = await supabase
+      .from('cards_with_program_details')
+      .select('*');
+
+    if (!viewError && cardsWithPrograms && cardsWithPrograms.length > 0) {
+      // Fetch category rewards and signup bonuses separately
+      const { data: categoryRewardsRows, error: crError } = await supabase
+        .from('category_rewards')
+        .select('*');
+
+      if (crError) {
+        throw new Error(`Failed to fetch category rewards: ${crError.message}`);
+      }
+
+      const { data: signupBonusRows, error: sbError } = await supabase
+        .from('signup_bonuses')
+        .select('*')
+        .eq('is_active', true);
+
+      if (sbError) {
+        throw new Error(`Failed to fetch signup bonuses: ${sbError.message}`);
+      }
+
+      const typedCategoryRewards = (categoryRewardsRows || []) as CategoryRewardRow[];
+      const typedSignupBonuses = (signupBonusRows || []) as SignupBonusRow[];
+
+      // Transform cards with program details
+      const cards: Card[] = (cardsWithPrograms as CardWithProgramDetails[]).map((cardRow) => {
+        const cardCategoryRewards = typedCategoryRewards.filter((cr) => cr.card_id === cardRow.id);
+        const cardSignupBonus = typedSignupBonuses.find((sb) => sb.card_id === cardRow.id);
+        return transformCardWithProgramDetails(cardRow, cardCategoryRewards, cardSignupBonus);
+      });
+
+      return cards;
+    }
+  } catch (error) {
+    console.warn('Failed to fetch from cards_with_program_details view, falling back to cards table:', error);
+  }
+
+  // Fallback to regular cards table if view doesn't exist
   const { data: cardsRows, error: cardsError } = await supabase
     .from('cards')
     .select('*')

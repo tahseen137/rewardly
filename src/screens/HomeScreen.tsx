@@ -282,6 +282,8 @@ export default function HomeScreen() {
               bestCard={state.results.bestCard}
               isLoading={state.isCalculating}
               isEmpty={!hasCards}
+              amount={state.amount || 0}
+              cards={getAllCardsSync()}
             />
           </View>
         ) : state.selectedCategory && state.amount ? (

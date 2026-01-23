@@ -75,6 +75,29 @@ export interface Card {
   annualFee?: number; // Annual fee in CAD
   signupBonus?: SignupBonus; // Signup bonus details
   pointValuation?: number; // Value of one point in CAD cents
+  programDetails?: ProgramDetails; // Detailed reward program information
+}
+
+/**
+ * Detailed reward program information
+ */
+export interface ProgramDetails {
+  programName: string;
+  programCategory?: string; // 'Airline Miles', 'Credit Card Points', etc.
+  directRateCents?: number; // Direct/baseline redemption value in cents
+  optimalRateCents?: number; // Best possible redemption value in cents
+  optimalMethod?: string; // How to achieve optimal rate
+  redemptionOptions?: RedemptionOption[]; // All available redemption methods
+}
+
+/**
+ * Redemption option for a reward program
+ */
+export interface RedemptionOption {
+  redemption_type: string;
+  cents_per_point: number;
+  minimum_redemption: number | null;
+  notes: string | null;
 }
 
 /**
