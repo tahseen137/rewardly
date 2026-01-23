@@ -92,7 +92,7 @@ Each task group follows this workflow:
     - Run: `git add . && git commit -m "feat: add amount validation and formatting utilities"`
     - Run: `git push origin feature/amount-utilities`
 
-- [ ] 4. Create Reward Formatting Utilities
+- [x] 4. Create Reward Formatting Utilities
   - [x] 4.0 Git setup for reward formatting
     - Run: `git checkout main && git pull origin main`
     - Run: `git checkout -b feature/reward-formatting`
@@ -112,11 +112,11 @@ Each task group follows this workflow:
     - **Property 15: Annual Fee Display**
     - **Validates: Requirements 6.1**
 
-  - [-] 4.4 Push reward formatting to GitHub
+  - [x] 4.4 Push reward formatting to GitHub
     - Run: `git add . && git commit -m "feat: add reward formatting utilities"`
     - Run: `git push origin feature/reward-formatting`
 
-- [ ] 5. Checkpoint - Ensure utility tests pass
+- [-] 5. Checkpoint - Ensure utility tests pass
   - Ensure all tests pass, ask the user if questions arise.
   - Merge branches: `git checkout main && git merge feature/amount-utilities && git merge feature/reward-formatting && git push origin main`
 
