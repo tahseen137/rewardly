@@ -210,17 +210,17 @@ Each task group follows this workflow:
     - Run: `git push origin feature/simplified-homescreen`
 
 - [ ] 9. Update Component Exports
-  - [ ] 9.0 Git setup for exports update
+  - [x] 9.0 Git setup for exports update
     - Run: `git checkout main && git pull origin main`
     - Run: `git checkout -b feature/update-exports`
 
-  - [ ] 9.1 Update component index exports
+  - [x] 9.1 Update component index exports
     - Add new components to `src/components/index.ts`
     - Add new utils to `src/utils/index.ts` (create if needed)
     - Ensure all new components are properly exported
     - _Requirements: N/A (housekeeping)_
 
-  - [ ] 9.2 Push exports update to GitHub
+  - [-] 9.2 Push exports update to GitHub
     - Run: `git add . && git commit -m "chore: update component and utility exports"`
     - Run: `git push origin feature/update-exports`
 

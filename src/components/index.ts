@@ -43,3 +43,10 @@ export { RewardBadge } from './RewardBadge';
 export { CardVisual } from './CardVisual';
 export { BottomSheet } from './BottomSheet';
 export { Toast } from './Toast';
+
+// Rewards Calculator Components
+export { AmountInput } from './AmountInput';
+export { CardRewardItem } from './CardRewardItem';
+export { CategoryPicker } from './CategoryPicker';
+export { RewardsDisplay } from './RewardsDisplay';
+export { StoreSelector } from './StoreSelector';
