@@ -61,8 +61,8 @@ export function RewardsDisplay({
       <EmptyState
         icon="💳"
         title="No Cards in Portfolio"
-        message="Add cards to your portfolio to see rewards for this purchase"
-        actionText="Go to My Cards"
+        description="Add cards to your portfolio to see rewards for this purchase"
+        actionLabel="Go to My Cards"
         onAction={() => {
           // Navigation will be handled by parent component
           console.log('Navigate to My Cards');
@@ -77,7 +77,7 @@ export function RewardsDisplay({
       <EmptyState
         icon="🔍"
         title="No Results"
-        message="Unable to calculate rewards. Please try again."
+        description="Unable to calculate rewards. Please try again."
       />
     );
   }

@@ -5,6 +5,53 @@
 
 import * as fc from 'fast-check';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { RewardType, SpendingCategory, Card } from '../../../types';
+
+// Mock card data for testing
+const mockCards: Card[] = [
+  {
+    id: 'amex-cobalt-canada',
+    name: 'American Express Cobalt Card',
+    issuer: 'American Express Canada',
+    rewardProgram: 'Membership Rewards',
+    annualFee: 156,
+    baseRewardRate: { value: 1, type: RewardType.POINTS, unit: 'multiplier' },
+    categoryRewards: [
+      { category: SpendingCategory.DINING, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
+      { category: SpendingCategory.GROCERIES, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
+    ],
+  },
+  {
+    id: 'td-cash-back-visa-infinite',
+    name: 'TD Cash Back Visa Infinite',
+    issuer: 'TD Canada Trust',
+    rewardProgram: 'Cash Back',
+    annualFee: 139,
+    baseRewardRate: { value: 1, type: RewardType.CASHBACK, unit: 'percent' },
+    categoryRewards: [
+      { category: SpendingCategory.GROCERIES, rewardRate: { value: 3, type: RewardType.CASHBACK, unit: 'percent' } },
+      { category: SpendingCategory.GAS, rewardRate: { value: 3, type: RewardType.CASHBACK, unit: 'percent' } },
+    ],
+  },
+  {
+    id: 'cibc-dividend-visa-infinite',
+    name: 'CIBC Dividend Visa Infinite',
+    issuer: 'CIBC',
+    rewardProgram: 'Cash Back',
+    annualFee: 120,
+    baseRewardRate: { value: 1, type: RewardType.CASHBACK, unit: 'percent' },
+    categoryRewards: [
+      { category: SpendingCategory.GROCERIES, rewardRate: { value: 4, type: RewardType.CASHBACK, unit: 'percent' } },
+    ],
+  },
+];
+
+// Mock the CardDataService module
+jest.mock('../../CardDataService', () => ({
+  getAllCardsSync: jest.fn(() => mockCards),
+  getCardByIdSync: jest.fn((id: string) => mockCards.find((c) => c.id === id) || null),
+}));
+
 import {
   addCard,
   removeCard,
@@ -14,14 +61,8 @@ import {
   resetCache,
   initializePortfolio,
 } from '../../CardPortfolioManager';
-import { getAllCardsSync, initializeMemoryCacheSync } from '../../CardDataService';
 
-// Initialize memory cache with bundled cards for testing
-initializeMemoryCacheSync();
-
-// Get all valid card IDs from the database
-const allCards = getAllCardsSync();
-const validCardIds = allCards.map((card) => card.id);
+const validCardIds = mockCards.map((c) => c.id);
 
 // Arbitrary for selecting a random valid card ID
 const cardIdArbitrary = fc.constantFrom(...validCardIds);

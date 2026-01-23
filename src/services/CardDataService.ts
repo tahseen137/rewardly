@@ -9,7 +9,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card, SpendingCategory, RewardType, CategoryReward, SignupBonus } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 import type { CardRow, CategoryRewardRow, SignupBonusRow, CardWithProgramDetails, RedemptionOption } from './supabase';
-import cardsData from '../data/cards.json';
 
 // ============================================================================
 // Constants
@@ -18,10 +17,6 @@ import cardsData from '../data/cards.json';
 const CACHE_KEY = 'canadian_cards_cache';
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-// Type assertion for the JSON data structure
-interface CardsDataFile {
-  cards: Card[];
-}
 
 // Cache structure
 interface CachedData {
@@ -84,9 +79,8 @@ function transformCardWithProgramDetails(
   signupBonus?: SignupBonusRow
 ): Card {
   // Use optimal rate from program if available, otherwise fall back to card's point_valuation
-  const pointValuation = row.optimal_rate_cents 
-    ? row.optimal_rate_cents / 100  // Convert cents to dollars
-    : row.point_valuation;
+  // Note: optimal_rate_cents is already in cents (e.g., 2.1 cents per point), no conversion needed
+  const pointValuation = row.optimal_rate_cents ?? row.point_valuation;
 
   const card: Card = {
     id: row.card_key,
@@ -334,12 +328,6 @@ async function fetchCardsFromSupabase(): Promise<Card[]> {
   return cards;
 }
 
-/**
- * Get bundled cards from local JSON file
- */
-function getBundledCards(): Card[] {
-  return (cardsData as CardsDataFile).cards;
-}
 
 // ============================================================================
 // Public API
@@ -399,15 +387,6 @@ export function getAllCardsSync(): Card[] {
   return memoryCache;
 }
 
-/**
- * Initialize memory cache with bundled cards (for testing)
- * This allows synchronous access to cards without async initialization
- */
-export function initializeMemoryCacheSync(): void {
-  if (!memoryCache) {
-    memoryCache = getBundledCards();
-  }
-}
 
 /**
  * Get a card by its ID

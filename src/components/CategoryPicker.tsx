@@ -90,6 +90,14 @@ export function CategoryPicker({
           const config = CATEGORY_CONFIG[category];
           const isSelected = selectedCategory === category;
 
+          const cardStyle = [
+            styles.categoryCard,
+            ...(isSelected ? [{
+              backgroundColor: theme.colors.primary.main,
+              borderColor: theme.colors.primary.main,
+            }] : []),
+          ];
+
           return (
             <TouchableOpacity
               key={category}
@@ -101,13 +109,7 @@ export function CategoryPicker({
               <Card
                 variant={isSelected ? 'filled' : 'outlined'}
                 padding="medium"
-                style={[
-                  styles.categoryCard,
-                  isSelected && {
-                    backgroundColor: theme.colors.primary.main,
-                    borderColor: theme.colors.primary.main,
-                  },
-                ]}
+                style={cardStyle}
               >
                 <View style={styles.categoryContent}>
                   <Text style={styles.categoryIcon}>{config.icon}</Text>

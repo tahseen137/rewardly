@@ -4,15 +4,55 @@
  */
 
 import * as fc from 'fast-check';
-import { getAllCardsSync, initializeMemoryCacheSync } from '../../CardDataService';
+import { getAllCardsSync } from '../../CardDataService';
 import { rankCardsForCategory, getRewardRateForCategory } from '../../RecommendationEngine';
 import { SpendingCategory, RewardType, Card } from '../../../types';
 
-// Initialize memory cache with bundled cards for testing
-initializeMemoryCacheSync();
+// Mock cards for testing when database is not available
+const mockCards: Card[] = [
+  {
+    id: 'mock-cashback-1',
+    name: 'Mock Cashback Card',
+    issuer: 'Mock Bank',
+    rewardProgram: 'Cash Back',
+    annualFee: 0,
+    baseRewardRate: { value: 1, type: RewardType.CASHBACK, unit: 'percent' },
+    categoryRewards: [
+      { category: SpendingCategory.GROCERIES, rewardRate: { value: 3, type: RewardType.CASHBACK, unit: 'percent' } },
+    ],
+  },
+  {
+    id: 'mock-points-1',
+    name: 'Mock Points Card',
+    issuer: 'Mock Bank',
+    rewardProgram: 'Points',
+    annualFee: 100,
+    baseRewardRate: { value: 1, type: RewardType.POINTS, unit: 'multiplier' },
+    categoryRewards: [
+      { category: SpendingCategory.DINING, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
+    ],
+  },
+  {
+    id: 'mock-miles-1',
+    name: 'Mock Miles Card',
+    issuer: 'Mock Bank',
+    rewardProgram: 'Miles',
+    annualFee: 150,
+    baseRewardRate: { value: 1.5, type: RewardType.AIRLINE_MILES, unit: 'multiplier' },
+    categoryRewards: [
+      { category: SpendingCategory.TRAVEL, rewardRate: { value: 3, type: RewardType.AIRLINE_MILES, unit: 'multiplier' } },
+    ],
+  },
+];
+
+// Get cards from cache if available, otherwise use mock cards
+const getTestCards = (): Card[] => {
+  const cards = getAllCardsSync();
+  return cards.length > 0 ? cards : mockCards;
+};
 
 // Get all cards and categories for testing
-const allCards = getAllCardsSync();
+const allCards = getTestCards();
 const allCategories = Object.values(SpendingCategory);
 const allRewardTypes = Object.values(RewardType);
 

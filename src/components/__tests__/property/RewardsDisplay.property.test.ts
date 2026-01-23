@@ -29,8 +29,11 @@ const rewardCalculationResultArb = fc.record({
   rewardCurrency: rewardTypeArb,
   pointsEarned: fc.double({ min: 0, max: 100000, noNaN: true }),
   cadValue: fc.double({ min: 0, max: 10000, noNaN: true }),
+  originalPrice: fc.double({ min: 0, max: 100000, noNaN: true }),
+  effectivePrice: fc.double({ min: 0, max: 100000, noNaN: true }),
   multiplierUsed: fc.double({ min: 0.5, max: 10, noNaN: true }),
   isBaseRate: fc.boolean(),
+  isCashback: fc.boolean(),
   annualFee: fc.nat({ max: 1000 }),
   pointValuation: fc.double({ min: 0.5, max: 5, noNaN: true }),
 });
@@ -214,8 +217,11 @@ describe('Rewards Display Components - Property Tests', () => {
               rewardCurrency: RewardType.POINTS,
               pointsEarned: 100,
               cadValue: cadValue,
+              originalPrice: 100,
+              effectivePrice: 100 - cadValue,
               multiplierUsed: 1,
               isBaseRate: false,
+              isCashback: false,
               annualFee: 0,
               pointValuation: 1,
             }));

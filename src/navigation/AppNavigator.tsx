@@ -7,13 +7,12 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, StyleSheet } from 'react-native';
 
-import { HomeScreen, MyCardsScreen, SettingsScreen, ProductSearchScreen } from '../screens';
+import { HomeScreen, MyCardsScreen, SettingsScreen } from '../screens';
 import { ErrorBoundary, Icon } from '../components';
 import { useTheme } from '../theme';
 
 export type RootTabParamList = {
   Home: undefined;
-  ProductSearch: undefined;
   MyCards: undefined;
   Settings: undefined;
 };
@@ -26,7 +25,6 @@ const Tab = createBottomTabNavigator<RootTabParamList>();
 function TabIcon({ name, focused, color }: { name: string; focused: boolean; color: string }) {
   const iconMap: Record<string, string> = {
     Home: 'home',
-    ProductSearch: 'search',
     MyCards: 'cards',
     Settings: 'settings',
   };
@@ -66,17 +64,6 @@ function SettingsScreenWithErrorBoundary() {
       fallbackMessage="There was a problem loading settings. Please try again."
     >
       <SettingsScreen />
-    </ErrorBoundary>
-  );
-}
-
-function ProductSearchScreenWithErrorBoundary() {
-  return (
-    <ErrorBoundary
-      fallbackTitle="Unable to load product search"
-      fallbackMessage="There was a problem loading product search. Please try again."
-    >
-      <ProductSearchScreen />
     </ErrorBoundary>
   );
 }
@@ -137,14 +124,6 @@ export default function AppNavigator() {
           options={{
             title: 'Find Best Card',
             tabBarLabel: 'Home',
-          }}
-        />
-        <Tab.Screen
-          name="ProductSearch"
-          component={ProductSearchScreenWithErrorBoundary}
-          options={{
-            title: 'Product Search',
-            tabBarLabel: 'Products',
           }}
         />
         <Tab.Screen

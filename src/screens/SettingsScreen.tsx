@@ -16,12 +16,8 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme, Theme } from '../theme';
-import { Toast } from '../components';
 
-import { RewardType } from '../types';
 import {
-  getRewardTypePreference,
-  setRewardTypePreference,
   isNewCardSuggestionsEnabled,
   setNewCardSuggestionsEnabled,
   getLanguage,
@@ -33,92 +29,12 @@ import { refreshCards, getLastSyncTime, getAllCards } from '../services/CardData
 import { isSupabaseConfigured } from '../services/supabase';
 
 /**
- * Reward type option data
- */
-const REWARD_TYPE_OPTIONS: Array<{
-  type: RewardType;
-  labelKey: string;
-  descriptionKey: string;
-  icon: string;
-}> = [
-  {
-    type: RewardType.CASHBACK,
-    labelKey: 'rewardTypes.cashback',
-    descriptionKey: 'rewardTypes.cashbackDescription',
-    icon: '💵',
-  },
-  {
-    type: RewardType.POINTS,
-    labelKey: 'rewardTypes.points',
-    descriptionKey: 'rewardTypes.pointsDescription',
-    icon: '⭐',
-  },
-  {
-    type: RewardType.AIRLINE_MILES,
-    labelKey: 'rewardTypes.airline_miles',
-    descriptionKey: 'rewardTypes.airline_milesDescription',
-    icon: '✈️',
-  },
-  {
-    type: RewardType.HOTEL_POINTS,
-    labelKey: 'rewardTypes.hotel_points',
-    descriptionKey: 'rewardTypes.hotel_pointsDescription',
-    icon: '🏨',
-  },
-];
-
-/**
  * Language options
  */
 const LANGUAGE_OPTIONS: Array<{ code: Language; labelKey: string; icon: string }> = [
   { code: 'en', labelKey: 'languages.en', icon: '🇬🇧' },
   { code: 'fr', labelKey: 'languages.fr', icon: '🇫🇷' },
 ];
-
-/**
- * Reward type selector option component
- */
-function RewardTypeOption({
-  type,
-  labelKey,
-  descriptionKey,
-  icon,
-  isSelected,
-  onSelect,
-  theme,
-}: {
-  type: RewardType;
-  labelKey: string;
-  descriptionKey: string;
-  icon: string;
-  isSelected: boolean;
-  onSelect: (type: RewardType) => void;
-  theme: Theme;
-}) {
-  const { t } = useTranslation();
-  const styles = useMemo(() => createStyles(theme), [theme]);
-  const label = t(labelKey);
-  const description = t(descriptionKey);
-
-  return (
-    <TouchableOpacity
-      style={[styles.optionItem, isSelected && styles.optionItemSelected]}
-      onPress={() => onSelect(type)}
-      accessibilityLabel={`${label}: ${description}${isSelected ? ', selected' : ''}`}
-      accessibilityRole="radio"
-      accessibilityState={{ selected: isSelected }}
-    >
-      <Text style={styles.optionIcon}>{icon}</Text>
-      <View style={styles.optionInfo}>
-        <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>{label}</Text>
-        <Text style={styles.optionDescription}>{description}</Text>
-      </View>
-      <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
-        {isSelected && <View style={styles.radioInner} />}
-      </View>
-    </TouchableOpacity>
-  );
-}
 
 /**
  * Language selector option component
@@ -177,7 +93,6 @@ export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const [rewardType, setRewardType] = useState<RewardType>(RewardType.CASHBACK);
   const [newCardSuggestions, setNewCardSuggestions] = useState(true);
   const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
   const [isLoading, setIsLoading] = useState(true);
@@ -187,13 +102,16 @@ export default function SettingsScreen() {
 
   const loadPreferences = useCallback(async () => {
     await initializePreferences();
-    setRewardType(getRewardTypePreference());
     setNewCardSuggestions(isNewCardSuggestionsEnabled());
     setCurrentLanguage(getLanguage());
 
     // Load card count and last sync time
-    const cards = await getAllCards();
-    setCardCount(cards.length);
+    try {
+      const cards = await getAllCards();
+      setCardCount(cards.length);
+    } catch {
+      setCardCount(0);
+    }
     const syncTime = await getLastSyncTime();
     setLastSync(syncTime);
 
@@ -203,11 +121,6 @@ export default function SettingsScreen() {
   useEffect(() => {
     loadPreferences();
   }, [loadPreferences]);
-
-  const handleRewardTypeChange = async (type: RewardType) => {
-    setRewardType(type);
-    await setRewardTypePreference(type);
-  };
 
   const handleNewCardSuggestionsChange = async (enabled: boolean) => {
     setNewCardSuggestions(enabled);
@@ -259,25 +172,6 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <SectionHeader title={t('settings.rewardPreference')} theme={theme} />
-      <View style={styles.section}>
-        <Text style={styles.sectionDescription}>{t('settings.rewardPreferenceDescription')}</Text>
-        <View style={styles.optionsContainer}>
-          {REWARD_TYPE_OPTIONS.map((option) => (
-            <RewardTypeOption
-              key={option.type}
-              type={option.type}
-              labelKey={option.labelKey}
-              descriptionKey={option.descriptionKey}
-              icon={option.icon}
-              isSelected={rewardType === option.type}
-              onSelect={handleRewardTypeChange}
-              theme={theme}
-            />
-          ))}
-        </View>
-      </View>
-
       <SectionHeader title={t('settings.recommendations')} theme={theme} />
       <View style={styles.section}>
         <View style={styles.toggleRow}>

@@ -1,12 +1,10 @@
 /**
- * PreferenceManager - Handles user preferences including reward type selection
+ * PreferenceManager - Handles user preferences
  * Uses AsyncStorage for persistence
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { RewardType } from '../types';
 
-const REWARD_TYPE_STORAGE_KEY = '@rewards_optimizer/reward_type_preference';
 const NEW_CARD_SUGGESTIONS_STORAGE_KEY = '@rewards_optimizer/new_card_suggestions_enabled';
 const LANGUAGE_STORAGE_KEY = '@rewards_optimizer/language';
 
@@ -15,14 +13,12 @@ export type Language = 'en' | 'fr';
 /**
  * In-memory cache of preferences for synchronous operations
  */
-let rewardTypeCache: RewardType | null = null;
 let newCardSuggestionsCache: boolean | null = null;
 let languageCache: Language | null = null;
 
 /**
  * Default values for preferences
  */
-const DEFAULT_REWARD_TYPE = RewardType.CASHBACK;
 const DEFAULT_NEW_CARD_SUGGESTIONS = true;
 const DEFAULT_LANGUAGE: Language = 'en';
 
@@ -31,17 +27,10 @@ const DEFAULT_LANGUAGE: Language = 'en';
  */
 export async function initializePreferences(): Promise<void> {
   try {
-    const [storedRewardType, storedNewCardSuggestions, storedLanguage] = await Promise.all([
-      AsyncStorage.getItem(REWARD_TYPE_STORAGE_KEY),
+    const [storedNewCardSuggestions, storedLanguage] = await Promise.all([
       AsyncStorage.getItem(NEW_CARD_SUGGESTIONS_STORAGE_KEY),
       AsyncStorage.getItem(LANGUAGE_STORAGE_KEY),
     ]);
-
-    if (storedRewardType && isValidRewardType(storedRewardType)) {
-      rewardTypeCache = storedRewardType as RewardType;
-    } else {
-      rewardTypeCache = DEFAULT_REWARD_TYPE;
-    }
 
     if (storedNewCardSuggestions !== null) {
       newCardSuggestionsCache = storedNewCardSuggestions === 'true';
@@ -55,17 +44,9 @@ export async function initializePreferences(): Promise<void> {
       languageCache = DEFAULT_LANGUAGE;
     }
   } catch {
-    rewardTypeCache = DEFAULT_REWARD_TYPE;
     newCardSuggestionsCache = DEFAULT_NEW_CARD_SUGGESTIONS;
     languageCache = DEFAULT_LANGUAGE;
   }
-}
-
-/**
- * Check if a string is a valid RewardType
- */
-function isValidRewardType(value: string): boolean {
-  return Object.values(RewardType).includes(value as RewardType);
 }
 
 /**
@@ -73,26 +54,6 @@ function isValidRewardType(value: string): boolean {
  */
 function isValidLanguage(value: string): boolean {
   return value === 'en' || value === 'fr';
-}
-
-/**
- * Set the user's reward type preference
- * @param type - The reward type to set as preference
- */
-export async function setRewardTypePreference(type: RewardType): Promise<void> {
-  rewardTypeCache = type;
-  await AsyncStorage.setItem(REWARD_TYPE_STORAGE_KEY, type);
-}
-
-/**
- * Get the user's reward type preference
- * @returns The current reward type preference
- */
-export function getRewardTypePreference(): RewardType {
-  if (rewardTypeCache === null) {
-    return DEFAULT_REWARD_TYPE;
-  }
-  return rewardTypeCache;
 }
 
 /**
@@ -139,11 +100,9 @@ export function getLanguage(): Language {
  * Clear all preferences (useful for testing)
  */
 export async function clearPreferences(): Promise<void> {
-  rewardTypeCache = DEFAULT_REWARD_TYPE;
   newCardSuggestionsCache = DEFAULT_NEW_CARD_SUGGESTIONS;
   languageCache = DEFAULT_LANGUAGE;
   await Promise.all([
-    AsyncStorage.removeItem(REWARD_TYPE_STORAGE_KEY),
     AsyncStorage.removeItem(NEW_CARD_SUGGESTIONS_STORAGE_KEY),
     AsyncStorage.removeItem(LANGUAGE_STORAGE_KEY),
   ]);
@@ -153,7 +112,6 @@ export async function clearPreferences(): Promise<void> {
  * Reset the in-memory cache (useful for testing)
  */
 export function resetPreferenceCache(): void {
-  rewardTypeCache = null;
   newCardSuggestionsCache = null;
   languageCache = null;
 }

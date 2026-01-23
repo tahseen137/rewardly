@@ -10,14 +10,14 @@ import { Badge } from './Badge';
 import { useTheme } from '../theme';
 import { RewardCalculationResult } from '../services/RewardsCalculatorService';
 import { formatRewardEarned, formatAnnualFee, REWARD_TYPE_ICONS } from '../utils/rewardFormatUtils';
-import { formatCadValue } from '../utils/amountUtils';
+import { Card as CardType } from '../types';
 
 interface CardRewardItemProps {
   result: RewardCalculationResult;
   isBestValue: boolean;
   onPress?: () => void;
   onViewOptions?: () => void;
-  card?: Card;
+  card?: CardType;
 }
 
 export function CardRewardItem({ result, isBestValue, onPress, onViewOptions, card }: CardRewardItemProps) {
@@ -35,6 +35,15 @@ export function CardRewardItem({ result, isBestValue, onPress, onViewOptions, ca
     return iconMap[icon] || '⭐';
   };
 
+  // Format reward display based on card type
+  const formatRewardDisplay = (): string => {
+    if (result.isCashback) {
+      return `$${result.cadValue.toFixed(2)}`;
+    }
+    // For points/miles, show points and CAD value
+    return `${Math.round(result.pointsEarned)} pts = $${result.cadValue.toFixed(2)}`;
+  };
+
   const CardContent = (
     <View style={styles.container}>
       {/* Header with card name and best value badge */}
@@ -49,7 +58,7 @@ export function CardRewardItem({ result, isBestValue, onPress, onViewOptions, ca
         </View>
         {isBestValue && (
           <Badge
-            text="Best Value"
+            label="Best Value"
             variant="success"
             size="small"
             style={styles.bestValueBadge}
@@ -57,18 +66,34 @@ export function CardRewardItem({ result, isBestValue, onPress, onViewOptions, ca
         )}
       </View>
 
-      {/* Reward details */}
-      <View style={styles.rewardSection}>
-        <View style={styles.rewardRow}>
-          <Text style={styles.rewardIcon}>{getRewardIconEmoji(rewardIcon)}</Text>
-          <View style={styles.rewardDetails}>
-            <Text style={[styles.rewardEarned, { color: theme.colors.text.primary }]}>
-              {formatRewardEarned(result.pointsEarned, result.rewardCurrency)}
-            </Text>
-            <Text style={[styles.cadValue, { color: theme.colors.success.main }]}>
-              ${formatCadValue(result.cadValue)}
+      {/* Price breakdown: Original → Reward → Effective */}
+      <View style={styles.priceBreakdown}>
+        <View style={styles.priceRow}>
+          <Text style={[styles.priceLabel, { color: theme.colors.text.secondary }]}>
+            Original:
+          </Text>
+          <Text style={[styles.priceValue, { color: theme.colors.text.primary }]}>
+            ${result.originalPrice.toFixed(2)}
+          </Text>
+        </View>
+        <View style={styles.priceRow}>
+          <View style={styles.rewardLabelRow}>
+            <Text style={styles.rewardIcon}>{getRewardIconEmoji(rewardIcon)}</Text>
+            <Text style={[styles.priceLabel, { color: theme.colors.text.secondary }]}>
+              {result.isCashback ? 'Cashback:' : 'Reward:'}
             </Text>
           </View>
+          <Text style={[styles.rewardValue, { color: theme.colors.success.main }]}>
+            {formatRewardDisplay()}
+          </Text>
+        </View>
+        <View style={[styles.priceRow, styles.effectiveRow]}>
+          <Text style={[styles.effectiveLabel, { color: theme.colors.text.primary }]}>
+            Effective:
+          </Text>
+          <Text style={[styles.effectiveValue, { color: theme.colors.primary.main }]}>
+            ${result.effectivePrice.toFixed(2)}
+          </Text>
         </View>
       </View>
 
@@ -144,26 +169,49 @@ const styles = StyleSheet.create({
   bestValueBadge: {
     marginLeft: 8,
   },
-  rewardSection: {
+  priceBreakdown: {
     marginBottom: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+    borderRadius: 8,
+    padding: 12,
   },
-  rewardRow: {
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  rewardLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   rewardIcon: {
-    fontSize: 24,
-    marginRight: 12,
-  },
-  rewardDetails: {
-    flex: 1,
-  },
-  rewardEarned: {
     fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
+    marginRight: 6,
   },
-  cadValue: {
+  priceLabel: {
+    fontSize: 14,
+  },
+  priceValue: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  rewardValue: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  effectiveRow: {
+    marginBottom: 0,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0, 0, 0, 0.1)',
+    marginTop: 6,
+  },
+  effectiveLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  effectiveValue: {
     fontSize: 18,
     fontWeight: '700',
   },
