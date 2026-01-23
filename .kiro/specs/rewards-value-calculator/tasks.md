@@ -120,7 +120,7 @@ Each task group follows this workflow:
   - Ensure all tests pass, ask the user if questions arise.
   - Merge branches: `git checkout main && git merge feature/amount-utilities && git merge feature/reward-formatting && git push origin main`
 
-- [-] 6. Create UI Components
+- [x] 6. Create UI Components
   - [x] 6.0 Git setup for UI components
     - Run: `git checkout main && git pull origin main`
     - Run: `git checkout -b feature/calculator-ui-components`
@@ -168,11 +168,11 @@ Each task group follows this workflow:
     - **Property 14: Best Value Badge Assignment**
     - **Validates: Requirements 5.5**
 
-  - [-] 6.8 Push UI components to GitHub
+  - [x] 6.8 Push UI components to GitHub
     - Run: `git add . && git commit -m "feat: add calculator UI components"`
     - Run: `git push origin feature/calculator-ui-components`
 
-- [ ] 7. Checkpoint - Ensure component tests pass
+- [-] 7. Checkpoint - Ensure component tests pass
   - Ensure all tests pass, ask the user if questions arise.
   - Merge to main: `git checkout main && git merge feature/calculator-ui-components && git push origin main`
 
