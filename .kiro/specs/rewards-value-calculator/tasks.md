@@ -16,7 +16,7 @@ Each task group follows this workflow:
 
 ## Tasks
 
-- [-] 1. Create RewardsCalculatorService
+- [x] 1. Create RewardsCalculatorService
   - [x] 1.0 Git setup for calculator service
     - Run: `git checkout main && git pull origin main`
     - Run: `git checkout -b feature/rewards-calculator-service`
@@ -52,11 +52,11 @@ Each task group follows this workflow:
     - **Property 7: Complete Portfolio Processing with Sorting**
     - **Validates: Requirements 4.1, 4.5**
 
-  - [-] 1.7 Push calculator service to GitHub
+  - [x] 1.7 Push calculator service to GitHub
     - Run: `git add . && git commit -m "feat: add RewardsCalculatorService with property tests"`
     - Run: `git push origin feature/rewards-calculator-service`
 
-- [ ] 2. Checkpoint - Ensure calculator service tests pass
+- [-] 2. Checkpoint - Ensure calculator service tests pass
   - Ensure all tests pass, ask the user if questions arise.
   - Merge to main: `git checkout main && git merge feature/rewards-calculator-service && git push origin main`
 
