@@ -1,5 +1,6 @@
 /**
  * HomeScreen - Simplified rewards calculator
+ * Redesigned to match web with gradient header and CategoryGrid
  * Requirements: 8.1, 8.2, 8.3, 8.4
  */
 
@@ -14,13 +15,15 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
-  StoreSelector,
   AmountInput,
   RewardsDisplay,
-  CategoryPicker,
   EmptyState,
+  GradientText,
 } from '../components';
+import { StoreSelector } from '../components/StoreSelectorNew';
+import { CategoryGrid, CategoryType } from '../components/CategoryGrid';
 import { useTheme, Theme } from '../theme';
+import { colors } from '../theme/colors';
 import { Store, SpendingCategory } from '../types';
 import { getCards } from '../services/CardPortfolioManager';
 import { getAllCardsSync, getAllCards } from '../services/CardDataService';
@@ -29,6 +32,37 @@ import {
   CalculatorInput,
   CalculatorOutput,
 } from '../services/RewardsCalculatorService';
+
+// Map CategoryType to SpendingCategory
+const categoryTypeToSpendingCategory = (cat: CategoryType): SpendingCategory => {
+  const mapping: Record<CategoryType, SpendingCategory> = {
+    groceries: SpendingCategory.GROCERIES,
+    dining: SpendingCategory.DINING,
+    gas: SpendingCategory.GAS,
+    travel: SpendingCategory.TRAVEL,
+    online: SpendingCategory.ONLINE_SHOPPING,
+    entertainment: SpendingCategory.ENTERTAINMENT,
+    pharmacy: SpendingCategory.DRUGSTORES,
+    homeImprovement: SpendingCategory.HOME_IMPROVEMENT,
+    other: SpendingCategory.OTHER,
+  };
+  return mapping[cat] || SpendingCategory.OTHER;
+};
+
+const spendingCategoryToCategoryType = (cat: SpendingCategory): CategoryType | null => {
+  const mapping: Record<SpendingCategory, CategoryType> = {
+    [SpendingCategory.GROCERIES]: 'groceries',
+    [SpendingCategory.DINING]: 'dining',
+    [SpendingCategory.GAS]: 'gas',
+    [SpendingCategory.TRAVEL]: 'travel',
+    [SpendingCategory.ONLINE_SHOPPING]: 'online',
+    [SpendingCategory.ENTERTAINMENT]: 'entertainment',
+    [SpendingCategory.DRUGSTORES]: 'pharmacy',
+    [SpendingCategory.HOME_IMPROVEMENT]: 'homeImprovement',
+    [SpendingCategory.OTHER]: 'other',
+  };
+  return mapping[cat] || null;
+};
 
 // ============================================================================
 // Calculator State Interface
@@ -100,6 +134,12 @@ export default function HomeScreen() {
       selectedCategory: category,
     }));
   }, []);
+
+  // Handle CategoryGrid selection (converts CategoryType to SpendingCategory)
+  const handleCategoryGridSelect = useCallback((categoryType: CategoryType) => {
+    const spendingCat = categoryTypeToSpendingCategory(categoryType);
+    handleCategorySelect(spendingCat);
+  }, [handleCategorySelect]);
 
   // Handle amount change
   const handleAmountChange = useCallback((amount: number | null) => {
@@ -195,47 +235,57 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
+        {/* Header - Redesigned with GradientText */}
         <View style={styles.header}>
-          <Text style={styles.title}>{t('home.title') || 'Rewards Calculator'}</Text>
+          <GradientText variant="primary" style={styles.title}>
+            {t('home.title') || 'Rewards Optimizer'}
+          </GradientText>
           <Text style={styles.subtitle}>
-            {t('home.subtitle') || 'Find the best card for your purchase'}
+            {t('home.subtitle') || 'Find the best card for every purchase'}
           </Text>
         </View>
 
+        {/* Calculator Section */}
         {/* Store Selector */}
         <View style={styles.section}>
+          <Text style={styles.sectionLabel}>
+            {t('home.selectStore') || 'Select Store (Optional)'}
+          </Text>
           <StoreSelector
-            onStoreSelect={handleStoreSelect}
-            onCategorySelect={handleCategorySelect}
             selectedStore={state.selectedStore}
-            selectedCategory={state.selectedCategory}
+            onStoreSelect={handleStoreSelect}
+            onCategoryChange={handleCategorySelect}
           />
         </View>
 
-        {/* Category Picker - shows auto-filled category or allows manual override */}
+        {/* Category Grid - Replaces CategoryPicker */}
         <View style={styles.section}>
-          <CategoryPicker
-            onCategorySelect={handleCategorySelect}
-            selectedCategory={state.selectedCategory}
-            label={state.selectedStore
-              ? (t('home.categoryFromStore') || 'Category (from store)')
-              : (t('home.selectCategory') || 'Select Category')}
+          <Text style={styles.sectionLabel}>
+            {t('home.category') || 'Category'}
+          </Text>
+          <CategoryGrid
+            selectedCategory={state.selectedCategory ? spendingCategoryToCategoryType(state.selectedCategory) : null}
+            onCategorySelect={handleCategoryGridSelect}
           />
         </View>
 
         {/* Amount Input */}
         <View style={styles.section}>
+          <Text style={styles.sectionLabel}>
+            {t('home.purchaseAmount') || 'Purchase Amount'}
+          </Text>
           <AmountInput
             value={state.amount}
             onChange={handleAmountChange}
             error={state.amountError}
-            label={t('home.purchaseAmount') || 'Purchase Amount'}
-            placeholder={t('home.enterAmount') || 'Enter amount'}
+            placeholder={t('home.enterAmount') || '0.00'}
           />
         </View>
 
-        {/* Results Display */}
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Results Section */}
         {!hasCards ? (
           <EmptyState
             icon="💳"
@@ -245,7 +295,10 @@ export default function HomeScreen() {
             }
           />
         ) : state.results ? (
-          <View style={styles.section}>
+          <View>
+            <Text style={styles.resultsHeader}>
+              {t('home.resultsTitle') || 'Best Cards for This Purchase'}
+            </Text>
             <RewardsDisplay
               results={state.results.results}
               bestCard={state.results.bestCard}
@@ -267,7 +320,7 @@ export default function HomeScreen() {
             title={t('home.getStartedTitle') || 'Get Started'}
             description={
               t('home.getStartedMessage') ||
-              'Select a store or category and enter an amount to see rewards'
+              'Select a category and enter an amount to find the best card'
             }
           />
         )}
@@ -284,38 +337,61 @@ const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.primary,
+      backgroundColor: colors.background.primary,
     },
     scrollView: {
       flex: 1,
     },
     scrollContent: {
-      padding: theme.spacing.screenPadding,
-      paddingBottom: 40,
+      paddingHorizontal: 16, // px-4
+      paddingVertical: 24, // py-6
+      paddingBottom: 100, // Extra padding for tab bar
     },
     header: {
-      marginBottom: theme.spacing.lg,
+      marginBottom: 24,
+      alignItems: 'center', // Center aligned
     },
     title: {
-      ...theme.textStyles.h1,
-      color: theme.colors.text.primary,
-      marginBottom: theme.spacing.xs,
+      fontSize: 24, // text-2xl
+      fontWeight: '700', // bold
+      marginBottom: 4,
+      textAlign: 'center',
     },
     subtitle: {
-      ...theme.textStyles.body,
-      color: theme.colors.text.secondary,
+      fontSize: 13, // text-sm
+      color: colors.text.secondary,
+      textAlign: 'center',
     },
     section: {
-      marginBottom: theme.spacing.lg,
+      marginBottom: 16, // space-y-4 (16px gap)
+    },
+    sectionLabel: {
+      fontSize: 13, // text-sm
+      fontWeight: '500', // font-medium
+      color: colors.text.secondary,
+      marginBottom: 8, // space-y-2 (8px gap)
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.border.light,
+      marginVertical: 24, // Divider spacing
+    },
+    resultsHeader: {
+      fontSize: 13, // text-sm
+      fontWeight: '500', // font-medium
+      color: colors.text.secondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5, // tracking-wide
+      marginBottom: 12,
     },
     emptyResults: {
-      padding: theme.spacing.xl,
+      paddingVertical: 48,
       alignItems: 'center',
       justifyContent: 'center',
     },
     emptyText: {
-      ...theme.textStyles.body,
-      color: theme.colors.text.tertiary,
+      fontSize: 15,
+      color: colors.text.tertiary,
       textAlign: 'center',
     },
   });
