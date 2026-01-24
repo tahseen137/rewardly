@@ -1,5 +1,6 @@
 /**
  * MyCardsScreen - Display and manage user's card portfolio
+ * Redesigned to match web with lucide icons and modern card styling
  * Requirements: 1.1, 1.2, 1.3
  */
 
@@ -14,6 +15,7 @@ import {
   TextInput,
   Alert,
   RefreshControl,
+  ScrollView,
 } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
@@ -22,8 +24,11 @@ import Animated, {
   withSpring,
   runOnJS,
 } from 'react-native-reanimated';
+import { Plus, Search, Trash2, ChevronRight, X } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme, Theme } from '../theme';
-import { CardVisual } from '../components';
+import { colors } from '../theme/colors';
+import { borderRadius } from '../theme/borders';
 import { Card, UserCard, RewardType } from '../types';
 import {
   getCards,
@@ -43,13 +48,12 @@ function formatRewardRate(value: number, type: RewardType, unit: 'percent' | 'mu
 function CardItem({
   userCard,
   onRemove,
-  theme,
+  onViewDetails,
 }: {
   userCard: UserCard;
   onRemove: (cardId: string) => void;
-  theme: Theme;
+  onViewDetails: (card: Card) => void;
 }) {
-  const styles = useMemo(() => createStyles(theme), [theme]);
   const card = getCardByIdSync(userCard.cardId);
   const translateX = useSharedValue(0);
 
@@ -79,35 +83,46 @@ function CardItem({
   return (
     <View style={styles.cardItemContainer}>
       <View style={styles.deleteBackground}>
-        <Text style={styles.deleteText}>Delete</Text>
+        <Trash2 size={20} color={colors.error.main} />
       </View>
       <GestureDetector gesture={panGesture}>
         <Animated.View style={[styles.cardItem, animatedStyle]}>
-          <CardVisual name={card.name} issuer={card.issuer} size="medium" />
-          <View style={styles.cardDetails}>
-            <Text style={styles.cardAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
-            <Text style={styles.cardReward}>
-              Base:{' '}
-              {formatRewardRate(
-                card.baseRewardRate.value,
-                card.baseRewardRate.type,
-                card.baseRewardRate.unit
-              )}
+          {/* Issuer Badge with Gradient */}
+          <LinearGradient
+            colors={[colors.primary.main + '4D', colors.accent.main + '4D']} // 30% opacity (~4D in hex)
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.issuerBadge}
+          >
+            <Text style={styles.issuerText}>
+              {card.issuer.slice(0, 2).toUpperCase()}
             </Text>
-            {card.categoryRewards.length > 0 && (
-              <Text style={styles.cardCategories}>
-                Bonus: {card.categoryRewards.length} categories
-              </Text>
-            )}
-          </View>
+          </LinearGradient>
+
+          {/* Card Info - Tappable */}
           <TouchableOpacity
-            style={styles.removeButton}
+            style={styles.cardInfo}
+            onPress={() => onViewDetails(card)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.cardName}>{card.name}</Text>
+            <Text style={styles.cardMeta}>
+              {card.issuer} • {formatAnnualFee(card.annualFee)}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Delete Button */}
+          <TouchableOpacity
+            style={styles.deleteButton}
             onPress={() => onRemove(card.id)}
             accessibilityLabel={`Remove ${card.name}`}
             accessibilityRole="button"
           >
-            <Text style={styles.removeButtonText}>Remove</Text>
+            <Trash2 size={18} color={colors.text.secondary} />
           </TouchableOpacity>
+
+          {/* Chevron */}
+          <ChevronRight size={18} color={colors.text.tertiary} />
         </Animated.View>
       </GestureDetector>
     </View>
@@ -118,14 +133,11 @@ function CardPickerItem({
   card,
   isOwned,
   onSelect,
-  theme,
 }: {
   card: Card;
   isOwned: boolean;
   onSelect: (cardId: string) => void;
-  theme: Theme;
 }) {
-  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const formatAnnualFee = (fee?: number) => {
     if (fee === undefined || fee === 0) return 'No annual fee';
@@ -164,15 +176,15 @@ function CardPickerItem({
 }
 
 export default function MyCardsScreen() {
-  const theme = useTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const [portfolio, setPortfolio] = useState<UserCard[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [portfolioSearchQuery, setPortfolioSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [availableCards, setAvailableCards] = useState<Card[]>([]);
   const [isLoadingCards, setIsLoadingCards] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
 
   const loadPortfolio = useCallback(async () => {
     await initializePortfolio();
@@ -191,6 +203,20 @@ export default function MyCardsScreen() {
       setIsLoadingCards(false);
     }
   }, [searchQuery]);
+
+  // Filter portfolio based on search
+  const filteredPortfolio = useMemo(() => {
+    if (!portfolioSearchQuery.trim()) return portfolio;
+    const query = portfolioSearchQuery.toLowerCase();
+    return portfolio.filter((userCard) => {
+      const card = getCardByIdSync(userCard.cardId);
+      if (!card) return false;
+      return (
+        card.name.toLowerCase().includes(query) ||
+        card.issuer.toLowerCase().includes(query)
+      );
+    });
+  }, [portfolio, portfolioSearchQuery]);
 
   useEffect(() => {
     loadPortfolio();
@@ -256,6 +282,40 @@ export default function MyCardsScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerText}>
+          <Text style={styles.title}>My Cards</Text>
+          <Text style={styles.subtitle}>
+            {portfolio.length} card{portfolio.length !== 1 ? 's' : ''} in portfolio
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setIsModalVisible(true)}
+          accessibilityLabel="Add card"
+          accessibilityRole="button"
+        >
+          <Plus size={16} color={colors.primary.main} />
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Search */}
+      {portfolio.length > 0 && (
+        <View style={styles.searchContainer}>
+          <Search size={16} color={colors.text.secondary} style={styles.searchIcon} />
+          <TextInput
+            placeholder="Search cards..."
+            value={portfolioSearchQuery}
+            onChangeText={setPortfolioSearchQuery}
+            placeholderTextColor={colors.text.tertiary}
+            style={styles.searchInput}
+          />
+        </View>
+      )}
+
+      {/* Content */}
       {portfolio.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyStateIcon}>💳</Text>
@@ -273,25 +333,26 @@ export default function MyCardsScreen() {
           </TouchableOpacity>
         </View>
       ) : (
-        <>
-          <FlatList
-            data={portfolio}
-            keyExtractor={(item) => item.cardId}
-            renderItem={({ item }) => (
-              <CardItem userCard={item} onRemove={handleRemoveCard} theme={theme} />
-            )}
-            contentContainerStyle={styles.listContent}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-          />
-          <TouchableOpacity
-            style={styles.fab}
-            onPress={() => setIsModalVisible(true)}
-            accessibilityLabel="Add a card"
-            accessibilityRole="button"
-          >
-            <Text style={styles.fabText}>+</Text>
-          </TouchableOpacity>
-        </>
+        <FlatList
+          data={filteredPortfolio}
+          keyExtractor={(item) => item.cardId}
+          renderItem={({ item }) => (
+            <CardItem
+              userCard={item}
+              onRemove={handleRemoveCard}
+              onViewDetails={setSelectedCard}
+            />
+          )}
+          contentContainerStyle={styles.listContent}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          ListEmptyComponent={
+            portfolioSearchQuery ? (
+              <View style={styles.emptySearch}>
+                <Text style={styles.emptySearchText}>No cards match your search</Text>
+              </View>
+            ) : null
+          }
+        />
       )}
 
       <Modal
@@ -316,9 +377,9 @@ export default function MyCardsScreen() {
           </View>
 
           <TextInput
-            style={styles.searchInput}
+            style={styles.modalSearchInput}
             placeholder="Search cards..."
-            placeholderTextColor={theme.colors.text.tertiary}
+            placeholderTextColor={colors.text.tertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"
@@ -339,7 +400,6 @@ export default function MyCardsScreen() {
                   card={item}
                   isOwned={ownedCardIds.has(item.id)}
                   onSelect={handleAddCard}
-                  theme={theme}
                 />
               )}
               contentContainerStyle={styles.pickerListContent}
@@ -351,158 +411,254 @@ export default function MyCardsScreen() {
   );
 }
 
-const createStyles = (theme: Theme) =>
-  StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.colors.background.primary },
-    listContent: { padding: theme.spacing.screenPadding, paddingBottom: 80 },
-    cardItemContainer: {
-      position: 'relative',
-      marginBottom: theme.spacing.lg,
-    },
-    deleteBackground: {
-      position: 'absolute',
-      right: 0,
-      top: 0,
-      bottom: 0,
-      backgroundColor: theme.colors.error.main,
-      justifyContent: 'center',
-      alignItems: 'flex-end',
-      paddingRight: theme.spacing.lg,
-      borderRadius: theme.borderRadius.lg,
-      width: '100%',
-    },
-    deleteText: {
-      color: theme.colors.error.contrast,
-      fontWeight: '600',
-      fontSize: 16,
-    },
-    cardItem: {
-      backgroundColor: theme.colors.background.secondary,
-      borderRadius: theme.borderRadius.lg,
-      padding: theme.spacing.lg,
-      alignItems: 'center',
-      ...theme.shadows.card,
-    },
-    cardDetails: {
-      alignItems: 'center',
-      marginTop: theme.spacing.md,
-      marginBottom: theme.spacing.md,
-    },
-    cardReward: {
-      ...theme.textStyles.bodySmall,
-      color: theme.colors.primary.main,
-      marginBottom: 4,
-    },
-    cardAnnualFee: {
-      ...theme.textStyles.caption,
-      color: theme.colors.text.tertiary,
-      marginBottom: 4,
-    },
-    cardCategories: { ...theme.textStyles.caption, color: theme.colors.text.tertiary },
-    removeButton: {
-      backgroundColor: theme.colors.error.background,
-      paddingHorizontal: theme.spacing.lg,
-      paddingVertical: theme.spacing.sm,
-      borderRadius: theme.borderRadius.md,
-      borderWidth: 1,
-      borderColor: theme.colors.error.main,
-    },
-    removeButtonText: { color: theme.colors.error.main, fontSize: 14, fontWeight: '600' },
-    emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
-    emptyStateIcon: { fontSize: 64, marginBottom: theme.spacing.lg },
-    emptyStateTitle: {
-      ...theme.textStyles.h2,
-      color: theme.colors.text.primary,
-      marginBottom: theme.spacing.sm,
-    },
-    emptyStateText: {
-      ...theme.textStyles.body,
-      color: theme.colors.text.secondary,
-      textAlign: 'center',
-      marginBottom: theme.spacing.xl,
-    },
-    addButtonLarge: {
-      backgroundColor: theme.colors.primary.main,
-      paddingHorizontal: theme.spacing.xl,
-      paddingVertical: theme.spacing.inputPadding,
-      borderRadius: theme.borderRadius.md,
-    },
-    addButtonLargeText: { ...theme.textStyles.button, color: theme.colors.primary.contrast },
-    fab: {
-      position: 'absolute',
-      right: 20,
-      bottom: 20,
-      width: theme.layout.fabSize,
-      height: theme.layout.fabSize,
-      borderRadius: theme.layout.fabSize / 2,
-      backgroundColor: theme.colors.primary.main,
-      alignItems: 'center',
-      justifyContent: 'center',
-      ...theme.shadows.md,
-    },
-    fabText: {
-      color: theme.colors.primary.contrast,
-      fontSize: 28,
-      fontWeight: '400',
-      marginTop: -2,
-    },
-    modalContainer: { flex: 1, backgroundColor: theme.colors.background.primary },
-    modalHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: theme.spacing.screenPadding,
-      backgroundColor: theme.colors.background.secondary,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.light,
-    },
-    modalTitle: { ...theme.textStyles.h4, color: theme.colors.text.primary },
-    modalClose: { ...theme.textStyles.button, color: theme.colors.primary.main },
-    searchInput: {
-      backgroundColor: theme.colors.background.secondary,
-      margin: theme.spacing.screenPadding,
-      padding: theme.spacing.md,
-      borderRadius: theme.borderRadius.md,
-      ...theme.textStyles.body,
-      color: theme.colors.text.primary,
-      borderWidth: 1,
-      borderColor: theme.colors.border.light,
-    },
-    pickerListContent: { paddingHorizontal: theme.spacing.screenPadding, paddingBottom: 20 },
-    pickerItem: {
-      backgroundColor: theme.colors.background.secondary,
-      borderRadius: theme.borderRadius.md,
-      padding: theme.spacing.inputPadding,
-      marginBottom: theme.spacing.sm,
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    pickerItemDisabled: { opacity: 0.6 },
-    pickerItemInfo: { flex: 1 },
-    pickerItemName: {
-      ...theme.textStyles.body,
-      fontWeight: '500',
-      color: theme.colors.text.primary,
-      marginBottom: 2,
-    },
-    pickerItemIssuer: {
-      ...theme.textStyles.bodySmall,
-      color: theme.colors.text.secondary,
-      marginBottom: 2,
-    },
-    pickerItemReward: { ...theme.textStyles.caption, color: theme.colors.primary.main },
-    pickerItemAnnualFee: {
-      ...theme.textStyles.caption,
-      color: theme.colors.success.main,
-      marginBottom: 2,
-    },
-    pickerItemTextDisabled: { color: theme.colors.text.tertiary },
-    ownedBadge: {
-      ...theme.textStyles.caption,
-      color: theme.colors.success.main,
-      fontWeight: '600',
-      marginLeft: theme.spacing.sm,
-    },
-    loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
-    loadingText: { ...theme.textStyles.body, color: theme.colors.text.secondary },
-  });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background.primary,
+    paddingHorizontal: 16,
+    paddingTop: 24,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  headerText: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 24, // text-2xl
+    fontWeight: '700', // bold
+    color: colors.text.primary,
+  },
+  subtitle: {
+    fontSize: 13, // text-sm
+    color: colors.text.secondary,
+    marginTop: 2,
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: colors.primary.main,
+    borderRadius: 8,
+  },
+  addButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.background.primary, // Dark text on bright green
+  },
+  searchContainer: {
+    position: 'relative',
+    height: 44,
+    backgroundColor: colors.background.tertiary,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 12,
+    marginBottom: 16,
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: 12,
+  },
+  searchInput: {
+    flex: 1,
+    paddingLeft: 32,
+    fontSize: 15,
+    color: colors.text.primary,
+  },
+  listContent: {
+    paddingBottom: 100, // Space for tab bar
+  },
+  // Card Item styles
+  cardItemContainer: {
+    position: 'relative',
+    marginBottom: 8,
+  },
+  deleteBackground: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    paddingRight: 20,
+    width: '100%',
+  },
+  cardItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 16,
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.md, // 12px
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  issuerBadge: {
+    width: 56, // w-14
+    height: 40, // h-10
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  issuerText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.text.primary,
+  },
+  cardInfo: {
+    flex: 1,
+  },
+  cardName: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.text.primary,
+    marginBottom: 2,
+  },
+  cardMeta: {
+    fontSize: 12,
+    color: colors.text.secondary,
+  },
+  deleteButton: {
+    padding: 8,
+  },
+  emptySearch: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptySearchText: {
+    fontSize: 15,
+    color: colors.text.secondary,
+  },
+  // Empty state styles
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  emptyStateIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  emptyStateTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text.primary,
+    marginBottom: 8,
+  },
+  emptyStateText: {
+    fontSize: 15,
+    color: colors.text.secondary,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  addButtonLarge: {
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: borderRadius.md,
+  },
+  addButtonLargeText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: colors.background.primary,
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: colors.background.primary,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: colors.text.primary,
+  },
+  modalClose: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: colors.primary.main,
+  },
+  modalSearchInput: {
+    height: 40,
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: 40,
+    fontSize: 15,
+    color: colors.text.primary,
+    marginHorizontal: 16,
+    marginVertical: 12,
+  },
+  pickerListContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+  pickerItem: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.md,
+    padding: 12,
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pickerItemDisabled: {
+    opacity: 0.6,
+  },
+  pickerItemInfo: {
+    flex: 1,
+  },
+  pickerItemName: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.text.primary,
+    marginBottom: 2,
+  },
+  pickerItemIssuer: {
+    fontSize: 13,
+    color: colors.text.secondary,
+    marginBottom: 2,
+  },
+  pickerItemReward: {
+    fontSize: 11,
+    color: colors.primary.main,
+  },
+  pickerItemAnnualFee: {
+    fontSize: 11,
+    color: colors.success.main,
+    marginBottom: 2,
+  },
+  pickerItemTextDisabled: {
+    color: colors.text.tertiary,
+  },
+  ownedBadge: {
+    fontSize: 11,
+    color: colors.success.main,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  loadingText: {
+    fontSize: 15,
+    color: colors.text.secondary,
+  },
+});
