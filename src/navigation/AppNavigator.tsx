@@ -1,15 +1,20 @@
 /**
  * AppNavigator - Main navigation structure with bottom tabs
+ * Redesigned with glass morphism effect and lucide icons
  */
 
 import React from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
+import { Home, CreditCard, Settings } from 'lucide-react-native';
+import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 import { HomeScreen, MyCardsScreen, SettingsScreen } from '../screens';
-import { ErrorBoundary, Icon } from '../components';
+import { ErrorBoundary } from '../components';
 import { useTheme } from '../theme';
+import { colors } from '../theme/colors';
+import { BlurView } from 'expo-blur';
 
 export type RootTabParamList = {
   Home: undefined;
@@ -20,16 +25,45 @@ export type RootTabParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 /**
- * Tab icon component using Icon component
+ * Tab icon component using lucide-react-native with scale animation
  */
 function TabIcon({ name, focused, color }: { name: string; focused: boolean; color: string }) {
-  const iconMap: Record<string, string> = {
-    Home: 'home',
-    MyCards: 'cards',
-    Settings: 'settings',
+  const scale = useAnimatedStyle(() => ({
+    transform: [
+      {
+        scale: withSpring(focused ? 1.1 : 1.0, {
+          damping: 15,
+          stiffness: 150,
+        }),
+      },
+    ],
+  }));
+
+  const iconProps = {
+    size: 20, // h-5 w-5
+    color,
   };
 
-  return <Icon name={iconMap[name] || 'home'} size={focused ? 26 : 24} color={color} />;
+  let IconComponent;
+  switch (name) {
+    case 'Home':
+      IconComponent = Home;
+      break;
+    case 'MyCards':
+      IconComponent = CreditCard;
+      break;
+    case 'Settings':
+      IconComponent = Settings;
+      break;
+    default:
+      IconComponent = Home;
+  }
+
+  return (
+    <Animated.View style={scale}>
+      <IconComponent {...iconProps} />
+    </Animated.View>
+  );
 }
 
 /**
@@ -103,26 +137,44 @@ export default function AppNavigator() {
           tabBarIcon: ({ focused, color }) => (
             <TabIcon name={route.name} focused={focused} color={color} />
           ),
-          tabBarActiveTintColor: theme.colors.primary.main,
-          tabBarInactiveTintColor: theme.colors.text.tertiary,
+          tabBarActiveTintColor: colors.primary.main,
+          tabBarInactiveTintColor: colors.text.secondary,
           tabBarStyle: {
-            backgroundColor: theme.colors.background.secondary,
-            borderTopColor: theme.colors.border.light,
+            height: 64, // h-16
+            backgroundColor: Platform.OS === 'web'
+              ? 'rgba(15, 21, 40, 0.8)' // Glass effect fallback for web
+              : colors.background.secondary,
+            borderTopWidth: 1,
+            borderTopColor: colors.border.light,
+            position: 'absolute',
+            paddingBottom: Platform.OS === 'ios' ? 20 : 8, // Safe area inset bottom
+            paddingTop: 8,
           },
-          headerStyle: {
-            backgroundColor: theme.colors.primary.main,
+          tabBarLabelStyle: {
+            fontSize: 11,
+            fontWeight: '500',
           },
-          headerTintColor: theme.colors.primary.contrast,
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
+          tabBarBackground: () =>
+            Platform.OS === 'web' ? null : (
+              <BlurView
+                intensity={25}
+                tint="dark"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                }}
+              />
+            ),
+          headerShown: false, // Hide headers for cleaner design
         })}
       >
         <Tab.Screen
           name="Home"
           component={HomeScreenWithErrorBoundary}
           options={{
-            title: 'Find Best Card',
             tabBarLabel: 'Home',
           }}
         />
@@ -130,7 +182,6 @@ export default function AppNavigator() {
           name="MyCards"
           component={MyCardsScreenWithErrorBoundary}
           options={{
-            title: 'My Cards',
             tabBarLabel: 'My Cards',
           }}
         />
@@ -138,7 +189,6 @@ export default function AppNavigator() {
           name="Settings"
           component={SettingsScreenWithErrorBoundary}
           options={{
-            title: 'Settings',
             tabBarLabel: 'Settings',
           }}
         />
@@ -146,5 +196,3 @@ export default function AppNavigator() {
     </NavigationContainer>
   );
 }
-
-// Styles removed - using theme-based Icon component
