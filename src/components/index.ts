@@ -57,3 +57,4 @@ export { GradientText } from './GradientText';
 export { GlassCard } from './GlassCard';
 export { CategoryGrid } from './CategoryGrid';
 export type { CategoryType } from './CategoryGrid';
+export { FadeInView } from './FadeInView';
