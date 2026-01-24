@@ -119,13 +119,143 @@ src/
 - **Local computation:** Recommendations calculated on-device for privacy/speed
 - **Hybrid storage:** AsyncStorage for user data, Supabase for card database
 
+## Design System
+
+### Color Palette (Dark Blue/Green Theme)
+
+The app uses a modern dark theme with bright green (#1DDB82) as the primary color:
+
+```typescript
+// Import colors
+import { colors } from '../theme/colors';
+
+// Primary Colors
+colors.primary.main      // #1DDB82 - Bright green
+colors.primary.light     // #4DE89D
+colors.primary.dark      // #14B66F
+colors.primary.bg10      // rgba(29, 219, 130, 0.1)
+colors.primary.bg20      // rgba(29, 219, 130, 0.2)
+
+// Accent Colors (Purple)
+colors.accent.main       // #8B5CF6
+colors.accent.light      // #A78BFA
+colors.accent.dark       // #7C3AED
+
+// Background Colors (Dark Blue)
+colors.background.primary    // #0A0E1F - Main background
+colors.background.secondary  // #0F1528 - Card background
+colors.background.tertiary   // #1D2639 - Secondary elements
+colors.background.elevated   // #171D30 - Elevated cards
+colors.background.muted      // #17202F - Muted backgrounds
+
+// Text Colors
+colors.text.primary      // #F8FAFC - Main text
+colors.text.secondary    // #7C8BA1 - Secondary text
+colors.text.tertiary     // #64748B - Muted text
+
+// Border Colors
+colors.border.light      // #212B3E - Main borders
+colors.border.medium     // #2D3B54
+colors.border.dark       // #3A4A6B
+```
+
+### Typography
+
+```typescript
+// Font sizes and weights
+h1: 28px, bold (700)      // Page titles
+h2: 24px, semibold (600)  // Section headers
+body: 15px, normal (400)  // Body text
+bodySmall: 13px           // Small body text
+caption: 11px             // Labels, captions
+```
+
+### Spacing
+
+```typescript
+paddingHorizontal: 16px   // Screen padding
+paddingVertical: 24px     // Section spacing
+sectionSpacing: 16px      // Between sections
+borderRadius: 12px (md)   // Cards, inputs
+borderRadius: 16px (lg)   // Large cards
+```
+
+### Components
+
+#### New Redesigned Components
+
+1. **GradientText** - Gradient text with primary/accent variants
+   ```typescript
+   import { GradientText } from '../components';
+   <GradientText variant="primary">Title</GradientText>
+   ```
+
+2. **GlassCard** - Glass morphism card with blur effect
+   ```typescript
+   import { GlassCard } from '../components';
+   <GlassCard><Content /></GlassCard>
+   ```
+
+3. **CategoryGrid** - 4-column category selector grid
+   ```typescript
+   import { CategoryGrid } from '../components';
+   <CategoryGrid
+     selectedCategory={category}
+     onCategorySelect={handleSelect}
+   />
+   ```
+
+4. **FadeInView** - Animated fade-in wrapper with stagger support
+   ```typescript
+   import { FadeInView } from '../components';
+   <FadeInView delay={0}><Content /></FadeInView>
+   ```
+
+#### Icons
+
+Use lucide-react-native for all icons:
+
+```typescript
+import { Home, CreditCard, Settings, Plus, Search, Trash2 } from 'lucide-react-native';
+
+<Home size={20} color={colors.primary.main} />
+```
+
+Common icon sizes:
+- Navigation: 20px
+- Buttons: 16-20px
+- Headers: 24px
+
+### Animations
+
+```typescript
+// Animation timings
+fadeIn: 300ms
+slideUp: 400ms
+stagger: 50ms delay per item
+
+// Spring animations (tab navigation)
+spring: {
+  damping: 15,
+  stiffness: 150
+}
+```
+
+### Accessibility
+
+- All touch targets ≥ 44x44px
+- Color contrast meets WCAG AA standards
+- Screen reader support via accessibilityLabel
+- Focus indicators on interactive elements
+
 ## Code Conventions
 
 - **Components/Services:** PascalCase (e.g., `HomeScreen.tsx`, `CardDataService.ts`)
 - **Functions:** camelCase
 - **Types/Interfaces:** PascalCase
 - **Error handling:** `Result<T, E>` pattern - no thrown exceptions
-- **Styling:** React Native StyleSheet (no external CSS-in-JS)
+- **Styling:** React Native StyleSheet with direct color imports from `theme/colors`
+- **Icons:** lucide-react-native (consistent 20px sizing)
 
 ## Environment Variables
 
