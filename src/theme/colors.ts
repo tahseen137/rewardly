@@ -1,105 +1,114 @@
 /**
  * Color tokens for the design system
- * Semantic color naming for consistent theming
+ * Dark blue/green finance theme from web redesign
+ * HSL values converted to Hex for React Native compatibility
  */
 
 export const colors = {
-  // Primary brand colors
+  // Primary brand colors (bright green)
   primary: {
-    main: '#007AFF',
-    light: '#4DA3FF',
-    dark: '#0055B3',
-    contrast: '#FFFFFF',
+    main: '#1DDB82', // hsl(142 76% 46%) - bright green
+    light: '#4DE89D',
+    dark: '#14B66F',
+    contrast: '#0A0E1F', // background color for contrast
+    // Opacity variants for backgrounds
+    bg10: 'rgba(29, 219, 130, 0.1)',
+    bg20: 'rgba(29, 219, 130, 0.2)',
   },
 
-  // Secondary/accent colors
-  secondary: {
-    main: '#5856D6',
-    light: '#7A79E0',
-    dark: '#3634A3',
-    contrast: '#FFFFFF',
+  // Secondary/accent colors (purple)
+  accent: {
+    main: '#8B5CF6', // hsl(262 83% 58%) - purple
+    light: '#A78BFA',
+    dark: '#7C3AED',
+    contrast: '#F8FAFC',
+    bg10: 'rgba(139, 92, 246, 0.1)',
+    bg20: 'rgba(139, 92, 246, 0.2)',
   },
 
   // Semantic colors
   success: {
-    main: '#34C759',
-    light: '#A8E6B4',
-    dark: '#248A3D',
-    background: '#E8F5E9',
-    contrast: '#FFFFFF',
+    main: '#1DDB82', // Same as primary
+    light: '#4DE89D',
+    dark: '#14B66F',
+    background: 'rgba(29, 219, 130, 0.1)',
+    contrast: '#F8FAFC',
   },
 
   error: {
-    main: '#FF3B30',
-    light: '#FF6B63',
-    dark: '#C62828',
-    background: '#FFEBEE',
-    contrast: '#FFFFFF',
+    main: '#F04438', // hsl(0 84% 60%) - destructive
+    light: '#F97066',
+    dark: '#D92D20',
+    background: 'rgba(240, 68, 56, 0.1)',
+    contrast: '#F8FAFC',
   },
 
   warning: {
-    main: '#FF9500',
-    light: '#FFB84D',
-    dark: '#C77700',
-    background: '#FFF9E6',
-    contrast: '#000000',
+    main: '#F79009', // hsl(38 92% 50%) - warning
+    light: '#FDB022',
+    dark: '#DC6803',
+    background: 'rgba(247, 144, 9, 0.1)',
+    contrast: '#0A0E1F',
   },
 
   info: {
-    main: '#5AC8FA',
-    light: '#8DDBFC',
-    dark: '#0A84FF',
-    background: '#E3F2FD',
-    contrast: '#000000',
+    main: '#0BA5EC', // hsl(199 89% 48%) - info
+    light: '#36BFFA',
+    dark: '#0086C9',
+    background: 'rgba(11, 165, 236, 0.1)',
+    contrast: '#F8FAFC',
   },
 
-  // Neutral colors (light theme)
+  // Dark theme neutrals
   neutral: {
     white: '#FFFFFF',
-    gray50: '#F9FAFB',
-    gray100: '#F2F2F7',
-    gray200: '#E5E5EA',
-    gray300: '#D1D1D6',
-    gray400: '#C7C7CC',
-    gray500: '#8E8E93',
-    gray600: '#636366',
-    gray700: '#48484A',
-    gray800: '#3A3A3C',
-    gray900: '#1C1C1E',
+    gray50: '#F8FAFC', // foreground - hsl(210 40% 98%)
+    gray100: '#E2E8F0',
+    gray200: '#CBD5E1',
+    gray300: '#94A3B8',
+    gray400: '#7C8BA1', // muted-foreground - hsl(215 20% 55%)
+    gray500: '#64748B',
+    gray600: '#475569',
+    gray700: '#334155',
+    gray800: '#1E293B',
+    gray900: '#0F172A',
     black: '#000000',
   },
 
-  // Background colors (light theme)
+  // Background colors (dark blue theme)
   background: {
-    primary: '#F2F2F7',
-    secondary: '#FFFFFF',
-    tertiary: '#F9F9F9',
-    elevated: '#FFFFFF',
+    primary: '#0A0E1F', // hsl(222 47% 6%) - main background
+    secondary: '#0F1528', // hsl(222 47% 9%) - card background
+    tertiary: '#1D2639', // hsl(217 33% 17%) - secondary
+    elevated: '#171D30', // Slightly elevated card
+    muted: '#17202F', // hsl(217 33% 14%) - muted
   },
 
-  // Text colors (light theme)
+  // Text colors (light on dark)
   text: {
-    primary: '#000000',
-    secondary: '#666666',
-    tertiary: '#8E8E93',
-    disabled: '#C7C7CC',
-    inverse: '#FFFFFF',
+    primary: '#F8FAFC', // hsl(210 40% 98%) - foreground
+    secondary: '#7C8BA1', // hsl(215 20% 55%) - muted-foreground
+    tertiary: '#64748B',
+    disabled: '#475569',
+    inverse: '#0A0E1F',
   },
 
   // Border colors
   border: {
-    light: '#E5E5EA',
-    medium: '#D1D1D6',
-    dark: '#C7C7CC',
-    focus: '#007AFF',
+    light: '#212B3E', // hsl(217 33% 18%) - border
+    medium: '#2D3B54',
+    dark: '#3A4A6B',
+    focus: '#1DDB82', // primary color
+    // Opacity variant for glass effect
+    glass: 'rgba(33, 43, 62, 0.5)',
   },
 
   // Reward type colors (app-specific)
   rewards: {
-    cashback: '#34C759',
-    points: '#FFD700',
-    miles: '#007AFF',
-    hotel: '#FF9500',
+    cashback: '#1DDB82', // primary green
+    points: '#F79009', // warning orange
+    miles: '#0BA5EC', // info blue
+    hotel: '#8B5CF6', // accent purple
   },
 
   // Overlay colors
@@ -107,59 +116,20 @@ export const colors = {
     light: 'rgba(0, 0, 0, 0.1)',
     medium: 'rgba(0, 0, 0, 0.3)',
     dark: 'rgba(0, 0, 0, 0.5)',
+    backdrop: 'rgba(10, 14, 31, 0.8)', // Semi-transparent background
+  },
+
+  // Gradients (for gradient components)
+  gradients: {
+    primary: ['#1DDB82', '#14B8A6'], // Green gradient (135deg in CSS)
+    accent: ['#8B5CF6', '#7C3AED'], // Purple gradient
+    card: ['#0F1528', '#0A0E1F'], // Card gradient (top to bottom)
   },
 } as const;
 
-// Dark theme color overrides
+// Dark theme (this is our default theme, matching web redesign)
 export const darkColors = {
   ...colors,
-
-  primary: {
-    main: '#0A84FF',
-    light: '#4DA3FF',
-    dark: '#0055B3',
-    contrast: '#FFFFFF',
-  },
-
-  background: {
-    primary: '#000000',
-    secondary: '#1C1C1E',
-    tertiary: '#2C2C2E',
-    elevated: '#2C2C2E',
-  },
-
-  text: {
-    primary: '#FFFFFF',
-    secondary: '#EBEBF5',
-    tertiary: '#8E8E93',
-    disabled: '#48484A',
-    inverse: '#000000',
-  },
-
-  border: {
-    light: '#38383A',
-    medium: '#48484A',
-    dark: '#636366',
-    focus: '#0A84FF',
-  },
-
-  success: {
-    ...colors.success,
-    main: '#30D158',
-    background: '#1C3829',
-  },
-
-  error: {
-    ...colors.error,
-    main: '#FF453A',
-    background: '#3C1F1F',
-  },
-
-  warning: {
-    ...colors.warning,
-    main: '#FFD60A',
-    background: '#3D3520',
-  },
 } as const;
 
 // Color palette structure type with string values
@@ -168,15 +138,21 @@ interface ColorPalette {
   light: string;
   dark: string;
   contrast: string;
+  bg10: string;
+  bg20: string;
 }
 
-interface SemanticColorPalette extends ColorPalette {
+interface SemanticColorPalette {
+  main: string;
+  light: string;
+  dark: string;
   background: string;
+  contrast: string;
 }
 
 export interface Colors {
   primary: ColorPalette;
-  secondary: ColorPalette;
+  accent: ColorPalette;
   success: SemanticColorPalette;
   error: SemanticColorPalette;
   warning: SemanticColorPalette;
@@ -200,6 +176,7 @@ export interface Colors {
     secondary: string;
     tertiary: string;
     elevated: string;
+    muted: string;
   };
   text: {
     primary: string;
@@ -213,6 +190,7 @@ export interface Colors {
     medium: string;
     dark: string;
     focus: string;
+    glass: string;
   };
   rewards: {
     cashback: string;
@@ -224,6 +202,12 @@ export interface Colors {
     light: string;
     medium: string;
     dark: string;
+    backdrop: string;
+  };
+  gradients: {
+    primary: string[];
+    accent: string[];
+    card: string[];
   };
 }
 
