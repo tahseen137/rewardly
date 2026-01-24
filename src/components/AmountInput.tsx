@@ -1,13 +1,16 @@
 /**
  * AmountInput - Numeric input with currency formatting for purchase amounts
+ * Redesigned to match web - larger sizing, lucide icons
  * Requirements: 3.1, 3.2, 3.3, 3.4
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Input } from './Input';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { DollarSign } from 'lucide-react-native';
 import { validateAmount, formatCurrency } from '../utils/amountUtils';
 import { useTheme } from '../theme';
+import { colors } from '../theme/colors';
+import { borderRadius } from '../theme/borders';
 
 interface AmountInputProps {
   value: number | null;
@@ -80,21 +83,36 @@ export function AmountInput({
 
   return (
     <View style={styles.container}>
-      <Input
-        label={label}
-        value={inputValue}
-        onChangeText={handleChangeText}
-        placeholder={placeholder}
-        keyboardType="decimal-pad"
-        error={displayError || undefined}
-        leftIcon={
-          <Text style={[styles.currencySymbol, { color: theme.colors.text.secondary }]}>
-            $
-          </Text>
-        }
-        accessibilityLabel={label}
-        accessibilityHint="Enter the purchase amount in Canadian dollars"
-      />
+      {label && (
+        <Text style={styles.label}>
+          {label}
+        </Text>
+      )}
+      <View style={[
+        styles.inputContainer,
+        displayError && styles.inputContainerError
+      ]}>
+        <DollarSign
+          size={20}
+          color={colors.text.secondary}
+          style={styles.dollarIcon}
+        />
+        <TextInput
+          value={inputValue}
+          onChangeText={handleChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={colors.text.tertiary}
+          keyboardType="decimal-pad"
+          style={styles.input}
+          accessibilityLabel={label}
+          accessibilityHint="Enter the purchase amount in Canadian dollars"
+        />
+      </View>
+      {displayError && (
+        <Text style={styles.errorText}>
+          {displayError}
+        </Text>
+      )}
     </View>
   );
 }
@@ -103,9 +121,41 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
   },
-  currencySymbol: {
-    fontSize: 16,
+  label: {
+    fontSize: 13,
     fontWeight: '500',
+    color: colors.text.secondary,
+    marginBottom: 8,
+  },
+  inputContainer: {
+    height: 56, // h-14 (14 * 4px = 56px)
+    backgroundColor: colors.background.tertiary, // secondary
+    borderRadius: borderRadius.md, // 12px
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 12,
+    paddingRight: 16,
+  },
+  inputContainerError: {
+    borderColor: colors.error.main,
+  },
+  dollarIcon: {
+    position: 'absolute',
+    left: 12,
+  },
+  input: {
+    flex: 1,
+    paddingLeft: 40, // Make space for the dollar icon (left: 12px + icon width 20px + 8px gap)
+    fontSize: 24, // text-2xl
+    fontWeight: '700', // bold
+    color: colors.text.primary,
+  },
+  errorText: {
+    fontSize: 12,
+    color: colors.error.main,
+    marginTop: 6,
   },
 });
 
