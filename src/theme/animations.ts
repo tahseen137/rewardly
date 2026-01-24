@@ -38,10 +38,16 @@ export const animationConfig = {
     friction: 20,
     useNativeDriver: true,
   },
+  // Tab icon scale animation (for navigation)
+  springTabScale: {
+    damping: 15,
+    stiffness: 150,
+    useNativeDriver: true,
+  },
 
   // Timing configs
   fadeIn: {
-    duration: duration.normal,
+    duration: 300, // Updated from duration.normal
     useNativeDriver: true,
   },
   fadeOut: {
@@ -52,9 +58,21 @@ export const animationConfig = {
     duration: duration.normal,
     useNativeDriver: true,
   },
+  slideUp: {
+    duration: 400, // For slide-up animations
+    useNativeDriver: true,
+  },
   scale: {
     duration: duration.fast,
     useNativeDriver: true,
+  },
+  scaleActive: {
+    duration: 200, // Tab icon active scale
+    useNativeDriver: true,
+  },
+  // Stagger delay for card animations
+  stagger: {
+    delay: 50, // Delay per item in staggered animations
   },
 } as const;
 

@@ -28,15 +28,15 @@ export const fontFamily = {
   }),
 } as const;
 
-// Font sizes
+// Font sizes - updated to match web redesign
 export const fontSize = {
-  xs: 11,
-  sm: 13,
-  md: 15,
+  xs: 11, // caption/grid labels
+  sm: 13, // bodySmall
+  md: 15, // body (default)
   lg: 17,
   xl: 20,
-  '2xl': 24,
-  '3xl': 28,
+  '2xl': 24, // h2, large inputs
+  '3xl': 28, // h1
   '4xl': 34,
   '5xl': 42,
 } as const;
@@ -66,17 +66,17 @@ export const letterSpacing = {
 
 // Predefined text styles
 export const textStyles = {
-  // Headings
+  // Headings - updated to match web redesign
   h1: {
-    fontSize: fontSize['4xl'],
-    fontWeight: fontWeight.bold,
-    lineHeight: fontSize['4xl'] * lineHeight.tight,
+    fontSize: fontSize['3xl'], // 28px
+    fontWeight: fontWeight.bold, // 700
+    lineHeight: fontSize['3xl'] * lineHeight.tight,
     letterSpacing: letterSpacing.tight,
   } as TextStyle,
 
   h2: {
-    fontSize: fontSize['2xl'],
-    fontWeight: fontWeight.bold,
+    fontSize: fontSize['2xl'], // 24px
+    fontWeight: fontWeight.semibold, // 600
     lineHeight: fontSize['2xl'] * lineHeight.tight,
     letterSpacing: letterSpacing.tight,
   } as TextStyle,
@@ -93,21 +93,21 @@ export const textStyles = {
     lineHeight: fontSize.lg * lineHeight.normal,
   } as TextStyle,
 
-  // Body text
+  // Body text - updated to match web redesign
   bodyLarge: {
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.normal,
+    fontSize: fontSize.lg, // 17px
+    fontWeight: fontWeight.normal, // 400
     lineHeight: fontSize.lg * lineHeight.relaxed,
   } as TextStyle,
 
   body: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.normal,
+    fontSize: fontSize.md, // 15px (default)
+    fontWeight: fontWeight.normal, // 400
     lineHeight: fontSize.md * lineHeight.relaxed,
   } as TextStyle,
 
   bodySmall: {
-    fontSize: fontSize.sm,
+    fontSize: fontSize.sm, // 13px
     fontWeight: fontWeight.normal,
     lineHeight: fontSize.sm * lineHeight.relaxed,
   } as TextStyle,
@@ -131,9 +131,9 @@ export const textStyles = {
     lineHeight: fontSize.sm * lineHeight.normal,
   } as TextStyle,
 
-  // Caption / helper text
+  // Caption / helper text - 11px for category grid labels
   caption: {
-    fontSize: fontSize.xs,
+    fontSize: fontSize.xs, // 11px
     fontWeight: fontWeight.normal,
     lineHeight: fontSize.xs * lineHeight.normal,
     letterSpacing: letterSpacing.wide,
