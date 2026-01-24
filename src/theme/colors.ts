@@ -26,6 +26,11 @@ export const colors = {
     bg20: 'rgba(139, 92, 246, 0.2)',
   },
 
+  // Alias for backward compatibility with existing components
+  get secondary() {
+    return this.accent;
+  },
+
   // Semantic colors
   success: {
     main: '#1DDB82', // Same as primary
@@ -153,6 +158,7 @@ interface SemanticColorPalette {
 export interface Colors {
   primary: ColorPalette;
   accent: ColorPalette;
+  secondary: ColorPalette; // Alias for accent (backward compatibility)
   success: SemanticColorPalette;
   error: SemanticColorPalette;
   warning: SemanticColorPalette;
@@ -205,9 +211,9 @@ export interface Colors {
     backdrop: string;
   };
   gradients: {
-    primary: string[];
-    accent: string[];
-    card: string[];
+    primary: readonly string[];
+    accent: readonly string[];
+    card: readonly string[];
   };
 }
 

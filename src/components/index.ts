@@ -51,3 +51,9 @@ export { CategoryPicker } from './CategoryPicker';
 export { RewardsDisplay } from './RewardsDisplay';
 export { StoreSelector } from './StoreSelector';
 export { RedemptionOptionsModal } from './RedemptionOptionsModal';
+
+// Redesigned Components
+export { GradientText } from './GradientText';
+export { GlassCard } from './GlassCard';
+export { CategoryGrid } from './CategoryGrid';
+export type { CategoryType } from './CategoryGrid';

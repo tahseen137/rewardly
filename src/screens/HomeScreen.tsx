@@ -119,12 +119,19 @@ export default function HomeScreen() {
   }, []);
 
   // Handle store selection - auto-set category from store
-  const handleStoreSelect = useCallback((store: Store) => {
-    setState((prev) => ({
-      ...prev,
-      selectedStore: store,
-      selectedCategory: store.category,
-    }));
+  const handleStoreSelect = useCallback((store: Store | null) => {
+    if (store) {
+      setState((prev) => ({
+        ...prev,
+        selectedStore: store,
+        selectedCategory: store.category,
+      }));
+    } else {
+      setState((prev) => ({
+        ...prev,
+        selectedStore: null,
+      }));
+    }
   }, []);
 
   // Handle category selection (manual override or when no store selected)
