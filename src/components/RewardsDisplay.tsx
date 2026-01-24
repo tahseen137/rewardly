@@ -65,7 +65,6 @@ export function RewardsDisplay({
         actionLabel="Go to My Cards"
         onAction={() => {
           // Navigation will be handled by parent component
-          console.log('Navigate to My Cards');
         }}
       />
     );
