@@ -112,38 +112,45 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -4, // Negative margin to account for item margins
+    marginHorizontal: -4,
+    gap: 8, // Modern gap property
   },
   itemWrapper: {
-    width: '23%', // ~23% width for 4 columns with gaps
-    margin: '1%', // 1% margin = 2% gap between items
+    width: '30%', // 3 columns for cleaner look
+    marginBottom: 8,
   },
   item: {
-    aspectRatio: 1, // Square items
-    borderRadius: borderRadius.md, // 12px
-    borderWidth: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: borderRadius.md,
+    borderWidth: 1.5,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 8,
+    minHeight: 72, // Fixed height instead of aspect ratio
   },
   itemSelected: {
-    backgroundColor: colors.primary.bg20, // primary/20
+    backgroundColor: colors.primary.bg20,
     borderColor: colors.primary.main,
+    shadowColor: colors.primary.main,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   itemUnselected: {
-    backgroundColor: colors.background.muted,
-    borderColor: 'transparent',
+    backgroundColor: colors.background.elevated,
+    borderColor: colors.border.light,
   },
   icon: {
-    fontSize: 28, // Large emoji
+    fontSize: 24,
     marginBottom: 4,
   },
   label: {
-    fontSize: 10, // Small text
+    fontSize: 11,
     fontWeight: '500',
     color: colors.text.secondary,
     textAlign: 'center',
-    lineHeight: 12,
+    lineHeight: 14,
   },
   labelSelected: {
     color: colors.primary.main,

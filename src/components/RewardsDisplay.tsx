@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { CardRewardItem } from './CardRewardItem';
 import { RedemptionOptionsModal } from './RedemptionOptionsModal';
 import { EmptyState } from './EmptyState';
@@ -31,6 +32,7 @@ export function RewardsDisplay({
   cards,
   onCardPress,
 }: RewardsDisplayProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
@@ -49,7 +51,7 @@ export function RewardsDisplay({
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color={theme.colors.primary.main} />
         <Text style={[styles.loadingText, { color: theme.colors.text.secondary }]}>
-          Calculating rewards...
+          {t('home.calculating')}
         </Text>
       </View>
     );
@@ -60,9 +62,9 @@ export function RewardsDisplay({
     return (
       <EmptyState
         icon="💳"
-        title="No Cards in Portfolio"
-        description="Add cards to your portfolio to see rewards for this purchase"
-        actionLabel="Go to My Cards"
+        title={t('home.noCardsTitle')}
+        description={t('home.noCardsMessage')}
+        actionLabel={t('tabs.myCards')}
         onAction={() => {
           // Navigation will be handled by parent component
         }}
@@ -75,8 +77,8 @@ export function RewardsDisplay({
     return (
       <EmptyState
         icon="🔍"
-        title="No Results"
-        description="Unable to calculate rewards. Please try again."
+        title={t('home.noResultsTitle')}
+        description={t('home.noResultsMessage')}
       />
     );
   }
@@ -85,10 +87,10 @@ export function RewardsDisplay({
   return (
     <View style={styles.container}>
       <Text style={[styles.header, { color: theme.colors.text.primary }]}>
-        Rewards Comparison
+        {t('home.rewardsComparison')}
       </Text>
       <Text style={[styles.subheader, { color: theme.colors.text.secondary }]}>
-        {results.length} {results.length === 1 ? 'card' : 'cards'} in your portfolio
+        {t('home.cardsInPortfolio', { count: results.length })}
       </Text>
 
       <FlatList
