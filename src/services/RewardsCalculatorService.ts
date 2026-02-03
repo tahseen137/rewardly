@@ -77,17 +77,19 @@ export function getApplicableMultiplier(card: Card, category: SpendingCategory):
 /**
  * Convert reward points to CAD value
  * Uses optimal rate from program details if available
- * For cashback cards, returns the points value directly (cashback is already in dollars)
+ * For cashback cards with percentage rates, divides by 100 to get actual dollar value
  *
- * @param points - Number of points earned (or cashback dollars for cashback cards)
+ * @param points - Number of points earned (amount × rate for cashback, or actual points for points cards)
  * @param card - The credit card (to check for program details and reward type)
  * @param fallbackValuation - Fallback value of one point in CAD cents
  * @returns CAD value of the points/cashback
  */
 export function pointsToCad(points: number, card: Card, fallbackValuation: number): number {
-  // For cashback cards, the "points" are already in dollars (percentage of purchase)
+  // For cashback cards, the "points" value is actually (amount × percentage rate)
+  // We need to divide by 100 to get the actual dollar value
+  // e.g., $100 purchase at 4% = 100 × 4 = 400, but actual cashback is $4.00
   if (card.baseRewardRate.type === RewardType.CASHBACK) {
-    return points; // Already in CAD
+    return points / 100; // Convert percentage calculation to actual dollars
   }
 
   // For points/miles cards, use optimal rate from program details if available
