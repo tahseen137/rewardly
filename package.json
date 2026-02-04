@@ -1,6 +1,24 @@
 {
   "name": "rewardly",
   "version": "1.0.0",
+  "description": "A React Native app that helps Canadians maximize credit card rewards with smart, real-time recommendations for which card to use at any store",
+  "keywords": [
+    "credit-cards",
+    "rewards",
+    "cashback",
+    "canada",
+    "react-native",
+    "expo",
+    "typescript",
+    "rewards-optimization",
+    "personal-finance",
+    "mobile-app"
+  ],
+  "author": "tahseen137",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tahseen137/rewardly.git"
+  },
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
