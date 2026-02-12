@@ -3,30 +3,33 @@
  *
  * This service fetches card data from Supabase with local caching.
  * Falls back to bundled JSON data when offline or Supabase is not configured.
+ * Supports both US and Canadian cards with country filtering.
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card, SpendingCategory, RewardType, CategoryReward, SignupBonus } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
 import type { CardRow, CategoryRewardRow, SignupBonusRow, CardWithProgramDetails, RedemptionOption } from './supabase';
+import { getCountry, Country } from './PreferenceManager';
 
 // ============================================================================
 // Constants
 // ============================================================================
 
-const CACHE_KEY = 'canadian_cards_cache';
+const CACHE_KEY_PREFIX = 'cards_cache_';
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-
 
 // Cache structure
 interface CachedData {
   version: string;
   lastFetched: number;
   cards: Card[];
+  country: Country;
 }
 
 // In-memory cache for synchronous access
 let memoryCache: Card[] | null = null;
+let memoryCacheCountry: Country | null = null;
 
 // ============================================================================
 // Data Transformation
@@ -164,49 +167,62 @@ function mapRewardUnit(unit: string): RewardType {
 // ============================================================================
 
 /**
- * Get cached cards from AsyncStorage
+ * Get cache key for a specific country
  */
-async function getCachedCards(): Promise<Card[] | null> {
+function getCacheKey(country: Country): string {
+  return `${CACHE_KEY_PREFIX}${country}`;
+}
+
+/**
+ * Get cached cards from AsyncStorage for current country
+ */
+async function getCachedCards(country: Country): Promise<Card[] | null> {
   try {
-    const cached = await AsyncStorage.getItem(CACHE_KEY);
+    const cached = await AsyncStorage.getItem(getCacheKey(country));
     if (!cached) return null;
 
     const data: CachedData = JSON.parse(cached);
     const now = Date.now();
 
-    // Check if cache is still valid
-    if (now - data.lastFetched < CACHE_TTL) {
+    // Check if cache is still valid and matches current country
+    if (now - data.lastFetched < CACHE_TTL && data.country === country) {
       return data.cards;
     }
 
-    return null; // Cache expired
+    return null; // Cache expired or country mismatch
   } catch {
     return null;
   }
 }
 
 /**
- * Save cards to cache
+ * Save cards to cache for a specific country
  */
-async function setCachedCards(cards: Card[]): Promise<void> {
+async function setCachedCards(cards: Card[], country: Country): Promise<void> {
   try {
     const data: CachedData = {
-      version: '1.0',
+      version: '2.0',
       lastFetched: Date.now(),
       cards,
+      country,
     };
-    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(data));
+    await AsyncStorage.setItem(getCacheKey(country), JSON.stringify(data));
   } catch {
     // Silently fail - caching is optional
   }
 }
 
 /**
- * Clear the card cache
+ * Clear the card cache for all countries
  */
 async function clearCache(): Promise<void> {
   try {
-    await AsyncStorage.removeItem(CACHE_KEY);
+    await Promise.all([
+      AsyncStorage.removeItem(getCacheKey('US')),
+      AsyncStorage.removeItem(getCacheKey('CA')),
+    ]);
+    memoryCache = null;
+    memoryCacheCountry = null;
   } catch {
     // Silently fail
   }
@@ -217,7 +233,8 @@ async function clearCache(): Promise<void> {
  */
 async function getLastSyncTime(): Promise<Date | null> {
   try {
-    const cached = await AsyncStorage.getItem(CACHE_KEY);
+    const country = getCountry();
+    const cached = await AsyncStorage.getItem(getCacheKey(country));
     if (!cached) return null;
 
     const data: CachedData = JSON.parse(cached);
@@ -233,8 +250,9 @@ async function getLastSyncTime(): Promise<Date | null> {
 
 /**
  * Fetch cards from Supabase with program details
+ * Filters by country
  */
-async function fetchCardsFromSupabase(): Promise<Card[]> {
+async function fetchCardsFromSupabase(country: Country): Promise<Card[]> {
   // Check if Supabase client is available
   if (!supabase) {
     throw new Error('Supabase client not configured');
@@ -244,13 +262,18 @@ async function fetchCardsFromSupabase(): Promise<Card[]> {
   try {
     const { data: cardsWithPrograms, error: viewError } = await supabase
       .from('cards_with_program_details')
-      .select('*');
+      .select('*')
+      .eq('country', country);
 
     if (!viewError && cardsWithPrograms && cardsWithPrograms.length > 0) {
+      // Get card IDs for filtering related data
+      const cardIds = cardsWithPrograms.map((c: CardWithProgramDetails) => c.id);
+
       // Fetch category rewards and signup bonuses separately
       const { data: categoryRewardsRows, error: crError } = await supabase
         .from('category_rewards')
-        .select('*');
+        .select('*')
+        .in('card_id', cardIds);
 
       if (crError) {
         throw new Error(`Failed to fetch category rewards: ${crError.message}`);
@@ -259,7 +282,8 @@ async function fetchCardsFromSupabase(): Promise<Card[]> {
       const { data: signupBonusRows, error: sbError } = await supabase
         .from('signup_bonuses')
         .select('*')
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .in('card_id', cardIds);
 
       if (sbError) {
         throw new Error(`Failed to fetch signup bonuses: ${sbError.message}`);
@@ -285,7 +309,8 @@ async function fetchCardsFromSupabase(): Promise<Card[]> {
   const { data: cardsRows, error: cardsError } = await supabase
     .from('cards')
     .select('*')
-    .eq('is_active', true);
+    .eq('is_active', true)
+    .eq('country', country);
 
   if (cardsError) {
     throw new Error(`Failed to fetch cards: ${cardsError.message}`);
@@ -295,20 +320,25 @@ async function fetchCardsFromSupabase(): Promise<Card[]> {
     return [];
   }
 
-  // Fetch all category rewards
+  // Get card IDs for filtering
+  const cardIds = cardsRows.map((c: CardRow) => c.id);
+
+  // Fetch all category rewards for these cards
   const { data: categoryRewardsRows, error: crError } = await supabase
     .from('category_rewards')
-    .select('*');
+    .select('*')
+    .in('card_id', cardIds);
 
   if (crError) {
     throw new Error(`Failed to fetch category rewards: ${crError.message}`);
   }
 
-  // Fetch all active signup bonuses
+  // Fetch all active signup bonuses for these cards
   const { data: signupBonusRows, error: sbError } = await supabase
     .from('signup_bonuses')
     .select('*')
-    .eq('is_active', true);
+    .eq('is_active', true)
+    .in('card_id', cardIds);
 
   if (sbError) {
     throw new Error(`Failed to fetch signup bonuses: ${sbError.message}`);
@@ -334,31 +364,68 @@ async function fetchCardsFromSupabase(): Promise<Card[]> {
 // ============================================================================
 
 /**
- * Get all cards from the database
+ * Get all cards from the database for current country
  * Fetches from Supabase with caching
  */
 export async function getAllCards(): Promise<Card[]> {
+  const country = getCountry();
+  
   // Check if Supabase is configured
   if (!isSupabaseConfigured()) {
     throw new Error('Database connection not configured. Please check your environment settings.');
   }
 
-  // Try to get from cache first
-  const cached = await getCachedCards();
+  // Check if memory cache is valid for current country
+  if (memoryCache && memoryCacheCountry === country) {
+    return memoryCache;
+  }
+
+  // Try to get from storage cache first
+  const cached = await getCachedCards(country);
   if (cached && cached.length > 0) {
-    memoryCache = cached; // Update memory cache
+    memoryCache = cached;
+    memoryCacheCountry = country;
     return cached;
   }
 
   // Fetch from Supabase
   try {
-    const cards = await fetchCardsFromSupabase();
+    const cards = await fetchCardsFromSupabase(country);
     if (cards.length > 0) {
-      await setCachedCards(cards);
-      memoryCache = cards; // Update memory cache
+      await setCachedCards(cards, country);
+      memoryCache = cards;
+      memoryCacheCountry = country;
       return cards;
     }
-    throw new Error('No cards found in database');
+    throw new Error(`No cards found in database for ${country}`);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to fetch cards from database: ${errorMessage}`);
+  }
+}
+
+/**
+ * Get cards for a specific country (bypasses current preference)
+ */
+export async function getCardsByCountry(country: Country): Promise<Card[]> {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Database connection not configured. Please check your environment settings.');
+  }
+
+  // Try to get from storage cache first
+  const cached = await getCachedCards(country);
+  if (cached && cached.length > 0) {
+    return cached;
+  }
+
+  // Fetch from Supabase
+  try {
+    const cards = await fetchCardsFromSupabase(country);
+    if (cards.length > 0) {
+      await setCachedCards(cards, country);
+      return cards;
+    }
+    return [];
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     throw new Error(`Failed to fetch cards from database: ${errorMessage}`);
@@ -387,6 +454,12 @@ export function getAllCardsSync(): Card[] {
   return memoryCache;
 }
 
+/**
+ * Get current country for cached cards
+ */
+export function getCachedCountry(): Country | null {
+  return memoryCacheCountry;
+}
 
 /**
  * Get a card by its ID
@@ -428,26 +501,47 @@ export async function searchCards(query: string): Promise<Card[]> {
 
 /**
  * Force refresh cards from Supabase
- * Clears cache and fetches fresh data
+ * Clears cache and fetches fresh data for current country
  */
 export async function refreshCards(): Promise<Card[]> {
-  await clearCache();
+  const country = getCountry();
+  
+  // Clear memory cache
+  memoryCache = null;
+  memoryCacheCountry = null;
+  
+  // Clear storage cache for current country
+  try {
+    await AsyncStorage.removeItem(getCacheKey(country));
+  } catch {
+    // Continue even if cache clear fails
+  }
 
   if (!isSupabaseConfigured()) {
     throw new Error('Database connection not configured. Please check your environment settings.');
   }
 
   try {
-    const cards = await fetchCardsFromSupabase();
+    const cards = await fetchCardsFromSupabase(country);
     if (cards.length > 0) {
-      await setCachedCards(cards);
+      await setCachedCards(cards, country);
+      memoryCache = cards;
+      memoryCacheCountry = country;
       return cards;
     }
-    throw new Error('No cards found in database');
+    throw new Error(`No cards found in database for ${country}`);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     throw new Error(`Failed to refresh cards from database: ${errorMessage}`);
   }
+}
+
+/**
+ * Called when country preference changes - invalidates cache
+ */
+export async function onCountryChange(): Promise<void> {
+  memoryCache = null;
+  memoryCacheCountry = null;
 }
 
 /**
@@ -459,7 +553,8 @@ export { getLastSyncTime };
  * Check if cards are being served from cache
  */
 export async function isCacheValid(): Promise<boolean> {
-  const cached = await getCachedCards();
+  const country = getCountry();
+  const cached = await getCachedCards(country);
   return cached !== null && cached.length > 0;
 }
 

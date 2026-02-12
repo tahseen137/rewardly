@@ -472,7 +472,7 @@ VALUES ('pc-world-elite', 'PC Financial World Elite Mastercard', 'PC Financial',
 INSERT INTO category_rewards (card_id, category, multiplier, reward_unit, description, has_spend_limit, spend_limit)
 SELECT id, 'groceries', 45.0, 'multiplier', '45 PC Optimum points per $1 at Shoppers Drug Mart (first $8,000)', true, 8000 FROM cards WHERE card_key = 'pc-world-elite'
 UNION ALL
-SELECT id, 'other', 30.0, 'multiplier', '30 PC Optimum points per $1 at Loblaws stores' FROM cards WHERE card_key = 'pc-world-elite';
+SELECT id, 'other', 30.0, 'multiplier', '30 PC Optimum points per $1 at Loblaws stores', false, NULL FROM cards WHERE card_key = 'pc-world-elite';
 
 -- PC Financial Mastercard (No Fee)
 INSERT INTO cards (card_key, name, issuer, reward_program, reward_currency, point_valuation, annual_fee, base_reward_rate, base_reward_unit)

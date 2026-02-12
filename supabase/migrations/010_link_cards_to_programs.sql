@@ -139,6 +139,7 @@ LEFT JOIN reward_programs rp ON c.reward_program_id = rp.id
 WHERE c.is_active = true;
 
 -- Add RLS policy for the new view
+DROP POLICY IF EXISTS "Allow anonymous read access to cards_with_program_details" ON cards;
 CREATE POLICY "Allow anonymous read access to cards_with_program_details"
   ON cards FOR SELECT
   TO anon

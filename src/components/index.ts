@@ -57,3 +57,10 @@ export { GlassCard } from './GlassCard';
 export { CategoryGrid } from './CategoryGrid';
 export type { CategoryType } from './CategoryGrid';
 export { FadeInView } from './FadeInView';
+
+// Chat Components (Sage AI Assistant)
+export { ChatBubble, ChatInput, QuickActions, CardRecommendationCard } from './chat';
+export type { ChatBubbleProps, ChatInputProps, QuickActionsProps, QuickAction, CardRecommendationCardProps } from './chat';
+
+// Subscription Components
+export { default as Paywall } from './Paywall';

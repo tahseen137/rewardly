@@ -5,7 +5,7 @@
       "name": "American Express Cobalt Card",
       "issuer": "American Express",
       "rewardProgram": "Membership Rewards",
-      "annualFee": 191.88,
+      "annualFee": 155.88,
       "pointValuation": 2.1,
       "baseRewardRate": {
         "value": 1,
@@ -59,7 +59,8 @@
         "currency": "points",
         "spendRequirement": 9000,
         "timeframeDays": 365
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "amex-gold-rewards",
@@ -104,7 +105,8 @@
         "currency": "points",
         "spendRequirement": 3000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "amex-platinum-card",
@@ -129,48 +131,12 @@
         }
       ],
       "signupBonus": {
-        "amount": 70000,
+        "amount": 80000,
         "currency": "points",
         "spendRequirement": 6000,
         "timeframeDays": 90
-      }
-    },
-    {
-      "id": "amex-green-card",
-      "name": "American Express Green Card",
-      "issuer": "American Express",
-      "rewardProgram": "Membership Rewards",
-      "annualFee": 150,
-      "pointValuation": 2.1,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
       },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 3,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "dining",
-          "rewardRate": {
-            "value": 3,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 45000,
-        "currency": "points",
-        "spendRequirement": 3000,
-        "timeframeDays": 90
-      }
+      "country": "CA"
     },
     {
       "id": "amex-simplycash-preferred",
@@ -188,7 +154,7 @@
         {
           "category": "gas",
           "rewardRate": {
-            "value": 4,
+            "value": 2,
             "type": "cashback",
             "unit": "percent"
           }
@@ -196,7 +162,7 @@
         {
           "category": "groceries",
           "rewardRate": {
-            "value": 4,
+            "value": 2,
             "type": "cashback",
             "unit": "percent"
           }
@@ -204,18 +170,19 @@
         {
           "category": "dining",
           "rewardRate": {
-            "value": 4,
+            "value": 2,
             "type": "cashback",
             "unit": "percent"
           }
         }
       ],
       "signupBonus": {
-        "amount": 400,
+        "amount": 150,
         "currency": "cashback",
-        "spendRequirement": 3000,
+        "spendRequirement": 1500,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "amex-simplycash",
@@ -231,11 +198,12 @@
       },
       "categoryRewards": [],
       "signupBonus": {
-        "amount": 200,
+        "amount": 100,
         "currency": "cashback",
-        "spendRequirement": 2000,
+        "spendRequirement": 1000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "amex-aeroplan-card",
@@ -245,7 +213,7 @@
       "annualFee": 120,
       "pointValuation": 2.0,
       "baseRewardRate": {
-        "value": 1,
+        "value": 1.25,
         "type": "airline_miles",
         "unit": "multiplier"
       },
@@ -253,18 +221,27 @@
         {
           "category": "travel",
           "rewardRate": {
-            "value": 1.5,
+            "value": 3,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
             "type": "airline_miles",
             "unit": "multiplier"
           }
         }
       ],
       "signupBonus": {
-        "amount": 25000,
+        "amount": 30000,
         "currency": "airline_miles",
         "spendRequirement": 3000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "amex-aeroplan-reserve",
@@ -297,11 +274,12 @@
         }
       ],
       "signupBonus": {
-        "amount": 80000,
+        "amount": 75000,
         "currency": "airline_miles",
         "spendRequirement": 6000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "amex-marriott-bonvoy",
@@ -326,11 +304,12 @@
         }
       ],
       "signupBonus": {
-        "amount": 50000,
+        "amount": 80000,
         "currency": "hotel_points",
         "spendRequirement": 3000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "td-aeroplan-visa-infinite",
@@ -368,6 +347,14 @@
             "type": "airline_miles",
             "unit": "multiplier"
           }
+        },
+        {
+          "category": "drugstores",
+          "rewardRate": {
+            "value": 1.5,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
         }
       ],
       "signupBonus": {
@@ -375,7 +362,8 @@
         "currency": "airline_miles",
         "spendRequirement": 1500,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "td-aeroplan-visa-infinite-privilege",
@@ -413,6 +401,14 @@
             "type": "airline_miles",
             "unit": "multiplier"
           }
+        },
+        {
+          "category": "drugstores",
+          "rewardRate": {
+            "value": 1.5,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
         }
       ],
       "signupBonus": {
@@ -420,17 +416,18 @@
         "currency": "airline_miles",
         "spendRequirement": 3000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "td-first-class-travel",
       "name": "TD First Class Travel Visa Infinite Card",
       "issuer": "TD",
       "rewardProgram": "TD Rewards",
-      "annualFee": 120,
+      "annualFee": 139,
       "pointValuation": 0.5,
       "baseRewardRate": {
-        "value": 3,
+        "value": 1.5,
         "type": "points",
         "unit": "multiplier"
       },
@@ -438,7 +435,7 @@
         {
           "category": "travel",
           "rewardRate": {
-            "value": 6,
+            "value": 9,
             "type": "points",
             "unit": "multiplier"
           }
@@ -446,28 +443,29 @@
         {
           "category": "dining",
           "rewardRate": {
-            "value": 6,
+            "value": 3,
             "type": "points",
             "unit": "multiplier"
           }
         }
       ],
       "signupBonus": {
-        "amount": 40000,
+        "amount": 165000,
         "currency": "points",
-        "spendRequirement": 1000,
+        "spendRequirement": 5000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "td-cash-back-visa-infinite",
       "name": "TD Cash Back Visa Infinite Card",
       "issuer": "TD",
       "rewardProgram": "Cash Back",
-      "annualFee": 89,
+      "annualFee": 139,
       "pointValuation": 1.0,
       "baseRewardRate": {
-        "value": 1,
+        "value": 0.5,
         "type": "cashback",
         "unit": "percent"
       },
@@ -498,42 +496,42 @@
         }
       ],
       "signupBonus": {
-        "amount": 100,
+        "amount": 350,
         "currency": "cashback",
-        "spendRequirement": 500,
+        "spendRequirement": 3500,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
-      "id": "td-cash-back-visa",
-      "name": "TD Cash Back Visa Card",
+      "id": "td-platinum-travel-visa",
+      "name": "TD Platinum Travel Visa Card",
       "issuer": "TD",
-      "rewardProgram": "Cash Back",
+      "rewardProgram": "TD Rewards",
       "annualFee": 0,
-      "pointValuation": 1.0,
+      "pointValuation": 0.5,
       "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
+        "value": 1.5,
+        "type": "points",
+        "unit": "multiplier"
       },
       "categoryRewards": [
         {
-          "category": "groceries",
+          "category": "travel",
           "rewardRate": {
-            "value": 1,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 1,
-            "type": "cashback",
-            "unit": "percent"
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
           }
         }
-      ]
+      ],
+      "signupBonus": {
+        "amount": 15000,
+        "currency": "points",
+        "spendRequirement": 1000,
+        "timeframeDays": 90
+      },
+      "country": "CA"
     },
     {
       "id": "rbc-avion-visa-infinite",
@@ -562,7 +560,8 @@
         "currency": "points",
         "spendRequirement": 5000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "rbc-avion-visa-infinite-privilege",
@@ -572,7 +571,7 @@
       "annualFee": 399,
       "pointValuation": 1.14,
       "baseRewardRate": {
-        "value": 1,
+        "value": 1.25,
         "type": "points",
         "unit": "multiplier"
       },
@@ -580,7 +579,7 @@
         {
           "category": "travel",
           "rewardRate": {
-            "value": 1,
+            "value": 1.25,
             "type": "points",
             "unit": "multiplier"
           }
@@ -591,14 +590,45 @@
         "currency": "points",
         "spendRequirement": 5000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
+    },
+    {
+      "id": "rbc-westjet-world-elite",
+      "name": "RBC WestJet World Elite Mastercard",
+      "issuer": "RBC",
+      "rewardProgram": "WestJet Dollars",
+      "annualFee": 119,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 350,
+        "currency": "cashback",
+        "spendRequirement": 3000,
+        "timeframeDays": 120
+      },
+      "country": "CA"
     },
     {
       "id": "rbc-cash-back-preferred-we",
       "name": "RBC Cash Back Preferred World Elite Mastercard",
       "issuer": "RBC",
       "rewardProgram": "Cash Back",
-      "annualFee": 99,
+      "annualFee": 120,
       "pointValuation": 1.0,
       "baseRewardRate": {
         "value": 1,
@@ -609,6 +639,14 @@
         {
           "category": "groceries",
           "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
             "value": 2,
             "type": "cashback",
             "unit": "percent"
@@ -616,42 +654,63 @@
         }
       ],
       "signupBonus": {
-        "amount": 50,
+        "amount": 100,
         "currency": "cashback",
-        "spendRequirement": 500,
+        "spendRequirement": 1000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
-      "id": "rbc-ion-visa",
-      "name": "RBC ION Visa Card",
+      "id": "rbc-ion-plus-visa",
+      "name": "RBC ION+ Visa Card",
       "issuer": "RBC",
       "rewardProgram": "Cash Back",
       "annualFee": 0,
       "pointValuation": 1.0,
       "baseRewardRate": {
-        "value": 0.5,
+        "value": 1,
         "type": "cashback",
         "unit": "percent"
       },
       "categoryRewards": [
         {
-          "category": "dining",
+          "category": "online_shopping",
           "rewardRate": {
-            "value": 1,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 1,
+            "value": 5,
             "type": "cashback",
             "unit": "percent"
           }
         }
-      ]
+      ],
+      "signupBonus": {
+        "amount": 80,
+        "currency": "cashback",
+        "spendRequirement": 1000,
+        "timeframeDays": 90
+      },
+      "country": "CA"
+    },
+    {
+      "id": "rbc-rewards-plus-visa",
+      "name": "RBC Rewards+ Visa Card",
+      "issuer": "RBC",
+      "rewardProgram": "RBC Avion Rewards",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [],
+      "signupBonus": {
+        "amount": 5000,
+        "currency": "points",
+        "spendRequirement": 1000,
+        "timeframeDays": 90
+      },
+      "country": "CA"
     },
     {
       "id": "cibc-aeroplan-visa-infinite",
@@ -696,7 +755,8 @@
         "currency": "airline_miles",
         "spendRequirement": 1500,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "cibc-aventura-visa-infinite",
@@ -714,33 +774,26 @@
         {
           "category": "travel",
           "rewardRate": {
-            "value": 2,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 2,
+            "value": 1.5,
             "type": "points",
             "unit": "multiplier"
           }
         }
       ],
       "signupBonus": {
-        "amount": 20000,
+        "amount": 35000,
         "currency": "points",
-        "spendRequirement": 1000,
+        "spendRequirement": 3000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "cibc-dividend-visa-infinite",
       "name": "CIBC Dividend Visa Infinite Card",
       "issuer": "CIBC",
       "rewardProgram": "Cash Back",
-      "annualFee": 99,
+      "annualFee": 120,
       "pointValuation": 1.0,
       "baseRewardRate": {
         "value": 1,
@@ -778,38 +831,8 @@
         "currency": "cashback",
         "spendRequirement": 2500,
         "timeframeDays": 120
-      }
-    },
-    {
-      "id": "cibc-dividend-platinum",
-      "name": "CIBC Dividend Platinum Visa Card",
-      "issuer": "CIBC",
-      "rewardProgram": "Cash Back",
-      "annualFee": 39,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
       },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
+      "country": "CA"
     },
     {
       "id": "cibc-costco-mastercard",
@@ -841,14 +864,36 @@
           }
         },
         {
-          "category": "groceries",
+          "category": "travel",
           "rewardRate": {
             "value": 2,
             "type": "cashback",
             "unit": "percent"
           }
         }
-      ]
+      ],
+      "country": "CA"
+    },
+    {
+      "id": "cibc-select-visa",
+      "name": "CIBC Select Visa Card",
+      "issuer": "CIBC",
+      "rewardProgram": "CIBC Aventura",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [],
+      "signupBonus": {
+        "amount": 10000,
+        "currency": "points",
+        "spendRequirement": 1000,
+        "timeframeDays": 90
+      },
+      "country": "CA"
     },
     {
       "id": "scotia-passport-visa-infinite",
@@ -878,6 +923,14 @@
             "type": "points",
             "unit": "multiplier"
           }
+        },
+        {
+          "category": "entertainment",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
         }
       ],
       "signupBonus": {
@@ -885,7 +938,8 @@
         "currency": "points",
         "spendRequirement": 1500,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "scotia-gold-amex",
@@ -903,7 +957,7 @@
         {
           "category": "dining",
           "rewardRate": {
-            "value": 6,
+            "value": 5,
             "type": "points",
             "unit": "multiplier"
           }
@@ -934,11 +988,12 @@
         }
       ],
       "signupBonus": {
-        "amount": 45000,
+        "amount": 50000,
         "currency": "points",
         "spendRequirement": 2000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "scotia-momentum-visa-infinite",
@@ -976,14 +1031,23 @@
             "type": "cashback",
             "unit": "percent"
           }
+        },
+        {
+          "category": "entertainment",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
         }
       ],
       "signupBonus": {
-        "amount": 250,
+        "amount": 100,
         "currency": "cashback",
         "spendRequirement": 2500,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "scotia-scene-visa",
@@ -991,7 +1055,7 @@
       "issuer": "Scotiabank",
       "rewardProgram": "Scene+",
       "annualFee": 0,
-      "pointValuation": 0.75,
+      "pointValuation": 1.0,
       "baseRewardRate": {
         "value": 1,
         "type": "points",
@@ -1013,8 +1077,63 @@
             "type": "points",
             "unit": "multiplier"
           }
+        },
+        {
+          "category": "entertainment",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
         }
-      ]
+      ],
+      "signupBonus": {
+        "amount": 10000,
+        "currency": "points",
+        "spendRequirement": 500,
+        "timeframeDays": 90
+      },
+      "country": "CA"
+    },
+    {
+      "id": "scotia-momentum-no-fee",
+      "name": "Scotia Momentum No-Fee Visa Card",
+      "issuer": "Scotiabank",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "drugstores",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        }
+      ],
+      "country": "CA"
     },
     {
       "id": "bmo-airmiles-world-elite",
@@ -1022,7 +1141,7 @@
       "issuer": "BMO",
       "rewardProgram": "AIR MILES",
       "annualFee": 120,
-      "pointValuation": 10.53,
+      "pointValuation": 10.5,
       "baseRewardRate": {
         "value": 1,
         "type": "airline_miles",
@@ -1044,6 +1163,14 @@
             "type": "airline_miles",
             "unit": "multiplier"
           }
+        },
+        {
+          "category": "drugstores",
+          "rewardRate": {
+            "value": 1,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
         }
       ],
       "signupBonus": {
@@ -1051,7 +1178,8 @@
         "currency": "airline_miles",
         "spendRequirement": 3000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "bmo-cashback-world-elite",
@@ -1088,14 +1216,15 @@
         "currency": "cashback",
         "spendRequirement": 1000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "bmo-eclipse-visa-infinite",
       "name": "BMO eclipse Visa Infinite Card",
       "issuer": "BMO",
       "rewardProgram": "BMO Rewards",
-      "annualFee": 99,
+      "annualFee": 120,
       "pointValuation": 0.67,
       "baseRewardRate": {
         "value": 1,
@@ -1126,24 +1255,33 @@
             "type": "points",
             "unit": "multiplier"
           }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
         }
       ],
       "signupBonus": {
-        "amount": 40000,
+        "amount": 60000,
         "currency": "points",
         "spendRequirement": 3000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
-      "id": "bmo-cashback",
+      "id": "bmo-cashback-mastercard",
       "name": "BMO CashBack Mastercard",
       "issuer": "BMO",
       "rewardProgram": "Cash Back",
       "annualFee": 0,
       "pointValuation": 1.0,
       "baseRewardRate": {
-        "value": 0.5,
+        "value": 1,
         "type": "cashback",
         "unit": "percent"
       },
@@ -1156,7 +1294,29 @@
             "unit": "percent"
           }
         }
-      ]
+      ],
+      "signupBonus": {
+        "amount": 100,
+        "currency": "cashback",
+        "spendRequirement": 1000,
+        "timeframeDays": 90
+      },
+      "country": "CA"
+    },
+    {
+      "id": "bmo-preferred-rate-mastercard",
+      "name": "BMO Preferred Rate Mastercard",
+      "issuer": "BMO",
+      "rewardProgram": "None",
+      "annualFee": 20,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 0,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [],
+      "country": "CA"
     },
     {
       "id": "tangerine-money-back",
@@ -1186,8 +1346,17 @@
             "type": "cashback",
             "unit": "percent"
           }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
         }
-      ]
+      ],
+      "country": "CA"
     },
     {
       "id": "tangerine-world-mastercard",
@@ -1226,7 +1395,8 @@
             "unit": "percent"
           }
         }
-      ]
+      ],
+      "country": "CA"
     },
     {
       "id": "rogers-world-elite",
@@ -1249,11 +1419,12 @@
             "unit": "percent"
           }
         }
-      ]
+      ],
+      "country": "CA"
     },
     {
-      "id": "rogers-red-world-elite",
-      "name": "Rogers Red World Elite Mastercard",
+      "id": "rogers-platinum-mastercard",
+      "name": "Rogers Platinum Mastercard",
       "issuer": "Rogers Bank",
       "rewardProgram": "Cash Back",
       "annualFee": 0,
@@ -1263,16 +1434,8 @@
         "type": "cashback",
         "unit": "percent"
       },
-      "categoryRewards": [
-        {
-          "category": "online_shopping",
-          "rewardRate": {
-            "value": 4,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
+      "categoryRewards": [],
+      "country": "CA"
     },
     {
       "id": "neo-mastercard",
@@ -1286,45 +1449,14 @@
         "type": "cashback",
         "unit": "percent"
       },
-      "categoryRewards": [
-        {
-          "category": "other",
-          "rewardRate": {
-            "value": 10,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ],
+      "categoryRewards": [],
       "signupBonus": {
         "amount": 100,
         "currency": "cashback",
         "spendRequirement": 500,
         "timeframeDays": 90
-      }
-    },
-    {
-      "id": "neo-secured-mastercard",
-      "name": "Neo Secured Mastercard",
-      "issuer": "Neo Financial",
-      "rewardProgram": "Cash Back",
-      "annualFee": 96,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
       },
-      "categoryRewards": [
-        {
-          "category": "other",
-          "rewardRate": {
-            "value": 10,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
+      "country": "CA"
     },
     {
       "id": "pc-world-elite",
@@ -1348,14 +1480,23 @@
           }
         },
         {
-          "category": "other",
+          "category": "drugstores",
+          "rewardRate": {
+            "value": 30,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
           "rewardRate": {
             "value": 30,
             "type": "points",
             "unit": "multiplier"
           }
         }
-      ]
+      ],
+      "country": "CA"
     },
     {
       "id": "pc-mastercard",
@@ -1379,14 +1520,15 @@
           }
         },
         {
-          "category": "other",
+          "category": "drugstores",
           "rewardRate": {
             "value": 25,
             "type": "points",
             "unit": "multiplier"
           }
         }
-      ]
+      ],
+      "country": "CA"
     },
     {
       "id": "simplii-cash-back-visa",
@@ -1427,11 +1569,12 @@
         }
       ],
       "signupBonus": {
-        "amount": 125,
+        "amount": 100,
         "currency": "cashback",
         "spendRequirement": 1000,
         "timeframeDays": 120
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "triangle-world-elite",
@@ -1455,14 +1598,15 @@
           }
         },
         {
-          "category": "other",
+          "category": "groceries",
           "rewardRate": {
             "value": 5,
             "type": "points",
             "unit": "multiplier"
           }
         }
-      ]
+      ],
+      "country": "CA"
     },
     {
       "id": "triangle-mastercard",
@@ -1484,155 +1628,16 @@
             "type": "points",
             "unit": "multiplier"
           }
-        },
-        {
-          "category": "other",
-          "rewardRate": {
-            "value": 4,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "mbna-rewards-world-elite",
-      "name": "MBNA Rewards World Elite Mastercard",
-      "issuer": "MBNA",
-      "rewardProgram": "MBNA Rewards",
-      "annualFee": 89,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 5,
-            "type": "points",
-            "unit": "multiplier"
-          }
         }
       ],
-      "signupBonus": {
-        "amount": 20000,
-        "currency": "points",
-        "spendRequirement": 1000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "mbna-true-line",
-      "name": "MBNA True Line Mastercard",
-      "issuer": "MBNA",
-      "rewardProgram": "None",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "capital-one-aspire-cash",
-      "name": "Capital One Aspire Cash Platinum Mastercard",
-      "issuer": "Capital One",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "capital-one-secured",
-      "name": "Capital One Secured Mastercard",
-      "issuer": "Capital One",
-      "rewardProgram": "None",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "brim-mastercard",
-      "name": "Brim Mastercard",
-      "issuer": "Brim Financial",
-      "rewardProgram": "Brim Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 2,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "brim-world-elite",
-      "name": "Brim World Elite Mastercard",
-      "issuer": "Brim Financial",
-      "rewardProgram": "Brim Rewards",
-      "annualFee": 199,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 4,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 50000,
-        "currency": "points",
-        "spendRequirement": 3000,
-        "timeframeDays": 90
-      }
+      "country": "CA"
     },
     {
       "id": "desjardins-cashback-world-elite",
       "name": "Desjardins Cash Back World Elite Mastercard",
       "issuer": "Desjardins",
       "rewardProgram": "Cash Back",
-      "annualFee": 110,
+      "annualFee": 120,
       "pointValuation": 1.0,
       "baseRewardRate": {
         "value": 1,
@@ -1666,11 +1671,12 @@
         }
       ],
       "signupBonus": {
-        "amount": 200,
+        "amount": 150,
         "currency": "cashback",
-        "spendRequirement": 2000,
+        "spendRequirement": 1500,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "desjardins-odyssey-world-elite",
@@ -1703,11 +1709,12 @@
         }
       ],
       "signupBonus": {
-        "amount": 30000,
+        "amount": 40000,
         "currency": "points",
-        "spendRequirement": 1500,
+        "spendRequirement": 2000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
       "id": "hsbc-world-elite",
@@ -1717,7 +1724,7 @@
       "annualFee": 149,
       "pointValuation": 0.5,
       "baseRewardRate": {
-        "value": 1,
+        "value": 1.5,
         "type": "points",
         "unit": "multiplier"
       },
@@ -1733,78 +1740,19 @@
         {
           "category": "dining",
           "rewardRate": {
-            "value": 1.5,
+            "value": 2,
             "type": "points",
             "unit": "multiplier"
           }
         }
       ],
       "signupBonus": {
-        "amount": 50000,
+        "amount": 60000,
         "currency": "points",
         "spendRequirement": 4000,
         "timeframeDays": 90
-      }
-    },
-    {
-      "id": "bmo-cashback-student",
-      "name": "BMO CashBack Mastercard for Students",
-      "issuer": "BMO",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
       },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 3,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 125,
-        "currency": "cashback",
-        "spendRequirement": 1000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "cibc-dividend-student",
-      "name": "CIBC Dividend Visa Card for Students",
-      "issuer": "CIBC",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.25,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 1,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 1,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
+      "country": "CA"
     },
     {
       "id": "national-bank-world-elite",
@@ -1849,418 +1797,71 @@
         "currency": "cashback",
         "spendRequirement": 2000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
-      "id": "amex-essential",
-      "name": "American Express Essential Credit Card",
-      "issuer": "American Express",
-      "rewardProgram": "None",
+      "id": "national-bank-syncro",
+      "name": "National Bank Syncro Mastercard",
+      "issuer": "National Bank",
+      "rewardProgram": "Cash Back",
       "annualFee": 0,
       "pointValuation": 1.0,
       "baseRewardRate": {
-        "value": 0,
+        "value": 1,
         "type": "cashback",
         "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "amex-business-edge",
-      "name": "American Express Business Edge Card",
-      "issuer": "American Express",
-      "rewardProgram": "Membership Rewards",
-      "annualFee": 99,
-      "pointValuation": 2.1,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 3,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 2,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 40000,
-        "currency": "points",
-        "spendRequirement": 5000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "amex-business-platinum",
-      "name": "Business Platinum Card from American Express",
-      "issuer": "American Express",
-      "rewardProgram": "Membership Rewards",
-      "annualFee": 799,
-      "pointValuation": 2.1,
-      "baseRewardRate": {
-        "value": 1.25,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 2,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 80000,
-        "currency": "points",
-        "spendRequirement": 10000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "amex-business-gold",
-      "name": "American Express Business Gold Rewards Card",
-      "issuer": "American Express",
-      "rewardProgram": "Membership Rewards",
-      "annualFee": 199,
-      "pointValuation": 2.1,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 2,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 2,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 50000,
-        "currency": "points",
-        "spendRequirement": 5000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "amex-aeroplan-business-reserve",
-      "name": "American Express Aeroplan Business Reserve Card",
-      "issuer": "American Express",
-      "rewardProgram": "Aeroplan",
-      "annualFee": 599,
-      "pointValuation": 2.0,
-      "baseRewardRate": {
-        "value": 1.25,
-        "type": "airline_miles",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 2.5,
-            "type": "airline_miles",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 75000,
-        "currency": "airline_miles",
-        "spendRequirement": 7500,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "amex-marriott-bonvoy-business",
-      "name": "Marriott Bonvoy Business American Express Card",
-      "issuer": "American Express",
-      "rewardProgram": "Marriott Bonvoy",
-      "annualFee": 150,
-      "pointValuation": 0.74,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "hotel_points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 6,
-            "type": "hotel_points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "dining",
-          "rewardRate": {
-            "value": 4,
-            "type": "hotel_points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 60000,
-        "currency": "hotel_points",
-        "spendRequirement": 4000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "td-aeroplan-visa-platinum",
-      "name": "TD Aeroplan Visa Platinum Card",
-      "issuer": "TD",
-      "rewardProgram": "Aeroplan",
-      "annualFee": 89,
-      "pointValuation": 2.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "airline_miles",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 1.5,
-            "type": "airline_miles",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 15000,
-        "currency": "airline_miles",
-        "spendRequirement": 1000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "td-platinum-travel",
-      "name": "TD Platinum Travel Visa Card",
-      "issuer": "TD",
-      "rewardProgram": "TD Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 4,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "td-rewards-visa",
-      "name": "TD Rewards Visa Card",
-      "issuer": "TD",
-      "rewardProgram": "TD Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "td-aeroplan-visa-business",
-      "name": "TD Aeroplan Visa Business Card",
-      "issuer": "TD",
-      "rewardProgram": "Aeroplan",
-      "annualFee": 120,
-      "pointValuation": 2.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "airline_miles",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 1.5,
-            "type": "airline_miles",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 20000,
-        "currency": "airline_miles",
-        "spendRequirement": 2000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "rbc-avion-visa-platinum",
-      "name": "RBC Avion Visa Platinum Card",
-      "issuer": "RBC",
-      "rewardProgram": "RBC Avion Rewards",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
       },
       "categoryRewards": [],
       "signupBonus": {
-        "amount": 15000,
-        "currency": "points",
-        "spendRequirement": 1000,
+        "amount": 50,
+        "currency": "cashback",
+        "spendRequirement": 500,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
     },
     {
-      "id": "rbc-ion-plus-visa",
-      "name": "RBC ION+ Visa Card",
-      "issuer": "RBC",
+      "id": "capital-one-aspire-cash",
+      "name": "Capital One Aspire Cash Platinum Mastercard",
+      "issuer": "Capital One",
       "rewardProgram": "Cash Back",
-      "annualFee": 48,
+      "annualFee": 0,
       "pointValuation": 1.0,
       "baseRewardRate": {
         "value": 1,
         "type": "cashback",
         "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "dining",
-          "rewardRate": {
-            "value": 1.5,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 1.5,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "rbc-british-airways-visa",
-      "name": "RBC British Airways Visa Infinite Card",
-      "issuer": "RBC",
-      "rewardProgram": "Avios",
-      "annualFee": 165,
-      "pointValuation": 1.5,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "airline_miles",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 1.5,
-            "type": "airline_miles",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 25000,
-        "currency": "airline_miles",
-        "spendRequirement": 5000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "rbc-rewards-plus-visa",
-      "name": "RBC Rewards+ Visa Card",
-      "issuer": "RBC",
-      "rewardProgram": "RBC Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.67,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
       },
       "categoryRewards": [
         {
           "category": "groceries",
           "rewardRate": {
             "value": 2,
-            "type": "points",
-            "unit": "multiplier"
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
           }
         }
-      ]
+      ],
+      "country": "CA"
     },
     {
-      "id": "rbc-avion-visa-infinite-business",
-      "name": "RBC Avion Visa Infinite Business Card",
-      "issuer": "RBC",
-      "rewardProgram": "RBC Avion Rewards",
-      "annualFee": 175,
+      "id": "capital-one-aspire-travel",
+      "name": "Capital One Aspire Travel World Mastercard",
+      "issuer": "Capital One",
+      "rewardProgram": "Capital One Miles",
+      "annualFee": 120,
       "pointValuation": 1.0,
       "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [],
-      "signupBonus": {
-        "amount": 35000,
-        "currency": "points",
-        "spendRequirement": 5000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "cibc-aventura-visa-privilege",
-      "name": "CIBC Aventura Visa Infinite Privilege Card",
-      "issuer": "CIBC",
-      "rewardProgram": "CIBC Aventura",
-      "annualFee": 499,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1.5,
+        "value": 2,
         "type": "points",
         "unit": "multiplier"
       },
@@ -2268,7 +1869,53 @@
         {
           "category": "travel",
           "rewardRate": {
-            "value": 2.5,
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 30000,
+        "currency": "points",
+        "spendRequirement": 3000,
+        "timeframeDays": 90
+      },
+      "country": "CA"
+    },
+    {
+      "id": "brim-world-elite",
+      "name": "Brim World Elite Mastercard",
+      "issuer": "Brim Financial",
+      "rewardProgram": "Brim Rewards",
+      "annualFee": 199,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
             "type": "points",
             "unit": "multiplier"
           }
@@ -2279,14 +1926,231 @@
         "currency": "points",
         "spendRequirement": 3000,
         "timeframeDays": 90
-      }
+      },
+      "country": "CA"
+    },
+    {
+      "id": "brim-mastercard",
+      "name": "Brim Mastercard",
+      "issuer": "Brim Financial",
+      "rewardProgram": "Brim Rewards",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "country": "CA"
+    },
+    {
+      "id": "mbna-rewards-world-elite",
+      "name": "MBNA Rewards World Elite Mastercard",
+      "issuer": "MBNA",
+      "rewardProgram": "MBNA Rewards",
+      "annualFee": 89,
+      "pointValuation": 0.5,
+      "baseRewardRate": {
+        "value": 2,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 30000,
+        "currency": "points",
+        "spendRequirement": 2000,
+        "timeframeDays": 90
+      },
+      "country": "CA"
+    },
+    {
+      "id": "mbna-cash-back-mastercard",
+      "name": "MBNA True Line Mastercard Gold",
+      "issuer": "MBNA",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 2,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 5,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 5,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        }
+      ],
+      "country": "CA"
+    },
+    {
+      "id": "walmart-rewards-mastercard",
+      "name": "Walmart Rewards Mastercard",
+      "issuer": "Rogers Bank",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        }
+      ],
+      "country": "CA"
+    },
+    {
+      "id": "visa-infinite-privilege-td",
+      "name": "TD Platinum Travel Visa Card",
+      "issuer": "TD",
+      "rewardProgram": "TD Rewards",
+      "annualFee": 89,
+      "pointValuation": 0.5,
+      "baseRewardRate": {
+        "value": 1.5,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 30000,
+        "currency": "points",
+        "spendRequirement": 2000,
+        "timeframeDays": 90
+      },
+      "country": "CA"
+    },
+    {
+      "id": "rbc-signature-rewards",
+      "name": "RBC Signature Rewards Visa",
+      "issuer": "RBC",
+      "rewardProgram": "RBC Avion Rewards",
+      "annualFee": 39,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [],
+      "signupBonus": {
+        "amount": 10000,
+        "currency": "points",
+        "spendRequirement": 1500,
+        "timeframeDays": 90
+      },
+      "country": "CA"
+    },
+    {
+      "id": "canadian-tire-triangle-gold",
+      "name": "Canadian Tire Triangle Gold Mastercard",
+      "issuer": "Canadian Tire",
+      "rewardProgram": "Triangle Rewards",
+      "annualFee": 0,
+      "pointValuation": 0.1,
+      "baseRewardRate": {
+        "value": 3,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 4,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "country": "CA"
+    },
+    {
+      "id": "scotiabank-value-visa",
+      "name": "Scotiabank Value Visa Card",
+      "issuer": "Scotiabank",
+      "rewardProgram": "None",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 0,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [],
+      "country": "CA"
     },
     {
       "id": "cibc-aventura-gold",
       "name": "CIBC Aventura Gold Visa Card",
       "issuer": "CIBC",
       "rewardProgram": "CIBC Aventura",
-      "annualFee": 79,
+      "annualFee": 120,
       "pointValuation": 1.0,
       "baseRewardRate": {
         "value": 1,
@@ -2297,687 +2161,37 @@
         {
           "category": "travel",
           "rewardRate": {
-            "value": 1.5,
+            "value": 2,
             "type": "points",
             "unit": "multiplier"
           }
         }
       ],
       "signupBonus": {
-        "amount": 10000,
+        "amount": 20000,
         "currency": "points",
-        "spendRequirement": 500,
+        "spendRequirement": 1500,
         "timeframeDays": 90
-      }
-    },
-    {
-      "id": "cibc-aeroplan-visa-platinum",
-      "name": "CIBC Aeroplan Visa Platinum Card",
-      "issuer": "CIBC",
-      "rewardProgram": "Aeroplan",
-      "annualFee": 79,
-      "pointValuation": 2.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "airline_miles",
-        "unit": "multiplier"
       },
-      "categoryRewards": [],
-      "signupBonus": {
-        "amount": 10000,
-        "currency": "airline_miles",
-        "spendRequirement": 500,
-        "timeframeDays": 90
-      }
+      "country": "CA"
     },
     {
-      "id": "cibc-aeroplan-visa-privilege",
-      "name": "CIBC Aeroplan Visa Infinite Privilege Card",
-      "issuer": "CIBC",
-      "rewardProgram": "Aeroplan",
-      "annualFee": 599,
-      "pointValuation": 2.0,
-      "baseRewardRate": {
-        "value": 1.5,
-        "type": "airline_miles",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 2,
-            "type": "airline_miles",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 1.5,
-            "type": "airline_miles",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 80000,
-        "currency": "airline_miles",
-        "spendRequirement": 6000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "cibc-costco-world-elite",
-      "name": "CIBC Costco World Elite Mastercard",
-      "issuer": "CIBC",
+      "id": "vancity-enviro-visa",
+      "name": "Vancity enviro Visa",
+      "issuer": "Vancity",
       "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 4,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "dining",
-          "rewardRate": {
-            "value": 3,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "cibc-aventura-business",
-      "name": "CIBC Aventura Visa Business Card",
-      "issuer": "CIBC",
-      "rewardProgram": "CIBC Aventura",
-      "annualFee": 149,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 2,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 25000,
-        "currency": "points",
-        "spendRequirement": 2500,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "scotia-passport-privilege",
-      "name": "Scotiabank Passport Visa Infinite Privilege Card",
-      "issuer": "Scotiabank",
-      "rewardProgram": "Scotia Rewards",
-      "annualFee": 399,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 4,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "dining",
-          "rewardRate": {
-            "value": 3,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 60000,
-        "currency": "points",
-        "spendRequirement": 2000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "scotia-platinum-amex",
-      "name": "Scotiabank Platinum American Express Card",
-      "issuer": "Scotiabank",
-      "rewardProgram": "Scene+",
-      "annualFee": 399,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "dining",
-          "rewardRate": {
-            "value": 8,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 6,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "entertainment",
-          "rewardRate": {
-            "value": 6,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 70000,
-        "currency": "points",
-        "spendRequirement": 3000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "scotia-momentum-no-fee",
-      "name": "Scotia Momentum No-Fee Visa Card",
-      "issuer": "Scotiabank",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "bmo-airmiles",
-      "name": "BMO AIR MILES Mastercard",
-      "issuer": "BMO",
-      "rewardProgram": "AIR MILES",
-      "annualFee": 0,
-      "pointValuation": 10.53,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "airline_miles",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [],
-      "signupBonus": {
-        "amount": 500,
-        "currency": "airline_miles",
-        "spendRequirement": 500,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "bmo-eclipse-visa-privilege",
-      "name": "BMO eclipse Visa Infinite Privilege Card",
-      "issuer": "BMO",
-      "rewardProgram": "BMO Rewards",
-      "annualFee": 399,
-      "pointValuation": 0.67,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "dining",
-          "rewardRate": {
-            "value": 6,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 6,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 4,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 80000,
-        "currency": "points",
-        "spendRequirement": 5000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "bmo-rewards-mastercard",
-      "name": "BMO Rewards Mastercard",
-      "issuer": "BMO",
-      "rewardProgram": "BMO Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.67,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "bmo-airmiles-business",
-      "name": "BMO AIR MILES Business Mastercard",
-      "issuer": "BMO",
-      "rewardProgram": "AIR MILES",
-      "annualFee": 0,
-      "pointValuation": 10.53,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "airline_miles",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "other",
-          "rewardRate": {
-            "value": 2,
-            "type": "airline_miles",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "national-bank-platinum",
-      "name": "National Bank Platinum Mastercard",
-      "issuer": "National Bank",
-      "rewardProgram": "Cash Back",
-      "annualFee": 39,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "national-bank-no-fee",
-      "name": "National Bank No-Fee Mastercard",
-      "issuer": "National Bank",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 1,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "desjardins-odyssey-gold",
-      "name": "Desjardins Odyssey Gold Visa Card",
-      "issuer": "Desjardins",
-      "rewardProgram": "Odyssey Points",
-      "annualFee": 70,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 2,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 15000,
-        "currency": "points",
-        "spendRequirement": 1000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "desjardins-odyssey-privilege",
-      "name": "Desjardins Odyssey Visa Infinite Privilege Card",
-      "issuer": "Desjardins",
-      "rewardProgram": "Odyssey Points",
-      "annualFee": 400,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 4,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "dining",
-          "rewardRate": {
-            "value": 3,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 50000,
-        "currency": "points",
-        "spendRequirement": 3000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "mbna-rewards-platinum-plus",
-      "name": "MBNA Rewards Platinum Plus Mastercard",
-      "issuer": "MBNA",
-      "rewardProgram": "MBNA Rewards",
-      "annualFee": 39,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 3,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "koho-premium",
-      "name": "KOHO Premium Prepaid Visa Card",
-      "issuer": "KOHO",
-      "rewardProgram": "Cash Back",
-      "annualFee": 84,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "dining",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "koho-easy",
-      "name": "KOHO Easy Prepaid Visa Card",
-      "issuer": "KOHO",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "wealthsimple-cash",
-      "name": "Wealthsimple Cash Card",
-      "issuer": "Wealthsimple",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "amazon-rewards",
-      "name": "Amazon.ca Rewards Mastercard",
-      "issuer": "MBNA",
-      "rewardProgram": "Amazon Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "online_shopping",
-          "rewardRate": {
-            "value": 2.5,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 30,
-        "currency": "cashback",
-        "spendRequirement": 0,
-        "timeframeDays": 0
-      }
-    },
-    {
-      "id": "walmart-rewards",
-      "name": "Walmart Rewards Mastercard",
-      "issuer": "Duo Bank",
-      "rewardProgram": "Walmart Rewards",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 3,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "online_shopping",
-          "rewardRate": {
-            "value": 3,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "home-trust-secured",
-      "name": "Home Trust Secured Visa Card",
-      "issuer": "Home Trust",
-      "rewardProgram": "None",
-      "annualFee": 59,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "refresh-secured",
-      "name": "Refresh Financial Secured Visa Card",
-      "issuer": "Refresh Financial",
-      "rewardProgram": "None",
-      "annualFee": 48.95,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "td-low-rate-visa",
-      "name": "TD Emerald Visa Card",
-      "issuer": "TD",
-      "rewardProgram": "None",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "rbc-low-rate-visa",
-      "name": "RBC Low Rate Visa Card",
-      "issuer": "RBC",
-      "rewardProgram": "None",
       "annualFee": 20,
       "pointValuation": 1.0,
       "baseRewardRate": {
-        "value": 0,
+        "value": 0.5,
         "type": "cashback",
         "unit": "percent"
       },
-      "categoryRewards": []
+      "categoryRewards": [],
+      "country": "CA"
     },
     {
-      "id": "meridian-visa-infinite",
+      "id": "meridian-visa-infinite-cashback",
       "name": "Meridian Visa Infinite Cash Back Card",
       "issuer": "Meridian Credit Union",
       "rewardProgram": "Cash Back",
@@ -3000,1055 +2214,19 @@
         {
           "category": "gas",
           "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "meridian-visa-platinum",
-      "name": "Meridian Visa Platinum Card",
-      "issuer": "Meridian Credit Union",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "vancity-enviro-visa",
-      "name": "Vancity enviro Visa Card",
-      "issuer": "Vancity",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "vancity-visa-infinite",
-      "name": "Vancity Visa Infinite Card",
-      "issuer": "Vancity",
-      "rewardProgram": "Cash Back",
-      "annualFee": 99,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 3,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "coast-capital-visa",
-      "name": "Coast Capital Visa Card",
-      "issuer": "Coast Capital Savings",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "coast-capital-visa-infinite",
-      "name": "Coast Capital Visa Infinite Card",
-      "issuer": "Coast Capital Savings",
-      "rewardProgram": "Cash Back",
-      "annualFee": 79,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "servus-visa-infinite",
-      "name": "Servus Visa Infinite Card",
-      "issuer": "Servus Credit Union",
-      "rewardProgram": "Cash Back",
-      "annualFee": 99,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
             "value": 4,
             "type": "cashback",
             "unit": "percent"
           }
         }
-      ]
-    },
-    {
-      "id": "servus-visa-platinum",
-      "name": "Servus Visa Platinum Card",
-      "issuer": "Servus Credit Union",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "conexus-visa",
-      "name": "Conexus Visa Card",
-      "issuer": "Conexus Credit Union",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "affinity-visa",
-      "name": "Affinity Visa Card",
-      "issuer": "Affinity Credit Union",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "atb-mastercard",
-      "name": "ATB Financial Mastercard",
-      "issuer": "ATB Financial",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "atb-world-mastercard",
-      "name": "ATB World Mastercard",
-      "issuer": "ATB Financial",
-      "rewardProgram": "Cash Back",
-      "annualFee": 79,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "laurentian-visa",
-      "name": "Laurentian Bank Visa Card",
-      "issuer": "Laurentian Bank",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "laurentian-visa-infinite",
-      "name": "Laurentian Bank Visa Infinite Card",
-      "issuer": "Laurentian Bank",
-      "rewardProgram": "Cash Back",
-      "annualFee": 99,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "eq-bank-card",
-      "name": "EQ Bank Card",
-      "issuer": "EQ Bank",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "peoples-trust-secured",
-      "name": "Peoples Trust Secured Visa Card",
-      "issuer": "Peoples Trust",
-      "rewardProgram": "None",
-      "annualFee": 33,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "hudsons-bay-mastercard",
-      "name": "Hudson's Bay Mastercard",
-      "issuer": "Capital One",
-      "rewardProgram": "Hudson's Bay Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "other",
-          "rewardRate": {
-            "value": 7,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "ct-options-mastercard",
-      "name": "Canadian Tire Options Mastercard",
-      "issuer": "Canadian Tire",
-      "rewardProgram": "CT Money",
-      "annualFee": 0,
-      "pointValuation": 0.1,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 5,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "sportchek-triangle",
-      "name": "Sport Chek Triangle Mastercard",
-      "issuer": "Canadian Tire",
-      "rewardProgram": "Triangle Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.1,
-      "baseRewardRate": {
-        "value": 4,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "other",
-          "rewardRate": {
-            "value": 5,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "marks-triangle",
-      "name": "Mark's Triangle Mastercard",
-      "issuer": "Canadian Tire",
-      "rewardProgram": "Triangle Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.1,
-      "baseRewardRate": {
-        "value": 4,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "other",
-          "rewardRate": {
-            "value": 5,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "metro-moi",
-      "name": "Metro moi Rewards Card",
-      "issuer": "Metro",
-      "rewardProgram": "moi Points",
-      "annualFee": 0,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 3,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "petrocanada-superpass",
-      "name": "Petro-Canada SuperPass Visa",
-      "issuer": "RBC",
-      "rewardProgram": "Petro-Points",
-      "annualFee": 0,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 3,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "shell-airmiles",
-      "name": "Shell AIR MILES Mastercard",
-      "issuer": "BMO",
-      "rewardProgram": "AIR MILES",
-      "annualFee": 0,
-      "pointValuation": 10.53,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "airline_miles",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 2,
-            "type": "airline_miles",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "staples-card",
-      "name": "Staples Business Advantage Card",
-      "issuer": "MBNA",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "other",
-          "rewardRate": {
-            "value": 5,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "westjet-rbc-world-elite",
-      "name": "WestJet RBC World Elite Mastercard",
-      "issuer": "RBC",
-      "rewardProgram": "WestJet Rewards",
-      "annualFee": 119,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1.5,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 2,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
       ],
       "signupBonus": {
-        "amount": 450,
+        "amount": 200,
         "currency": "cashback",
-        "spendRequirement": 5000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "westjet-rbc",
-      "name": "WestJet RBC Mastercard",
-      "issuer": "RBC",
-      "rewardProgram": "WestJet Rewards",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [],
-      "signupBonus": {
-        "amount": 250,
-        "currency": "cashback",
-        "spendRequirement": 1000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "bmo-viporter",
-      "name": "BMO VIPorter Mastercard",
-      "issuer": "BMO",
-      "rewardProgram": "VIPorter Points",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 2,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "bmo-viporter-world-elite",
-      "name": "BMO VIPorter World Elite Mastercard",
-      "issuer": "BMO",
-      "rewardProgram": "VIPorter Points",
-      "annualFee": 150,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1.5,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 3,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 40000,
-        "currency": "points",
-        "spendRequirement": 3000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "hilton-honors-amex",
-      "name": "Hilton Honors American Express Card",
-      "issuer": "American Express",
-      "rewardProgram": "Hilton Honors",
-      "annualFee": 0,
-      "pointValuation": 0.48,
-      "baseRewardRate": {
-        "value": 3,
-        "type": "hotel_points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 7,
-            "type": "hotel_points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "dining",
-          "rewardRate": {
-            "value": 5,
-            "type": "hotel_points",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 5,
-            "type": "hotel_points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "ihg-rewards-premier",
-      "name": "IHG Rewards Premier Mastercard",
-      "issuer": "MBNA",
-      "rewardProgram": "IHG One Rewards",
-      "annualFee": 99,
-      "pointValuation": 0.7,
-      "baseRewardRate": {
-        "value": 3,
-        "type": "hotel_points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 10,
-            "type": "hotel_points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 80000,
-        "currency": "hotel_points",
         "spendRequirement": 2000,
         "timeframeDays": 90
-      }
-    },
-    {
-      "id": "choice-privileges",
-      "name": "Choice Privileges Visa Card",
-      "issuer": "Wells Fargo",
-      "rewardProgram": "Choice Privileges",
-      "annualFee": 0,
-      "pointValuation": 0.6,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "hotel_points",
-        "unit": "multiplier"
       },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 5,
-            "type": "hotel_points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "best-western-rewards",
-      "name": "Best Western Rewards Mastercard",
-      "issuer": "MBNA",
-      "rewardProgram": "Best Western Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.65,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "hotel_points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 5,
-            "type": "hotel_points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "rbc-business-visa",
-      "name": "RBC Visa Business Card",
-      "issuer": "RBC",
-      "rewardProgram": "RBC Rewards",
-      "annualFee": 35,
-      "pointValuation": 0.67,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "td-business-travel",
-      "name": "TD Business Travel Visa Card",
-      "issuer": "TD",
-      "rewardProgram": "TD Rewards",
-      "annualFee": 79,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 4,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "scotia-passport-business",
-      "name": "Scotiabank Passport Visa Infinite Business Card",
-      "issuer": "Scotiabank",
-      "rewardProgram": "Scotia Rewards",
-      "annualFee": 199,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1.5,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "travel",
-          "rewardRate": {
-            "value": 3,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ],
-      "signupBonus": {
-        "amount": 40000,
-        "currency": "points",
-        "spendRequirement": 3000,
-        "timeframeDays": 90
-      }
-    },
-    {
-      "id": "bmo-airmiles-business-we",
-      "name": "BMO AIR MILES World Elite Business Mastercard",
-      "issuer": "BMO",
-      "rewardProgram": "AIR MILES",
-      "annualFee": 150,
-      "pointValuation": 10.53,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "airline_miles",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 3,
-            "type": "airline_miles",
-            "unit": "multiplier"
-          }
-        },
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 3,
-            "type": "airline_miles",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "scotia-usd-visa",
-      "name": "Scotiabank U.S. Dollar Visa Card",
-      "issuer": "Scotiabank",
-      "rewardProgram": "None",
-      "annualFee": 35,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "cibc-usd-aventura",
-      "name": "CIBC U.S. Dollar Aventura Gold Visa Card",
-      "issuer": "CIBC",
-      "rewardProgram": "CIBC Aventura",
-      "annualFee": 79,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "bmo-usd-mastercard",
-      "name": "BMO U.S. Dollar Mastercard",
-      "issuer": "BMO",
-      "rewardProgram": "None",
-      "annualFee": 39,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "td-usd-visa",
-      "name": "TD U.S. Dollar Visa Card",
-      "issuer": "TD",
-      "rewardProgram": "None",
-      "annualFee": 39,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "rbc-usd-visa",
-      "name": "RBC U.S. Dollar Visa Gold Card",
-      "issuer": "RBC",
-      "rewardProgram": "None",
-      "annualFee": 35,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "capital-one-guaranteed",
-      "name": "Capital One Guaranteed Mastercard",
-      "issuer": "Capital One",
-      "rewardProgram": "Cash Back",
-      "annualFee": 59,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "fairstone-secured",
-      "name": "Fairstone Secured Visa Card",
-      "issuer": "Fairstone",
-      "rewardProgram": "None",
-      "annualFee": 59,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "plastk-secured",
-      "name": "Plastk Secured Visa Card",
-      "issuer": "Plastk",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "td-rewards-student",
-      "name": "TD Rewards Visa Card for Students",
-      "issuer": "TD",
-      "rewardProgram": "TD Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.5,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "rbc-rewards-student",
-      "name": "RBC Rewards+ Visa Card for Students",
-      "issuer": "RBC",
-      "rewardProgram": "RBC Rewards",
-      "annualFee": 0,
-      "pointValuation": 0.67,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 2,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "scotia-scene-student",
-      "name": "Scotiabank Scene+ Visa Card for Students",
-      "issuer": "Scotiabank",
-      "rewardProgram": "Scene+",
-      "annualFee": 0,
-      "pointValuation": 0.75,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "points",
-        "unit": "multiplier"
-      },
-      "categoryRewards": [
-        {
-          "category": "entertainment",
-          "rewardRate": {
-            "value": 5,
-            "type": "points",
-            "unit": "multiplier"
-          }
-        }
-      ]
-    },
-    {
-      "id": "stack-prepaid",
-      "name": "Stack Prepaid Mastercard",
-      "issuer": "Stack",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "wise-card",
-      "name": "Wise Debit Card",
-      "issuer": "Wise",
-      "rewardProgram": "None",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 0,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "revolut-card",
-      "name": "Revolut Card",
-      "issuer": "Revolut",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "mogo-prepaid",
-      "name": "Mogo Visa Platinum Prepaid Card",
-      "issuer": "Mogo",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 2,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "float-card",
-      "name": "Float Corporate Card",
-      "issuer": "Float Financial",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": []
-    },
-    {
-      "id": "caa-rewards",
-      "name": "CAA Rewards Mastercard",
-      "issuer": "MBNA",
-      "rewardProgram": "CAA Dollars",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 3,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
-    },
-    {
-      "id": "costco-executive",
-      "name": "CIBC Costco Executive Mastercard",
-      "issuer": "CIBC",
-      "rewardProgram": "Cash Back",
-      "annualFee": 0,
-      "pointValuation": 1.0,
-      "baseRewardRate": {
-        "value": 1,
-        "type": "cashback",
-        "unit": "percent"
-      },
-      "categoryRewards": [
-        {
-          "category": "gas",
-          "rewardRate": {
-            "value": 4,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "dining",
-          "rewardRate": {
-            "value": 3,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        },
-        {
-          "category": "groceries",
-          "rewardRate": {
-            "value": 3,
-            "type": "cashback",
-            "unit": "percent"
-          }
-        }
-      ]
+      "country": "CA"
     }
-  ],
-  "metadata": {
-    "version": "4.0.0",
-    "lastUpdated": "2026-02-03",
-    "source": "Official bank websites, Credit union sites, RateHub, GreedyRates",
-    "cardCount": 150
-  }
+  ]
 }
