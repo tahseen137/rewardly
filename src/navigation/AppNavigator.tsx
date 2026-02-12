@@ -25,6 +25,7 @@ import {
   RewardsIQScreen,
   PortfolioOptimizerScreen,
   SpendingInsightsScreen,
+  CardTrackerScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
@@ -44,6 +45,7 @@ export type InsightsStackParamList = {
   RewardsIQ: undefined;
   PortfolioOptimizer: undefined;
   SpendingInsights: undefined;
+  CardTracker: undefined;
 };
 
 export type RootTabParamList = {
@@ -93,6 +95,11 @@ function InsightsNavigator() {
       <InsightsStack.Screen 
         name="SpendingInsights" 
         component={SpendingInsightsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="CardTracker" 
+        component={CardTrackerScreen}
         options={{ animation: 'slide_from_right' }}
       />
     </InsightsStack.Navigator>

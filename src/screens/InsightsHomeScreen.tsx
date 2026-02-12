@@ -36,6 +36,7 @@ import {
   BarChart3,
   Zap,
   PieChart,
+  Clock,
 } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
@@ -424,6 +425,24 @@ export default function InsightsHomeScreen() {
             <View style={styles.actionTextContainer}>
               <Text style={styles.actionTitle}>Spending Insights</Text>
               <Text style={styles.actionDesc}>Visual breakdown of your spending patterns</Text>
+            </View>
+            <ChevronRight size={20} color={colors.text.tertiary} />
+          </LinearGradient>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.actionCardFull}
+          onPress={() => navigation.navigate('CardTracker')}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={[colors.warning.main + '15', colors.warning.main + '05']}
+            style={styles.actionGradientFull}
+          >
+            <Clock size={24} color={colors.warning.main} />
+            <View style={styles.actionTextContainer}>
+              <Text style={styles.actionTitle}>Card Tracker</Text>
+              <Text style={styles.actionDesc}>Track signup bonuses & spending requirements</Text>
             </View>
             <ChevronRight size={20} color={colors.text.tertiary} />
           </LinearGradient>
