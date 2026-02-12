@@ -19,6 +19,12 @@ import { supabase, isSupabaseConfigured } from './supabase';
 import { getAllCardsSync, getCardByIdSync } from './CardDataService';
 import { getCards } from './CardPortfolioManager';
 import { SpendingCategory, Card } from '../types';
+import {
+  getBestCardForCategory as getBestCardForCategoryV2,
+  getAllCardRecommendations,
+  formatNotificationMessage,
+  CardRecommendation,
+} from './BestCardRecommendationService';
 
 // ============================================================================
 // Constants
@@ -602,56 +608,27 @@ async function updateLastNotified(geofenceId: string): Promise<void> {
 
 /**
  * Get the best card for a spending category from user's portfolio
+ * Uses the enhanced BestCardRecommendationService
  */
 export async function getBestCardForCategory(
   category: SpendingCategory
 ): Promise<BestCardRecommendation | null> {
   try {
-    // Get user's cards
-    const userCards = await getCards();
+    // Use the enhanced recommendation service
+    const recommendations = await getAllCardRecommendations(category);
     
-    if (userCards.length === 0) {
+    if (recommendations.length === 0) {
       console.log('[AutoPilot] No cards in portfolio');
       return null;
     }
     
-    // Get full card data for each user card
-    const cardsWithData: { card: Card; rewardRate: number }[] = [];
-    
-    for (const userCard of userCards) {
-      const cardData = getCardByIdSync(userCard.cardId);
-      if (cardData) {
-        // Find the reward rate for this category
-        const categoryReward = cardData.categoryRewards.find(
-          cr => cr.category.toLowerCase() === category.toLowerCase()
-        );
-        
-        const rewardRate = categoryReward 
-          ? categoryReward.rewardRate.value 
-          : cardData.baseRewardRate?.value || 1;
-        
-        cardsWithData.push({ card: cardData, rewardRate });
-      }
-    }
-    
-    if (cardsWithData.length === 0) {
-      return null;
-    }
-    
-    // Sort by reward rate (highest first)
-    cardsWithData.sort((a, b) => b.rewardRate - a.rewardRate);
-    
-    const best = cardsWithData[0];
-    const second = cardsWithData.length > 1 ? cardsWithData[1] : undefined;
-    
-    // Calculate estimated value (assuming $50 purchase)
-    const estimatedPurchase = 50;
-    const estimatedValue = (best.rewardRate / 100) * estimatedPurchase;
+    const best = recommendations[0];
+    const second = recommendations.length > 1 ? recommendations[1] : undefined;
     
     return {
       card: best.card,
       rewardRate: best.rewardRate,
-      estimatedValue,
+      estimatedValue: best.estimatedValue,
       category,
       comparisonCard: second?.card,
       comparisonRate: second?.rewardRate,
