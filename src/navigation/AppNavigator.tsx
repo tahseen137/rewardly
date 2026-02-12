@@ -8,11 +8,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Platform, View, ActivityIndicator, StyleSheet } from 'react-native';
-import { Home, CreditCard, Settings, Calculator } from 'lucide-react-native';
+import { Home, CreditCard, Settings, Calculator, Navigation } from 'lucide-react-native';
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 
-import { MyCardsScreen, SettingsScreen, SageScreen, PointsCalculatorScreen } from '../screens';
+import { MyCardsScreen, SettingsScreen, SageScreen, PointsCalculatorScreen, AutoPilotScreen } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import { ErrorBoundary } from '../components';
@@ -21,10 +21,12 @@ import { colors } from '../theme/colors';
 import { getCurrentUser, onAuthStateChange, AuthUser } from '../services/AuthService';
 import { isOnboardingComplete, initializePreferences } from '../services/PreferenceManager';
 import { initializeSubscription } from '../services/SubscriptionService';
+import { initializeAutoPilot } from '../services/AutoPilotService';
 
 export type RootTabParamList = {
   Sage: undefined;
   Points: undefined;
+  AutoPilot: undefined;
   MyCards: undefined;
   Settings: undefined;
 };
@@ -60,6 +62,9 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
       break;
     case 'Points':
       IconComponent = Calculator;
+      break;
+    case 'AutoPilot':
+      IconComponent = Navigation;
       break;
     case 'MyCards':
       IconComponent = CreditCard;
@@ -134,6 +139,17 @@ function SettingsScreenWithErrorBoundary({ onSignOut }: { onSignOut: () => void 
   );
 }
 
+function AutoPilotScreenWithErrorBoundary() {
+  return (
+    <ErrorBoundary
+      fallbackTitle="Unable to load AutoPilot"
+      fallbackMessage="There was a problem loading AutoPilot. Please try again."
+    >
+      <AutoPilotScreen />
+    </ErrorBoundary>
+  );
+}
+
 /**
  * Main tab navigator
  */
@@ -195,6 +211,13 @@ function MainTabs({ onSignOut }: { onSignOut: () => void }) {
         }}
       />
       <Tab.Screen
+        name="AutoPilot"
+        component={AutoPilotScreenWithErrorBoundary}
+        options={{
+          tabBarLabel: 'AutoPilot',
+        }}
+      />
+      <Tab.Screen
         name="MyCards"
         component={MyCardsScreenWithErrorBoundary}
         options={{
@@ -227,6 +250,9 @@ export default function AppNavigator() {
         
         // Initialize subscription service
         await initializeSubscription();
+        
+        // Initialize AutoPilot service
+        await initializeAutoPilot();
         
         // Check for existing user
         const currentUser = await getCurrentUser();

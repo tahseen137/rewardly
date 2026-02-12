@@ -1,0 +1,4277 @@
+{
+  "metadata": {
+    "generated": "2026-02-12T21:43:52.559553Z",
+    "version": "1.2",
+    "total_cards": 203,
+    "canadian_cards": 86,
+    "us_cards": 117,
+    "countries": [
+      "CA",
+      "US"
+    ],
+    "card_types": [
+      "personal",
+      "business"
+    ],
+    "categories": [
+      "travel",
+      "cashback",
+      "rewards",
+      "co-branded",
+      "store",
+      "low-interest",
+      "student",
+      "secured"
+    ],
+    "data_quality": "Comprehensive - Verified from official sources, comparison sites, and community data",
+    "sources": [
+      "NerdWallet (US/CA)",
+      "RateHub Canada",
+      "Official bank websites (TD, RBC, CIBC, BMO, Scotiabank, Chase, Amex, Citi, Capital One, Wells Fargo, etc.)",
+      "The Points Guy (point valuations)",
+      "Reddit r/churningcanada and r/churning",
+      "Existing Rewardly database",
+      "Bank comparison sites",
+      "Credit union websites"
+    ],
+    "notes": [
+      "Signup bonuses verified as of February 2026",
+      "Point valuations based on community consensus (The Points Guy, Reddit communities)",
+      "Foreign transaction fees are standard (2.5%) unless card specifically waives them",
+      "Earning rates may include limited-time promotions",
+      "Store cards typically have 0% rewards outside their ecosystem",
+      "Some cards require membership (Costco, Navy Federal, PenFed, credit unions)",
+      "Student and secured cards help build credit history",
+      "Business cards require business ownership or sole proprietorship"
+    ]
+  },
+  "cards": [
+    {
+      "name": "American Express Cobalt Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Membership Rewards",
+      "point_value_cad": 2.1,
+      "point_value_usd": 1.5555555555555556,
+      "annual_fee": 155.88,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "dining": 5.0,
+        "groceries": 5.0,
+        "entertainment": 3.0,
+        "gas": 2.0,
+        "travel": 2.0
+      },
+      "signup_bonus": {
+        "points": 15000,
+        "spend_requirement": 9000,
+        "months": 12
+      }
+    },
+    {
+      "name": "American Express Platinum Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Membership Rewards",
+      "point_value_cad": 2.1,
+      "point_value_usd": 1.5555555555555556,
+      "annual_fee": 799.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 2.0
+      },
+      "signup_bonus": {
+        "points": 70000,
+        "spend_requirement": 6000,
+        "months": 3
+      }
+    },
+    {
+      "name": "American Express Gold Rewards Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Membership Rewards",
+      "point_value_cad": 2.1,
+      "point_value_usd": 1.5555555555555556,
+      "annual_fee": 250.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 2.0,
+        "gas": 2.0,
+        "groceries": 2.0
+      },
+      "signup_bonus": {
+        "points": 40000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "American Express Green Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Membership Rewards",
+      "point_value_cad": 2.1,
+      "point_value_usd": 1.5555555555555556,
+      "annual_fee": 150.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 3.0,
+        "dining": 3.0
+      },
+      "signup_bonus": {
+        "points": 45000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "SimplyCash Preferred Card from American Express",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 99.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.25,
+        "gas": 4.0,
+        "groceries": 4.0,
+        "dining": 4.0
+      },
+      "signup_bonus": {
+        "points": 400,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "SimplyCash Card from American Express",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.25
+      },
+      "signup_bonus": {
+        "points": 200,
+        "spend_requirement": 2000,
+        "months": 3
+      }
+    },
+    {
+      "name": "American Express Aeroplan Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Aeroplan",
+      "point_value_cad": 2.0,
+      "point_value_usd": 1.4814814814814814,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 1.5
+      },
+      "signup_bonus": {
+        "points": 25000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "American Express Aeroplan Reserve Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Aeroplan",
+      "point_value_cad": 2.0,
+      "point_value_usd": 1.4814814814814814,
+      "annual_fee": 599.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.25,
+        "travel": 3.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 80000,
+        "spend_requirement": 6000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Marriott Bonvoy American Express Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Marriott Bonvoy",
+      "point_value_cad": 0.74,
+      "point_value_usd": 0.548148148148148,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 2.0,
+        "travel": 5.0
+      },
+      "signup_bonus": {
+        "points": 50000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "TD Aeroplan Visa Infinite Card",
+      "issuer": "TD Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Aeroplan",
+      "point_value_cad": 2.0,
+      "point_value_usd": 1.4814814814814814,
+      "annual_fee": 139.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 1.5,
+        "groceries": 1.5,
+        "gas": 1.5,
+        "dining": 1.5
+      },
+      "signup_bonus": {
+        "points": 40000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "TD Aeroplan Visa Infinite Privilege Card",
+      "issuer": "TD Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Aeroplan",
+      "point_value_cad": 2.0,
+      "point_value_usd": 1.4814814814814814,
+      "annual_fee": 599.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.25,
+        "travel": 2.0,
+        "groceries": 1.5,
+        "gas": 1.5,
+        "dining": 1.5
+      },
+      "signup_bonus": {
+        "points": 100000,
+        "spend_requirement": 10000,
+        "months": 6
+      }
+    },
+    {
+      "name": "TD First Class Travel Visa Infinite Card",
+      "issuer": "TD Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "TD Rewards",
+      "point_value_cad": 0.5,
+      "point_value_usd": 0.37037037037037035,
+      "annual_fee": 139.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.5,
+        "travel": 3.0,
+        "groceries": 1.5,
+        "gas": 1.5,
+        "dining": 1.5
+      },
+      "signup_bonus": {
+        "points": 165000,
+        "spend_requirement": 7500,
+        "months": 6
+      }
+    },
+    {
+      "name": "TD Cash Back Visa Infinite Card",
+      "issuer": "TD Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 139.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.5,
+        "groceries": 3.0,
+        "gas": 3.0,
+        "recurring_bills": 3.0
+      },
+      "signup_bonus": {
+        "points": 350,
+        "spend_requirement": 3500,
+        "months": 3
+      }
+    },
+    {
+      "name": "TD Rewards Visa Card",
+      "issuer": "TD Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "TD Rewards",
+      "point_value_cad": 0.5,
+      "point_value_usd": 0.37037037037037035,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      }
+    },
+    {
+      "name": "RBC Avion Visa Infinite Card",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Avion",
+      "point_value_cad": 2.1,
+      "point_value_usd": 1.5555555555555556,
+      "annual_fee": 139.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 1.25,
+        "groceries": 1.25,
+        "gas": 1.25,
+        "dining": 1.25,
+        "drugstores": 1.25
+      },
+      "signup_bonus": {
+        "points": 35000,
+        "spend_requirement": 5000,
+        "months": 6
+      }
+    },
+    {
+      "name": "RBC Avion Visa Infinite Privilege Card",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Avion",
+      "point_value_cad": 2.1,
+      "point_value_usd": 1.5555555555555556,
+      "annual_fee": 399.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.25,
+        "travel": 1.5,
+        "groceries": 1.5,
+        "gas": 1.5,
+        "dining": 1.5,
+        "drugstores": 1.5
+      },
+      "signup_bonus": {
+        "points": 55000,
+        "spend_requirement": 7000,
+        "months": 6
+      }
+    },
+    {
+      "name": "RBC WestJet World Elite Mastercard",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "WestJet Rewards",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 119.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "westjet": 2.0,
+        "travel": 1.5,
+        "dining": 1.5
+      },
+      "signup_bonus": {
+        "points": 450,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "RBC Cash Back Mastercard",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 2.0
+      }
+    },
+    {
+      "name": "RBC ION+ Visa",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Avion",
+      "point_value_cad": 2.1,
+      "point_value_usd": 1.5555555555555556,
+      "annual_fee": 48.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 3.0,
+        "groceries": 2.0,
+        "subscriptions": 2.0
+      },
+      "signup_bonus": {
+        "points": 10000,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "CIBC Aeroplan Visa Infinite Card",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Aeroplan",
+      "point_value_cad": 2.0,
+      "point_value_usd": 1.4814814814814814,
+      "annual_fee": 139.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 1.5,
+        "groceries": 1.5,
+        "gas": 1.5,
+        "dining": 1.5
+      },
+      "signup_bonus": {
+        "points": 45000,
+        "spend_requirement": 3000,
+        "months": 4
+      }
+    },
+    {
+      "name": "CIBC Aeroplan Visa Infinite Privilege Card",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Aeroplan",
+      "point_value_cad": 2.0,
+      "point_value_usd": 1.4814814814814814,
+      "annual_fee": 599.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.5,
+        "travel": 2.0,
+        "groceries": 2.0,
+        "gas": 2.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 120000,
+        "spend_requirement": 12000,
+        "months": 12
+      }
+    },
+    {
+      "name": "CIBC Aventura Visa Infinite Card",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "CIBC Aventura",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 139.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 1.5,
+        "gas": 1.5,
+        "groceries": 1.5,
+        "dining": 1.5
+      },
+      "signup_bonus": {
+        "points": 35000,
+        "spend_requirement": 3000,
+        "months": 4
+      }
+    },
+    {
+      "name": "CIBC Aventura Visa Infinite Privilege Card",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "CIBC Aventura",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 499.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.5,
+        "travel": 2.0,
+        "gas": 2.0,
+        "groceries": 2.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 80000,
+        "spend_requirement": 10000,
+        "months": 12
+      }
+    },
+    {
+      "name": "CIBC Dividend Visa Infinite Card",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 139.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 4.0,
+        "gas": 2.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 10,
+        "spend_requirement": 3000,
+        "months": 4
+      }
+    },
+    {
+      "name": "CIBC Select Visa Card",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "CIBC Aventura",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 29.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      }
+    },
+    {
+      "name": "BMO Eclipse Visa Infinite Card",
+      "issuer": "BMO",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "BMO Rewards",
+      "point_value_cad": 0.67,
+      "point_value_usd": 0.4962962962962963,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 5.0,
+        "groceries": 5.0,
+        "dining": 5.0,
+        "transit": 5.0,
+        "recurring_bills": 2.0
+      },
+      "signup_bonus": {
+        "points": 50000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "BMO Ascend World Elite Mastercard",
+      "issuer": "BMO",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "BMO Rewards",
+      "point_value_cad": 0.67,
+      "point_value_usd": 0.4962962962962963,
+      "annual_fee": 150.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 5.0,
+        "dining": 5.0,
+        "entertainment": 5.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "BMO CashBack World Elite Mastercard",
+      "issuer": "BMO",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 5.0,
+        "gas": 5.0,
+        "dining": 2.0,
+        "recurring_bills": 2.0
+      },
+      "signup_bonus": {
+        "points": 400,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "BMO Rewards Mastercard",
+      "issuer": "BMO",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "BMO Rewards",
+      "point_value_cad": 0.67,
+      "point_value_usd": 0.4962962962962963,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      }
+    },
+    {
+      "name": "Scotiabank Passport Visa Infinite Card",
+      "issuer": "Scotiabank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Scene+",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 139.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 5.0,
+        "dining": 5.0,
+        "entertainment": 3.0,
+        "groceries": 2.0,
+        "transit": 2.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 5000,
+        "months": 4
+      }
+    },
+    {
+      "name": "Scotiabank Gold American Express Card",
+      "issuer": "Scotiabank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Scene+",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 5.0,
+        "dining": 5.0,
+        "entertainment": 3.0,
+        "recurring_bills": 2.0
+      },
+      "signup_bonus": {
+        "points": 50000,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Scotiabank Scene+ Visa Card",
+      "issuer": "Scotiabank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Scene+",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "cineplex": 5.0,
+        "sobeys": 2.0,
+        "empire": 2.0
+      },
+      "signup_bonus": {
+        "points": 10000,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Scotiabank Momentum Visa Infinite Card",
+      "issuer": "Scotiabank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 4.0,
+        "gas": 4.0,
+        "recurring_bills": 2.0,
+        "drugstores": 2.0
+      },
+      "signup_bonus": {
+        "points": 100,
+        "spend_requirement": 2000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Tangerine Money-Back Credit Card",
+      "issuer": "Tangerine Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 0.5,
+        "selected_categories": 2.0
+      }
+    },
+    {
+      "name": "Tangerine World Mastercard",
+      "issuer": "Tangerine Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 0.5,
+        "selected_categories": 2.0
+      }
+    },
+    {
+      "name": "Simplii Financial Cash Back Visa Card",
+      "issuer": "Simplii Financial",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 0.5,
+        "restaurants": 4.0,
+        "gas": 4.0,
+        "drugstores": 1.5
+      }
+    },
+    {
+      "name": "PC Financial Mastercard",
+      "issuer": "PC Financial",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "rewards",
+      "reward_program": "PC Optimum",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "shoppers_drug_mart": 25.0,
+        "esso": 20.0,
+        "loblaws": 10.0
+      }
+    },
+    {
+      "name": "PC Financial World Mastercard",
+      "issuer": "PC Financial",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "rewards",
+      "reward_program": "PC Optimum",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "shoppers_drug_mart": 30.0,
+        "esso": 25.0,
+        "loblaws": 20.0
+      }
+    },
+    {
+      "name": "Triangle Mastercard",
+      "issuer": "Canadian Tire Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Canadian Tire Money",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.4,
+        "canadian_tire": 5.0,
+        "gas": 3.0,
+        "groceries": 2.0
+      }
+    },
+    {
+      "name": "Triangle World Elite Mastercard",
+      "issuer": "Canadian Tire Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Canadian Tire Money",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.5,
+        "canadian_tire": 5.0,
+        "gas": 5.0,
+        "groceries": 3.0,
+        "recurring_bills": 2.0
+      },
+      "signup_bonus": {
+        "points": 100,
+        "spend_requirement": 5000,
+        "months": 6
+      }
+    },
+    {
+      "name": "MBNA Rewards Mastercard",
+      "issuer": "MBNA",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "MBNA Rewards",
+      "point_value_cad": 0.5,
+      "point_value_usd": 0.37037037037037035,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      }
+    },
+    {
+      "name": "MBNA True Line Gold Mastercard",
+      "issuer": "MBNA",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "low-interest",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      }
+    },
+    {
+      "name": "Desjardins Cash Back World Elite Mastercard",
+      "issuer": "Desjardins",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 4.0,
+        "gas": 4.0,
+        "dining": 2.0
+      }
+    },
+    {
+      "name": "Neo World Mastercard",
+      "issuer": "Neo Financial",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 0.5,
+        "groceries": 2.0,
+        "gas": 2.0,
+        "recurring_payments": 2.0
+      }
+    },
+    {
+      "name": "Neo Credit Mastercard",
+      "issuer": "Neo Financial",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 0.5
+      }
+    },
+    {
+      "name": "National Bank World Elite Mastercard",
+      "issuer": "National Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "NBC Rewards",
+      "point_value_cad": 0.5,
+      "point_value_usd": 0.37037037037037035,
+      "annual_fee": 150.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 2.0,
+        "gas": 2.0,
+        "groceries": 2.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 40000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "National Bank Syncro Mastercard",
+      "issuer": "National Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "NBC Rewards",
+      "point_value_cad": 0.5,
+      "point_value_usd": 0.37037037037037035,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      }
+    },
+    {
+      "name": "Laurentian Bank Visa Gold",
+      "issuer": "Laurentian Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 75.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 2.0,
+        "groceries": 2.0
+      }
+    },
+    {
+      "name": "Rogers World Elite Mastercard",
+      "issuer": "Rogers Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "rogers_services": 4.0,
+        "foreign_currency": 3.0,
+        "dining": 2.0,
+        "groceries": 1.5
+      }
+    },
+    {
+      "name": "Rogers Red World Elite Mastercard",
+      "issuer": "Rogers Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5
+      }
+    },
+    {
+      "name": "HSBC World Elite Mastercard",
+      "issuer": "HSBC Canada",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "HSBC Rewards",
+      "point_value_cad": 0.6,
+      "point_value_usd": 0.4444444444444444,
+      "annual_fee": 149.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 3.0,
+        "dining": 3.0,
+        "groceries": 2.0,
+        "gas": 2.0
+      },
+      "signup_bonus": {
+        "points": 30000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Home Trust Preferred Visa",
+      "issuer": "Home Trust",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 79.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 1.5,
+        "groceries": 1.5
+      }
+    },
+    {
+      "name": "CIBC Dividend Platinum Visa Card",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 29.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 2.0,
+        "gas": 2.0
+      }
+    },
+    {
+      "name": "CIBC Costco Mastercard",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 0.5,
+        "costco_gas": 3.0,
+        "restaurants": 2.0,
+        "travel": 2.0,
+        "costco": 1.0
+      }
+    },
+    {
+      "name": "TD Platinum Travel Visa Card",
+      "issuer": "TD Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "TD Rewards",
+      "point_value_cad": 0.5,
+      "point_value_usd": 0.37037037037037035,
+      "annual_fee": 89.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 1.5
+      }
+    },
+    {
+      "name": "TD Business Travel Visa Card",
+      "issuer": "TD Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "TD Rewards",
+      "point_value_cad": 0.5,
+      "point_value_usd": 0.37037037037037035,
+      "annual_fee": 149.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.5,
+        "travel": 3.0,
+        "gas": 1.5,
+        "dining": 1.5
+      }
+    },
+    {
+      "name": "TD Business Cash Back Visa Card",
+      "issuer": "TD Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 125.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.5,
+        "gas": 3.0,
+        "office_supplies": 2.0,
+        "advertising": 2.0
+      }
+    },
+    {
+      "name": "RBC Cash Back Preferred World Elite Mastercard",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 3.0,
+        "gas": 2.0
+      }
+    },
+    {
+      "name": "RBC ION Visa",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      }
+    },
+    {
+      "name": "RBC Rewards+ Visa",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Avion",
+      "point_value_cad": 2.1,
+      "point_value_usd": 1.5555555555555556,
+      "annual_fee": 39.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      }
+    },
+    {
+      "name": "BMO CashBack Mastercard",
+      "issuer": "BMO",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 3.0,
+        "gas": 0.5
+      }
+    },
+    {
+      "name": "BMO Preferred Rate Mastercard",
+      "issuer": "BMO",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "low-interest",
+      "reward_program": "None",
+      "point_value_cad": 0.0,
+      "point_value_usd": 0.0,
+      "annual_fee": 20.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      }
+    },
+    {
+      "name": "BMO AIR MILES Mastercard",
+      "issuer": "BMO",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "AIR MILES",
+      "point_value_cad": 1.6,
+      "point_value_usd": 1.1851851851851851,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 3.0,
+        "gas": 2.0
+      }
+    },
+    {
+      "name": "Scotiabank Momentum No-Fee Visa Card",
+      "issuer": "Scotiabank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 2.0,
+        "gas": 2.0,
+        "recurring_bills": 2.0
+      }
+    },
+    {
+      "name": "Scotiabank Value Visa Card",
+      "issuer": "Scotiabank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Scene+",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 29.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      }
+    },
+    {
+      "name": "Scotiabank Scene+ Debit Mastercard",
+      "issuer": "Scotiabank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Scene+",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.1,
+        "sobeys": 5.0,
+        "cineplex": 5.0
+      }
+    },
+    {
+      "name": "American Express Business Platinum Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Membership Rewards",
+      "point_value_cad": 2.1,
+      "point_value_usd": 1.5555555555555556,
+      "annual_fee": 499.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 2.0,
+        "advertising": 1.25
+      },
+      "signup_bonus": {
+        "points": 75000,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "American Express Business Gold Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Membership Rewards",
+      "point_value_cad": 2.1,
+      "point_value_usd": 1.5555555555555556,
+      "annual_fee": 199.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 2.0,
+        "advertising": 2.0,
+        "travel": 2.0
+      },
+      "signup_bonus": {
+        "points": 40000,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "American Express AIR MILES Platinum Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "AIR MILES",
+      "point_value_cad": 1.6,
+      "point_value_usd": 1.1851851851851851,
+      "annual_fee": 65.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 2.0,
+        "gas": 2.0
+      }
+    },
+    {
+      "name": "BMO Student CashBack Mastercard",
+      "issuer": "BMO",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "student",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.5,
+        "groceries": 3.0,
+        "dining": 1.0
+      }
+    },
+    {
+      "name": "CIBC Student Dividend Visa Card",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "student",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.25,
+        "groceries": 2.0,
+        "gas": 2.0
+      }
+    },
+    {
+      "name": "Scotiabank Student Scene+ Visa Card",
+      "issuer": "Scotiabank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "student",
+      "reward_program": "Scene+",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "cineplex": 5.0
+      }
+    },
+    {
+      "name": "TD Student Cash Back Visa Card",
+      "issuer": "TD Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "student",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.5,
+        "groceries": 2.0,
+        "gas": 2.0,
+        "dining": 2.0,
+        "recurring_bills": 2.0
+      }
+    },
+    {
+      "name": "RBC Student Cash Back Mastercard",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "student",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 2.0
+      }
+    },
+    {
+      "name": "MBNA True Line Platinum Plus Mastercard",
+      "issuer": "MBNA",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "low-interest",
+      "reward_program": "None",
+      "point_value_cad": 0.0,
+      "point_value_usd": 0.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      }
+    },
+    {
+      "name": "RBC Cash Back Preferred Mastercard",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "low-interest",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 39.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 2.0
+      }
+    },
+    {
+      "name": "HSBC Low Rate Mastercard",
+      "issuer": "HSBC Canada",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "low-interest",
+      "reward_program": "None",
+      "point_value_cad": 0.0,
+      "point_value_usd": 0.0,
+      "annual_fee": 29.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      }
+    },
+    {
+      "name": "National Bank \u00e0 la carte Mastercard",
+      "issuer": "National Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "rewards",
+      "reward_program": "NBC Rewards",
+      "point_value_cad": 0.5,
+      "point_value_usd": 0.37037037037037035,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "selected_categories": 2.0
+      }
+    },
+    {
+      "name": "Coast Capital Savings Cash Back Mastercard",
+      "issuer": "Coast Capital Savings",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 2.0,
+        "groceries": 2.0
+      }
+    },
+    {
+      "name": "Meridian Cash Back Visa Infinite Card",
+      "issuer": "Meridian Credit Union",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 110.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 4.0,
+        "groceries": 4.0,
+        "dining": 2.0
+      }
+    },
+    {
+      "name": "CIBC Business Aerogold Visa Card for Business",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Aeroplan",
+      "point_value_cad": 2.0,
+      "point_value_usd": 1.4814814814814814,
+      "annual_fee": 149.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 1.5,
+        "gas": 1.5,
+        "office_supplies": 1.5
+      }
+    },
+    {
+      "name": "RBC Business Platinum Avion Visa",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Avion",
+      "point_value_cad": 2.1,
+      "point_value_usd": 1.5555555555555556,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 1.25,
+        "gas": 1.25
+      }
+    },
+    {
+      "name": "BMO Business Cashback Mastercard",
+      "issuer": "BMO",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 99.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 2.0,
+        "office_supplies": 2.0,
+        "advertising": 2.0
+      }
+    },
+    {
+      "name": "Scotiabank Business SCENE Visa Card",
+      "issuer": "Scotiabank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Scene+",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      }
+    },
+    {
+      "name": "Amazon.ca Rewards Visa Card (Canadian)",
+      "issuer": "Chase Canada",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "amazon_ca": 2.5,
+        "restaurants": 2.0,
+        "gas": 2.0,
+        "drugstores": 2.0
+      }
+    },
+    {
+      "name": "Walmart Rewards Mastercard (Canadian)",
+      "issuer": "Duo Bank of Canada",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Walmart Rewards",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.7407407407407407,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "walmart": 3.0,
+        "international": 1.25
+      }
+    },
+    {
+      "name": "Chase Sapphire Reserve",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Chase Ultimate Rewards",
+      "point_value_cad": 2.7675,
+      "point_value_usd": 2.05,
+      "annual_fee": 550.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 3.0,
+        "dining": 3.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 4000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Chase Sapphire Preferred Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Chase Ultimate Rewards",
+      "point_value_cad": 2.7675,
+      "point_value_usd": 2.05,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 2.0,
+        "dining": 3.0,
+        "streaming": 2.0,
+        "online_grocery": 2.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 4000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Chase Freedom Unlimited",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Chase Ultimate Rewards",
+      "point_value_cad": 2.7675,
+      "point_value_usd": 2.05,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.03,
+      "earning_rates": {
+        "base": 1.5,
+        "travel": 5.0,
+        "dining": 3.0,
+        "drugstores": 3.0
+      },
+      "signup_bonus": {
+        "points": 20000,
+        "spend_requirement": 500,
+        "months": 3
+      }
+    },
+    {
+      "name": "Chase Freedom Flex",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Chase Ultimate Rewards",
+      "point_value_cad": 2.7675,
+      "point_value_usd": 2.05,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.03,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 5.0,
+        "dining": 3.0,
+        "drugstores": 3.0,
+        "rotating": 5.0
+      },
+      "signup_bonus": {
+        "points": 20000,
+        "spend_requirement": 500,
+        "months": 3
+      }
+    },
+    {
+      "name": "Chase Ink Business Preferred Credit Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Chase Ultimate Rewards",
+      "point_value_cad": 2.7675,
+      "point_value_usd": 2.05,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 3.0,
+        "shipping": 3.0,
+        "advertising": 3.0,
+        "internet_cable_phone": 3.0
+      },
+      "signup_bonus": {
+        "points": 100000,
+        "spend_requirement": 8000,
+        "months": 3
+      }
+    },
+    {
+      "name": "United Explorer Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "United MileagePlus",
+      "point_value_cad": 2.0250000000000004,
+      "point_value_usd": 1.5,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "united": 2.0,
+        "dining": 2.0,
+        "hotels": 2.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "World of Hyatt Credit Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "World of Hyatt",
+      "point_value_cad": 2.9700000000000006,
+      "point_value_usd": 2.2,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "hyatt": 4.0,
+        "dining": 2.0,
+        "fitness": 2.0
+      },
+      "signup_bonus": {
+        "points": 30000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Southwest Rapid Rewards Priority Credit Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Southwest Rapid Rewards",
+      "point_value_cad": 2.0250000000000004,
+      "point_value_usd": 1.5,
+      "annual_fee": 149.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "southwest": 2.0,
+        "hotels": 2.0,
+        "car_rentals": 2.0,
+        "local_transit": 2.0
+      },
+      "signup_bonus": {
+        "points": 50000,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Marriott Bonvoy Boundless Credit Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Marriott Bonvoy",
+      "point_value_cad": 0.999,
+      "point_value_usd": 0.74,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "marriott": 6.0,
+        "groceries": 3.0,
+        "dining": 3.0,
+        "gas": 3.0
+      },
+      "signup_bonus": {
+        "points": 75000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "The Platinum Card from American Express",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Amex Membership Rewards (US)",
+      "point_value_cad": 2.7,
+      "point_value_usd": 2.0,
+      "annual_fee": 695.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "flights": 5.0,
+        "hotels": 5.0
+      },
+      "signup_bonus": {
+        "points": 80000,
+        "spend_requirement": 8000,
+        "months": 6
+      }
+    },
+    {
+      "name": "American Express Gold Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Amex Membership Rewards (US)",
+      "point_value_cad": 2.7,
+      "point_value_usd": 2.0,
+      "annual_fee": 250.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "dining": 4.0,
+        "supermarkets": 4.0,
+        "flights": 3.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 6000,
+        "months": 6
+      }
+    },
+    {
+      "name": "American Express Green Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Amex Membership Rewards (US)",
+      "point_value_cad": 2.7,
+      "point_value_usd": 2.0,
+      "annual_fee": 150.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 3.0,
+        "dining": 3.0,
+        "transit": 3.0
+      },
+      "signup_bonus": {
+        "points": 40000,
+        "spend_requirement": 2000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Blue Cash Preferred Card from American Express",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "supermarkets": 6.0,
+        "streaming": 6.0,
+        "transit": 3.0,
+        "gas": 3.0
+      },
+      "signup_bonus": {
+        "points": 350,
+        "spend_requirement": 3000,
+        "months": 6
+      }
+    },
+    {
+      "name": "Blue Cash Everyday Card from American Express",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "supermarkets": 3.0,
+        "gas": 2.0,
+        "online_retail": 2.0
+      },
+      "signup_bonus": {
+        "points": 200,
+        "spend_requirement": 2000,
+        "months": 6
+      }
+    },
+    {
+      "name": "Delta SkyMiles Gold American Express Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Delta SkyMiles",
+      "point_value_cad": 1.6875,
+      "point_value_usd": 1.25,
+      "annual_fee": 150.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "delta": 2.0,
+        "dining": 2.0,
+        "supermarkets": 2.0
+      },
+      "signup_bonus": {
+        "points": 50000,
+        "spend_requirement": 2000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Hilton Honors American Express Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Hilton Honors",
+      "point_value_cad": 0.648,
+      "point_value_usd": 0.48,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.03,
+      "earning_rates": {
+        "base": 3.0,
+        "hilton": 7.0,
+        "supermarkets": 5.0,
+        "dining": 5.0,
+        "gas": 5.0
+      },
+      "signup_bonus": {
+        "points": 80000,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Marriott Bonvoy Bevy American Express Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Marriott Bonvoy",
+      "point_value_cad": 0.999,
+      "point_value_usd": 0.74,
+      "annual_fee": 250.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "marriott": 6.0,
+        "dining": 4.0,
+        "gas": 3.0,
+        "groceries": 3.0
+      },
+      "signup_bonus": {
+        "points": 100000,
+        "spend_requirement": 6000,
+        "months": 6
+      }
+    },
+    {
+      "name": "Capital One Venture X Rewards Credit Card",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Capital One Miles",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 395.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "hotels": 10.0,
+        "car_rentals": 10.0,
+        "capital_one_travel": 5.0
+      },
+      "signup_bonus": {
+        "points": 75000,
+        "spend_requirement": 4000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Capital One Venture Rewards Credit Card",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Capital One Miles",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "hotels": 5.0,
+        "car_rentals": 5.0
+      },
+      "signup_bonus": {
+        "points": 75000,
+        "spend_requirement": 4000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Capital One VentureOne Rewards Credit Card",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Capital One Miles",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.25,
+        "hotels": 5.0,
+        "car_rentals": 5.0
+      },
+      "signup_bonus": {
+        "points": 20000,
+        "spend_requirement": 500,
+        "months": 3
+      }
+    },
+    {
+      "name": "Capital One Savor Cash Rewards Credit Card",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "dining": 4.0,
+        "entertainment": 4.0,
+        "streaming": 4.0,
+        "groceries": 3.0
+      },
+      "signup_bonus": {
+        "points": 300,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Capital One SavorOne Cash Rewards Credit Card",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "dining": 3.0,
+        "entertainment": 3.0,
+        "streaming": 3.0,
+        "groceries": 2.0
+      },
+      "signup_bonus": {
+        "points": 200,
+        "spend_requirement": 500,
+        "months": 3
+      }
+    },
+    {
+      "name": "Capital One Quicksilver Cash Rewards Credit Card",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5
+      },
+      "signup_bonus": {
+        "points": 200,
+        "spend_requirement": 500,
+        "months": 3
+      }
+    },
+    {
+      "name": "Citi Strata Premier Card",
+      "issuer": "Citi",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Citi ThankYou Points",
+      "point_value_cad": 2.16,
+      "point_value_usd": 1.6,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 3.0,
+        "gas": 3.0,
+        "supermarkets": 3.0,
+        "dining": 3.0,
+        "ev_charging": 3.0
+      },
+      "signup_bonus": {
+        "points": 70000,
+        "spend_requirement": 4000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Citi Prestige Card",
+      "issuer": "Citi",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Citi ThankYou Points",
+      "point_value_cad": 2.16,
+      "point_value_usd": 1.6,
+      "annual_fee": 495.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "dining": 5.0,
+        "air_travel": 5.0,
+        "hotels": 3.0
+      },
+      "signup_bonus": {
+        "points": 75000,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Citi Double Cash Card",
+      "issuer": "Citi",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.03,
+      "earning_rates": {
+        "base": 2.0
+      }
+    },
+    {
+      "name": "Citi Custom Cash Card",
+      "issuer": "Citi",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.03,
+      "earning_rates": {
+        "base": 1.0,
+        "top_category": 5.0
+      },
+      "signup_bonus": {
+        "points": 200,
+        "spend_requirement": 1500,
+        "months": 3
+      }
+    },
+    {
+      "name": "Citi AAdvantage Platinum Select World Elite Mastercard",
+      "issuer": "Citi",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "American Airlines AAdvantage",
+      "point_value_cad": 2.295,
+      "point_value_usd": 1.7,
+      "annual_fee": 99.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "american_airlines": 2.0,
+        "dining": 2.0,
+        "gas": 2.0
+      },
+      "signup_bonus": {
+        "points": 50000,
+        "spend_requirement": 2500,
+        "months": 3
+      }
+    },
+    {
+      "name": "Costco Anywhere Visa Card by Citi",
+      "issuer": "Citi",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 4.0,
+        "travel": 3.0,
+        "dining": 3.0,
+        "costco": 2.0
+      }
+    },
+    {
+      "name": "Discover it Cash Back",
+      "issuer": "Discover",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Discover Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "rotating": 5.0
+      }
+    },
+    {
+      "name": "Discover it Miles",
+      "issuer": "Discover",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Discover Miles",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5
+      }
+    },
+    {
+      "name": "Discover it Chrome",
+      "issuer": "Discover",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Discover Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 2.0,
+        "dining": 2.0
+      }
+    },
+    {
+      "name": "Wells Fargo Autograph Journey Card",
+      "issuer": "Wells Fargo",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Wells Fargo Rewards",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "hotels": 5.0,
+        "airlines": 5.0,
+        "car_rentals": 5.0,
+        "dining": 3.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 4000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Wells Fargo Autograph Card",
+      "issuer": "Wells Fargo",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Wells Fargo Rewards",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "dining": 3.0,
+        "travel": 3.0,
+        "gas": 3.0,
+        "transit": 3.0,
+        "streaming": 3.0,
+        "phone_plans": 3.0
+      },
+      "signup_bonus": {
+        "points": 20000,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Wells Fargo Active Cash Card",
+      "issuer": "Wells Fargo",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.03,
+      "earning_rates": {
+        "base": 2.0
+      },
+      "signup_bonus": {
+        "points": 200,
+        "spend_requirement": 500,
+        "months": 3
+      }
+    },
+    {
+      "name": "Bilt Mastercard",
+      "issuer": "Bilt",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Bilt Rewards",
+      "point_value_cad": 2.9700000000000006,
+      "point_value_usd": 2.2,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "rent": 1.0,
+        "travel": 2.0,
+        "dining": 3.0
+      }
+    },
+    {
+      "name": "Amazon Prime Rewards Visa Signature Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "amazon": 5.0,
+        "whole_foods": 5.0,
+        "gas": 2.0,
+        "dining": 2.0,
+        "drugstores": 2.0
+      },
+      "signup_bonus": {
+        "points": 150,
+        "spend_requirement": null,
+        "months": null
+      }
+    },
+    {
+      "name": "Target RedCard Credit Card",
+      "issuer": "TD Bank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 0.0,
+        "target": 5.0
+      }
+    },
+    {
+      "name": "Walmart Rewards Card",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "walmart": 5.0,
+        "travel": 2.0,
+        "dining": 2.0
+      }
+    },
+    {
+      "name": "U.S. Bank Altitude Reserve Visa Infinite Card",
+      "issuer": "U.S. Bank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "U.S. Bank Rewards",
+      "point_value_cad": 2.0250000000000004,
+      "point_value_usd": 1.5,
+      "annual_fee": 400.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "mobile_wallet": 5.0,
+        "travel": 3.0,
+        "dining": 3.0
+      },
+      "signup_bonus": {
+        "points": 50000,
+        "spend_requirement": 4500,
+        "months": 3
+      }
+    },
+    {
+      "name": "U.S. Bank Altitude Go Visa Signature Card",
+      "issuer": "U.S. Bank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "dining": 4.0,
+        "gas": 2.0,
+        "groceries": 2.0,
+        "streaming": 2.0
+      }
+    },
+    {
+      "name": "Bank of America Premium Rewards Credit Card",
+      "issuer": "Bank of America",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "BofA Rewards",
+      "point_value_cad": 2.0250000000000004,
+      "point_value_usd": 1.5,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5,
+        "travel": 2.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Bank of America Travel Rewards Credit Card",
+      "issuer": "Bank of America",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "BofA Rewards",
+      "point_value_cad": 2.0250000000000004,
+      "point_value_usd": 1.5,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5
+      },
+      "signup_bonus": {
+        "points": 25000,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Bank of America Customized Cash Rewards Credit Card",
+      "issuer": "Bank of America",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.03,
+      "earning_rates": {
+        "base": 1.0,
+        "choice_category": 3.0,
+        "grocery_stores": 2.0,
+        "wholesale_clubs": 2.0
+      },
+      "signup_bonus": {
+        "points": 200,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Bank of America Unlimited Cash Rewards Credit Card",
+      "issuer": "Bank of America",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.03,
+      "earning_rates": {
+        "base": 1.5
+      },
+      "signup_bonus": {
+        "points": 200,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Barclays Arrival Premier World Elite Mastercard",
+      "issuer": "Barclays",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Barclays Miles",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 89.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 3.0,
+        "dining": 3.0
+      },
+      "signup_bonus": {
+        "points": 75000,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "JetBlue Plus Card",
+      "issuer": "Barclays",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "JetBlue TrueBlue",
+      "point_value_cad": 1.8225000000000002,
+      "point_value_usd": 1.35,
+      "annual_fee": 99.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "jetblue": 6.0,
+        "dining": 2.0,
+        "groceries": 2.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Wyndham Rewards Earner Business Card",
+      "issuer": "Barclays",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Wyndham Rewards",
+      "point_value_cad": 1.4850000000000003,
+      "point_value_usd": 1.1,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "wyndham": 8.0,
+        "gas": 4.0,
+        "utilities": 4.0
+      },
+      "signup_bonus": {
+        "points": 45000,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Alaska Airlines Visa Signature Card",
+      "issuer": "Bank of America",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Alaska Mileage Plan",
+      "point_value_cad": 2.43,
+      "point_value_usd": 1.8,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "alaska": 3.0,
+        "gas": 2.0,
+        "local_transit": 2.0,
+        "cable_streaming": 2.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 2000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Delta SkyMiles Platinum American Express Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Delta SkyMiles",
+      "point_value_cad": 1.6875,
+      "point_value_usd": 1.25,
+      "annual_fee": 250.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "delta": 3.0,
+        "dining": 2.0,
+        "supermarkets": 2.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Delta SkyMiles Reserve American Express Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Delta SkyMiles",
+      "point_value_cad": 1.6875,
+      "point_value_usd": 1.25,
+      "annual_fee": 650.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "delta": 3.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 85000,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "United Quest Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "United MileagePlus",
+      "point_value_cad": 2.0250000000000004,
+      "point_value_usd": 1.5,
+      "annual_fee": 250.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "united": 3.0,
+        "dining": 2.0,
+        "hotels": 2.0
+      },
+      "signup_bonus": {
+        "points": 80000,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "United Club Infinite Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "United MileagePlus",
+      "point_value_cad": 2.0250000000000004,
+      "point_value_usd": 1.5,
+      "annual_fee": 525.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5,
+        "united": 4.0,
+        "dining": 2.0,
+        "hotels": 2.0
+      },
+      "signup_bonus": {
+        "points": 100000,
+        "spend_requirement": 6000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Citi AAdvantage Executive World Elite Mastercard",
+      "issuer": "Citi",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "American Airlines AAdvantage",
+      "point_value_cad": 2.295,
+      "point_value_usd": 1.7,
+      "annual_fee": 595.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "american_airlines": 2.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 50000,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Southwest Rapid Rewards Plus Credit Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Southwest Rapid Rewards",
+      "point_value_cad": 2.0250000000000004,
+      "point_value_usd": 1.5,
+      "annual_fee": 99.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "southwest": 2.0,
+        "hotels": 2.0,
+        "car_rentals": 2.0
+      },
+      "signup_bonus": {
+        "points": 50000,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Southwest Rapid Rewards Performance Business Credit Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Southwest Rapid Rewards",
+      "point_value_cad": 2.0250000000000004,
+      "point_value_usd": 1.5,
+      "annual_fee": 199.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "southwest": 3.0,
+        "hotels": 2.0,
+        "car_rentals": 2.0,
+        "telecom": 2.0,
+        "internet_cable": 2.0
+      },
+      "signup_bonus": {
+        "points": 80000,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Marriott Bonvoy Bold Credit Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Marriott Bonvoy",
+      "point_value_cad": 0.999,
+      "point_value_usd": 0.74,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "marriott": 14.0,
+        "gas": 3.0,
+        "dining": 3.0,
+        "groceries": 2.0
+      },
+      "signup_bonus": {
+        "points": 30000,
+        "spend_requirement": 1000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Marriott Bonvoy Business American Express Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Marriott Bonvoy",
+      "point_value_cad": 0.999,
+      "point_value_usd": 0.74,
+      "annual_fee": 125.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "marriott": 6.0,
+        "gas": 4.0,
+        "wireless": 4.0,
+        "office_supplies": 4.0,
+        "shipping": 4.0,
+        "internet": 4.0
+      },
+      "signup_bonus": {
+        "points": 100000,
+        "spend_requirement": 5000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Hilton Honors American Express Surpass Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Hilton Honors",
+      "point_value_cad": 0.648,
+      "point_value_usd": 0.48,
+      "annual_fee": 150.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 3.0,
+        "hilton": 12.0,
+        "supermarkets": 6.0,
+        "dining": 6.0,
+        "gas": 6.0
+      },
+      "signup_bonus": {
+        "points": 130000,
+        "spend_requirement": 2000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Hilton Honors American Express Aspire Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Hilton Honors",
+      "point_value_cad": 0.648,
+      "point_value_usd": 0.48,
+      "annual_fee": 450.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 3.0,
+        "hilton": 14.0,
+        "dining": 7.0,
+        "flights": 7.0,
+        "car_rentals": 7.0
+      },
+      "signup_bonus": {
+        "points": 150000,
+        "spend_requirement": 4000,
+        "months": 3
+      }
+    },
+    {
+      "name": "IHG One Rewards Premier Credit Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "IHG One Rewards",
+      "point_value_cad": 0.945,
+      "point_value_usd": 0.7,
+      "annual_fee": 99.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "ihg": 10.0,
+        "gas": 2.0,
+        "groceries": 2.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 140000,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "IHG One Rewards Traveler Credit Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "IHG One Rewards",
+      "point_value_cad": 0.945,
+      "point_value_usd": 0.7,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "ihg": 5.0,
+        "travel": 3.0,
+        "dining": 3.0
+      },
+      "signup_bonus": {
+        "points": 75000,
+        "spend_requirement": 2000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Ink Business Cash Credit Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "cashback",
+      "reward_program": "Chase Ultimate Rewards",
+      "point_value_cad": 2.7675,
+      "point_value_usd": 2.05,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "office_supplies": 5.0,
+        "internet_cable_phone": 5.0,
+        "gas": 2.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 75000,
+        "spend_requirement": 6000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Ink Business Unlimited Credit Card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Chase Ultimate Rewards",
+      "point_value_cad": 2.7675,
+      "point_value_usd": 2.05,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5
+      },
+      "signup_bonus": {
+        "points": 75000,
+        "spend_requirement": 6000,
+        "months": 3
+      }
+    },
+    {
+      "name": "The Business Platinum Card from American Express",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Amex Membership Rewards (US)",
+      "point_value_cad": 2.7,
+      "point_value_usd": 2.0,
+      "annual_fee": 695.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "flights": 5.0,
+        "prepaid_hotels": 5.0,
+        "purchases_over_5000": 1.5
+      },
+      "signup_bonus": {
+        "points": 150000,
+        "spend_requirement": 15000,
+        "months": 3
+      }
+    },
+    {
+      "name": "American Express Blue Business Plus Credit Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Amex Membership Rewards (US)",
+      "point_value_cad": 2.7,
+      "point_value_usd": 2.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 2.0
+      }
+    },
+    {
+      "name": "American Express Blue Business Cash Card",
+      "issuer": "American Express",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 2.0,
+        "gas": 2.0,
+        "office_supplies": 2.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 250,
+        "spend_requirement": 3000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Capital One Spark Cash Plus",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 150.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0
+      },
+      "signup_bonus": {
+        "points": 2000,
+        "spend_requirement": 10000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Capital One Spark Miles for Business",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Capital One Miles",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0
+      },
+      "signup_bonus": {
+        "points": 50000,
+        "spend_requirement": 4500,
+        "months": 3
+      }
+    },
+    {
+      "name": "Apple Card",
+      "issuer": "Goldman Sachs",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "apple": 3.0,
+        "apple_wallet": 2.0
+      }
+    },
+    {
+      "name": "Best Buy Credit Card",
+      "issuer": "Citibank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "best_buy": 5.0,
+        "dining": 3.0,
+        "groceries": 2.0
+      }
+    },
+    {
+      "name": "Home Depot Consumer Credit Card",
+      "issuer": "Citibank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "store",
+      "reward_program": "None",
+      "point_value_cad": 0.0,
+      "point_value_usd": 0.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      }
+    },
+    {
+      "name": "Lowe's Advantage Card",
+      "issuer": "Synchrony Bank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "store",
+      "reward_program": "None",
+      "point_value_cad": 0.0,
+      "point_value_usd": 0.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      }
+    },
+    {
+      "name": "PenFed Pathfinder Rewards Visa Signature Card",
+      "issuer": "PenFed",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "PenFed Points",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 4.0,
+        "gas": 3.0,
+        "supermarkets": 2.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 50000,
+        "spend_requirement": 2500,
+        "months": 3
+      }
+    },
+    {
+      "name": "PenFed Power Cash Rewards Visa Signature Card",
+      "issuer": "PenFed",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5,
+        "gas": 3.0
+      },
+      "signup_bonus": {
+        "points": 200,
+        "spend_requirement": 1500,
+        "months": 3
+      }
+    },
+    {
+      "name": "Navy Federal Credit Union GO REWARDS Credit Card",
+      "issuer": "Navy Federal Credit Union",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "GO Rewards",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "supermarkets": 3.0,
+        "gas": 2.0,
+        "dining": 2.0
+      }
+    },
+    {
+      "name": "Navy Federal More Rewards American Express Card",
+      "issuer": "Navy Federal Credit Union",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "More Rewards",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "supermarkets": 3.0,
+        "gas": 2.0,
+        "transit": 2.0
+      }
+    },
+    {
+      "name": "USAA Rewards Visa Signature",
+      "issuer": "USAA",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "USAA Rewards",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5,
+        "gas": 3.0,
+        "military_bases": 2.0
+      }
+    },
+    {
+      "name": "USAA Cashback Rewards Plus American Express Card",
+      "issuer": "USAA",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 5.0,
+        "military_bases": 2.0,
+        "groceries": 2.0
+      }
+    },
+    {
+      "name": "Upgrade Cash Rewards Visa",
+      "issuer": "Upgrade",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.5
+      }
+    },
+    {
+      "name": "Capital One Venture X Business",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Capital One Miles",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 395.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "hotels": 10.0,
+        "car_rentals": 10.0,
+        "flights": 5.0
+      },
+      "signup_bonus": {
+        "points": 150000,
+        "spend_requirement": 20000,
+        "months": 3
+      }
+    },
+    {
+      "name": "Alliant Cashback Visa Signature",
+      "issuer": "Alliant Credit Union",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 99.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.5
+      }
+    },
+    {
+      "name": "Affinity Federal Credit Union Cash Rewards Visa Signature",
+      "issuer": "Affinity FCU",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 49.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5,
+        "gas": 3.0,
+        "groceries": 2.0
+      }
+    },
+    {
+      "name": "Discover it Student Cash Back",
+      "issuer": "Discover",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "student",
+      "reward_program": "Discover Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "rotating": 5.0
+      }
+    },
+    {
+      "name": "Discover it Student Chrome",
+      "issuer": "Discover",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "student",
+      "reward_program": "Discover Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "gas": 2.0,
+        "dining": 2.0
+      }
+    },
+    {
+      "name": "Bank of America Student Cash Rewards Credit Card",
+      "issuer": "Bank of America",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "student",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.03,
+      "earning_rates": {
+        "base": 1.0,
+        "choice_category": 3.0,
+        "groceries": 2.0
+      }
+    },
+    {
+      "name": "Capital One Quicksilver Student Cash Rewards Credit Card",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "student",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5
+      }
+    },
+    {
+      "name": "Chase Freedom Student credit card",
+      "issuer": "Chase",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "student",
+      "reward_program": "Chase Ultimate Rewards",
+      "point_value_cad": 2.7675,
+      "point_value_usd": 2.05,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.03,
+      "earning_rates": {
+        "base": 1.0,
+        "rotating": 5.0,
+        "drugstores": 3.0
+      }
+    },
+    {
+      "name": "Journey Student Rewards from Capital One",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "student",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0
+      }
+    },
+    {
+      "name": "Discover it Secured Credit Card",
+      "issuer": "Discover",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "secured",
+      "reward_program": "Discover Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "gas": 2.0,
+        "dining": 2.0
+      }
+    },
+    {
+      "name": "Capital One Platinum Secured Credit Card",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "secured",
+      "reward_program": "None",
+      "point_value_cad": 0.0,
+      "point_value_usd": 0.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      }
+    },
+    {
+      "name": "Citi Secured Mastercard",
+      "issuer": "Citi",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "secured",
+      "reward_program": "None",
+      "point_value_cad": 0.0,
+      "point_value_usd": 0.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      }
+    },
+    {
+      "name": "Uber Visa Card",
+      "issuer": "Barclays",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "uber": 5.0,
+        "dining": 4.0,
+        "hotels": 3.0,
+        "airfare": 3.0,
+        "online_shopping": 2.0
+      }
+    },
+    {
+      "name": "Uber Pro Card",
+      "issuer": "Barclays",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5,
+        "uber": 6.0,
+        "gas": 4.0,
+        "dining": 3.0,
+        "phone_plans": 2.0
+      }
+    },
+    {
+      "name": "Rakuten Visa Card",
+      "issuer": "Synchrony Bank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "rakuten": 3.0,
+        "dining": 3.0,
+        "drugstores": 2.0
+      }
+    },
+    {
+      "name": "Macy's American Express Card",
+      "issuer": "Citibank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "macys": 5.0,
+        "restaurants": 2.0,
+        "gas": 2.0,
+        "groceries": 2.0
+      }
+    },
+    {
+      "name": "Kohl's Charge Card",
+      "issuer": "Capital One",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "store",
+      "reward_program": "None",
+      "point_value_cad": 0.0,
+      "point_value_usd": 0.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      }
+    },
+    {
+      "name": "Nordstrom Visa Card",
+      "issuer": "TD Bank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "co-branded",
+      "reward_program": "Nordstrom Rewards",
+      "point_value_cad": 0.675,
+      "point_value_usd": 0.5,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "nordstrom": 3.0,
+        "dining": 2.0,
+        "gas": 2.0
+      }
+    },
+    {
+      "name": "Gap Visa Signature Card",
+      "issuer": "Synchrony Bank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "store",
+      "reward_program": "None",
+      "point_value_cad": 0.0,
+      "point_value_usd": 0.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0,
+        "gap": 5.0,
+        "dining": 2.0,
+        "gas": 2.0
+      }
+    },
+    {
+      "name": "Bank of America Business Advantage Cash Rewards Mastercard",
+      "issuer": "Bank of America",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.03,
+      "earning_rates": {
+        "base": 1.0,
+        "choice_category": 3.0,
+        "gas": 2.0,
+        "office_supplies": 2.0,
+        "dining": 2.0
+      }
+    },
+    {
+      "name": "Wells Fargo Business Platinum Credit Card",
+      "issuer": "Wells Fargo",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "low-interest",
+      "reward_program": "None",
+      "point_value_cad": 0.0,
+      "point_value_usd": 0.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      }
+    },
+    {
+      "name": "Discover it Business Card",
+      "issuer": "Discover",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5
+      }
+    },
+    {
+      "name": "U.S. Bank Business Triple Cash Rewards World Elite Mastercard",
+      "issuer": "U.S. Bank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "choice_category": 3.0,
+        "gas": 2.0,
+        "office_supplies": 2.0
+      }
+    },
+    {
+      "name": "Brex Card for Startups",
+      "issuer": "Brex",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Brex Points",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "software": 7.0,
+        "advertising": 4.0,
+        "dining": 3.0,
+        "travel": 2.0
+      }
+    },
+    {
+      "name": "Choice Privileges Visa Signature Card",
+      "issuer": "Barclays",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Choice Privileges",
+      "point_value_cad": 0.81,
+      "point_value_usd": 0.6,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 3.0,
+        "choice_hotels": 10.0,
+        "gas": 2.0,
+        "groceries": 2.0,
+        "utilities": 2.0
+      }
+    },
+    {
+      "name": "Best Western Rewards Mastercard",
+      "issuer": "Barclays",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Best Western Rewards",
+      "point_value_cad": 0.8775000000000001,
+      "point_value_usd": 0.65,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 3.0,
+        "best_western": 10.0,
+        "gas": 5.0,
+        "groceries": 3.0
+      }
+    },
+    {
+      "name": "Wyndham Rewards Earner Card",
+      "issuer": "Barclays",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Wyndham Rewards",
+      "point_value_cad": 1.4850000000000003,
+      "point_value_usd": 1.1,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "wyndham": 8.0,
+        "gas": 4.0,
+        "supermarkets": 4.0,
+        "utilities": 4.0
+      }
+    },
+    {
+      "name": "Alaska Airlines Visa Business Card",
+      "issuer": "Bank of America",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Alaska Mileage Plan",
+      "point_value_cad": 2.43,
+      "point_value_usd": 1.8,
+      "annual_fee": 95.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "alaska": 3.0,
+        "gas": 2.0,
+        "shipping": 2.0,
+        "advertising": 2.0
+      }
+    },
+    {
+      "name": "JetBlue Business Card",
+      "issuer": "Barclays",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "JetBlue TrueBlue",
+      "point_value_cad": 1.8225000000000002,
+      "point_value_usd": 1.35,
+      "annual_fee": 99.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "jetblue": 6.0,
+        "office_supplies": 2.0,
+        "gas": 2.0,
+        "dining": 2.0,
+        "advertising": 2.0
+      }
+    },
+    {
+      "name": "Hawaiian Airlines World Elite Mastercard",
+      "issuer": "Barclays",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "HawaiianMiles",
+      "point_value_cad": 1.62,
+      "point_value_usd": 1.2,
+      "annual_fee": 99.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "hawaiian": 3.0,
+        "gas": 2.0,
+        "dining": 2.0,
+        "supermarkets": 2.0
+      }
+    },
+    {
+      "name": "Spirit Airlines World Elite Mastercard",
+      "issuer": "Bank of America",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Spirit Airlines Miles",
+      "point_value_cad": 1.08,
+      "point_value_usd": 0.8,
+      "annual_fee": 69.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "spirit": 5.0,
+        "gas": 2.0,
+        "dining": 2.0
+      }
+    },
+    {
+      "name": "Frontier Airlines World Mastercard",
+      "issuer": "Barclays",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Frontier Miles",
+      "point_value_cad": 0.945,
+      "point_value_usd": 0.7,
+      "annual_fee": 99.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "frontier": 5.0,
+        "dining": 3.0,
+        "drugstores": 3.0
+      }
+    },
+    {
+      "name": "Brex 30 Card",
+      "issuer": "Brex",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Brex Points",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 3.0,
+        "rideshare": 8.0,
+        "flights": 7.0,
+        "hotels": 6.0,
+        "dining": 4.0,
+        "software": 3.0
+      }
+    },
+    {
+      "name": "Ramp Card",
+      "issuer": "Ramp",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "business",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5
+      }
+    },
+    {
+      "name": "Connexus Aspire Visa Signature",
+      "issuer": "Connexus Credit Union",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "gas": 5.0,
+        "groceries": 3.0,
+        "utilities": 3.0
+      }
+    },
+    {
+      "name": "SoFi Credit Card",
+      "issuer": "SoFi",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0
+      }
+    },
+    {
+      "name": "Petal 2 Visa Credit Card",
+      "issuer": "WebBank",
+      "country": "US",
+      "currency": "USD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Cashback",
+      "point_value_cad": 1.35,
+      "point_value_usd": 1.0,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "choice_category": 1.5
+      }
+    }
+  ]
+}

@@ -16,7 +16,13 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.rewardsoptimizer.app",
-      "buildNumber": "1"
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Rewardly uses your location to alert you with the best credit card to use at stores you choose to monitor.",
+        "NSLocationWhenInUseUsageDescription": "Rewardly uses your location to recommend the best credit card at your current store.",
+        "NSLocationAlwaysUsageDescription": "Rewardly monitors stores you choose in the background to alert you with credit card recommendations.",
+        "UIBackgroundModes": ["location", "fetch", "remote-notification"]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +32,14 @@
       "package": "com.rewardsoptimizer.app",
       "versionCode": 1,
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
