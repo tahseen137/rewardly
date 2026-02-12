@@ -16,6 +16,7 @@ import {
   Alert,
   RefreshControl,
   ScrollView,
+  Platform,
 } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
@@ -55,9 +56,108 @@ function CardItem({
   onViewDetails: (card: Card) => void;
 }) {
   const card = getCardByIdSync(userCard.cardId);
-  const translateX = useSharedValue(0);
 
-  if (!card) return null;
+  // Show placeholder for cards not in current country's cache
+  // This can happen if user switches country but has cards from another country
+  if (!card) {
+    return (
+      <View style={styles.cardItemContainer}>
+        <View style={styles.cardItem}>
+          <View style={[styles.issuerBadge, { backgroundColor: colors.background.tertiary }]}>
+            <Text style={styles.issuerText}>??</Text>
+          </View>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardName}>Card not available</Text>
+            <Text style={styles.cardMeta}>This card may be from another country</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => onRemove(userCard.cardId)}
+            accessibilityLabel="Remove card"
+            accessibilityRole="button"
+          >
+            <Trash2 size={18} color={colors.text.secondary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  const formatAnnualFee = (fee?: number) => {
+    if (fee === undefined || fee === 0) return 'No annual fee';
+    return `$${fee}/year`;
+  };
+
+  // Web-compatible card item without gesture handler
+  // Gesture handler has issues on web with Modal, so we use a simpler implementation
+  const cardContent = (
+    <View style={styles.cardItem}>
+      {/* Issuer Badge with Gradient */}
+      <LinearGradient
+        colors={[colors.primary.main + '4D', colors.accent.main + '4D']} // 30% opacity (~4D in hex)
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.issuerBadge}
+      >
+        <Text style={styles.issuerText}>
+          {card.issuer.slice(0, 2).toUpperCase()}
+        </Text>
+      </LinearGradient>
+
+      {/* Card Info - Tappable */}
+      <TouchableOpacity
+        style={styles.cardInfo}
+        onPress={() => onViewDetails(card)}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.cardName}>{card.name}</Text>
+        <Text style={styles.cardMeta}>
+          {card.issuer} • {formatAnnualFee(card.annualFee)}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Delete Button */}
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => onRemove(card.id)}
+        accessibilityLabel={`Remove ${card.name}`}
+        accessibilityRole="button"
+      >
+        <Trash2 size={18} color={colors.text.secondary} />
+      </TouchableOpacity>
+
+      {/* Chevron */}
+      <ChevronRight size={18} color={colors.text.tertiary} />
+    </View>
+  );
+
+  // On native, wrap with gesture handler for swipe-to-delete
+  // On web, skip gesture handler to avoid React hook errors
+  if (Platform.OS === 'web') {
+    return (
+      <View style={styles.cardItemContainer}>
+        {cardContent}
+      </View>
+    );
+  }
+
+  // Native implementation with gesture handler
+  return <CardItemWithGesture userCard={userCard} onRemove={onRemove} onViewDetails={onViewDetails} card={card} />;
+}
+
+// Native-only component with gesture handler
+function CardItemWithGesture({
+  userCard,
+  onRemove,
+  onViewDetails,
+  card,
+}: {
+  userCard: UserCard;
+  onRemove: (cardId: string) => void;
+  onViewDetails: (card: Card) => void;
+  card: Card;
+}) {
+  const translateX = useSharedValue(0);
 
   const formatAnnualFee = (fee?: number) => {
     if (fee === undefined || fee === 0) return 'No annual fee';
@@ -185,10 +285,15 @@ export default function MyCardsScreen() {
   const [availableCards, setAvailableCards] = useState<Card[]>([]);
   const [isLoadingCards, setIsLoadingCards] = useState(false);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const loadPortfolio = useCallback(async () => {
+    // Ensure card cache is populated before loading portfolio
+    // This fixes the race condition where portfolio loads before cards are cached
+    await getAllCards();
     await initializePortfolio();
     setPortfolio(getCards());
+    setIsInitialLoading(false);
   }, []);
 
   const loadAvailableCards = useCallback(async () => {
@@ -279,6 +384,15 @@ export default function MyCardsScreen() {
   };
 
   const ownedCardIds = new Set(portfolio.map((uc) => uc.cardId));
+
+  // Show loading state while initializing
+  if (isInitialLoading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <Text style={styles.loadingText}>Loading cards...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

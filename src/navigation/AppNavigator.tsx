@@ -1,26 +1,34 @@
 /**
- * AppNavigator - Main navigation structure with bottom tabs
- * Redesigned with glass morphism effect and lucide icons
+ * AppNavigator - Main navigation structure with auth handling
+ * Shows AuthScreen if not logged in, OnboardingScreen for new users
+ * Then bottom tabs with glass morphism effect and lucide icons
  */
 
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Platform } from 'react-native';
+import { Platform, View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Home, CreditCard, Settings } from 'lucide-react-native';
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { BlurView } from 'expo-blur';
 
-import { HomeScreen, MyCardsScreen, SettingsScreen } from '../screens';
+import { MyCardsScreen, SettingsScreen, SageScreen } from '../screens';
+import AuthScreen from '../screens/AuthScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
 import { ErrorBoundary } from '../components';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
-import { BlurView } from 'expo-blur';
+import { getCurrentUser, onAuthStateChange, AuthUser } from '../services/AuthService';
+import { isOnboardingComplete, initializePreferences } from '../services/PreferenceManager';
+import { initializeSubscription } from '../services/SubscriptionService';
 
 export type RootTabParamList = {
-  Home: undefined;
+  Sage: undefined;
   MyCards: undefined;
   Settings: undefined;
 };
+
+type AppState = 'loading' | 'auth' | 'onboarding' | 'main';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
@@ -46,7 +54,7 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
 
   let IconComponent;
   switch (name) {
-    case 'Home':
+    case 'Sage':
       IconComponent = Home;
       break;
     case 'MyCards':
@@ -67,19 +75,28 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
 }
 
 /**
- * Wrapped screen components with error boundaries
+ * Loading screen
  */
-function HomeScreenWithErrorBoundary() {
+function LoadingScreen() {
   return (
-    <ErrorBoundary
-      fallbackTitle="Unable to load recommendations"
-      fallbackMessage="There was a problem loading the recommendation screen. Please try again."
-    >
-      <HomeScreen />
-    </ErrorBoundary>
+    <View style={loadingStyles.container}>
+      <ActivityIndicator size="large" color={colors.primary.main} />
+    </View>
   );
 }
 
+const loadingStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+/**
+ * Wrapped screen components with error boundaries
+ */
 function MyCardsScreenWithErrorBoundary() {
   return (
     <ErrorBoundary
@@ -91,19 +108,166 @@ function MyCardsScreenWithErrorBoundary() {
   );
 }
 
-function SettingsScreenWithErrorBoundary() {
+function SageScreenWithErrorBoundary() {
+  return (
+    <ErrorBoundary
+      fallbackTitle="Unable to load Sage"
+      fallbackMessage="There was a problem loading the AI assistant. Please try again."
+    >
+      <SageScreen />
+    </ErrorBoundary>
+  );
+}
+
+function SettingsScreenWithErrorBoundary({ onSignOut }: { onSignOut: () => void }) {
   return (
     <ErrorBoundary
       fallbackTitle="Unable to load settings"
       fallbackMessage="There was a problem loading settings. Please try again."
     >
-      <SettingsScreen />
+      <SettingsScreen onSignOut={onSignOut} />
     </ErrorBoundary>
+  );
+}
+
+/**
+ * Main tab navigator
+ */
+function MainTabs({ onSignOut }: { onSignOut: () => void }) {
+  const theme = useTheme();
+
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color }) => (
+          <TabIcon name={route.name} focused={focused} color={color} />
+        ),
+        tabBarActiveTintColor: colors.primary.main,
+        tabBarInactiveTintColor: colors.text.secondary,
+        tabBarStyle: {
+          height: 64, // h-16
+          backgroundColor: Platform.OS === 'web'
+            ? 'rgba(15, 21, 40, 0.8)' // Glass effect fallback for web
+            : colors.background.secondary,
+          borderTopWidth: 1,
+          borderTopColor: colors.border.light,
+          position: 'absolute',
+          paddingBottom: Platform.OS === 'ios' ? 20 : 8, // Safe area inset bottom
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '500',
+        },
+        tabBarBackground: () =>
+          Platform.OS === 'web' ? null : (
+            <BlurView
+              intensity={25}
+              tint="dark"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+              }}
+            />
+          ),
+        headerShown: false, // Hide headers for cleaner design
+      })}
+    >
+      <Tab.Screen
+        name="Sage"
+        component={SageScreenWithErrorBoundary}
+        options={{
+          tabBarLabel: 'Home',
+        }}
+      />
+      <Tab.Screen
+        name="MyCards"
+        component={MyCardsScreenWithErrorBoundary}
+        options={{
+          tabBarLabel: 'My Cards',
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        options={{
+          tabBarLabel: 'Settings',
+        }}
+      >
+        {() => <SettingsScreenWithErrorBoundary onSignOut={onSignOut} />}
+      </Tab.Screen>
+    </Tab.Navigator>
   );
 }
 
 export default function AppNavigator() {
   const theme = useTheme();
+  const [appState, setAppState] = useState<AppState>('loading');
+  const [user, setUser] = useState<AuthUser | null>(null);
+
+  // Initialize app state
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        // Initialize preferences
+        await initializePreferences();
+        
+        // Initialize subscription service
+        await initializeSubscription();
+        
+        // Check for existing user
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+        
+        if (currentUser) {
+          // User exists, check onboarding
+          const onboardingDone = isOnboardingComplete();
+          setAppState(onboardingDone ? 'main' : 'onboarding');
+        } else {
+          // No user, show auth
+          setAppState('auth');
+        }
+      } catch (error) {
+        console.error('Failed to initialize app:', error);
+        // Default to auth screen on error
+        setAppState('auth');
+      }
+    };
+
+    initializeApp();
+  }, []);
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChange((event, authUser) => {
+      if (event === 'SIGNED_IN' && authUser) {
+        setUser(authUser);
+        const onboardingDone = isOnboardingComplete();
+        setAppState(onboardingDone ? 'main' : 'onboarding');
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setAppState('auth');
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const handleAuthSuccess = useCallback(() => {
+    const onboardingDone = isOnboardingComplete();
+    setAppState(onboardingDone ? 'main' : 'onboarding');
+  }, []);
+
+  const handleOnboardingComplete = useCallback(() => {
+    setAppState('main');
+  }, []);
+
+  const handleSignOut = useCallback(() => {
+    setUser(null);
+    setAppState('auth');
+  }, []);
 
   // Create navigation theme based on app theme
   const navigationTheme = theme.isDark
@@ -130,69 +294,25 @@ export default function AppNavigator() {
         },
       };
 
+  // Show loading screen while initializing
+  if (appState === 'loading') {
+    return <LoadingScreen />;
+  }
+
+  // Show auth screen if not logged in
+  if (appState === 'auth') {
+    return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
+  }
+
+  // Show onboarding for new users
+  if (appState === 'onboarding') {
+    return <OnboardingScreen onComplete={handleOnboardingComplete} />;
+  }
+
+  // Main app with tabs
   return (
     <NavigationContainer theme={navigationTheme}>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon name={route.name} focused={focused} color={color} />
-          ),
-          tabBarActiveTintColor: colors.primary.main,
-          tabBarInactiveTintColor: colors.text.secondary,
-          tabBarStyle: {
-            height: 64, // h-16
-            backgroundColor: Platform.OS === 'web'
-              ? 'rgba(15, 21, 40, 0.8)' // Glass effect fallback for web
-              : colors.background.secondary,
-            borderTopWidth: 1,
-            borderTopColor: colors.border.light,
-            position: 'absolute',
-            paddingBottom: Platform.OS === 'ios' ? 20 : 8, // Safe area inset bottom
-            paddingTop: 8,
-          },
-          tabBarLabelStyle: {
-            fontSize: 11,
-            fontWeight: '500',
-          },
-          tabBarBackground: () =>
-            Platform.OS === 'web' ? null : (
-              <BlurView
-                intensity={25}
-                tint="dark"
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                }}
-              />
-            ),
-          headerShown: false, // Hide headers for cleaner design
-        })}
-      >
-        <Tab.Screen
-          name="Home"
-          component={HomeScreenWithErrorBoundary}
-          options={{
-            tabBarLabel: 'Home',
-          }}
-        />
-        <Tab.Screen
-          name="MyCards"
-          component={MyCardsScreenWithErrorBoundary}
-          options={{
-            tabBarLabel: 'My Cards',
-          }}
-        />
-        <Tab.Screen
-          name="Settings"
-          component={SettingsScreenWithErrorBoundary}
-          options={{
-            tabBarLabel: 'Settings',
-          }}
-        />
-      </Tab.Navigator>
+      <MainTabs onSignOut={handleSignOut} />
     </NavigationContainer>
   );
 }

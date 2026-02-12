@@ -1,6 +1,7 @@
 /**
  * SettingsScreen - User preferences and settings
  * Redesigned to match web with section grouping and lucide icons
+ * Now includes country selector and account management
  * Requirements: 5.1, 3.4
  */
 
@@ -15,7 +16,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { Bell, Globe, RefreshCw, Info } from 'lucide-react-native';
+import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, User, Crown } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -25,11 +26,19 @@ import {
   setNewCardSuggestionsEnabled,
   getLanguage,
   setLanguage,
+  getCountry,
+  setCountry,
+  getCountryFlag,
+  getCountryName,
   initializePreferences,
   Language,
+  Country,
 } from '../services/PreferenceManager';
-import { refreshCards, getLastSyncTime, getAllCards } from '../services/CardDataService';
+import { refreshCards, getLastSyncTime, getAllCards, onCountryChange } from '../services/CardDataService';
 import { isSupabaseConfigured } from '../services/supabase';
+import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
+import { getCurrentTier, SUBSCRIPTION_TIERS, SubscriptionTier } from '../services/SubscriptionService';
+import Paywall from '../components/Paywall';
 
 /**
  * Language options
@@ -38,6 +47,11 @@ const LANGUAGE_OPTIONS: Array<{ code: Language; labelKey: string; icon: string }
   { code: 'en', labelKey: 'languages.en', icon: '🇬🇧' },
   { code: 'fr', labelKey: 'languages.fr', icon: '🇫🇷' },
 ];
+
+/**
+ * Country options
+ */
+const COUNTRY_OPTIONS: Country[] = ['US', 'CA'];
 
 /**
  * Settings section header component
@@ -90,19 +104,36 @@ function SettingsRow({
   return content;
 }
 
-export default function SettingsScreen() {
+interface SettingsScreenProps {
+  onSignOut?: () => void;
+}
+
+export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
   const { t, i18n } = useTranslation();
   const [newCardSuggestions, setNewCardSuggestions] = useState(true);
   const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
+  const [currentCountry, setCurrentCountry] = useState<Country>('US');
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [cardCount, setCardCount] = useState<number>(0);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>('free');
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const loadPreferences = useCallback(async () => {
     await initializePreferences();
     setNewCardSuggestions(isNewCardSuggestionsEnabled());
     setCurrentLanguage(getLanguage());
+    setCurrentCountry(getCountry());
+
+    // Load user
+    const currentUser = await getCurrentUser();
+    setUser(currentUser);
+
+    // Load subscription tier
+    const tier = await getCurrentTier();
+    setSubscriptionTier(tier);
 
     // Load card count and last sync time
     try {
@@ -130,6 +161,38 @@ export default function SettingsScreen() {
     setCurrentLanguage(lang);
     await setLanguage(lang);
     i18n.changeLanguage(lang);
+  };
+
+  const handleCountryChange = async (country: Country) => {
+    if (country === currentCountry) return;
+    
+    // Show confirmation
+    Alert.alert(
+      t('settings.changeCountryTitle'),
+      t('settings.changeCountryMessage', { country: getCountryName(country) }),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.ok'),
+          onPress: async () => {
+            setIsLoading(true);
+            setCurrentCountry(country);
+            await setCountry(country);
+            await onCountryChange();
+            
+            // Reload cards for new country
+            try {
+              const cards = await getAllCards();
+              setCardCount(cards.length);
+            } catch {
+              setCardCount(0);
+            }
+            
+            setIsLoading(false);
+          },
+        },
+      ]
+    );
   };
 
   const handleRefreshCards = async () => {
@@ -161,6 +224,28 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleSignOut = async () => {
+    Alert.alert(
+      t('settings.signOutTitle'),
+      t('settings.signOutMessage'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('settings.signOut'),
+          style: 'destructive',
+          onPress: async () => {
+            await signOut();
+            onSignOut?.();
+          },
+        },
+      ]
+    );
+  };
+
+  const handleUpgrade = () => {
+    setShowPaywall(true);
+  };
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -173,99 +258,171 @@ export default function SettingsScreen() {
     return lang === 'en' ? 'English' : 'Français';
   };
 
+  const tierConfig = SUBSCRIPTION_TIERS[subscriptionTier];
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>{t('settings.title') || 'Settings'}</Text>
-        <Text style={styles.subtitle}>Customize your experience</Text>
-      </View>
+    <>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>{t('settings.title') || 'Settings'}</Text>
+          <Text style={styles.subtitle}>{t('settings.customizeExperience')}</Text>
+        </View>
 
-      {/* Preferences Section */}
-      <SectionHeader title="PREFERENCES" />
-      <View style={styles.section}>
-        <SettingsRow
-          icon={<Bell size={20} color={colors.text.secondary} />}
-          title={t('settings.newCardSuggestions')}
-          description={t('settings.newCardSuggestionsDescription')}
-          isLast={false}
-        >
-          <Switch
-            value={newCardSuggestions}
-            onValueChange={handleNewCardSuggestionsChange}
-            trackColor={{ false: colors.border.light, true: colors.success.main }}
-            thumbColor={colors.background.secondary}
-            accessibilityLabel={t('settings.newCardSuggestions')}
-            accessibilityRole="switch"
-          />
-        </SettingsRow>
+        {/* Account Section */}
+        {user && (
+          <>
+            <SectionHeader title={t('settings.account')} />
+            <View style={styles.section}>
+              <SettingsRow
+                icon={<User size={20} color={colors.text.secondary} />}
+                title={user.displayName || user.email || t('settings.guest')}
+                description={user.isAnonymous ? t('settings.guestMode') : user.email || undefined}
+                isLast={false}
+              >
+                {!user.isAnonymous && (
+                  <TouchableOpacity onPress={handleSignOut}>
+                    <LogOut size={20} color={colors.error.main} />
+                  </TouchableOpacity>
+                )}
+              </SettingsRow>
 
-        <SettingsRow
-          icon={<Globe size={20} color={colors.text.secondary} />}
-          title={t('settings.language')}
-          description="Choose your preferred language"
-          isLast={true}
-          onPress={() => {
-            // Toggle language for now (can be enhanced to a modal)
-            const newLang = currentLanguage === 'en' ? 'fr' : 'en';
-            handleLanguageChange(newLang);
-          }}
-        >
-          <Text style={styles.languageValue}>{getLanguageLabel(currentLanguage)}</Text>
-        </SettingsRow>
-      </View>
+              <SettingsRow
+                icon={<Crown size={20} color={tierConfig.id === 'free' ? colors.text.secondary : colors.primary.main} />}
+                title={t('settings.subscription')}
+                description={tierConfig.name}
+                isLast={true}
+                onPress={subscriptionTier === 'free' ? handleUpgrade : undefined}
+              >
+                {subscriptionTier === 'free' && (
+                  <Text style={styles.upgradeText}>{t('settings.upgrade')}</Text>
+                )}
+              </SettingsRow>
+            </View>
+          </>
+        )}
 
-      {/* Data Section */}
-      <SectionHeader title="DATA" />
-      <View style={styles.section}>
-        <SettingsRow
-          icon={
-            <RefreshCw
-              size={20}
-              color={colors.text.secondary}
-              style={isRefreshing ? { transform: [{ rotate: '180deg' }] } : undefined}
+        {/* Region Section */}
+        <SectionHeader title={t('settings.region')} />
+        <View style={styles.section}>
+          <SettingsRow
+            icon={<MapPin size={20} color={colors.text.secondary} />}
+            title={t('settings.country')}
+            description={t('settings.countryDescription')}
+            isLast={true}
+          >
+            <View style={styles.countryToggle}>
+              {COUNTRY_OPTIONS.map((country) => (
+                <TouchableOpacity
+                  key={country}
+                  style={[
+                    styles.countryOption,
+                    currentCountry === country && styles.countryOptionActive,
+                  ]}
+                  onPress={() => handleCountryChange(country)}
+                >
+                  <Text style={styles.countryFlag}>{getCountryFlag(country)}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </SettingsRow>
+        </View>
+
+        {/* Preferences Section */}
+        <SectionHeader title={t('settings.preferences')} />
+        <View style={styles.section}>
+          <SettingsRow
+            icon={<Bell size={20} color={colors.text.secondary} />}
+            title={t('settings.newCardSuggestions')}
+            description={t('settings.newCardSuggestionsDescription')}
+            isLast={false}
+          >
+            <Switch
+              value={newCardSuggestions}
+              onValueChange={handleNewCardSuggestionsChange}
+              trackColor={{ false: colors.border.light, true: colors.success.main }}
+              thumbColor={colors.background.secondary}
+              accessibilityLabel={t('settings.newCardSuggestions')}
+              accessibilityRole="switch"
             />
-          }
-          title={t('settings.refreshCards')}
-          description="Refresh card data from server"
-          isLast={true}
-          onPress={isRefreshing ? undefined : handleRefreshCards}
-        >
-          {isRefreshing ? (
-            <ActivityIndicator size="small" color={colors.primary.main} />
-          ) : (
-            <Text style={styles.syncButtonText}>Sync Now</Text>
-          )}
-        </SettingsRow>
-      </View>
+          </SettingsRow>
 
-      {/* About Section */}
-      <SectionHeader title="ABOUT" />
-      <View style={styles.section}>
-        <SettingsRow
-          icon={<Info size={20} color={colors.text.secondary} />}
-          title="App Version"
-          description="Rewards Optimizer"
-          isLast={false}
-        >
-          <Text style={styles.aboutValue}>1.0.0</Text>
-        </SettingsRow>
+          <SettingsRow
+            icon={<Globe size={20} color={colors.text.secondary} />}
+            title={t('settings.language')}
+            description={t('settings.languageDescription')}
+            isLast={true}
+            onPress={() => {
+              // Toggle language for now (can be enhanced to a modal)
+              const newLang = currentLanguage === 'en' ? 'fr' : 'en';
+              handleLanguageChange(newLang);
+            }}
+          >
+            <Text style={styles.languageValue}>{getLanguageLabel(currentLanguage)}</Text>
+          </SettingsRow>
+        </View>
 
-        <SettingsRow
-          icon={<Info size={20} color={colors.text.secondary} />}
-          title={t('settings.cardsInDatabase')}
-          description={lastSync ? `Last synced: ${lastSync.toLocaleDateString()}` : undefined}
-          isLast={true}
-        >
-          <Text style={styles.aboutValue}>{cardCount}</Text>
-        </SettingsRow>
-      </View>
+        {/* Data Section */}
+        <SectionHeader title={t('settings.data')} />
+        <View style={styles.section}>
+          <SettingsRow
+            icon={
+              <RefreshCw
+                size={20}
+                color={colors.text.secondary}
+                style={isRefreshing ? { transform: [{ rotate: '180deg' }] } : undefined}
+              />
+            }
+            title={t('settings.refreshCards')}
+            description={t('settings.refreshCardsDescription')}
+            isLast={true}
+            onPress={isRefreshing ? undefined : handleRefreshCards}
+          >
+            {isRefreshing ? (
+              <ActivityIndicator size="small" color={colors.primary.main} />
+            ) : (
+              <Text style={styles.syncButtonText}>{t('settings.syncNow')}</Text>
+            )}
+          </SettingsRow>
+        </View>
 
-      {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Made with 💳 for smart spenders</Text>
-      </View>
-    </ScrollView>
+        {/* About Section */}
+        <SectionHeader title={t('settings.about')} />
+        <View style={styles.section}>
+          <SettingsRow
+            icon={<Info size={20} color={colors.text.secondary} />}
+            title={t('settings.appVersion')}
+            description="Rewardly"
+            isLast={false}
+          >
+            <Text style={styles.aboutValue}>1.0.0</Text>
+          </SettingsRow>
+
+          <SettingsRow
+            icon={<Info size={20} color={colors.text.secondary} />}
+            title={t('settings.cardsInDatabase')}
+            description={lastSync ? `${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}` : undefined}
+            isLast={true}
+          >
+            <Text style={styles.aboutValue}>{cardCount}</Text>
+          </SettingsRow>
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>{t('settings.footerText')}</Text>
+        </View>
+      </ScrollView>
+
+      {/* Paywall Modal */}
+      <Paywall
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onSubscribe={async (tier) => {
+          setSubscriptionTier(tier);
+        }}
+      />
+    </>
   );
 }
 
@@ -356,6 +513,25 @@ const styles = StyleSheet.create({
   settingsRowAction: {
     flexShrink: 0,
   },
+  // Country toggle
+  countryToggle: {
+    flexDirection: 'row',
+    backgroundColor: colors.background.primary,
+    borderRadius: borderRadius.md,
+    padding: 4,
+    gap: 4,
+  },
+  countryOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: borderRadius.sm,
+  },
+  countryOptionActive: {
+    backgroundColor: colors.primary.bg20,
+  },
+  countryFlag: {
+    fontSize: 20,
+  },
   // Language value
   languageValue: {
     fontSize: 13,
@@ -371,6 +547,12 @@ const styles = StyleSheet.create({
   aboutValue: {
     fontSize: 13,
     color: colors.text.secondary,
+  },
+  // Upgrade
+  upgradeText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.primary.main,
   },
   // Footer
   footer: {
