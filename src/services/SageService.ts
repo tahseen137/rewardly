@@ -69,9 +69,9 @@ export const QUICK_ACTIONS = [
   { id: 'dining', label: 'Best card for dining', message: 'What\'s my best card for dining and restaurants?' },
   { id: 'groceries', label: 'Best card for groceries', message: 'Which card should I use for grocery shopping?' },
   { id: 'travel', label: 'Best card for travel', message: 'What\'s the best card in my wallet for travel purchases?' },
-  { id: 'compare', label: 'Compare my cards', message: 'Can you compare my cards and tell me which one is best overall?' },
+  { id: 'compare', label: 'Compare my cards', message: 'Compare all my cards side-by-side and show me which is best for each category.' },
+  { id: 'compare_two', label: 'Compare two cards', message: 'Compare my Cobalt vs Gold card - which one is better overall?' },
   { id: 'redeem', label: 'How to redeem points', message: 'What\'s the best way to redeem my points for maximum value?' },
-  { id: 'trip', label: 'Plan a trip', message: 'I want to plan a trip using my points. Can you help me figure out the best options?' },
 ] as const;
 
 // ============================================================================
