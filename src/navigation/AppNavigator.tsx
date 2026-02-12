@@ -27,6 +27,7 @@ import {
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
+import PremiumOnboardingScreen from '../screens/PremiumOnboardingScreen';
 import { ErrorBoundary } from '../components';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
@@ -399,7 +400,7 @@ export default function AppNavigator() {
 
   // Show onboarding for new users
   if (appState === 'onboarding') {
-    return <OnboardingScreen onComplete={handleOnboardingComplete} />;
+    return <PremiumOnboardingScreen onComplete={handleOnboardingComplete} />;
   }
 
   // Main app with tabs
