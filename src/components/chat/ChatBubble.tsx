@@ -26,50 +26,133 @@ export interface ChatBubbleProps {
 }
 
 /**
+ * Parse markdown table into structured data
+ */
+function parseTable(lines: string[], startIndex: number): { table: string[][], endIndex: number } | null {
+  const rows: string[][] = [];
+  let i = startIndex;
+  
+  // Must have at least header row + separator + data row
+  if (i + 2 >= lines.length) return null;
+  
+  // Check if this looks like a table (has | characters)
+  if (!lines[i].includes('|')) return null;
+  
+  // Parse header row
+  const headerCells = lines[i].split('|').map(c => c.trim()).filter(c => c);
+  if (headerCells.length < 2) return null;
+  rows.push(headerCells);
+  i++;
+  
+  // Skip separator row (|---|---|)
+  if (!lines[i]?.match(/^\|?[\s\-:|]+\|?$/)) return null;
+  i++;
+  
+  // Parse data rows
+  while (i < lines.length && lines[i].includes('|')) {
+    const cells = lines[i].split('|').map(c => c.trim()).filter(c => c);
+    if (cells.length > 0) {
+      rows.push(cells);
+    }
+    i++;
+  }
+  
+  return { table: rows, endIndex: i - 1 };
+}
+
+/**
+ * Render a table as React Native views
+ */
+function renderTable(table: string[][], key: string): React.ReactNode {
+  const headers = table[0];
+  const dataRows = table.slice(1);
+  
+  return (
+    <View key={key} style={styles.tableContainer}>
+      {/* Header row */}
+      <View style={styles.tableHeaderRow}>
+        {headers.map((header, colIndex) => (
+          <View key={`h-${colIndex}`} style={[styles.tableCell, styles.tableHeaderCell, colIndex === 0 && styles.tableCellFirst]}>
+            <Text style={styles.tableHeaderText}>{header}</Text>
+          </View>
+        ))}
+      </View>
+      
+      {/* Data rows */}
+      {dataRows.map((row, rowIndex) => (
+        <View key={`r-${rowIndex}`} style={[styles.tableRow, rowIndex % 2 === 1 && styles.tableRowAlt]}>
+          {row.map((cell, colIndex) => (
+            <View key={`c-${colIndex}`} style={[styles.tableCell, colIndex === 0 && styles.tableCellFirst]}>
+              <Text style={styles.tableCellText}>{cell}</Text>
+            </View>
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/**
  * Parse simple markdown-like formatting in messages
  */
 function parseMessage(text: string): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
   const lines = text.split('\n');
   
-  lines.forEach((line, lineIndex) => {
-    if (lineIndex > 0) {
-      parts.push(<Text key={`br-${lineIndex}`}>{'\n'}</Text>);
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    
+    // Add line break if not first element
+    if (parts.length > 0 && i > 0) {
+      parts.push(<Text key={`br-${i}`}>{'\n'}</Text>);
+    }
+    
+    // Try to parse table
+    if (line.includes('|') && line.trim().startsWith('|')) {
+      const tableResult = parseTable(lines, i);
+      if (tableResult && tableResult.table.length >= 2) {
+        parts.push(renderTable(tableResult.table, `table-${i}`));
+        i = tableResult.endIndex + 1;
+        continue;
+      }
     }
     
     // Handle headers (##)
     if (line.startsWith('## ')) {
       parts.push(
-        <Text key={`h2-${lineIndex}`} style={styles.header}>
+        <Text key={`h2-${i}`} style={styles.header}>
           {line.slice(3)}
         </Text>
       );
-      return;
+      i++;
+      continue;
     }
     
     // Handle bullet points
     if (line.startsWith('• ') || line.startsWith('- ')) {
       parts.push(
-        <Text key={`bullet-${lineIndex}`} style={styles.bulletPoint}>
+        <Text key={`bullet-${i}`} style={styles.bulletPoint}>
           {'  • '}{line.slice(2)}
         </Text>
       );
-      return;
+      i++;
+      continue;
     }
     
     // Handle numbered lists
     const numberedMatch = line.match(/^(\d+)\.\s/);
     if (numberedMatch) {
       parts.push(
-        <Text key={`num-${lineIndex}`} style={styles.bulletPoint}>
+        <Text key={`num-${i}`} style={styles.bulletPoint}>
           {'  '}{line}
         </Text>
       );
-      return;
+      i++;
+      continue;
     }
     
     // Handle bold (**text**)
-    let processed = line;
     const boldRegex = /\*\*([^*]+)\*\*/g;
     let lastIndex = 0;
     let match;
@@ -80,7 +163,7 @@ function parseMessage(text: string): React.ReactNode[] {
         lineParts.push(line.slice(lastIndex, match.index));
       }
       lineParts.push(
-        <Text key={`bold-${lineIndex}-${match.index}`} style={styles.bold}>
+        <Text key={`bold-${i}-${match.index}`} style={styles.bold}>
           {match[1]}
         </Text>
       );
@@ -92,12 +175,14 @@ function parseMessage(text: string): React.ReactNode[] {
         lineParts.push(line.slice(lastIndex));
       }
       parts.push(
-        <Text key={`line-${lineIndex}`}>{lineParts}</Text>
+        <Text key={`line-${i}`}>{lineParts}</Text>
       );
     } else {
-      parts.push(processed);
+      parts.push(line);
     }
-  });
+    
+    i++;
+  }
   
   return parts;
 }
@@ -286,6 +371,50 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     marginHorizontal: 2,
+  },
+  
+  // Table styles for card comparisons
+  tableContainer: {
+    marginVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    overflow: 'hidden',
+  },
+  tableHeaderRow: {
+    flexDirection: 'row',
+    backgroundColor: colors.primary.main + '15',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
+  },
+  tableRowAlt: {
+    backgroundColor: colors.background.tertiary + '30',
+  },
+  tableCell: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+  },
+  tableCellFirst: {
+    flex: 1.5,
+  },
+  tableHeaderCell: {
+    paddingVertical: 10,
+  },
+  tableHeaderText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.text.primary,
+  },
+  tableCellText: {
+    fontSize: 12,
+    color: colors.text.secondary,
   },
 });
 

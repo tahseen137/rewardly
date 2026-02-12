@@ -166,9 +166,18 @@ class SageServiceClass {
       subscriptionTier: 'free',
     };
     
-    // Get session for auth
+    // Get session for auth - MUST have valid user session
     const { data: { session } } = await supabase?.auth.getSession() || { data: { session: null } };
-    const token = session?.access_token || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (!session?.access_token) {
+      throw {
+        code: 'AUTH_ERROR' as const,
+        message: 'Please sign in to use Sage',
+        retryable: false
+      } as SageError;
+    }
+    
+    const token = session.access_token;
 
     // Get conversation history (last 10 messages)
     const history = this.conversationHistory.get(convId) || [];
