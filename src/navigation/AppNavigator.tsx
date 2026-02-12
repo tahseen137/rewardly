@@ -2,17 +2,29 @@
  * AppNavigator - Main navigation structure with auth handling
  * Shows AuthScreen if not logged in, OnboardingScreen for new users
  * Then bottom tabs with glass morphism effect and lucide icons
+ * 
+ * MEGA BUILD UPDATE: Added Insights tab with MissedRewards, RewardsIQ, PortfolioOptimizer
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform, View, ActivityIndicator, StyleSheet } from 'react-native';
-import { Home, CreditCard, Settings, Calculator, Navigation } from 'lucide-react-native';
+import { Home, CreditCard, Settings, TrendingUp, Navigation, BarChart3 } from 'lucide-react-native';
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 
-import { MyCardsScreen, SettingsScreen, SageScreen, PointsCalculatorScreen, AutoPilotScreen } from '../screens';
+import { 
+  MyCardsScreen, 
+  SettingsScreen, 
+  SageScreen, 
+  AutoPilotScreen,
+  InsightsHomeScreen,
+  MissedRewardsScreen,
+  RewardsIQScreen,
+  PortfolioOptimizerScreen,
+} from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import { ErrorBoundary } from '../components';
@@ -23,9 +35,17 @@ import { isOnboardingComplete, initializePreferences } from '../services/Prefere
 import { initializeSubscription } from '../services/SubscriptionService';
 import { initializeAutoPilot } from '../services/AutoPilotService';
 
+// Stack navigator for Insights screens
+export type InsightsStackParamList = {
+  InsightsHome: undefined;
+  MissedRewards: undefined;
+  RewardsIQ: undefined;
+  PortfolioOptimizer: undefined;
+};
+
 export type RootTabParamList = {
   Sage: undefined;
-  Points: undefined;
+  Insights: undefined;
   AutoPilot: undefined;
   MyCards: undefined;
   Settings: undefined;
@@ -34,6 +54,42 @@ export type RootTabParamList = {
 type AppState = 'loading' | 'auth' | 'onboarding' | 'main';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
+const InsightsStack = createNativeStackNavigator<InsightsStackParamList>();
+
+/**
+ * Insights Stack Navigator - Contains InsightsHome, MissedRewards, RewardsIQ, PortfolioOptimizer
+ */
+function InsightsNavigator() {
+  return (
+    <InsightsStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: colors.background.primary },
+      }}
+      initialRouteName="InsightsHome"
+    >
+      <InsightsStack.Screen 
+        name="InsightsHome" 
+        component={InsightsHomeScreen}
+      />
+      <InsightsStack.Screen 
+        name="MissedRewards" 
+        component={MissedRewardsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="RewardsIQ" 
+        component={RewardsIQScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="PortfolioOptimizer" 
+        component={PortfolioOptimizerScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+    </InsightsStack.Navigator>
+  );
+}
 
 /**
  * Tab icon component using lucide-react-native with scale animation
@@ -60,8 +116,8 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
     case 'Sage':
       IconComponent = Home;
       break;
-    case 'Points':
-      IconComponent = Calculator;
+    case 'Insights':
+      IconComponent = BarChart3;
       break;
     case 'AutoPilot':
       IconComponent = Navigation;
@@ -204,10 +260,10 @@ function MainTabs({ onSignOut }: { onSignOut: () => void }) {
         }}
       />
       <Tab.Screen
-        name="Points"
-        component={PointsCalculatorScreen}
+        name="Insights"
+        component={InsightsNavigator}
         options={{
-          tabBarLabel: 'Points',
+          tabBarLabel: 'Insights',
         }}
       />
       <Tab.Screen

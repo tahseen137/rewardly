@@ -67,3 +67,7 @@ export { default as Paywall } from './Paywall';
 
 // AutoPilot Components
 export { default as AutoPilotNotificationCard } from './AutoPilotNotificationCard';
+
+// Tier 1 - Mega Build Widgets
+export { default as RewardsIQWidget } from './RewardsIQWidget';
+export { default as MissedRewardsWidget } from './MissedRewardsWidget';
