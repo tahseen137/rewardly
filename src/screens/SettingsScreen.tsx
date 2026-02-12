@@ -16,7 +16,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, User, Crown } from 'lucide-react-native';
+import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, User, Crown, Navigation } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -39,6 +39,14 @@ import { isSupabaseConfigured } from '../services/supabase';
 import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
 import { getCurrentTier, SUBSCRIPTION_TIERS, SubscriptionTier } from '../services/SubscriptionService';
 import Paywall from '../components/Paywall';
+import {
+  isAutoPilotEnabled,
+  enableAutoPilot,
+  disableAutoPilot,
+  getAutoPilotStatus,
+  initializeAutoPilot,
+  AutoPilotStatus,
+} from '../services/AutoPilotService';
 
 /**
  * Language options
@@ -120,6 +128,7 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>('free');
   const [showPaywall, setShowPaywall] = useState(false);
+  const [autoPilotStatus, setAutoPilotStatus] = useState<AutoPilotStatus | null>(null);
 
   const loadPreferences = useCallback(async () => {
     await initializePreferences();
@@ -144,6 +153,11 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
     }
     const syncTime = await getLastSyncTime();
     setLastSync(syncTime);
+
+    // Load AutoPilot status
+    await initializeAutoPilot();
+    const apStatus = await getAutoPilotStatus();
+    setAutoPilotStatus(apStatus);
 
     setIsLoading(false);
   }, []);
@@ -244,6 +258,24 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
 
   const handleUpgrade = () => {
     setShowPaywall(true);
+  };
+
+  const handleAutoPilotToggle = async (enabled: boolean) => {
+    if (enabled) {
+      const success = await enableAutoPilot();
+      if (!success) {
+        Alert.alert(
+          t('settings.autoPilotPermissionTitle') || 'Permission Required',
+          t('settings.autoPilotPermissionMessage') || 'AutoPilot needs location and notification permissions to work. Please enable them in your device settings.',
+          [{ text: t('common.ok') || 'OK' }]
+        );
+        return;
+      }
+    } else {
+      await disableAutoPilot();
+    }
+    const status = await getAutoPilotStatus();
+    setAutoPilotStatus(status);
   };
 
   if (isLoading) {
@@ -359,6 +391,30 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
             }}
           >
             <Text style={styles.languageValue}>{getLanguageLabel(currentLanguage)}</Text>
+          </SettingsRow>
+        </View>
+
+        {/* AutoPilot Section */}
+        <SectionHeader title={t('settings.autoPilot') || 'AutoPilot'} />
+        <View style={styles.section}>
+          <SettingsRow
+            icon={<Navigation size={20} color={autoPilotStatus?.enabled ? colors.primary.main : colors.text.secondary} />}
+            title={t('settings.autoPilotEnabled') || 'Enable AutoPilot'}
+            description={
+              autoPilotStatus?.enabled
+                ? (t('settings.autoPilotActiveDescription') || `Monitoring ${autoPilotStatus.activeGeofences} stores`)
+                : (t('settings.autoPilotDescription') || 'Get card alerts when you arrive at stores')
+            }
+            isLast={true}
+          >
+            <Switch
+              value={autoPilotStatus?.enabled || false}
+              onValueChange={handleAutoPilotToggle}
+              trackColor={{ false: colors.border.light, true: colors.success.main }}
+              thumbColor={colors.background.secondary}
+              accessibilityLabel={t('settings.autoPilotEnabled') || 'Enable AutoPilot'}
+              accessibilityRole="switch"
+            />
           </SettingsRow>
         </View>
 

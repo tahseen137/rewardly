@@ -64,3 +64,6 @@ export type { ChatBubbleProps, ChatInputProps, QuickActionsProps, QuickAction, C
 
 // Subscription Components
 export { default as Paywall } from './Paywall';
+
+// AutoPilot Components
+export { default as AutoPilotNotificationCard } from './AutoPilotNotificationCard';
