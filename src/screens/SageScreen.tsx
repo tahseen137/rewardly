@@ -10,7 +10,6 @@ import {
   View,
   FlatList,
   StyleSheet,
-  SafeAreaView,
   Text,
   TouchableOpacity,
   ActivityIndicator,
@@ -18,8 +17,9 @@ import {
   ListRenderItem,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
-import { MessageCircle, Plus, History, Sparkles } from 'lucide-react-native';
+import { MessageCircle, Plus, History, Sparkles, LogIn } from 'lucide-react-native';
 
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
@@ -41,6 +41,7 @@ import {
 import { getCards } from '../services/CardPortfolioManager';
 import { getPreferences } from '../services/PreferenceManager';
 import { getCardByIdSync } from '../services/CardDataService';
+import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
 import { UserPreferences, Card } from '../types';
 
 // ============================================================================
@@ -166,6 +167,18 @@ export const SageScreen: React.FC = () => {
   const [portfolio, setPortfolio] = useState<ReturnType<typeof getCards>>([]);
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [authCheckLoading, setAuthCheckLoading] = useState(true);
+  
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await getCurrentUser();
+      setCurrentUser(user);
+      setAuthCheckLoading(false);
+    };
+    checkAuth();
+  }, []);
   
   // Load user data
   useEffect(() => {
@@ -320,6 +333,13 @@ export const SageScreen: React.FC = () => {
     console.log('Learn more about card:', cardId);
   }, []);
   
+  // Handle sign in navigation
+  const handleSignIn = useCallback(async () => {
+    // Sign out current guest session to trigger auth flow
+    await signOut();
+    // The app navigator will detect the sign out and show AuthScreen
+  }, []);
+  
   // Render message item
   const renderMessage: ListRenderItem<DisplayMessage> = useCallback(({ item, index }) => {
     const showTimestamp = index === 0 || 
@@ -398,6 +418,60 @@ export const SageScreen: React.FC = () => {
             </View>
           }
         />
+      </SafeAreaView>
+    );
+  }
+  
+  // Show loading state while checking auth
+  if (authCheckLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary.main} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+  
+  // Show sign-in overlay if user is not authenticated or is a guest
+  const isAuthenticated = currentUser && !currentUser.isAnonymous;
+  
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerButton} />
+          <View style={styles.headerTitleContainer}>
+            <Sparkles size={18} color={colors.primary.main} />
+            <Text style={styles.headerTitle}>Sage</Text>
+          </View>
+          <View style={styles.headerButton} />
+        </View>
+        
+        {/* Sign-in overlay */}
+        <View style={styles.authOverlay}>
+          <View style={styles.authOverlayContent}>
+            <View style={styles.authIcon}>
+              <LogIn size={48} color={colors.primary.main} />
+            </View>
+            <Text style={styles.authTitle}>Sign In to Chat with Sage</Text>
+            <Text style={styles.authSubtitle}>
+              Create an account or sign in to get personalized credit card advice from your AI rewards advisor.
+            </Text>
+            <TouchableOpacity
+              style={styles.signInButton}
+              onPress={handleSignIn}
+              activeOpacity={0.8}
+            >
+              <LogIn size={20} color={colors.background.primary} />
+              <Text style={styles.signInButtonText}>Sign In or Create Account</Text>
+            </TouchableOpacity>
+            <Text style={styles.authFooter}>
+              Free to use • Personalized recommendations • Secure & private
+            </Text>
+          </View>
+        </View>
       </SafeAreaView>
     );
   }
@@ -664,6 +738,70 @@ const styles = StyleSheet.create({
   emptyHistoryText: {
     fontSize: 15,
     color: colors.text.tertiary,
+  },
+  
+  // Auth overlay styles
+  authOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  authOverlayContent: {
+    alignItems: 'center',
+    maxWidth: 400,
+  },
+  authIcon: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: colors.primary.main + '20',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  authTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text.primary,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  authSubtitle: {
+    fontSize: 15,
+    color: colors.text.secondary,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 32,
+    paddingHorizontal: 20,
+  },
+  signInButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary.main,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    minHeight: 56,
+    gap: 10,
+    shadowColor: colors.primary.main,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  signInButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.background.primary,
+  },
+  authFooter: {
+    fontSize: 13,
+    color: colors.text.tertiary,
+    textAlign: 'center',
+    marginTop: 24,
+    lineHeight: 18,
   },
 });
 

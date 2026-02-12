@@ -524,9 +524,11 @@ const styles = StyleSheet.create({
   },
   filterChip: {
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderRadius: 20,
     backgroundColor: colors.background.tertiary,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   filterChipActive: {
     backgroundColor: colors.primary.main + '20',
@@ -642,7 +644,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   closeButton: {
-    padding: 4,
+    padding: 10,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalContent: {
     flex: 1,
