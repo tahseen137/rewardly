@@ -74,3 +74,7 @@ export { default as MissedRewardsWidget } from './MissedRewardsWidget';
 
 // Tier 2 - Social Sharing
 export { default as SocialShareCard } from './SocialShareCard';
+
+// Tier 3 - Polish & Animations
+export { default as AnimatedNumber, AnimatedCurrency, AnimatedPoints, AnimatedPercent } from './AnimatedNumber';
+export { default as ConfettiAnimation } from './ConfettiAnimation';
