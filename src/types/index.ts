@@ -106,6 +106,9 @@ export interface RedemptionOption {
 export interface UserCard {
   cardId: string; // Reference to Card.id
   addedAt: Date;
+  pointBalance?: number; // User's current point balance for this card
+  balanceUpdatedAt?: Date; // When the balance was last updated
+  nickname?: string; // Optional nickname for the card
 }
 
 /**

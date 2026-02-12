@@ -25,7 +25,7 @@ import Animated, {
   withSpring,
   runOnJS,
 } from 'react-native-reanimated';
-import { Plus, Search, Trash2, ChevronRight, X } from 'lucide-react-native';
+import { Plus, Search, Trash2, ChevronRight, X, Wallet, TrendingUp, Edit3 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme, Theme } from '../theme';
 import { colors } from '../theme/colors';
@@ -36,6 +36,7 @@ import {
   addCard,
   removeCard,
   initializePortfolio,
+  updatePointBalance,
 } from '../services/CardPortfolioManager';
 import { getAllCards, searchCards, getCardByIdSync } from '../services/CardDataService';
 
@@ -46,14 +47,136 @@ function formatRewardRate(value: number, type: RewardType, unit: 'percent' | 'mu
   return `${value}x ${type.replace('_', ' ')}`;
 }
 
+function formatNumber(num: number): string {
+  return new Intl.NumberFormat('en-US').format(num);
+}
+
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  }).format(amount);
+}
+
+// Portfolio Summary Component
+function PortfolioSummary({ portfolio }: { portfolio: UserCard[] }) {
+  const totalPoints = portfolio.reduce((sum, uc) => sum + (uc.pointBalance || 0), 0);
+  
+  // Calculate estimated value (rough estimate using 1.5 cents average)
+  const estimatedValue = totalPoints * 0.015;
+  
+  const cardsWithBalance = portfolio.filter(uc => uc.pointBalance && uc.pointBalance > 0).length;
+  
+  if (totalPoints === 0) return null;
+  
+  return (
+    <View style={summaryStyles.container}>
+      <LinearGradient
+        colors={[colors.primary.main + '20', colors.accent.main + '15']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={summaryStyles.gradient}
+      >
+        <View style={summaryStyles.content}>
+          <View style={summaryStyles.iconContainer}>
+            <Wallet size={24} color={colors.primary.main} />
+          </View>
+          <View style={summaryStyles.stats}>
+            <Text style={summaryStyles.pointsValue}>{formatNumber(totalPoints)}</Text>
+            <Text style={summaryStyles.pointsLabel}>Total Points</Text>
+          </View>
+          <View style={summaryStyles.divider} />
+          <View style={summaryStyles.stats}>
+            <View style={summaryStyles.valueRow}>
+              <TrendingUp size={14} color={colors.primary.main} />
+              <Text style={summaryStyles.estimatedValue}>{formatCurrency(estimatedValue)}</Text>
+            </View>
+            <Text style={summaryStyles.valueLabel}>Est. Value</Text>
+          </View>
+        </View>
+        <Text style={summaryStyles.footer}>
+          {cardsWithBalance} card{cardsWithBalance !== 1 ? 's' : ''} with tracked balances
+        </Text>
+      </LinearGradient>
+    </View>
+  );
+}
+
+const summaryStyles = StyleSheet.create({
+  container: {
+    marginBottom: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  gradient: {
+    padding: 16,
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: colors.primary.main + '20',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  stats: {
+    flex: 1,
+  },
+  pointsValue: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: colors.text.primary,
+  },
+  pointsLabel: {
+    fontSize: 12,
+    color: colors.text.secondary,
+    marginTop: 2,
+  },
+  divider: {
+    width: 1,
+    height: 36,
+    backgroundColor: colors.border.light,
+    marginHorizontal: 12,
+  },
+  valueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  estimatedValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.primary.main,
+  },
+  valueLabel: {
+    fontSize: 12,
+    color: colors.text.secondary,
+    marginTop: 2,
+  },
+  footer: {
+    fontSize: 11,
+    color: colors.text.tertiary,
+    marginTop: 12,
+    textAlign: 'center',
+  },
+});
+
 function CardItem({
   userCard,
   onRemove,
   onViewDetails,
+  onUpdateBalance,
 }: {
   userCard: UserCard;
   onRemove: (cardId: string) => void;
   onViewDetails: (card: Card) => void;
+  onUpdateBalance: (cardId: string, currentBalance?: number) => void;
 }) {
   const card = getCardByIdSync(userCard.cardId);
 
@@ -114,6 +237,25 @@ function CardItem({
         <Text style={styles.cardMeta}>
           {card.issuer} • {formatAnnualFee(card.annualFee)}
         </Text>
+        {/* Point Balance Display */}
+        {userCard.pointBalance !== undefined && userCard.pointBalance > 0 ? (
+          <View style={styles.balanceRow}>
+            <Wallet size={12} color={colors.primary.main} />
+            <Text style={styles.balanceText}>
+              {formatNumber(userCard.pointBalance)} pts
+            </Text>
+          </View>
+        ) : null}
+      </TouchableOpacity>
+
+      {/* Balance Edit Button */}
+      <TouchableOpacity
+        style={styles.balanceEditButton}
+        onPress={() => onUpdateBalance(card.id, userCard.pointBalance)}
+        accessibilityLabel={`Edit balance for ${card.name}`}
+        accessibilityRole="button"
+      >
+        <Edit3 size={16} color={colors.text.tertiary} />
       </TouchableOpacity>
 
       {/* Delete Button */}
@@ -142,7 +284,7 @@ function CardItem({
   }
 
   // Native implementation with gesture handler
-  return <CardItemWithGesture userCard={userCard} onRemove={onRemove} onViewDetails={onViewDetails} card={card} />;
+  return <CardItemWithGesture userCard={userCard} onRemove={onRemove} onViewDetails={onViewDetails} onUpdateBalance={onUpdateBalance} card={card} />;
 }
 
 // Native-only component with gesture handler
@@ -150,11 +292,13 @@ function CardItemWithGesture({
   userCard,
   onRemove,
   onViewDetails,
+  onUpdateBalance,
   card,
 }: {
   userCard: UserCard;
   onRemove: (cardId: string) => void;
   onViewDetails: (card: Card) => void;
+  onUpdateBalance: (cardId: string, currentBalance?: number) => void;
   card: Card;
 }) {
   const translateX = useSharedValue(0);
@@ -209,6 +353,25 @@ function CardItemWithGesture({
             <Text style={styles.cardMeta}>
               {card.issuer} • {formatAnnualFee(card.annualFee)}
             </Text>
+            {/* Point Balance Display */}
+            {userCard.pointBalance !== undefined && userCard.pointBalance > 0 ? (
+              <View style={styles.balanceRow}>
+                <Wallet size={12} color={colors.primary.main} />
+                <Text style={styles.balanceText}>
+                  {formatNumber(userCard.pointBalance)} pts
+                </Text>
+              </View>
+            ) : null}
+          </TouchableOpacity>
+
+          {/* Balance Edit Button */}
+          <TouchableOpacity
+            style={styles.balanceEditButton}
+            onPress={() => onUpdateBalance(card.id, userCard.pointBalance)}
+            accessibilityLabel={`Edit balance for ${card.name}`}
+            accessibilityRole="button"
+          >
+            <Edit3 size={16} color={colors.text.tertiary} />
           </TouchableOpacity>
 
           {/* Delete Button */}
@@ -383,6 +546,61 @@ export default function MyCardsScreen() {
     }
   };
 
+  const handleUpdateBalance = useCallback((cardId: string, currentBalance?: number) => {
+    const card = getCardByIdSync(cardId);
+    const cardName = card?.name || 'this card';
+
+    // Use a simple prompt for balance input
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      const input = window.prompt(
+        `Enter point balance for ${cardName}:`,
+        currentBalance?.toString() || ''
+      );
+      if (input !== null) {
+        const newBalance = input.trim() === '' ? undefined : parseInt(input.replace(/,/g, ''), 10);
+        if (newBalance === undefined || (!isNaN(newBalance) && newBalance >= 0)) {
+          updatePointBalance(cardId, newBalance).then((result) => {
+            if (result.success) {
+              setPortfolio(getCards());
+            }
+          });
+        } else {
+          alert('Please enter a valid number');
+        }
+      }
+    } else {
+      Alert.prompt(
+        'Update Balance',
+        `Enter point balance for ${cardName}:`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Clear',
+            style: 'destructive',
+            onPress: () => {
+              updatePointBalance(cardId, undefined).then((result) => {
+                if (result.success) setPortfolio(getCards());
+              });
+            },
+          },
+          {
+            text: 'Save',
+            onPress: (value?: string) => {
+              const newBalance = value?.trim() === '' ? undefined : parseInt(value?.replace(/,/g, '') || '0', 10);
+              if (newBalance === undefined || (!isNaN(newBalance) && newBalance >= 0)) {
+                updatePointBalance(cardId, newBalance).then((result) => {
+                  if (result.success) setPortfolio(getCards());
+                });
+              }
+            },
+          },
+        ],
+        'plain-text',
+        currentBalance?.toString() || ''
+      );
+    }
+  }, []);
+
   const ownedCardIds = new Set(portfolio.map((uc) => uc.cardId));
 
   // Show loading state while initializing
@@ -450,10 +668,12 @@ export default function MyCardsScreen() {
         <FlatList
           data={filteredPortfolio}
           keyExtractor={(item) => item.cardId}
+          ListHeaderComponent={<PortfolioSummary portfolio={portfolio} />}
           renderItem={({ item }) => (
             <CardItem
               userCard={item}
               onRemove={handleRemoveCard}
+              onUpdateBalance={handleUpdateBalance}
               onViewDetails={setSelectedCard}
             />
           )}
@@ -639,6 +859,21 @@ const styles = StyleSheet.create({
   cardMeta: {
     fontSize: 12,
     color: colors.text.secondary,
+  },
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+  },
+  balanceText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.primary.main,
+  },
+  balanceEditButton: {
+    padding: 8,
+    marginRight: -4,
   },
   deleteButton: {
     padding: 8,

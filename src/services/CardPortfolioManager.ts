@@ -22,9 +22,18 @@ export async function initializePortfolio(): Promise<void> {
     const stored = await AsyncStorage.getItem(PORTFOLIO_STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      portfolioCache = parsed.map((item: { cardId: string; addedAt: string }) => ({
+      portfolioCache = parsed.map((item: { 
+        cardId: string; 
+        addedAt: string;
+        pointBalance?: number;
+        balanceUpdatedAt?: string;
+        nickname?: string;
+      }) => ({
         cardId: item.cardId,
         addedAt: new Date(item.addedAt),
+        pointBalance: item.pointBalance,
+        balanceUpdatedAt: item.balanceUpdatedAt ? new Date(item.balanceUpdatedAt) : undefined,
+        nickname: item.nickname,
       }));
     } else {
       portfolioCache = [];
@@ -45,6 +54,9 @@ async function persistPortfolio(): Promise<void> {
     portfolioCache.map((card) => ({
       cardId: card.cardId,
       addedAt: card.addedAt.toISOString(),
+      pointBalance: card.pointBalance,
+      balanceUpdatedAt: card.balanceUpdatedAt?.toISOString(),
+      nickname: card.nickname,
     }))
   );
   await AsyncStorage.setItem(PORTFOLIO_STORAGE_KEY, serialized);
@@ -152,4 +164,88 @@ export async function clearPortfolio(): Promise<void> {
  */
 export function resetCache(): void {
   portfolioCache = null;
+}
+
+/**
+ * Update the point balance for a card in the portfolio
+ * @param cardId - The ID of the card to update
+ * @param pointBalance - The new point balance (or undefined to clear)
+ * @returns Result with the updated UserCard or a PortfolioError
+ */
+export async function updatePointBalance(
+  cardId: string, 
+  pointBalance: number | undefined
+): Promise<Result<UserCard, PortfolioError>> {
+  if (portfolioCache === null) {
+    await initializePortfolio();
+  }
+
+  const cardIndex = portfolioCache!.findIndex((card) => card.cardId === cardId);
+  if (cardIndex === -1) {
+    return failure({ type: 'CARD_NOT_FOUND', cardId });
+  }
+
+  portfolioCache![cardIndex] = {
+    ...portfolioCache![cardIndex],
+    pointBalance,
+    balanceUpdatedAt: pointBalance !== undefined ? new Date() : undefined,
+  };
+
+  await persistPortfolio();
+  return success(portfolioCache![cardIndex]);
+}
+
+/**
+ * Update the nickname for a card in the portfolio
+ * @param cardId - The ID of the card to update
+ * @param nickname - The new nickname (or undefined to clear)
+ * @returns Result with the updated UserCard or a PortfolioError
+ */
+export async function updateCardNickname(
+  cardId: string,
+  nickname: string | undefined
+): Promise<Result<UserCard, PortfolioError>> {
+  if (portfolioCache === null) {
+    await initializePortfolio();
+  }
+
+  const cardIndex = portfolioCache!.findIndex((card) => card.cardId === cardId);
+  if (cardIndex === -1) {
+    return failure({ type: 'CARD_NOT_FOUND', cardId });
+  }
+
+  portfolioCache![cardIndex] = {
+    ...portfolioCache![cardIndex],
+    nickname: nickname?.trim() || undefined,
+  };
+
+  await persistPortfolio();
+  return success(portfolioCache![cardIndex]);
+}
+
+/**
+ * Get the total portfolio value in dollars
+ * @param valuations - Map of program name to cents per point
+ * @returns Total value in dollars
+ */
+export function getPortfolioTotalValue(valuations: Map<string, number>): number {
+  if (portfolioCache === null) {
+    return 0;
+  }
+
+  let total = 0;
+  for (const userCard of portfolioCache) {
+    if (userCard.pointBalance && userCard.pointBalance > 0) {
+      const card = getCardByIdSync(userCard.cardId);
+      if (card) {
+        // Get valuation from map or use card's default
+        const centsPerPoint = valuations.get(card.rewardProgram) 
+          ?? card.pointValuation 
+          ?? card.programDetails?.optimalRateCents
+          ?? 1;
+        total += userCard.pointBalance * (centsPerPoint / 100);
+      }
+    }
+  }
+  return total;
 }
