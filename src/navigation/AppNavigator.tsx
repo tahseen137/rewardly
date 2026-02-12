@@ -8,11 +8,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Platform, View, ActivityIndicator, StyleSheet } from 'react-native';
-import { Home, CreditCard, Settings } from 'lucide-react-native';
+import { Home, CreditCard, Settings, Calculator } from 'lucide-react-native';
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 
-import { MyCardsScreen, SettingsScreen, SageScreen } from '../screens';
+import { MyCardsScreen, SettingsScreen, SageScreen, PointsCalculatorScreen } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import { ErrorBoundary } from '../components';
@@ -24,6 +24,7 @@ import { initializeSubscription } from '../services/SubscriptionService';
 
 export type RootTabParamList = {
   Sage: undefined;
+  Points: undefined;
   MyCards: undefined;
   Settings: undefined;
 };
@@ -56,6 +57,9 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
   switch (name) {
     case 'Sage':
       IconComponent = Home;
+      break;
+    case 'Points':
+      IconComponent = Calculator;
       break;
     case 'MyCards':
       IconComponent = CreditCard;
@@ -181,6 +185,13 @@ function MainTabs({ onSignOut }: { onSignOut: () => void }) {
         component={SageScreenWithErrorBoundary}
         options={{
           tabBarLabel: 'Home',
+        }}
+      />
+      <Tab.Screen
+        name="Points"
+        component={PointsCalculatorScreen}
+        options={{
+          tabBarLabel: 'Points',
         }}
       />
       <Tab.Screen
