@@ -5,6 +5,7 @@
 import React, { useMemo } from 'react';
 import { View, Text, Modal, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { TrendingUp, DollarSign, Info } from 'lucide-react-native';
 import { useTheme, Theme } from '../theme';
 import { Button } from './Button';
 import { Card, RewardType } from '../types';
@@ -76,6 +77,36 @@ export function CardDetailModal({
               </Text>
             </View>
           </View>
+
+          {/* Point Valuation - shows if card has pointValuation */}
+          {card.pointValuation && card.pointValuation > 0 && (
+            <View style={styles.valuationSection}>
+              <View style={styles.valuationHeader}>
+                <TrendingUp size={16} color={theme.colors.primary.main} />
+                <Text style={styles.valuationTitle}>Point Value</Text>
+              </View>
+              <View style={styles.valuationContent}>
+                <View style={styles.valuationMain}>
+                  <Text style={styles.valuationValue}>{card.pointValuation.toFixed(2)}¢</Text>
+                  <Text style={styles.valuationUnit}>per point</Text>
+                </View>
+                <View style={styles.valuationExample}>
+                  <DollarSign size={14} color={theme.colors.text.secondary} />
+                  <Text style={styles.valuationExampleText}>
+                    10,000 pts ≈ ${(10000 * card.pointValuation / 100).toFixed(0)} value
+                  </Text>
+                </View>
+              </View>
+              {card.programDetails?.optimalRateCents && card.programDetails.optimalRateCents > card.pointValuation && (
+                <View style={styles.optimalTip}>
+                  <Info size={12} color={theme.colors.success.main} />
+                  <Text style={styles.optimalTipText}>
+                    Up to {card.programDetails.optimalRateCents.toFixed(2)}¢ with optimal redemption
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
 
           {/* Current Store Rate (if provided) */}
           {currentRewardRate && (
@@ -227,6 +258,64 @@ const createStyles = (theme: Theme) =>
     feeValue: {
       ...theme.textStyles.label,
       color: theme.colors.text.primary,
+    },
+    valuationSection: {
+      backgroundColor: theme.colors.primary.main + '10',
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      marginBottom: theme.spacing.lg,
+    },
+    valuationHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.xs,
+      marginBottom: theme.spacing.sm,
+    },
+    valuationTitle: {
+      ...theme.textStyles.label,
+      color: theme.colors.primary.main,
+      fontWeight: '600',
+    },
+    valuationContent: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    valuationMain: {
+      alignItems: 'flex-start',
+    },
+    valuationValue: {
+      fontSize: 28,
+      fontWeight: '700',
+      color: theme.colors.primary.main,
+    },
+    valuationUnit: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.primary.dark,
+      marginTop: 2,
+    },
+    valuationExample: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background.primary,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.borderRadius.md,
+      gap: 4,
+    },
+    valuationExampleText: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.text.secondary,
+    },
+    optimalTip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: theme.spacing.md,
+      gap: 6,
+    },
+    optimalTipText: {
+      ...theme.textStyles.caption,
+      color: theme.colors.success.main,
     },
     highlightSection: {
       backgroundColor: theme.colors.primary.main + '10', // 10% opacity
