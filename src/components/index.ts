@@ -71,3 +71,6 @@ export { default as AutoPilotNotificationCard } from './AutoPilotNotificationCar
 // Tier 1 - Mega Build Widgets
 export { default as RewardsIQWidget } from './RewardsIQWidget';
 export { default as MissedRewardsWidget } from './MissedRewardsWidget';
+
+// Tier 2 - Social Sharing
+export { default as SocialShareCard } from './SocialShareCard';

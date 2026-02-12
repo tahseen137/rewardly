@@ -18,3 +18,4 @@ export { default as RewardsIQScreen } from './RewardsIQScreen';
 export { default as PortfolioOptimizerScreen } from './PortfolioOptimizerScreen';
 export { default as InsightsHomeScreen } from './InsightsHomeScreen';
 export { default as PremiumOnboardingScreen } from './PremiumOnboardingScreen';
+export { default as SpendingInsightsScreen } from './SpendingInsightsScreen';

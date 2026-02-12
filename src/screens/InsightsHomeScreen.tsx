@@ -35,6 +35,7 @@ import {
   Sparkles,
   BarChart3,
   Zap,
+  PieChart,
 } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
@@ -409,6 +410,24 @@ export default function InsightsHomeScreen() {
             </LinearGradient>
           </TouchableOpacity>
         </View>
+        
+        <TouchableOpacity
+          style={styles.actionCardFull}
+          onPress={() => navigation.navigate('SpendingInsights')}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={[colors.info.main + '15', colors.info.main + '05']}
+            style={styles.actionGradientFull}
+          >
+            <PieChart size={24} color={colors.info.main} />
+            <View style={styles.actionTextContainer}>
+              <Text style={styles.actionTitle}>Spending Insights</Text>
+              <Text style={styles.actionDesc}>Visual breakdown of your spending patterns</Text>
+            </View>
+            <ChevronRight size={20} color={colors.text.tertiary} />
+          </LinearGradient>
+        </TouchableOpacity>
       </Animated.View>
       
       {/* Bottom padding */}
@@ -692,5 +711,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.text.tertiary,
     textAlign: 'center',
+  },
+  actionCardFull: {
+    marginTop: 12,
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
+  },
+  actionGradientFull: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    gap: 14,
+  },
+  actionTextContainer: {
+    flex: 1,
   },
 });
