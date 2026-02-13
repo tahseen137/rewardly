@@ -226,7 +226,8 @@ export interface PriceComparisonResult {
 export type PortfolioError =
   | { type: 'DUPLICATE_CARD'; cardName: string }
   | { type: 'CARD_NOT_FOUND'; cardId: string }
-  | { type: 'INVALID_CARD_DATA'; message: string };
+  | { type: 'INVALID_CARD_DATA'; message: string }
+  | { type: 'LIMIT_REACHED'; message: string; limit: number };
 
 /**
  * Recommendation errors

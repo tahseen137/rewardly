@@ -6,6 +6,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserCard, Result, PortfolioError, success, failure } from '../types';
 import { getCardByIdSync } from './CardDataService';
+import { canAddCardSync, getCardLimitSync } from './SubscriptionService';
 
 const PORTFOLIO_STORAGE_KEY = '@rewards_optimizer/card_portfolio';
 
@@ -92,6 +93,17 @@ export async function addCard(cardId: string): Promise<Result<UserCard, Portfoli
   // Check for duplicate
   if (isDuplicate(cardId)) {
     return failure({ type: 'DUPLICATE_CARD', cardName: card.name });
+  }
+
+  // Check card limit for subscription tier
+  const currentCount = portfolioCache!.length;
+  if (!canAddCardSync(currentCount)) {
+    const limit = getCardLimitSync();
+    return failure({ 
+      type: 'LIMIT_REACHED', 
+      message: `You can only have ${limit} card${limit !== 1 ? 's' : ''} on the Free plan. Upgrade to Pro for unlimited cards.`,
+      limit,
+    });
   }
 
   // Add the card

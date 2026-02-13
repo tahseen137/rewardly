@@ -1,6 +1,6 @@
 /**
  * Paywall - Beautiful subscription paywall screen
- * Shows all tiers with feature comparison
+ * Shows all tiers (Free/Pro/Max) with feature comparison
  * Monthly/Annual toggle with savings display
  */
 
@@ -14,6 +14,8 @@ import {
   Dimensions,
   Modal,
   Platform,
+  Linking,
+  Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -29,6 +31,7 @@ import {
   TierConfig,
   getAnnualSavings,
   setTier,
+  createCheckoutSession,
 } from '../services/SubscriptionService';
 
 interface PaywallProps {
@@ -36,21 +39,29 @@ interface PaywallProps {
   onClose: () => void;
   onSubscribe?: (tier: SubscriptionTier, period: BillingPeriod) => void;
   highlightFeature?: string;
+  /** Pre-select a specific tier */
+  defaultTier?: SubscriptionTier;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// Stripe price IDs (to be set in production)
+const STRIPE_PRICES = {
+  pro_monthly: 'price_pro_monthly', // Replace with actual Stripe price IDs
+  pro_annual: 'price_pro_annual',
+  max_monthly: 'price_max_monthly',
+  max_annual: 'price_max_annual',
+};
 
 /**
  * Get icon for tier
  */
 function getTierIcon(tier: SubscriptionTier) {
   switch (tier) {
-    case 'plus':
-      return <Zap size={20} color={colors.primary.main} />;
     case 'pro':
-      return <Star size={20} color={colors.warning.main} />;
-    case 'elite':
-      return <Crown size={20} color={colors.accent.main} />;
+      return <Zap size={20} color={colors.primary.main} />;
+    case 'max':
+      return <Crown size={20} color={colors.warning.main} />;
     default:
       return <Sparkles size={20} color={colors.text.secondary} />;
   }
@@ -61,12 +72,10 @@ function getTierIcon(tier: SubscriptionTier) {
  */
 function getTierGradient(tier: SubscriptionTier): string[] {
   switch (tier) {
-    case 'plus':
-      return [colors.primary.main, colors.primary.dark];
     case 'pro':
+      return [colors.primary.main, colors.primary.dark];
+    case 'max':
       return [colors.warning.main, colors.warning.dark];
-    case 'elite':
-      return [colors.accent.main, colors.accent.dark];
     default:
       return [colors.neutral.gray600, colors.neutral.gray700];
   }
@@ -77,36 +86,68 @@ export default function Paywall({
   onClose,
   onSubscribe,
   highlightFeature,
+  defaultTier = 'pro',
 }: PaywallProps) {
   const { t } = useTranslation();
   
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('annual');
-  const [selectedTier, setSelectedTier] = useState<SubscriptionTier>('plus');
+  const [selectedTier, setSelectedTier] = useState<SubscriptionTier>(defaultTier);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const tiers = Object.values(SUBSCRIPTION_TIERS).filter(tier => tier.id !== 'free');
+  // Only show Pro and Max tiers
+  const tiers = [SUBSCRIPTION_TIERS.pro, SUBSCRIPTION_TIERS.max];
 
   const handleSubscribe = useCallback(async () => {
     setIsProcessing(true);
     
     try {
-      // In development, just set the tier directly
-      if (__DEV__) {
+      // In development, allow quick testing by setting tier directly
+      if (__DEV__ && false) { // Set to true only for local testing
         await setTier(selectedTier, billingPeriod);
         onSubscribe?.(selectedTier, billingPeriod);
         onClose();
         return;
       }
       
-      // TODO: Integrate with RevenueCat for production
-      // const offerings = await Purchases.getOfferings();
-      // const pkg = offerings.current?.availablePackages.find(...);
-      // await Purchases.purchasePackage(pkg);
+      // Call create-checkout edge function to get Stripe Checkout URL
+      const result = await createCheckoutSession(
+        selectedTier,
+        billingPeriod === 'annual' ? 'year' : 'month'
+      );
       
-      onSubscribe?.(selectedTier, billingPeriod);
-      onClose();
+      if ('error' in result) {
+        Alert.alert(
+          'Subscription Error',
+          result.error,
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+      
+      // Open Stripe Checkout in browser
+      const supported = await Linking.canOpenURL(result.url);
+      if (supported) {
+        await Linking.openURL(result.url);
+        // User will return to app after checkout
+        // Webhook will update subscription state automatically
+        onClose();
+        
+        // Optionally notify parent component
+        onSubscribe?.(selectedTier, billingPeriod);
+      } else {
+        Alert.alert(
+          'Error',
+          'Unable to open checkout page. Please try again.',
+          [{ text: 'OK' }]
+        );
+      }
     } catch (error) {
       console.error('Subscription error:', error);
+      Alert.alert(
+        'Subscription Error',
+        'Unable to start subscription. Please try again.',
+        [{ text: 'OK' }]
+      );
     } finally {
       setIsProcessing(false);
     }
@@ -130,9 +171,9 @@ export default function Paywall({
         onPress={() => setSelectedTier(tier.id)}
         activeOpacity={0.7}
       >
-        {tier.highlighted && (
+        {tier.id === 'pro' && (
           <View style={styles.popularBadge}>
-            <Text style={styles.popularBadgeText}>{t('paywall.mostPopular')}</Text>
+            <Text style={styles.popularBadgeText}>MOST POPULAR</Text>
           </View>
         )}
         
@@ -145,27 +186,27 @@ export default function Paywall({
 
         <View style={styles.tierPricing}>
           <Text style={styles.tierPrice}>${price}</Text>
-          <Text style={styles.tierPeriod}>/{t('paywall.month')}</Text>
+          <Text style={styles.tierPeriod}>/mo</Text>
         </View>
 
         {billingPeriod === 'annual' && savings > 0 && (
           <View style={styles.savingsBadge}>
             <Text style={styles.savingsText}>
-              {t('paywall.saveAmount', { amount: savings.toFixed(0) })}
+              Save ${savings.toFixed(0)}/year
             </Text>
           </View>
         )}
 
         <View style={styles.tierFeatures}>
-          {tier.features.slice(0, 4).map((feature, index) => (
+          {tier.featureDescriptions.slice(0, 5).map((feature, index) => (
             <View key={index} style={styles.featureRow}>
               <Check size={16} color={colors.primary.main} />
               <Text style={styles.featureText}>{feature}</Text>
             </View>
           ))}
-          {tier.features.length > 4 && (
+          {tier.featureDescriptions.length > 5 && (
             <Text style={styles.moreFeatures}>
-              +{tier.features.length - 4} {t('paywall.moreFeatures')}
+              +{tier.featureDescriptions.length - 5} more features
             </Text>
           )}
         </View>
@@ -199,8 +240,10 @@ export default function Paywall({
           <View style={styles.heroIconContainer}>
             <Sparkles size={32} color={colors.primary.main} />
           </View>
-          <Text style={styles.heroTitle}>{t('paywall.title')}</Text>
-          <Text style={styles.heroSubtitle}>{t('paywall.subtitle')}</Text>
+          <Text style={styles.heroTitle}>Unlock Premium</Text>
+          <Text style={styles.heroSubtitle}>
+            Get unlimited access to all features and maximize your rewards
+          </Text>
         </View>
 
         {/* Billing Toggle */}
@@ -216,7 +259,7 @@ export default function Paywall({
               styles.billingOptionText,
               billingPeriod === 'monthly' && styles.billingOptionTextActive,
             ]}>
-              {t('paywall.monthly')}
+              Monthly
             </Text>
           </TouchableOpacity>
 
@@ -231,10 +274,10 @@ export default function Paywall({
               styles.billingOptionText,
               billingPeriod === 'annual' && styles.billingOptionTextActive,
             ]}>
-              {t('paywall.annual')}
+              Annual
             </Text>
             <View style={styles.discountBadge}>
-              <Text style={styles.discountText}>{t('paywall.twoMonthsFree')}</Text>
+              <Text style={styles.discountText}>Save 30%+</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -262,26 +305,29 @@ export default function Paywall({
               style={styles.ctaButton}
             >
               <Text style={styles.ctaButtonText}>
-                {t('paywall.startFreeTrial')}
+                {isProcessing ? 'Processing...' : `Subscribe to ${SUBSCRIPTION_TIERS[selectedTier].name}`}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
 
           <Text style={styles.trialNote}>
-            {t('paywall.trialNote')}
+            7-day free trial • Cancel anytime
           </Text>
 
           <View style={styles.legalLinks}>
-            <TouchableOpacity>
-              <Text style={styles.legalLink}>{t('paywall.termsOfService')}</Text>
+            <TouchableOpacity onPress={() => Linking.openURL('https://rewardly.app/terms')}>
+              <Text style={styles.legalLink}>Terms of Service</Text>
             </TouchableOpacity>
             <Text style={styles.legalSeparator}>•</Text>
-            <TouchableOpacity>
-              <Text style={styles.legalLink}>{t('paywall.privacyPolicy')}</Text>
+            <TouchableOpacity onPress={() => Linking.openURL('https://rewardly.app/privacy')}>
+              <Text style={styles.legalLink}>Privacy Policy</Text>
             </TouchableOpacity>
             <Text style={styles.legalSeparator}>•</Text>
-            <TouchableOpacity>
-              <Text style={styles.legalLink}>{t('paywall.restorePurchases')}</Text>
+            <TouchableOpacity onPress={() => {
+              // TODO: Restore purchases via Stripe
+              Alert.alert('Restore Purchases', 'Contact support@rewardly.app to restore your subscription.');
+            }}>
+              <Text style={styles.legalLink}>Restore Purchases</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -412,7 +458,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     color: colors.background.primary,
-    textTransform: 'uppercase',
   },
   tierHeader: {
     flexDirection: 'row',

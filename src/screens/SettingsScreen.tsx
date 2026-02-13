@@ -15,6 +15,7 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, LogIn, User, Crown, Navigation } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +38,19 @@ import {
 import { refreshCards, getLastSyncTime, getAllCards, onCountryChange, getTotalCardCount } from '../services/CardDataService';
 import { isSupabaseConfigured } from '../services/supabase';
 import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
-import { getCurrentTier, SUBSCRIPTION_TIERS, SubscriptionTier } from '../services/SubscriptionService';
+import { 
+  getCurrentTier, 
+  SUBSCRIPTION_TIERS, 
+  SubscriptionTier,
+  getSageUsage,
+  SageUsage,
+  isAdminSync,
+  getSubscriptionState,
+  SubscriptionState,
+  SAGE_LIMITS,
+  refreshSubscription,
+  openCustomerPortal,
+} from '../services/SubscriptionService';
 import Paywall from '../components/Paywall';
 import {
   isAutoPilotEnabled,
@@ -129,6 +142,8 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
   const [cardCountDetail, setCardCountDetail] = useState<string>('');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>('free');
+  const [subscriptionState, setSubscriptionState] = useState<SubscriptionState | null>(null);
+  const [sageUsage, setSageUsage] = useState<SageUsage | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [autoPilotStatus, setAutoPilotStatus] = useState<AutoPilotStatus | null>(null);
 
@@ -142,9 +157,19 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
     const currentUser = await getCurrentUser();
     setUser(currentUser);
 
-    // Load subscription tier
+    // Load subscription tier and state
+    await refreshSubscription();
     const tier = await getCurrentTier();
     setSubscriptionTier(tier);
+    
+    const subState = await getSubscriptionState();
+    setSubscriptionState(subState);
+    
+    // Load Sage usage if user has access
+    if (tier === 'pro') {
+      const usage = await getSageUsage();
+      setSageUsage(usage);
+    }
 
     // Load card count and last sync time
     try {
@@ -333,16 +358,65 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
               </SettingsRow>
 
               <SettingsRow
-                icon={<Crown size={20} color={tierConfig.id === 'free' ? colors.text.secondary : colors.primary.main} />}
+                icon={<Crown size={20} color={subscriptionState?.isAdmin ? colors.warning.main : tierConfig.id === 'free' ? colors.text.secondary : colors.primary.main} />}
                 title={t('settings.subscription')}
-                description={tierConfig.name}
-                isLast={true}
+                description={subscriptionState?.isAdmin ? 'Admin Access' : tierConfig.name}
+                isLast={subscriptionTier !== 'pro'}
                 onPress={subscriptionTier === 'free' ? handleUpgrade : undefined}
               >
                 {subscriptionTier === 'free' && (
                   <Text style={styles.upgradeText}>{t('settings.upgrade')}</Text>
                 )}
+                {subscriptionState?.isAdmin && (
+                  <View style={styles.adminBadge}>
+                    <Text style={styles.adminBadgeText}>ADMIN</Text>
+                  </View>
+                )}
+                {(subscriptionTier === 'pro' || subscriptionTier === 'max') && !subscriptionState?.isAdmin && (
+                  <TouchableOpacity 
+                    style={styles.manageButton}
+                    onPress={async () => {
+                      try {
+                        const result = await openCustomerPortal();
+                        if ('error' in result) {
+                          Alert.alert('Error', result.error);
+                        } else if (result.url) {
+                          const supported = await Linking.canOpenURL(result.url);
+                          if (supported) {
+                            await Linking.openURL(result.url);
+                          } else {
+                            Alert.alert('Error', 'Unable to open settings page');
+                          }
+                        }
+                      } catch (error) {
+                        console.error('Portal error:', error);
+                        Alert.alert('Error', 'Failed to open subscription management');
+                      }
+                    }}
+                  >
+                    <Text style={styles.manageButtonText}>Manage</Text>
+                    <ChevronRight size={14} color={colors.primary.main} />
+                  </TouchableOpacity>
+                )}
               </SettingsRow>
+              
+              {/* Sage usage for Pro users */}
+              {subscriptionTier === 'pro' && sageUsage && sageUsage.limit !== null && (
+                <SettingsRow
+                  icon={<Crown size={20} color={colors.primary.main} />}
+                  title="Sage AI Usage"
+                  description={`${sageUsage.chatCount} of ${sageUsage.limit} chats used this month`}
+                  isLast={true}
+                >
+                  <Text style={[
+                    styles.usageText,
+                    sageUsage.remaining !== null && sageUsage.remaining <= 2 && styles.usageTextWarning,
+                    sageUsage.remaining !== null && sageUsage.remaining === 0 && styles.usageTextDanger,
+                  ]}>
+                    {sageUsage.remaining ?? 0} left
+                  </Text>
+                </SettingsRow>
+              )}
             </View>
           </>
         )}
@@ -628,6 +702,42 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: colors.primary.main,
+  },
+  // Admin badge
+  adminBadge: {
+    backgroundColor: colors.warning.main,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  adminBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.background.primary,
+  },
+  // Manage subscription button
+  manageButton: {
+    backgroundColor: colors.background.tertiary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  manageButtonText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.text.secondary,
+  },
+  // Usage text
+  usageText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.primary.main,
+  },
+  usageTextWarning: {
+    color: colors.warning.main,
+  },
+  usageTextDanger: {
+    color: colors.error.main,
   },
   // Sign In
   signInButton: {

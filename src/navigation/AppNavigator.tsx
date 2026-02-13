@@ -11,7 +11,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform, View, ActivityIndicator, StyleSheet, Animated } from 'react-native';
-import { Home, CreditCard, Settings, TrendingUp, Navigation, BarChart3 } from 'lucide-react-native';
+import { Home, CreditCard, Settings, Sparkles, Navigation, BarChart3 } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 
 import { 
@@ -30,12 +30,13 @@ import {
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import PremiumOnboardingScreen from '../screens/PremiumOnboardingScreen';
+import UpgradeScreen from '../screens/UpgradeScreen';
 import { ErrorBoundary } from '../components';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
 import { getCurrentUser, onAuthStateChange, AuthUser } from '../services/AuthService';
 import { isOnboardingComplete, initializePreferences } from '../services/PreferenceManager';
-import { initializeSubscription } from '../services/SubscriptionService';
+import { initializeSubscription, canAccessFeatureSync, getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
 import { initializeAutoPilot } from '../services/AutoPilotService';
 
 // Stack navigator for Insights screens
@@ -51,15 +52,26 @@ export type InsightsStackParamList = {
 export type RootTabParamList = {
   Home: undefined;
   Insights: undefined;
+  Sage: undefined;
   AutoPilot: undefined;
   MyCards: undefined;
   Settings: undefined;
+};
+
+// Root Stack for modals (Upgrade screen)
+export type RootStackParamList = {
+  MainTabs: undefined;
+  Upgrade: { 
+    feature?: string; 
+    source?: string;
+  };
 };
 
 type AppState = 'loading' | 'auth' | 'onboarding' | 'main';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const InsightsStack = createNativeStackNavigator<InsightsStackParamList>();
+const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 /**
  * Insights Stack Navigator - Contains InsightsHome, MissedRewards, RewardsIQ, PortfolioOptimizer
@@ -134,6 +146,9 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
       break;
     case 'Insights':
       IconComponent = BarChart3;
+      break;
+    case 'Sage':
+      IconComponent = Sparkles;
       break;
     case 'AutoPilot':
       IconComponent = Navigation;
@@ -238,6 +253,16 @@ function AutoPilotScreenWithErrorBoundary() {
  */
 function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: () => void }) {
   const theme = useTheme();
+  const [canAccessSage, setCanAccessSage] = React.useState(false);
+
+  // Check Sage access on mount and when returning to tabs
+  React.useEffect(() => {
+    const checkSageAccess = async () => {
+      const { canAccessFeatureSync } = await import('../services/SubscriptionService');
+      setCanAccessSage(canAccessFeatureSync('sage_ai'));
+    };
+    checkSageAccess();
+  }, []);
 
   return (
     <Tab.Navigator
@@ -295,6 +320,15 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
           tabBarLabel: 'Insights',
         }}
       />
+      {canAccessSage && (
+        <Tab.Screen
+          name="Sage"
+          component={SageScreenWithErrorBoundary}
+          options={{
+            tabBarLabel: 'Sage',
+          }}
+        />
+      )}
       <Tab.Screen
         name="AutoPilot"
         component={AutoPilotScreenWithErrorBoundary}
@@ -438,7 +472,28 @@ export default function AppNavigator() {
   // Main app with tabs
   return (
     <NavigationContainer theme={navigationTheme}>
-      <MainTabs onSignOut={handleSignOut} onSignIn={handleSignIn} />
+      <RootNavigator onSignOut={handleSignOut} onSignIn={handleSignIn} />
     </NavigationContainer>
+  );
+}
+
+/**
+ * RootNavigator - Wraps MainTabs and provides modal screens (Upgrade)
+ */
+function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: () => void }) {
+  return (
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      <RootStack.Screen name="MainTabs">
+        {() => <MainTabs onSignOut={onSignOut} onSignIn={onSignIn} />}
+      </RootStack.Screen>
+      <RootStack.Screen 
+        name="Upgrade" 
+        component={UpgradeScreen}
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+        }}
+      />
+    </RootStack.Navigator>
   );
 }

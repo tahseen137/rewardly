@@ -6,6 +6,8 @@
  * - Merchant search and pinning
  * - Active geofences list
  * - Privacy dashboard
+ * 
+ * Note: Requires Max subscription (free/pro users see paywall)
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -39,8 +41,11 @@ import {
   MoreHorizontal,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import { SpendingCategory } from '../types';
+import { canAccessFeatureSync, getCurrentTierSync, refreshSubscription, SubscriptionTier } from '../services/SubscriptionService';
+import { LockedFeature } from '../components';
 import {
   initializeAutoPilot,
   isAutoPilotEnabled,
@@ -80,6 +85,21 @@ export default function AutoPilotScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showMerchantPicker, setShowMerchantPicker] = useState(false);
   const [merchantsWithCards, setMerchantsWithCards] = useState<MerchantWithBestCard[]>([]);
+  const [hasAccess, setHasAccess] = useState(true);
+  const [currentTier, setCurrentTier] = useState<SubscriptionTier>('free');
+
+  // Check subscription access on focus
+  useFocusEffect(
+    useCallback(() => {
+      const checkAccess = async () => {
+        await refreshSubscription();
+        const tier = getCurrentTierSync();
+        setCurrentTier(tier);
+        setHasAccess(canAccessFeatureSync('autopilot'));
+      };
+      checkAccess();
+    }, [])
+  );
 
   // Load initial data
   useEffect(() => {
@@ -219,6 +239,25 @@ export default function AutoPilotScreen() {
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary.main} />
       </View>
+    );
+  }
+  
+  // Show paywall for non-Max users
+  if (!hasAccess) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <LockedFeature
+          feature="autopilot"
+          title="Unlock AutoPilot"
+          description="Get automatic card recommendations when you arrive at stores. AutoPilot uses geofencing to notify you which card to use for maximum rewards."
+          icon={<Navigation size={56} color={colors.warning.main} />}
+          variant="inline"
+          onSubscribe={() => {
+            setHasAccess(canAccessFeatureSync('autopilot'));
+            setCurrentTier(getCurrentTierSync());
+          }}
+        />
+      </SafeAreaView>
     );
   }
 
