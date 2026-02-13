@@ -286,6 +286,7 @@ export default function HomeScreen() {
             onChange={handleAmountChange}
             error={state.amountError}
             placeholder={t('home.enterAmount') || '0.00'}
+            label=""
           />
         </View>
 

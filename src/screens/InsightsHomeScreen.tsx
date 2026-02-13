@@ -47,6 +47,7 @@ import {
   analyzeMissedRewards,
   getPortfolioOptimization,
 } from '../services/RewardsIQService';
+import { getAllCards } from '../services/CardDataService';
 import { CATEGORY_INFO } from '../services/MockTransactionData';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
 
@@ -108,6 +109,9 @@ export default function InsightsHomeScreen() {
   
   const loadData = useCallback(async () => {
     try {
+      // Ensure cards are loaded first before calculating insights
+      await getAllCards();
+      
       const [iq, missed, opt] = await Promise.all([
         calculateRewardsIQ(),
         analyzeMissedRewards(),

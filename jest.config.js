@@ -11,5 +11,6 @@ module.exports = {
   moduleNameMapper: {
     '^@react-native-async-storage/async-storage$':
       '<rootDir>/src/services/__mocks__/@react-native-async-storage/async-storage.ts',
+    '^react-native$': '<rootDir>/src/services/__mocks__/react-native.ts',
   },
 };

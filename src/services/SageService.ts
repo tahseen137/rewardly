@@ -9,6 +9,7 @@ import { Card, UserCard, UserPreferences } from '../types';
 import { getCardByIdSync } from './CardDataService';
 import { generateSageSystemPrompt, SageUserContext } from '../data/sage_system_prompt';
 import { supabase } from './supabase/client';
+import { getValidSession, isGuestUser, getCurrentUser } from './AuthService';
 
 // ============================================================================
 // Constants
@@ -166,14 +167,25 @@ class SageServiceClass {
       subscriptionTier: 'free',
     };
     
+    // Check if user is a guest
+    const currentUser = await getCurrentUser();
+    if (isGuestUser(currentUser)) {
+      throw {
+        code: 'AUTH_ERROR' as const,
+        message: 'Please sign in to chat with Sage',
+        retryable: false
+      } as SageError;
+    }
+    
     // Get session for auth - MUST have valid user session
-    const { data: { session } } = await supabase?.auth.getSession() || { data: { session: null } };
+    // Use getValidSession to automatically refresh expired tokens
+    const session = await getValidSession();
     
     if (!session?.access_token) {
       throw {
         code: 'AUTH_ERROR' as const,
-        message: 'Please sign in to use Sage',
-        retryable: false
+        message: 'Session expired. Please sign in again.',
+        retryable: true
       } as SageError;
     }
     

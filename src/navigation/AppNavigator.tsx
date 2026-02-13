@@ -15,6 +15,7 @@ import { Home, CreditCard, Settings, TrendingUp, Navigation, BarChart3 } from 'l
 import { BlurView } from 'expo-blur';
 
 import { 
+  HomeScreen,
   MyCardsScreen, 
   SettingsScreen, 
   SageScreen, 
@@ -48,7 +49,7 @@ export type InsightsStackParamList = {
 };
 
 export type RootTabParamList = {
-  Sage: undefined;
+  Home: undefined;
   Insights: undefined;
   AutoPilot: undefined;
   MyCards: undefined;
@@ -128,7 +129,7 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
 
   let IconComponent;
   switch (name) {
-    case 'Sage':
+    case 'Home':
       IconComponent = Home;
       break;
     case 'Insights':
@@ -177,6 +178,17 @@ const loadingStyles = StyleSheet.create({
 /**
  * Wrapped screen components with error boundaries
  */
+function HomeScreenWithErrorBoundary() {
+  return (
+    <ErrorBoundary
+      fallbackTitle="Unable to load calculator"
+      fallbackMessage="There was a problem loading the rewards calculator. Please try again."
+    >
+      <HomeScreen />
+    </ErrorBoundary>
+  );
+}
+
 function MyCardsScreenWithErrorBoundary() {
   return (
     <ErrorBoundary
@@ -199,13 +211,13 @@ function SageScreenWithErrorBoundary() {
   );
 }
 
-function SettingsScreenWithErrorBoundary({ onSignOut }: { onSignOut: () => void }) {
+function SettingsScreenWithErrorBoundary({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: () => void }) {
   return (
     <ErrorBoundary
       fallbackTitle="Unable to load settings"
       fallbackMessage="There was a problem loading settings. Please try again."
     >
-      <SettingsScreen onSignOut={onSignOut} />
+      <SettingsScreen onSignOut={onSignOut} onSignIn={onSignIn} />
     </ErrorBoundary>
   );
 }
@@ -224,7 +236,7 @@ function AutoPilotScreenWithErrorBoundary() {
 /**
  * Main tab navigator
  */
-function MainTabs({ onSignOut }: { onSignOut: () => void }) {
+function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: () => void }) {
   const theme = useTheme();
 
   return (
@@ -235,6 +247,8 @@ function MainTabs({ onSignOut }: { onSignOut: () => void }) {
         ),
         tabBarActiveTintColor: colors.primary.main,
         tabBarInactiveTintColor: colors.text.secondary,
+        unmountOnBlur: true, // BUG #5 FIX: Unmount inactive tabs to prevent overlap
+        lazy: true, // Don't pre-render inactive tabs
         tabBarStyle: {
           height: 64, // h-16
           backgroundColor: Platform.OS === 'web'
@@ -268,8 +282,8 @@ function MainTabs({ onSignOut }: { onSignOut: () => void }) {
       })}
     >
       <Tab.Screen
-        name="Sage"
-        component={SageScreenWithErrorBoundary}
+        name="Home"
+        component={HomeScreenWithErrorBoundary}
         options={{
           tabBarLabel: 'Home',
         }}
@@ -301,7 +315,7 @@ function MainTabs({ onSignOut }: { onSignOut: () => void }) {
           tabBarLabel: 'Settings',
         }}
       >
-        {() => <SettingsScreenWithErrorBoundary onSignOut={onSignOut} />}
+        {() => <SettingsScreenWithErrorBoundary onSignOut={onSignOut} onSignIn={onSignIn} />}
       </Tab.Screen>
     </Tab.Navigator>
   );
@@ -377,6 +391,10 @@ export default function AppNavigator() {
     setAppState('auth');
   }, []);
 
+  const handleSignIn = useCallback(() => {
+    setAppState('auth');
+  }, []);
+
   // Create navigation theme based on app theme
   const navigationTheme = theme.isDark
     ? {
@@ -420,7 +438,7 @@ export default function AppNavigator() {
   // Main app with tabs
   return (
     <NavigationContainer theme={navigationTheme}>
-      <MainTabs onSignOut={handleSignOut} />
+      <MainTabs onSignOut={handleSignOut} onSignIn={handleSignIn} />
     </NavigationContainer>
   );
 }

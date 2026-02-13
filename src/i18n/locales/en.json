@@ -100,6 +100,8 @@
     "subscription": "Subscription",
     "upgrade": "Upgrade",
     "signOut": "Sign Out",
+    "signIn": "Sign In",
+    "signInPrompt": "Create an account to unlock all features",
     "signOutTitle": "Sign Out",
     "signOutMessage": "Are you sure you want to sign out?",
     "region": "REGION",
@@ -132,7 +134,13 @@
     "refreshError": "Error",
     "refreshErrorMessage": "Failed to refresh cards. Please check your connection.",
     "supabaseNotConfigured": "Database connection not configured. Using local data.",
-    "footerText": "Made with 💳 for smart spenders"
+    "footerText": "Made with 💳 for smart spenders",
+    "autoPilot": "AUTOPILOT",
+    "autoPilotEnabled": "AutoPilot",
+    "autoPilotDescription": "Get notified with the best card to use when you arrive at a store",
+    "autoPilotActiveDescription": "Monitoring {{count}} stores near you",
+    "autoPilotPermissionTitle": "Permission Required",
+    "autoPilotPermissionMessage": "AutoPilot needs location and notification permissions to work. Please enable them in your device settings."
   },
   "rewardTypes": {
     "cashback": "Cash Back",

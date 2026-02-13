@@ -288,8 +288,9 @@ describe('RewardsCalculatorService - Property Tests', () => {
             const result = output.results[0];
 
             if (result.isCashback) {
-              // For cashback, CAD value equals points earned (no conversion)
-              expect(result.cadValue).toBeCloseTo(result.pointsEarned, 10);
+              // For cashback, "points" are amount × percentage rate, so CAD value = points / 100
+              // e.g., $100 × 4% rate = 400 "points", CAD value = 400/100 = $4.00
+              expect(result.cadValue).toBeCloseTo(result.pointsEarned / 100, 10);
             } else {
               // For points/miles, use card's pointValuation (since our cardArb includes it)
               const expectedCadValue = result.pointsEarned * (result.pointValuation / 100);
@@ -356,8 +357,9 @@ describe('RewardsCalculatorService - Property Tests', () => {
             };
             const cadValue = pointsToCad(points, cashbackCard, pointValuation);
 
-            // For cashback, points ARE the CAD value (no conversion)
-            expect(cadValue).toBe(points);
+            // For cashback, "points" are amount × percentage rate, so CAD = points / 100
+            // e.g., points=400 (from $100 × 4%) → CAD value = $4.00
+            expect(cadValue).toBeCloseTo(points / 100, 10);
           }
         ),
         { numRuns: 100 }

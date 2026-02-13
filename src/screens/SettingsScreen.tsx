@@ -16,7 +16,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, User, Crown, Navigation } from 'lucide-react-native';
+import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, LogIn, User, Crown, Navigation } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -34,7 +34,7 @@ import {
   Language,
   Country,
 } from '../services/PreferenceManager';
-import { refreshCards, getLastSyncTime, getAllCards, onCountryChange } from '../services/CardDataService';
+import { refreshCards, getLastSyncTime, getAllCards, onCountryChange, getTotalCardCount } from '../services/CardDataService';
 import { isSupabaseConfigured } from '../services/supabase';
 import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
 import { getCurrentTier, SUBSCRIPTION_TIERS, SubscriptionTier } from '../services/SubscriptionService';
@@ -114,9 +114,10 @@ function SettingsRow({
 
 interface SettingsScreenProps {
   onSignOut?: () => void;
+  onSignIn?: () => void;
 }
 
-export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
+export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenProps) {
   const { t, i18n } = useTranslation();
   const [newCardSuggestions, setNewCardSuggestions] = useState(true);
   const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
@@ -125,6 +126,7 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [cardCount, setCardCount] = useState<number>(0);
+  const [cardCountDetail, setCardCountDetail] = useState<string>('');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>('free');
   const [showPaywall, setShowPaywall] = useState(false);
@@ -146,10 +148,12 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
 
     // Load card count and last sync time
     try {
-      const cards = await getAllCards();
-      setCardCount(cards.length);
+      const cardStats = await getTotalCardCount();
+      setCardCount(cardStats.total);
+      setCardCountDetail(`${cardStats.us} US + ${cardStats.ca} CA`);
     } catch {
       setCardCount(0);
+      setCardCountDetail('');
     }
     const syncTime = await getLastSyncTime();
     setLastSync(syncTime);
@@ -196,10 +200,12 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
             
             // Reload cards for new country
             try {
-              const cards = await getAllCards();
-              setCardCount(cards.length);
+              const cardStats = await getTotalCardCount();
+              setCardCount(cardStats.total);
+              setCardCountDetail(`${cardStats.us} US + ${cardStats.ca} CA`);
             } catch {
               setCardCount(0);
+              setCardCountDetail('');
             }
             
             setIsLoading(false);
@@ -220,13 +226,15 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
     setIsRefreshing(true);
     try {
       const cards = await refreshCards();
-      setCardCount(cards.length);
+      const cardStats = await getTotalCardCount();
+      setCardCount(cardStats.total);
+      setCardCountDetail(`${cardStats.us} US + ${cardStats.ca} CA`);
       const syncTime = await getLastSyncTime();
       setLastSync(syncTime);
 
       Alert.alert(
         t('settings.refreshSuccess'),
-        t('settings.refreshSuccessMessage', { count: cards.length }),
+        t('settings.refreshSuccessMessage', { count: cardStats.total }),
         [{ text: t('common.ok') }]
       );
     } catch (error) {
@@ -309,14 +317,19 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
               <SettingsRow
                 icon={<User size={20} color={colors.text.secondary} />}
                 title={user.displayName || user.email || t('settings.guest')}
-                description={user.isAnonymous ? t('settings.guestMode') : user.email || undefined}
+                description={user.isAnonymous ? t('settings.signInPrompt') : user.email || undefined}
                 isLast={false}
               >
-                {!user.isAnonymous && (
+                {!user.isAnonymous ? (
                   <TouchableOpacity onPress={handleSignOut}>
                     <LogOut size={20} color={colors.error.main} />
                   </TouchableOpacity>
-                )}
+                ) : onSignIn ? (
+                  <TouchableOpacity onPress={onSignIn} style={styles.signInButton}>
+                    <Text style={styles.signInText}>{t('settings.signIn')}</Text>
+                    <LogIn size={18} color={colors.primary.main} />
+                  </TouchableOpacity>
+                ) : null}
               </SettingsRow>
 
               <SettingsRow
@@ -402,8 +415,8 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
             title={t('settings.autoPilotEnabled') || 'Enable AutoPilot'}
             description={
               autoPilotStatus?.enabled
-                ? (t('settings.autoPilotActiveDescription') || `Monitoring ${autoPilotStatus.activeGeofences} stores`)
-                : (t('settings.autoPilotDescription') || 'Get card alerts when you arrive at stores')
+                ? t('settings.autoPilotActiveDescription', { count: autoPilotStatus.activeGeofences })
+                : t('settings.autoPilotDescription')
             }
             isLast={true}
           >
@@ -457,7 +470,13 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
           <SettingsRow
             icon={<Info size={20} color={colors.text.secondary} />}
             title={t('settings.cardsInDatabase')}
-            description={lastSync ? `${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}` : undefined}
+            description={
+              cardCountDetail
+                ? `${cardCountDetail}${lastSync ? ` • ${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}` : ''}`
+                : lastSync
+                ? `${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}`
+                : undefined
+            }
             isLast={true}
           >
             <Text style={styles.aboutValue}>{cardCount}</Text>
@@ -606,6 +625,17 @@ const styles = StyleSheet.create({
   },
   // Upgrade
   upgradeText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.primary.main,
+  },
+  // Sign In
+  signInButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  signInText: {
     fontSize: 13,
     fontWeight: '600',
     color: colors.primary.main,
