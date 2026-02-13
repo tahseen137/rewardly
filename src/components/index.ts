@@ -4,6 +4,7 @@
 
 // Error handling
 export { ErrorBoundary } from './ErrorBoundary';
+export { AppErrorBoundary } from './AppErrorBoundary';
 export { ErrorBanner, OfflineBanner } from './ErrorBanner';
 export { EmptyState, NoResultsState, ErrorState, OfflineState } from './EmptyState';
 

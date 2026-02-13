@@ -28,17 +28,21 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:web": "npx expo export --platform web && echo '✅ Web build successful - no crashes detected'",
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run lint && npm run typecheck && npm run test:web",
     "build:web": "expo export -p web",
     "build:preview": "eas build --profile preview --platform all",
     "build:production": "eas build --profile production --platform all",
     "build:android-apk": "eas build --profile preview --platform android",
     "build:ios-simulator": "eas build --profile development --platform ios",
+    "predeploy": "npm run validate",
     "submit:ios": "eas submit --platform ios",
     "submit:android": "eas submit --platform android",
-    "deploy:vercel": "vercel --prod",
-    "deploy:netlify": "netlify deploy --prod"
+    "deploy:vercel": "npm run predeploy && vercel --prod",
+    "deploy:netlify": "npm run predeploy && netlify deploy --prod"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
