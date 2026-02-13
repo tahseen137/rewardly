@@ -1,17 +1,12 @@
 /**
  * AnimatedNumber - Smooth number counting animation
  * Used throughout the app for engaging number reveals
+ * 
+ * Note: Uses requestAnimationFrame for web compatibility (no reanimated dependency)
  */
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Text, TextStyle } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-  withSpring,
-  Easing,
-} from 'react-native-reanimated';
 
 interface AnimatedNumberProps {
   value: number;

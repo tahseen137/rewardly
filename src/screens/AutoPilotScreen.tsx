@@ -355,19 +355,19 @@ export default function AutoPilotScreen() {
 
           <View style={styles.privacyCard}>
             <View style={styles.privacyRow}>
-              <Shield size={20} color={colors.semantic.success} />
+              <Shield size={20} color={colors.success.main} />
               <Text style={styles.privacyText}>
                 Location processed on-device only
               </Text>
             </View>
             <View style={styles.privacyRow}>
-              <Shield size={20} color={colors.semantic.success} />
+              <Shield size={20} color={colors.success.main} />
               <Text style={styles.privacyText}>
                 Only stores YOU choose are monitored
               </Text>
             </View>
             <View style={styles.privacyRow}>
-              <Shield size={20} color={colors.semantic.success} />
+              <Shield size={20} color={colors.success.main} />
               <Text style={styles.privacyText}>
                 Disable anytime in Settings
               </Text>
@@ -440,7 +440,7 @@ function GeofenceCard({ geofence, onToggle, onRemove }: GeofenceCardProps) {
           style={styles.removeButton}
           onPress={onRemove}
         >
-          <Trash2 size={18} color={colors.semantic.error} />
+          <Trash2 size={18} color={colors.error.main} />
         </TouchableOpacity>
       </View>
     </View>

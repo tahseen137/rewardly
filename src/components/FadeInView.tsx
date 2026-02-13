@@ -2,16 +2,12 @@
  * FadeInView - Animated component that fades in and slides up
  * Used throughout the app for smooth entry animations
  * Supports delay prop for staggered animations
+ * 
+ * Uses standard RN Animated for web compatibility
  */
 
-import React, { useEffect } from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
+import React, { useEffect, useRef } from 'react';
+import { StyleProp, ViewStyle, Animated, Easing } from 'react-native';
 
 interface FadeInViewProps {
   children: React.ReactNode;
@@ -36,28 +32,41 @@ export function FadeInView({
   duration = 300,
   style,
 }: FadeInViewProps) {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(10);
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(10)).current;
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      opacity.value = withTiming(1, {
-        duration,
-        easing: Easing.out(Easing.ease),
-      });
-      translateY.value = withTiming(0, {
-        duration,
-        easing: Easing.out(Easing.ease),
-      });
+      Animated.parallel([
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]).start();
     }, delay);
 
     return () => clearTimeout(timer);
   }, [delay, duration, opacity, translateY]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
-  }));
-
-  return <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>;
+  return (
+    <Animated.View
+      style={[
+        style,
+        {
+          opacity,
+          transform: [{ translateY }],
+        },
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
 }

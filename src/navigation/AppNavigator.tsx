@@ -10,9 +10,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Platform, View, ActivityIndicator, StyleSheet } from 'react-native';
+import { Platform, View, ActivityIndicator, StyleSheet, Animated } from 'react-native';
 import { Home, CreditCard, Settings, TrendingUp, Navigation, BarChart3 } from 'lucide-react-native';
-import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 
 import { 
@@ -108,18 +107,19 @@ function InsightsNavigator() {
 
 /**
  * Tab icon component using lucide-react-native with scale animation
+ * Uses standard RN Animated for web compatibility
  */
 function TabIcon({ name, focused, color }: { name: string; focused: boolean; color: string }) {
-  const scale = useAnimatedStyle(() => ({
-    transform: [
-      {
-        scale: withSpring(focused ? 1.1 : 1.0, {
-          damping: 15,
-          stiffness: 150,
-        }),
-      },
-    ],
-  }));
+  const scaleAnim = React.useRef(new Animated.Value(1)).current;
+
+  React.useEffect(() => {
+    Animated.spring(scaleAnim, {
+      toValue: focused ? 1.1 : 1.0,
+      friction: 8,
+      tension: 100,
+      useNativeDriver: true,
+    }).start();
+  }, [focused, scaleAnim]);
 
   const iconProps = {
     size: 20, // h-5 w-5
@@ -148,7 +148,7 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
   }
 
   return (
-    <Animated.View style={scale}>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <IconComponent {...iconProps} />
     </Animated.View>
   );

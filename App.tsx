@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import './src/i18n'; // Initialize i18n
@@ -16,6 +16,11 @@ import { initializePortfolio } from './src/services/CardPortfolioManager';
 import { initializePreferences, getLanguage } from './src/services/PreferenceManager';
 import { getAllCards } from './src/services/CardDataService';
 import { ThemeProvider, useTheme } from './src/theme';
+
+// Debug: Log app startup on web
+if (Platform.OS === 'web') {
+  console.log('[Rewardly] App module loading...');
+}
 
 function AppContent() {
   const theme = useTheme();

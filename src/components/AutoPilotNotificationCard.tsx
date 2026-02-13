@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   },
   rewardBadge: {
     alignItems: 'center',
-    backgroundColor: colors.semantic.success + '15',
+    backgroundColor: colors.success.main + '15',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
@@ -209,11 +209,11 @@ const styles = StyleSheet.create({
   rewardRate: {
     fontSize: 20,
     fontWeight: '700',
-    color: colors.semantic.success,
+    color: colors.success.main,
   },
   rewardLabel: {
     fontSize: 11,
-    color: colors.semantic.success,
+    color: colors.success.main,
   },
   comparison: {
     alignItems: 'center',

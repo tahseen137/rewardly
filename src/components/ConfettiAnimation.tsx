@@ -1,19 +1,12 @@
 /**
  * ConfettiAnimation - Celebration animation for achievements
  * Used when users complete signup bonuses, improve Rewards IQ, etc.
+ * 
+ * Uses standard RN Animated for web compatibility
  */
 
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-  withDelay,
-  withSequence,
-  Easing,
-  runOnJS,
-} from 'react-native-reanimated';
+import { View, StyleSheet, Dimensions, Animated, Platform } from 'react-native';
 import { colors } from '../theme/colors';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -39,69 +32,72 @@ const CONFETTI_COLORS = [
 ];
 
 function ConfettiPiece({ index, color, startX, duration, delay, onComplete }: ConfettiPieceProps) {
-  const translateY = useSharedValue(-50);
-  const translateX = useSharedValue(0);
-  const rotate = useSharedValue(0);
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(1);
+  const translateY = useRef(new Animated.Value(-50)).current;
+  const translateX = useRef(new Animated.Value(0)).current;
+  const rotate = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(1)).current;
+  const opacity = useRef(new Animated.Value(1)).current;
   
   useEffect(() => {
     const randomX = (Math.random() - 0.5) * 200;
     const randomRotation = Math.random() * 720 - 360;
     
-    translateY.value = withDelay(
-      delay,
-      withTiming(SCREEN_HEIGHT + 100, {
-        duration,
-        easing: Easing.linear,
-      })
-    );
-    
-    translateX.value = withDelay(
-      delay,
-      withTiming(randomX, {
-        duration,
-        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-      })
-    );
-    
-    rotate.value = withDelay(
-      delay,
-      withTiming(randomRotation, {
-        duration,
-        easing: Easing.linear,
-      })
-    );
-    
-    opacity.value = withDelay(
-      delay + duration * 0.7,
-      withTiming(0, {
-        duration: duration * 0.3,
-      }, () => {
+    const timer = setTimeout(() => {
+      Animated.parallel([
+        // Fall down
+        Animated.timing(translateY, {
+          toValue: SCREEN_HEIGHT + 100,
+          duration,
+          useNativeDriver: true,
+        }),
+        // Drift sideways
+        Animated.timing(translateX, {
+          toValue: randomX,
+          duration,
+          useNativeDriver: true,
+        }),
+        // Rotate
+        Animated.timing(rotate, {
+          toValue: randomRotation,
+          duration,
+          useNativeDriver: true,
+        }),
+        // Fade out near the end
+        Animated.sequence([
+          Animated.delay(duration * 0.7),
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: duration * 0.3,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Pop effect
+        Animated.sequence([
+          Animated.timing(scale, {
+            toValue: 1.2,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scale, {
+            toValue: 1,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start(() => {
         if (onComplete && index === 0) {
-          runOnJS(onComplete)();
+          onComplete();
         }
-      })
-    );
+      });
+    }, delay);
     
-    scale.value = withDelay(
-      delay,
-      withSequence(
-        withTiming(1.2, { duration: 100 }),
-        withTiming(1, { duration: 100 })
-      )
-    );
-  }, []);
+    return () => clearTimeout(timer);
+  }, [duration, delay, index, onComplete, translateY, translateX, rotate, scale, opacity]);
   
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      { rotate: `${rotate.value}deg` },
-      { scale: scale.value },
-    ],
-    opacity: opacity.value,
-  }));
+  const rotateInterpolation = rotate.interpolate({
+    inputRange: [-360, 360],
+    outputRange: ['-360deg', '360deg'],
+  });
   
   const isSquare = index % 3 === 0;
   const isCircle = index % 3 === 1;
@@ -116,8 +112,14 @@ function ConfettiPiece({ index, color, startX, duration, delay, onComplete }: Co
           width: isCircle ? 10 : 8,
           height: isCircle ? 10 : isSquare ? 8 : 14,
           borderRadius: isCircle ? 5 : 2,
+          opacity,
+          transform: [
+            { translateX },
+            { translateY },
+            { rotate: rotateInterpolation },
+            { scale },
+          ],
         },
-        animatedStyle,
       ]}
     />
   );
@@ -138,7 +140,10 @@ export default function ConfettiAnimation({
 }: ConfettiAnimationProps) {
   if (!active) return null;
   
-  const pieces = Array.from({ length: count }).map((_, index) => ({
+  // Reduce count on web for performance
+  const pieceCount = Platform.OS === 'web' ? Math.min(count, 30) : count;
+  
+  const pieces = Array.from({ length: pieceCount }).map((_, index) => ({
     index,
     color: CONFETTI_COLORS[index % CONFETTI_COLORS.length],
     startX: Math.random() * SCREEN_WIDTH,
