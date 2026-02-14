@@ -260,7 +260,7 @@ export default function CardDetailScreen() {
               <InfoRow
                 icon={<Gift size={18} color={colors.success.main} />}
                 label="Sign-Up Bonus"
-                value={card.signupBonus}
+                value={`${card.signupBonus.amount} ${card.signupBonus.currency === 'cashback' ? 'cash back' : 'points'} (spend $${card.signupBonus.spendRequirement} in ${Math.round(card.signupBonus.timeframeDays / 30)} mo)`}
               />
             )}
             {card.pointValuation && (
