@@ -80,7 +80,7 @@ describe('AuthService - Guest User Handling', () => {
         const premiumFeatures = [
           'sage-ai',         // AI chat assistant
           'save-cards',      // Save cards to portfolio
-          'autopilot',       // AutoPilot recommendations
+          'smartwallet',     // Smart Wallet recommendations
           'insights',        // Advanced insights
         ];
         

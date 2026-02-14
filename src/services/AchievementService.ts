@@ -83,7 +83,7 @@ const MAIN_SCREENS = [
   'Home',
   'Insights',
   'Sage',
-  'AutoPilot',
+  'SmartWallet',
   'MyCards',
   'Settings',
 ];

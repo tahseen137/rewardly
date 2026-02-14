@@ -137,7 +137,7 @@ describe('SubscriptionService - Feature Access', () => {
       });
       
       // Max should also include exclusive features
-      expect(maxFeatures).toContain('autopilot');
+      expect(maxFeatures).toContain('smartwallet');
       expect(maxFeatures).toContain('multi_country');
       expect(maxFeatures).toContain('export');
       expect(maxFeatures).toContain('family_sharing');
@@ -160,7 +160,7 @@ describe('SubscriptionService - Feature Access', () => {
     });
 
     it('should return max for Max-only features', () => {
-      expect(getFeatureUnlockTier('autopilot')).toBe('max');
+      expect(getFeatureUnlockTier('smartwallet')).toBe('max');
       expect(getFeatureUnlockTier('multi_country')).toBe('max');
       expect(getFeatureUnlockTier('export')).toBe('max');
       expect(getFeatureUnlockTier('family_sharing')).toBe('max');
@@ -417,9 +417,9 @@ describe('SubscriptionService - Feature Descriptions', () => {
     expect(maxDescriptions.toLowerCase()).toMatch(/unlimited/i);
   });
 
-  it('should mention AutoPilot for Max tier', () => {
+  it('should mention Smart Wallet for Max tier', () => {
     const maxDescriptions = SUBSCRIPTION_TIERS.max.featureDescriptions.join(' ');
-    expect(maxDescriptions.toLowerCase()).toMatch(/autopilot/i);
+    expect(maxDescriptions.toLowerCase()).toMatch(/smart.*wallet/i);
   });
 
   it('should mention multi-country for Max tier', () => {
