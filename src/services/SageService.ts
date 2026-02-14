@@ -168,43 +168,25 @@ class SageServiceClass {
       subscriptionTier: 'free',
     };
     
-    // Check if user is a guest
-    const currentUser = await getCurrentUser();
-    if (isGuestUser(currentUser)) {
-      throw {
-        code: 'AUTH_ERROR' as const,
-        message: 'Please sign in to chat with Sage',
-        retryable: false
-      } as SageError;
-    }
-    
-    // Get session for auth - MUST have valid user session
-    // Use getValidSession to automatically refresh expired tokens
-    const session = await getValidSession();
-    
-    if (!session?.access_token) {
-      throw {
-        code: 'AUTH_ERROR' as const,
-        message: 'Session expired. Please sign in again.',
-        retryable: true
-      } as SageError;
-    }
-    
-    const token = session.access_token;
+    // MVP: Use anon key for auth — edge function handles personalization server-side
+    const token: string | null = null;
 
     // Get conversation history (last 10 messages)
     const history = this.conversationHistory.get(convId) || [];
     const recentHistory = history.slice(-MAX_HISTORY);
 
     try {
+      const headers: Record<string, string> = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream',
+        // Always send Authorization header — use user token if available, anon key otherwise
+        'Authorization': `Bearer ${token || SUPABASE_ANON_KEY}`,
+      };
+      
       const response = await fetch(SAGE_FUNCTION_URL, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'apikey': SUPABASE_ANON_KEY,
-          'Content-Type': 'application/json',
-          'Accept': 'text/event-stream',
-        },
+        headers,
         body: JSON.stringify({
           message,
           conversationId: convId,

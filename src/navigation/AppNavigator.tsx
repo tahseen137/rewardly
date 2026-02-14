@@ -318,16 +318,6 @@ function AutoPilotScreenWithErrorBoundary() {
  */
 function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: () => void }) {
   const theme = useTheme();
-  const [canAccessSage, setCanAccessSage] = React.useState(false);
-
-  // Check Sage access on mount and when returning to tabs
-  React.useEffect(() => {
-    const checkSageAccess = async () => {
-      const { canAccessFeatureSync } = await import('../services/SubscriptionService');
-      setCanAccessSage(canAccessFeatureSync('sage_ai'));
-    };
-    checkSageAccess();
-  }, []);
 
   return (
     <Tab.Navigator
@@ -385,15 +375,13 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
           tabBarLabel: 'Insights',
         }}
       />
-      {canAccessSage && (
-        <Tab.Screen
-          name="Sage"
-          component={SageScreenWithErrorBoundary}
-          options={{
-            tabBarLabel: 'Sage',
-          }}
-        />
-      )}
+      <Tab.Screen
+        name="Sage"
+        component={SageScreenWithErrorBoundary}
+        options={{
+          tabBarLabel: 'Sage',
+        }}
+      />
       <Tab.Screen
         name="AutoPilot"
         component={AutoPilotScreenWithErrorBoundary}

@@ -112,8 +112,8 @@ describe('SubscriptionService - Tier Definitions', () => {
 
 describe('SubscriptionService - Feature Access', () => {
   describe('TIER_FEATURES', () => {
-    it('should have Free tier with no premium features', () => {
-      expect(TIER_FEATURES.free).toEqual([]);
+    it('should have Free tier with limited Sage access', () => {
+      expect(TIER_FEATURES.free).toEqual(['sage_ai']);
     });
 
     it('should have Pro tier with correct features', () => {
@@ -203,8 +203,8 @@ describe('SubscriptionService - Card Limits', () => {
 
 describe('SubscriptionService - Sage Limits', () => {
   describe('SAGE_LIMITS', () => {
-    it('should have 0 chats for Free tier (no access)', () => {
-      expect(SAGE_LIMITS.free).toBe(0);
+    it('should have 3 chats for Free tier (trial access)', () => {
+      expect(SAGE_LIMITS.free).toBe(3);
     });
 
     it('should have 10 chats per month for Pro tier', () => {

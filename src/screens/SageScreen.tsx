@@ -181,6 +181,7 @@ export const SageScreen: React.FC = () => {
   const [authCheckLoading, setAuthCheckLoading] = useState(true);
   const [sageUsage, setSageUsage] = useState<SageUsage | null>(null);
   const [chatLimitReached, setChatLimitReached] = useState(false);
+  const [chatLimitReason, setChatLimitReason] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   
   // Check authentication status
@@ -222,6 +223,9 @@ export const SageScreen: React.FC = () => {
       // Check if limit reached
       const canUse = await canUseSage();
       setChatLimitReached(!canUse.allowed);
+      if (canUse.reason) {
+        setChatLimitReason(canUse.reason);
+      }
     };
     loadSageUsage();
   }, [messages.length]);
@@ -475,48 +479,8 @@ export const SageScreen: React.FC = () => {
     );
   }
   
-  // Show sign-in overlay if user is not authenticated or is a guest
-  const isAuthenticated = currentUser && !currentUser.isAnonymous;
-  
-  if (!isAuthenticated) {
-    return (
-      <SafeAreaView style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerButton} />
-          <View style={styles.headerTitleContainer}>
-            <Sparkles size={18} color={colors.primary.main} />
-            <Text style={styles.headerTitle}>Sage</Text>
-          </View>
-          <View style={styles.headerButton} />
-        </View>
-        
-        {/* Sign-in overlay */}
-        <View style={styles.authOverlay}>
-          <View style={styles.authOverlayContent}>
-            <View style={styles.authIcon}>
-              <LogIn size={48} color={colors.primary.main} />
-            </View>
-            <Text style={styles.authTitle}>Sign In to Chat with Sage</Text>
-            <Text style={styles.authSubtitle}>
-              Create an account or sign in to get personalized credit card advice from your AI rewards advisor.
-            </Text>
-            <TouchableOpacity
-              style={styles.signInButton}
-              onPress={handleSignIn}
-              activeOpacity={0.8}
-            >
-              <LogIn size={20} color={colors.background.primary} />
-              <Text style={styles.signInButtonText}>Sign In or Create Account</Text>
-            </TouchableOpacity>
-            <Text style={styles.authFooter}>
-              Free to use • Personalized recommendations • Secure & private
-            </Text>
-          </View>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  // Auth is now optional — Sage works for all users
+  // Signed-in users get personalized advice, guests get general advice
   
   // Main chat view
   return (
@@ -599,9 +563,11 @@ export const SageScreen: React.FC = () => {
         <Animated.View entering={FadeIn.duration(300)} style={styles.limitReachedOverlay}>
           <View style={styles.limitReachedContent}>
             <Crown size={32} color={colors.warning.main} />
-            <Text style={styles.limitReachedTitle}>Monthly Limit Reached</Text>
+            <Text style={styles.limitReachedTitle}>
+              {chatLimitReason?.includes('requires Pro') ? 'Upgrade to Unlock Sage' : 'Monthly Limit Reached'}
+            </Text>
             <Text style={styles.limitReachedText}>
-              You've used all 10 Sage chats this month. Upgrade to Max for unlimited AI conversations.
+              {chatLimitReason || 'Upgrade to Max for unlimited AI conversations.'}
             </Text>
             <TouchableOpacity
               style={styles.upgradeButton}

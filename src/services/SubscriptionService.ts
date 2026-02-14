@@ -94,7 +94,7 @@ export const STRIPE_PRICE_IDS = {
  * Feature access by tier
  */
 export const TIER_FEATURES: Record<SubscriptionTier, Feature[]> = {
-  free: [],
+  free: ['sage_ai'],
   pro: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai'],
   max: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
   admin: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
@@ -114,7 +114,7 @@ export const CARD_LIMITS: Record<SubscriptionTier, number> = {
  * Sage monthly chat limits (null = unlimited)
  */
 export const SAGE_LIMITS: Record<SubscriptionTier, number | null> = {
-  free: 0, // Free users can't access Sage
+  free: 3, // Free users get 3 chats/month to try Sage
   pro: 10,
   max: null, // Unlimited
   admin: null, // Unlimited
@@ -138,7 +138,7 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     ],
     limits: {
       cardsInPortfolio: 3,
-      sageChatsPerMonth: 0,
+      sageChatsPerMonth: 3,
     },
   },
   pro: {
@@ -526,14 +526,8 @@ export async function getSageUsage(): Promise<SageUsage> {
 export async function canUseSage(): Promise<{allowed: boolean; remaining: number | null; reason?: string}> {
   const tier = await getCurrentTier();
   
-  // Free users can't access Sage at all
-  if (tier === 'free') {
-    return { 
-      allowed: false, 
-      remaining: 0, 
-      reason: 'Sage AI requires Pro or Max subscription' 
-    };
-  }
+  // Free users get limited access (3 chats/month)
+  // Falls through to the Pro limit check below
   
   // Max and Admin have unlimited access
   if (tier === 'max' || tier === 'admin') {

@@ -1,14 +1,8 @@
 /**
- * Sage Chat Stream - Supabase Edge Function (OPTIMIZED v2)
+ * Sage Chat Stream - Supabase Edge Function
  * 
- * Handles streaming AI chat with Anthropic Claude Haiku.
- * 
- * Optimizations Applied:
- * - Dynamic point valuations from database (not hardcoded)
- * - US + CA reward program support
- * - Smarter history trimming (token-aware)
- * - Graceful error recovery with fallback responses
- * - Cached reward program data (24h TTL)
+ * Handles streaming AI chat with Google Gemini Flash.
+ * Auth-optional: works for both authenticated and anonymous users.
  * 
  * Performance Target: <400ms TTFB, <2s total response
  */
@@ -56,48 +50,8 @@ interface UserContext {
   subscriptionTier?: string;
 }
 
-interface RewardProgram {
-  program_name: string;
-  direct_rate_cents: number;
-  optimal_rate_cents: number;
-  optimal_method: string;
-}
-
 // ============================================================================
-// Reward Program Cache (24h TTL)
-// ============================================================================
-
-let rewardProgramCache: { ca: RewardProgram[]; us: RewardProgram[]; timestamp: number } | null = null;
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
-
-async function getRewardPrograms(country: "US" | "CA", supabase: any): Promise<RewardProgram[]> {
-  // Check cache
-  const now = Date.now();
-  if (rewardProgramCache && (now - rewardProgramCache.timestamp < CACHE_TTL_MS)) {
-    return country === "CA" ? rewardProgramCache.ca : rewardProgramCache.us;
-  }
-
-  // Fetch from database
-  const { data: caPrograms } = await supabase
-    .from("reward_programs")
-    .select("program_name, direct_rate_cents, optimal_rate_cents, optimal_method")
-    .eq("program_category", "Credit Card Points")
-    .or("program_category.eq.Credit Card Cash Back,program_category.eq.Travel Points")
-    .order("optimal_rate_cents", { ascending: false })
-    .limit(20);
-
-  const ca = caPrograms || [];
-  
-  // For US, we'll use same programs for now (will expand database later)
-  // TODO: Add US-specific programs (Chase UR, Amex MR US, etc.) to database
-  const us = ca; // Placeholder until US programs added
-
-  rewardProgramCache = { ca, us, timestamp: now };
-  return country === "CA" ? ca : us;
-}
-
-// ============================================================================
-// System Prompt Generation (OPTIMIZED)
+// System Prompt Generation
 // ============================================================================
 
 function formatCardRewards(card: CardContext): string {
@@ -112,8 +66,9 @@ function formatCardRewards(card: CardContext): string {
   return bonuses ? `Base: ${baseRate}; ${bonuses}` : `Base: ${baseRate}`;
 }
 
-async function generateSystemPrompt(userContext: UserContext | undefined, supabase: any): Promise<string> {
+function generateSystemPrompt(userContext: UserContext | undefined): string {
   const country = userContext?.country || "CA";
+  const countryName = country === "CA" ? "Canadian" : "US";
   
   // Build card portfolio summary
   let cardSummary = "User has not added any cards yet.";
@@ -133,14 +88,6 @@ async function generateSystemPrompt(userContext: UserContext | undefined, supaba
       .join("\n");
   }
 
-  // Fetch point valuations from database
-  const programs = await getRewardPrograms(country, supabase);
-  const valuationsList = programs
-    .map(p => `- ${p.program_name}: ${p.optimal_rate_cents}¢/pt (${p.optimal_method})`)
-    .join("\n");
-
-  const countryName = country === "CA" ? "Canadian" : "US";
-
   return `You are Sage, a friendly ${countryName} credit card rewards expert. Help users maximize their rewards with specific, actionable advice.
 
 ## User's Card Portfolio
@@ -149,29 +96,25 @@ ${cardSummary}
 ## User's Point Balances
 ${balancesSummary}
 
-## ${countryName} Point Valuations (use for all calculations)
-${valuationsList}
+## Key ${countryName} Point Valuations
+- Aeroplan: 1.8-2.2¢/pt (book flights via Aeroplan)
+- Amex MR (CA): 1.5-2.0¢/pt (transfer to Aeroplan/Marriott)
+- Scene+: 0.8-1.0¢/pt (movies/groceries)
+- PC Optimum: 0.7-1.0¢/pt (Loblaws stores)
+- TD Rewards: 0.5-0.8¢/pt (travel via Expedia)
+- RBC Avion: 1.2-1.6¢/pt (transfer partners)
+- Chase UR: 1.5-2.0¢/pt (transfer to Hyatt/United)
+- Amex MR (US): 1.5-2.2¢/pt (transfer to airlines)
 
 ## Response Style
 - **Be concise**: 2-3 short paragraphs max
 - **Show the math**: "5x pts × 2.1¢ = 10.5% return"
 - **Be specific**: Name the exact card and bonus
-- **Card Comparisons**: When comparing cards, use a clear structured format:
-  
-  **[Card 1] vs [Card 2]**
-  
-  | Category | Card 1 | Card 2 |
-  |----------|--------|--------|
-  | Annual Fee | $X | $Y |
-  | Groceries | 5x | 4x |
-  | Dining | 3x | 4x |
-  | ... | ... | ... |
-  
-  **Verdict**: Which is better and why (1-2 sentences)
+- **Card Comparisons**: Use a clear structured format with categories
 
 ## What You Do
 - Recommend best card for specific purchases (show calculation)
-- Compare cards from their portfolio (structured table)
+- Compare cards from their portfolio
 - Explain point values and redemption tips
 - Calculate reward returns with real math
 
@@ -189,21 +132,17 @@ Be their rewards buddy. Brief, helpful, math-driven. 🎯`;
 // ============================================================================
 
 function trimHistoryForTokens(history: Message[], maxTokens: number = 2000): Message[] {
-  // Rough estimate: 1 token ≈ 4 characters
   const maxChars = maxTokens * 4;
-  
-  // Always include at least last 2 exchanges (4 messages)
   const minMessages = 4;
   let totalChars = 0;
   const result: Message[] = [];
   
-  // Reverse iterate to get most recent first
   for (let i = history.length - 1; i >= 0; i--) {
     const msg = history[i];
     const msgChars = msg.content.length;
     
     if (result.length < minMessages || totalChars + msgChars < maxChars) {
-      result.unshift(msg); // Add to front
+      result.unshift(msg);
       totalChars += msgChars;
     } else {
       break;
@@ -214,7 +153,40 @@ function trimHistoryForTokens(history: Message[], maxTokens: number = 2000): Mes
 }
 
 // ============================================================================
-// Fallback Responses (Graceful Degradation)
+// Convert messages to Gemini format
+// ============================================================================
+
+function toGeminiMessages(systemPrompt: string, history: Message[], currentMessage: string) {
+  const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+  
+  // Add history
+  for (const msg of history) {
+    contents.push({
+      role: msg.role === "user" ? "user" : "model",
+      parts: [{ text: msg.content }],
+    });
+  }
+  
+  // Add current message
+  contents.push({
+    role: "user",
+    parts: [{ text: currentMessage }],
+  });
+
+  return {
+    system_instruction: {
+      parts: [{ text: systemPrompt }],
+    },
+    contents,
+    generationConfig: {
+      maxOutputTokens: 1024,
+      temperature: 0.7,
+    },
+  };
+}
+
+// ============================================================================
+// Fallback Responses
 // ============================================================================
 
 function getFallbackResponse(userContext?: UserContext): string {
@@ -238,42 +210,49 @@ serve(async (req) => {
   const startTime = Date.now();
 
   try {
-    // Auth check
+    // Auth (optional — graceful degradation for anonymous users)
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Missing Authorization header" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
+    let user = null;
+    
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { global: { headers: { Authorization: authHeader } } }
+      authHeader 
+        ? { global: { headers: { Authorization: authHeader } } }
+        : {}
     );
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (authHeader) {
+      try {
+        const { data: { user: authUser }, error: userError } = await supabase.auth.getUser();
+        if (!userError && authUser) {
+          user = authUser;
+        }
+      } catch (_e) {
+        console.log("[Sage] Auth failed, continuing as anonymous");
+      }
     }
 
     // Parse request
     const { message, history, userContext, conversationId } = await req.json();
-    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+    
+    // Try Google API key first, fall back to Anthropic
+    const googleApiKey = Deno.env.get("GOOGLE_API_KEY");
+    const anthropicApiKey = Deno.env.get("ANTHROPIC_API_KEY");
 
-    if (!message || !apiKey) {
-      throw new Error("Missing message or API key");
+    if (!message) {
+      throw new Error("Missing message");
+    }
+    
+    if (!googleApiKey && !anthropicApiKey) {
+      throw new Error("No API key configured");
     }
 
-    // Build messages array with optimized history
-    const systemPrompt = await generateSystemPrompt(userContext, supabase);
-    const messages: Message[] = [];
+    // Build system prompt
+    const systemPrompt = generateSystemPrompt(userContext);
     
-    // Add conversation history (token-aware trimming)
+    // Build messages
+    const messages: Message[] = [];
     if (history && Array.isArray(history)) {
       const validHistory = history.filter((msg: any) => 
         (msg.role === "user" || msg.role === "assistant") && msg.content
@@ -281,143 +260,258 @@ serve(async (req) => {
       const trimmedHistory = trimHistoryForTokens(validHistory, 2000);
       messages.push(...trimmedHistory);
     }
-    
-    // Add current message
-    messages.push({ role: "user", content: message });
 
-    console.log(`[Sage] TTFB: ${Date.now() - startTime}ms | History: ${messages.length - 1} msgs`);
+    console.log(`[Sage] TTFB: ${Date.now() - startTime}ms | History: ${messages.length} msgs | Engine: ${googleApiKey ? 'Gemini' : 'Anthropic'}`);
 
-    // Call Anthropic API with streaming + timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    // ========================================================================
+    // Gemini Flash API (preferred)
+    // ========================================================================
+    if (googleApiKey) {
+      const geminiBody = toGeminiMessages(systemPrompt, messages, message);
+      const geminiModel = "gemini-2.0-flash";
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?key=${googleApiKey}&alt=sse`;
 
-    let response: Response;
-    try {
-      response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "claude-3-5-haiku-20241022",
-          max_tokens: 1024,
-          system: systemPrompt,
-          messages,
-          stream: true,
-        }),
-        signal: controller.signal,
-      });
-    } catch (err) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      let response: Response;
+      try {
+        response = await fetch(geminiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(geminiBody),
+          signal: controller.signal,
+        });
+      } catch (err) {
+        clearTimeout(timeoutId);
+        if (err.name === "AbortError") {
+          console.error("[Sage] Gemini timeout");
+          return new Response(JSON.stringify({ text: getFallbackResponse(userContext), fallback: true }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        throw err;
+      }
+
       clearTimeout(timeoutId);
-      
-      // Graceful fallback on timeout/error
-      if (err.name === "AbortError") {
-        console.error("[Sage] Anthropic timeout");
-        const fallback = getFallbackResponse(userContext);
-        return new Response(JSON.stringify({ text: fallback, fallback: true }), {
+
+      if (!response.ok) {
+        const err = await response.text();
+        console.error("[Sage] Gemini error:", response.status, err);
+        return new Response(JSON.stringify({ 
+          text: `Sage is temporarily unavailable. (API ${response.status})`, 
+          fallback: true,
+          debug: { status: response.status, error: err.substring(0, 200) }
+        }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      throw err;
-    }
 
-    clearTimeout(timeoutId);
+      // Stream Gemini SSE response
+      const stream = new ReadableStream({
+        async start(controller) {
+          const reader = response.body?.getReader();
+          if (!reader) { controller.close(); return; }
 
-    if (!response.ok) {
-      const err = await response.text();
-      console.error("[Sage] Anthropic error:", err);
-      
-      // Fallback on API error
-      const fallback = getFallbackResponse(userContext);
-      return new Response(JSON.stringify({ text: fallback, fallback: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+          const decoder = new TextDecoder();
+          const encoder = new TextEncoder();
+          let buffer = "";
 
-    // Stream response back to client
-    const stream = new ReadableStream({
-      async start(controller) {
-        const reader = response.body?.getReader();
-        if (!reader) {
-          controller.close();
-          return;
-        }
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
 
-        const decoder = new TextDecoder();
-        const encoder = new TextEncoder();
-        let buffer = "";
+              buffer += decoder.decode(value, { stream: true });
+              const events = buffer.split("\n\n");
+              buffer = events.pop() || "";
 
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+              for (const eventBlock of events) {
+                const lines = eventBlock.split("\n");
+                let eventData = "";
 
-            buffer += decoder.decode(value, { stream: true });
-            const events = buffer.split("\n\n");
-            buffer = events.pop() || "";
-
-            for (const eventBlock of events) {
-              const lines = eventBlock.split("\n");
-              let eventData = "";
-
-              for (const line of lines) {
-                if (line.startsWith("data: ")) {
-                  eventData = line.slice(6);
-                  break;
+                for (const line of lines) {
+                  if (line.startsWith("data: ")) {
+                    eventData = line.slice(6);
+                    break;
+                  }
                 }
-              }
 
-              if (eventData) {
-                try {
-                  const parsed = JSON.parse(eventData);
-                  
-                  if (parsed.type === "content_block_delta" && parsed.delta?.text) {
-                    // Send text chunk
-                    const chunk = JSON.stringify({ text: parsed.delta.text });
-                    controller.enqueue(encoder.encode(`event: text\ndata: ${chunk}\n\n`));
+                if (eventData) {
+                  try {
+                    const parsed = JSON.parse(eventData);
+                    
+                    // Gemini response format: candidates[0].content.parts[0].text
+                    const text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                      const chunk = JSON.stringify({ text });
+                      controller.enqueue(encoder.encode(`event: text\ndata: ${chunk}\n\n`));
+                    }
+
+                    // Check for finish
+                    const finishReason = parsed?.candidates?.[0]?.finishReason;
+                    if (finishReason === "STOP" || finishReason === "MAX_TOKENS") {
+                      const totalTime = Date.now() - startTime;
+                      const doneData = JSON.stringify({ 
+                        conversationId: conversationId || `conv_${Date.now()}`,
+                        status: "complete",
+                        metrics: { totalMs: totalTime, historyLength: messages.length }
+                      });
+                      controller.enqueue(encoder.encode(`event: done\ndata: ${doneData}\n\n`));
+                      console.log(`[Sage] Complete: ${totalTime}ms (Gemini Flash)`);
+                    }
+                  } catch (_e) {
+                    // Ignore parse errors
                   }
-                  
-                  if (parsed.type === "message_stop") {
-                    // Send done event with conversation ID + performance metrics
-                    const totalTime = Date.now() - startTime;
-                    const doneData = JSON.stringify({ 
-                      conversationId: conversationId || `conv_${Date.now()}`,
-                      status: "complete",
-                      metrics: {
-                        totalMs: totalTime,
-                        historyLength: messages.length - 1
-                      }
-                    });
-                    controller.enqueue(encoder.encode(`event: done\ndata: ${doneData}\n\n`));
-                    console.log(`[Sage] Complete: ${totalTime}ms`);
-                  }
-                } catch (_e) {
-                  // Ignore parse errors (ping/keepalive events)
                 }
               }
             }
+            
+            // Send done event if not already sent
+            const totalTime = Date.now() - startTime;
+            const doneData = JSON.stringify({ 
+              conversationId: conversationId || `conv_${Date.now()}`,
+              status: "complete",
+              metrics: { totalMs: totalTime, historyLength: messages.length }
+            });
+            controller.enqueue(encoder.encode(`event: done\ndata: ${doneData}\n\n`));
+          } catch (err) {
+            console.error("[Sage] Gemini stream error:", err);
+            const errorData = JSON.stringify({ error: "Stream interrupted" });
+            controller.enqueue(encoder.encode(`event: error\ndata: ${errorData}\n\n`));
+          } finally {
+            controller.close();
+            reader.releaseLock();
           }
-        } catch (err) {
-          console.error("[Sage] Stream error:", err);
-          const errorData = JSON.stringify({ error: "Stream interrupted" });
-          controller.enqueue(encoder.encode(`event: error\ndata: ${errorData}\n\n`));
-        } finally {
-          controller.close();
-          reader.releaseLock();
-        }
-      },
-    });
+        },
+      });
 
-    return new Response(stream, {
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
-      },
-    });
+      return new Response(stream, {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          "Connection": "keep-alive",
+        },
+      });
+    }
+
+    // ========================================================================
+    // Anthropic Fallback (if no Google key)
+    // ========================================================================
+    if (anthropicApiKey) {
+      messages.push({ role: "user", content: message });
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      let response: Response;
+      try {
+        response = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "x-api-key": anthropicApiKey,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-haiku-20241022",
+            max_tokens: 1024,
+            system: systemPrompt,
+            messages,
+            stream: true,
+          }),
+          signal: controller.signal,
+        });
+      } catch (err) {
+        clearTimeout(timeoutId);
+        if (err.name === "AbortError") {
+          return new Response(JSON.stringify({ text: getFallbackResponse(userContext), fallback: true }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        throw err;
+      }
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const err = await response.text();
+        console.error("[Sage] Anthropic error:", response.status, err);
+        return new Response(JSON.stringify({ 
+          text: `Sage is temporarily unavailable. (API ${response.status})`,
+          fallback: true
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Stream Anthropic response (same as before)
+      const stream = new ReadableStream({
+        async start(controller) {
+          const reader = response.body?.getReader();
+          if (!reader) { controller.close(); return; }
+
+          const decoder = new TextDecoder();
+          const encoder = new TextEncoder();
+          let buffer = "";
+
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const events = buffer.split("\n\n");
+              buffer = events.pop() || "";
+
+              for (const eventBlock of events) {
+                const lines = eventBlock.split("\n");
+                let eventData = "";
+                for (const line of lines) {
+                  if (line.startsWith("data: ")) { eventData = line.slice(6); break; }
+                }
+
+                if (eventData) {
+                  try {
+                    const parsed = JSON.parse(eventData);
+                    if (parsed.type === "content_block_delta" && parsed.delta?.text) {
+                      const chunk = JSON.stringify({ text: parsed.delta.text });
+                      controller.enqueue(encoder.encode(`event: text\ndata: ${chunk}\n\n`));
+                    }
+                    if (parsed.type === "message_stop") {
+                      const totalTime = Date.now() - startTime;
+                      const doneData = JSON.stringify({ 
+                        conversationId: conversationId || `conv_${Date.now()}`,
+                        status: "complete",
+                        metrics: { totalMs: totalTime, historyLength: messages.length - 1 }
+                      });
+                      controller.enqueue(encoder.encode(`event: done\ndata: ${doneData}\n\n`));
+                    }
+                  } catch (_e) {}
+                }
+              }
+            }
+          } catch (err) {
+            console.error("[Sage] Anthropic stream error:", err);
+          } finally {
+            controller.close();
+            reader.releaseLock();
+          }
+        },
+      });
+
+      return new Response(stream, {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          "Connection": "keep-alive",
+        },
+      });
+    }
+
+    throw new Error("No API key available");
 
   } catch (error) {
     console.error("[Sage] Handler error:", error);
