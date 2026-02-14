@@ -100,11 +100,11 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
-  // Initialize state
+  // Initialize state with sensible defaults for immediate value
   const [state, setState] = useState<CalculatorState>({
     selectedStore: null,
-    selectedCategory: null,
-    amount: null,
+    selectedCategory: SpendingCategory.GROCERIES, // Default to groceries - most common spend
+    amount: 100, // Default to $100 - realistic everyday purchase amount
     amountError: null,
     results: null,
     isCalculating: false,
@@ -116,6 +116,9 @@ export default function HomeScreen() {
   const [recommendations, setRecommendations] = useState<CardRecommendation[]>([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Top cards for category - shown when user has no portfolio
+  const [topCardsForCategory, setTopCardsForCategory] = useState<CalculatorOutput | null>(null);
 
   // Function to load data
   const loadData = useCallback(async () => {
@@ -217,31 +220,56 @@ export default function HomeScreen() {
     // Check if we have all required inputs
     if (!selectedCategory || !amount || amount <= 0) {
       setState((prev) => ({ ...prev, results: null }));
+      setTopCardsForCategory(null);
       return;
     }
 
-    // Get portfolio cards
+    const allCards = getAllCardsSync();
+    if (allCards.length === 0) {
+      setState((prev) => ({ ...prev, results: null }));
+      setTopCardsForCategory(null);
+      return;
+    }
+
+    // Build point valuations map
+    const pointValuations = new Map<string, number>();
+    allCards.forEach((card) => {
+      if (card.pointValuation) {
+        pointValuations.set(card.id, card.pointValuation);
+      }
+    });
+
+    // Always calculate top cards for category (from ALL database cards)
+    // This powers the "discover cards" experience for users without a portfolio
+    try {
+      const allCardIds = allCards.map((c) => c.id);
+      const topCardsInput: CalculatorInput = {
+        category: selectedCategory,
+        amount,
+        portfolioCardIds: allCardIds,
+      };
+      const topCardsOutput = calculateRewards(topCardsInput, allCards, pointValuations);
+      // Limit to top 5 cards for cleaner display
+      topCardsOutput.results = topCardsOutput.results.slice(0, 5);
+      setTopCardsForCategory(topCardsOutput);
+    } catch (error) {
+      console.error('Top cards calculation error:', error);
+      setTopCardsForCategory(null);
+    }
+
+    // Get portfolio cards for personalized results
     const portfolio = getCards();
     if (portfolio.length === 0) {
-      setState((prev) => ({ ...prev, results: null }));
+      setState((prev) => ({ ...prev, results: null, isCalculating: false }));
       return;
     }
 
     // Set calculating state
     setState((prev) => ({ ...prev, isCalculating: true }));
 
-    // Perform calculation
+    // Perform calculation for portfolio cards
     try {
-      const allCards = getAllCardsSync();
       const portfolioCardIds = portfolio.map((uc) => uc.cardId);
-
-      // Build point valuations map
-      const pointValuations = new Map<string, number>();
-      allCards.forEach((card) => {
-        if (card.pointValuation) {
-          pointValuations.set(card.id, card.pointValuation);
-        }
-      });
 
       const input: CalculatorInput = {
         category: selectedCategory,
@@ -417,13 +445,48 @@ export default function HomeScreen() {
 
         {/* Results Section */}
         {!hasCards ? (
-          <EmptyState
-            icon="💳"
-            title={t('home.noCardsTitle') || 'No Cards in Portfolio'}
-            description={
-              t('home.noCardsMessage') || 'Add cards to your portfolio to see rewards'
-            }
-          />
+          // When user has no portfolio, show top cards from database for selected category
+          state.selectedCategory && topCardsForCategory && topCardsForCategory.results.length > 0 ? (
+            <View>
+              {/* Personalization hint banner */}
+              <TouchableOpacity
+                style={styles.personalizationBanner}
+                onPress={() => navigation.navigate('MyCards' as never)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.bannerEmoji}>💡</Text>
+                <View style={styles.bannerTextContainer}>
+                  <Text style={styles.bannerText}>
+                    Add your cards for personalized recommendations
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={colors.primary.main} />
+              </TouchableOpacity>
+
+              <Text style={styles.resultsHeader}>
+                {t('home.topCardsTitle') || `Top Cards for ${state.selectedCategory?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'This Category'}`}
+              </Text>
+              <RewardsDisplay
+                results={topCardsForCategory.results}
+                bestCard={topCardsForCategory.bestCard}
+                isLoading={false}
+                isEmpty={false}
+                amount={state.amount || 100}
+                cards={getAllCardsSync()}
+                category={state.selectedCategory || undefined}
+                onCardPress={(result) => navigation.navigate('Insights', { screen: 'CardBenefits', params: { cardId: result.cardId } } as never)}
+              />
+            </View>
+          ) : (
+            <EmptyState
+              icon="🔍"
+              title={t('home.getStartedTitle') || 'Get Started'}
+              description={
+                t('home.getStartedMessage') ||
+                'Select a category above to discover the best cards'
+              }
+            />
+          )
         ) : state.results ? (
           <View>
             <Text style={styles.resultsHeader}>
@@ -839,6 +902,29 @@ const createStyles = (theme: Theme) =>
     streakText: {
       fontSize: 12,
       fontWeight: '600',
+      color: colors.primary.dark,
+    },
+    // Personalization banner styles
+    personalizationBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.primary.bg20,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.primary.main,
+      padding: 12,
+      marginBottom: 16,
+      gap: 8,
+    },
+    bannerEmoji: {
+      fontSize: 20,
+    },
+    bannerTextContainer: {
+      flex: 1,
+    },
+    bannerText: {
+      fontSize: 13,
+      fontWeight: '500',
       color: colors.primary.dark,
     },
   });

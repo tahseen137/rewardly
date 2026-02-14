@@ -430,7 +430,7 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         name="SmartWallet"
         component={SmartWalletScreenWithErrorBoundary}
         options={{
-          tabBarLabel: 'Smart Wallet',
+          tabBarLabel: 'Wallet',
         }}
       />
       <Tab.Screen
