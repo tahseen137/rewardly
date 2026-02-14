@@ -286,6 +286,28 @@ export default function HomeScreen() {
           </Text>
         </View>
 
+        {/* Wallet Optimizer Hero Banner */}
+        <TouchableOpacity
+          style={styles.heroCard}
+          onPress={() => navigation.navigate('WalletOptimizer' as never)}
+          activeOpacity={0.8}
+        >
+          <View style={styles.heroContent}>
+            <View style={styles.heroIcon}>
+              <Text style={styles.heroEmoji}>🎯</Text>
+            </View>
+            <View style={styles.heroText}>
+              <Text style={styles.heroTitle}>Find Your Perfect Wallet</Text>
+              <Text style={styles.heroSubtitle}>
+                Get personalized card recommendations based on your spending
+              </Text>
+            </View>
+          </View>
+          <View style={styles.heroArrow}>
+            <ChevronRight size={24} color={colors.primary.main} />
+          </View>
+        </TouchableOpacity>
+
         {/* Calculator Section */}
         {/* Store Selector */}
         <View style={styles.section}>
@@ -465,6 +487,51 @@ const createStyles = (theme: Theme) =>
       fontSize: 13, // text-sm
       color: colors.text.secondary,
       textAlign: 'center',
+    },
+    heroCard: {
+      backgroundColor: colors.primary.light,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 24,
+      borderWidth: 2,
+      borderColor: colors.primary.main,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    heroContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      gap: 16,
+    },
+    heroIcon: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: colors.primary.main,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    heroEmoji: {
+      fontSize: 28,
+    },
+    heroText: {
+      flex: 1,
+    },
+    heroTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.primary.dark,
+      marginBottom: 4,
+    },
+    heroSubtitle: {
+      fontSize: 13,
+      color: colors.primary.dark,
+      lineHeight: 18,
+    },
+    heroArrow: {
+      marginLeft: 8,
     },
     section: {
       marginBottom: 16, // space-y-4 (16px gap)

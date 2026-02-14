@@ -11,9 +11,11 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
+  TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
-import { useRoute, RouteProp } from '@react-navigation/native';
-import { Plane, ShieldCheck, Umbrella, Star } from 'lucide-react-native';
+import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
+import { Plane, ShieldCheck, Umbrella, Star, DollarSign, TrendingUp } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { colors } from '../theme/colors';
@@ -29,7 +31,10 @@ import {
 } from '../services/BenefitsService';
 import { getCardByIdSync } from '../services/CardDataService';
 import { getCurrentTierSync } from '../services/SubscriptionService';
-import { LockedFeature } from '../components';
+import { getSpendingProfileSync } from '../services/SpendingProfileService';
+import { calculateFeeBreakeven } from '../services/FeeBreakevenService';
+import { calculateSignupBonusROI } from '../services/SignupBonusService';
+import { LockedFeature, FeeBreakevenCard, SignupBonusCard } from '../components';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -114,11 +119,16 @@ function BenefitsSection({ category, benefits, startIndex }: BenefitsSectionProp
 
 export default function CardBenefitsScreen() {
   const route = useRoute<RouteParams>();
+  const navigation = useNavigation();
   const { cardId } = route.params;
 
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [hasAccess, setHasAccess] = useState(true);
   const [lockedCount, setLockedCount] = useState(0);
+  const [feeBreakevenResult, setFeeBreakevenResult] = useState<any>(null);
+  const [signupBonusResult, setSignupBonusResult] = useState<any>(null);
+  const [hasSpendingProfile, setHasSpendingProfile] = useState(false);
+  const [loadingAnalysis, setLoadingAnalysis] = useState(true);
 
   const card = useMemo(() => getCardByIdSync(cardId), [cardId]);
 
@@ -131,6 +141,42 @@ export default function CardBenefitsScreen() {
     setHasAccess(canViewAllBenefits(tier));
     setLockedCount(getLockedBenefitsCount(allBenefits.length, tier));
   }, [cardId]);
+
+  // Load fee breakeven and signup bonus analysis
+  useEffect(() => {
+    const loadAnalysis = async () => {
+      setLoadingAnalysis(true);
+      const profile = getSpendingProfileSync();
+      
+      if (profile) {
+        setHasSpendingProfile(true);
+        
+        // Calculate fee breakeven if card has annual fee
+        if (card?.annualFee && card.annualFee > 0) {
+          const feeResult = calculateFeeBreakeven(cardId, profile);
+          if (feeResult.success) {
+            setFeeBreakevenResult(feeResult.value);
+          }
+        }
+        
+        // Calculate signup bonus ROI if card has signup bonus
+        if (card?.signupBonus) {
+          const bonusResult = calculateSignupBonusROI(cardId, profile);
+          if (bonusResult.success) {
+            setSignupBonusResult(bonusResult.value);
+          }
+        }
+      } else {
+        setHasSpendingProfile(false);
+      }
+      
+      setLoadingAnalysis(false);
+    };
+    
+    if (card) {
+      loadAnalysis();
+    }
+  }, [cardId, card]);
 
   const groupedBenefits = useMemo(() => {
     return getBenefitsByCategory(benefits);
@@ -196,6 +242,46 @@ export default function CardBenefitsScreen() {
             benefits={groupedBenefits.lifestyle}
             startIndex={benefitIndex}
           />
+        )}
+
+        {/* Signup Bonus Analysis Section */}
+        {!loadingAnalysis && signupBonusResult && (
+          <View style={styles.analysisSection}>
+            <View style={styles.analysisSectionHeader}>
+              <TrendingUp size={20} color={colors.success.main} />
+              <Text style={styles.analysisSectionTitle}>Signup Bonus Analysis</Text>
+            </View>
+            <SignupBonusCard result={signupBonusResult} />
+          </View>
+        )}
+
+        {/* Fee Analysis Section */}
+        {!loadingAnalysis && feeBreakevenResult && (
+          <View style={styles.analysisSection}>
+            <View style={styles.analysisSectionHeader}>
+              <DollarSign size={20} color={colors.warning.main} />
+              <Text style={styles.analysisSectionTitle}>Fee Analysis</Text>
+            </View>
+            <FeeBreakevenCard result={feeBreakevenResult} />
+          </View>
+        )}
+
+        {/* No Spending Profile CTA */}
+        {!loadingAnalysis && !hasSpendingProfile && (card?.annualFee || card?.signupBonus) && (
+          <View style={styles.ctaSection}>
+            <View style={styles.ctaCard}>
+              <Text style={styles.ctaTitle}>Get Personalized Insights</Text>
+              <Text style={styles.ctaDescription}>
+                Set up your spending profile to see if this card's {card?.annualFee && card?.signupBonus ? 'fee and signup bonus are' : card?.annualFee ? 'fee is' : 'signup bonus is'} worth it for you.
+              </Text>
+              <TouchableOpacity
+                style={styles.ctaButton}
+                onPress={() => navigation.navigate('WalletOptimizer' as never)}
+              >
+                <Text style={styles.ctaButtonText}>Set Up Spending Profile</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
 
         {/* Locked Benefits Banner */}
@@ -348,5 +434,57 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     color: colors.text.secondary,
+  },
+  analysisSection: {
+    marginBottom: 24,
+    paddingHorizontal: 20,
+  },
+  analysisSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  analysisSectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text.primary,
+  },
+  ctaSection: {
+    marginBottom: 24,
+    paddingHorizontal: 20,
+  },
+  ctaCard: {
+    backgroundColor: colors.primary.light,
+    borderRadius: borderRadius.lg,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: colors.primary.main,
+    alignItems: 'center',
+  },
+  ctaTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.primary.dark,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  ctaDescription: {
+    fontSize: 14,
+    color: colors.primary.dark,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  ctaButton: {
+    backgroundColor: colors.primary.main,
+    borderRadius: borderRadius.md,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  ctaButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.background.primary,
   },
 });

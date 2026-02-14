@@ -74,6 +74,11 @@ export { default as AutoPilotNotificationCard } from './AutoPilotNotificationCar
 export { default as RewardsIQWidget } from './RewardsIQWidget';
 export { default as MissedRewardsWidget } from './MissedRewardsWidget';
 
+// Cycle 3 - Smart Recommendations Components
+export { default as SpendingProfileForm } from './SpendingProfileForm';
+export { default as FeeBreakevenCard } from './FeeBreakevenCard';
+export { default as SignupBonusCard } from './SignupBonusCard';
+
 // Tier 2 - Social Sharing
 export { default as SocialShareCard } from './SocialShareCard';
 

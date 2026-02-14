@@ -397,6 +397,241 @@ export interface AppNotification {
 }
 
 // ============================================================================
+// Cycle 3: Smart Recommendations Engine Types
+// ============================================================================
+
+/**
+ * Spending categories matching existing SpendingCategory enum
+ * Extended to include 'transit' for the spending profile
+ */
+export type SpendingProfileCategory = 
+  | 'groceries'
+  | 'dining'
+  | 'gas'
+  | 'travel'
+  | 'online_shopping'
+  | 'entertainment'
+  | 'drugstores'
+  | 'home_improvement'
+  | 'transit'
+  | 'other';
+
+/**
+ * F21/F22/F23 Shared: User's monthly spending profile
+ */
+export interface SpendingProfile {
+  id: string;
+  userId: string | null;  // null for anonymous/local-only users
+  groceries: number;      // Monthly $ amount
+  dining: number;
+  gas: number;
+  travel: number;
+  onlineShopping: number;
+  entertainment: number;
+  drugstores: number;
+  homeImprovement: number;
+  transit: number;
+  other: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Spending profile input (without metadata)
+ */
+export interface SpendingProfileInput {
+  groceries: number;
+  dining: number;
+  gas: number;
+  travel: number;
+  onlineShopping: number;
+  entertainment: number;
+  drugstores: number;
+  homeImprovement: number;
+  transit: number;
+  other: number;
+}
+
+/**
+ * F21: Wallet Optimizer Constraints
+ */
+export interface WalletConstraints {
+  maxTotalAnnualFees: number;        // e.g., $300/yr max across all cards
+  maxCards: 2 | 3;                   // Number of cards in combination
+  preferredBanks?: string[];         // e.g., ["TD", "RBC"]
+  excludedCardIds?: string[];        // Cards user doesn't want
+  country: 'CA' | 'US';
+  preferredRewardType?: 'cashback' | 'points' | 'any';
+}
+
+/**
+ * F21: Category assignment in wallet result
+ */
+export interface CategoryAssignment {
+  category: SpendingCategory;
+  bestCardId: string;
+  bestCardName: string;
+  rewardRate: number;                // e.g., 4 for 4% or 4x
+  rewardType: RewardType;
+  monthlySpend: number;
+  monthlyRewards: number;            // In CAD
+  annualRewards: number;             // In CAD
+}
+
+/**
+ * F21: Single wallet combination result
+ */
+export interface WalletCombination {
+  rank: number;
+  cardIds: string[];
+  cards: Card[];
+  totalAnnualRewards: number;        // Before fees, in CAD
+  totalAnnualFees: number;
+  netAnnualValue: number;            // Rewards - Fees
+  categoryAssignments: CategoryAssignment[];
+  effectiveRewardRate: number;       // Weighted average across all spending
+}
+
+/**
+ * F21: Comparison to current wallet
+ */
+export interface CurrentWalletComparison {
+  currentCardIds: string[];
+  currentNetValue: number;
+  improvement: number;               // $ more per year
+  improvementPercent: number;
+}
+
+/**
+ * F21: Full wallet optimizer result
+ */
+export interface WalletOptimizerResult {
+  spendingProfile: SpendingProfile;
+  constraints: WalletConstraints;
+  recommendations: WalletCombination[];  // Top N combinations
+  totalCombinationsEvaluated: number;
+  prunedCardCount: number;               // Cards after pruning
+  computeTimeMs: number;
+  vsCurrentWallet?: CurrentWalletComparison;
+}
+
+/**
+ * F22: Timeline entry for signup bonus progress
+ */
+export interface SignupBonusTimelineEntry {
+  month: number;                     // 1, 2, 3, etc.
+  cumulativeSpend: number;
+  hitTarget: boolean;
+  percentComplete: number;
+}
+
+/**
+ * F22: Signup bonus verdict
+ */
+export type SignupBonusVerdict = 'excellent' | 'good' | 'marginal' | 'not_worth_it';
+
+/**
+ * F22: Signup Bonus ROI result
+ */
+export interface SignupBonusROI {
+  card: Card;
+  bonusValueCAD: number;             // Converted to CAD
+  minimumSpend: number;
+  timeframeDays: number;
+  monthlySpendNeeded: number;        // To hit minimum on time
+  userMonthlySpend: number;          // From spending profile
+  canHitMinimum: boolean;
+  monthsToHit: number;
+  percentOfTimeframeUsed: number;    // monthsToHit / (timeframeDays / 30)
+  timeline: SignupBonusTimelineEntry[];
+  firstYearValue: number;            // Bonus + rewards - fee
+  ongoingAnnualValue: number;        // Year 2+ rewards - fee
+  verdict: SignupBonusVerdict;
+  verdictReason: string;
+}
+
+/**
+ * F23: Fee breakeven category breakdown
+ */
+export interface FeeCategoryBreakdown {
+  category: SpendingCategory;
+  monthlySpend: number;
+  rewardRate: number;
+  annualRewards: number;
+  percentOfFeeRecovered: number;     // This category alone covers X% of fee
+}
+
+/**
+ * F23: No-fee card comparison
+ */
+export interface NoFeeComparison {
+  bestNoFeeCard: Card;
+  noFeeAnnualRewards: number;
+  feeCardAdvantage: number;          // Can be negative
+  verdict: string;                   // Human-readable verdict
+}
+
+/**
+ * F23: Fee breakeven verdict
+ */
+export type FeeBreakevenVerdict = 'easily_worth_it' | 'worth_it' | 'borderline' | 'not_worth_it';
+
+/**
+ * F23: Fee breakeven result
+ */
+export interface FeeBreakevenResult {
+  card: Card;
+  annualFee: number;
+  annualRewardsEarned: number;
+  netValue: number;                  // Rewards - Fee
+  breakEvenMonthlySpend: number;     // Total spend needed to justify fee
+  userMonthlySpend: number;
+  userAnnualSpend: number;
+  exceedsBreakeven: boolean;
+  surplusOverBreakeven: number;      // How much above breakeven (or deficit if negative)
+  multiplierOverFee: number;         // e.g., 2.5 means rewards are 2.5x the fee
+  categoryBreakdown: FeeCategoryBreakdown[];
+  noFeeComparison?: NoFeeComparison;
+  verdict: FeeBreakevenVerdict;
+  verdictReason: string;
+}
+
+/**
+ * Pruned card for wallet optimizer (lightweight)
+ */
+export interface PrunedCard {
+  cardId: string;
+  card: Card;
+  topCategories: SpendingCategory[]; // Categories where this card is top 15
+  maxCategoryRate: number;           // Highest category rate
+  annualFee: number;
+}
+
+/**
+ * Error types for Cycle 3 services
+ */
+export type SpendingProfileError =
+  | { type: 'INVALID_AMOUNT'; category: string; value: number }
+  | { type: 'PROFILE_NOT_FOUND' }
+  | { type: 'STORAGE_ERROR'; message: string };
+
+export type WalletOptimizerError =
+  | { type: 'NO_CARDS_AVAILABLE'; country: string }
+  | { type: 'INVALID_CONSTRAINTS'; message: string }
+  | { type: 'TIMEOUT'; computeTimeMs: number }
+  | { type: 'SPENDING_PROFILE_REQUIRED' };
+
+export type SignupBonusError =
+  | { type: 'NO_SIGNUP_BONUS'; cardId: string }
+  | { type: 'SPENDING_PROFILE_REQUIRED' }
+  | { type: 'CARD_NOT_FOUND'; cardId: string };
+
+export type FeeBreakevenError =
+  | { type: 'NO_ANNUAL_FEE'; cardId: string }
+  | { type: 'SPENDING_PROFILE_REQUIRED' }
+  | { type: 'CARD_NOT_FOUND'; cardId: string };
+
+// ============================================================================
 // Helper Functions
 // ============================================================================
 

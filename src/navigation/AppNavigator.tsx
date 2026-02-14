@@ -2,7 +2,7 @@
  * AppNavigator - Main navigation structure with auth handling
  * Shows AuthScreen if not logged in, OnboardingScreen for new users
  * Then bottom tabs with glass morphism effect and lucide icons
- * 
+ *
  * MEGA BUILD UPDATE: Added Insights tab with MissedRewards, RewardsIQ, PortfolioOptimizer
  */
 
@@ -14,16 +14,17 @@ import { Platform, View, ActivityIndicator, StyleSheet, Animated } from 'react-n
 import { Home, CreditCard, Settings, Sparkles, Navigation, BarChart3 } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 
-import { 
+import {
   HomeScreen,
-  MyCardsScreen, 
-  SettingsScreen, 
-  SageScreen, 
+  MyCardsScreen,
+  SettingsScreen,
+  SageScreen,
   AutoPilotScreen,
   InsightsHomeScreen,
   MissedRewardsScreen,
   RewardsIQScreen,
   PortfolioOptimizerScreen,
+  WalletOptimizerScreen,
   SpendingInsightsScreen,
   CardTrackerScreen,
   CardBenefitsScreen,
@@ -55,6 +56,7 @@ export type InsightsStackParamList = {
   MissedRewards: undefined;
   RewardsIQ: undefined;
   PortfolioOptimizer: undefined;
+  WalletOptimizer: undefined;
   SpendingInsights: undefined;
   CardTracker: undefined;
   CardBenefits: { cardId: string };
@@ -80,8 +82,8 @@ export type RootTabParamList = {
 // Root Stack for modals (Upgrade screen, Notifications)
 export type RootStackParamList = {
   MainTabs: undefined;
-  Upgrade: { 
-    feature?: string; 
+  Upgrade: {
+    feature?: string;
     source?: string;
   };
   Notifications: undefined;
@@ -105,17 +107,17 @@ function InsightsNavigator() {
       }}
       initialRouteName="InsightsHome"
     >
-      <InsightsStack.Screen 
-        name="InsightsHome" 
+      <InsightsStack.Screen
+        name="InsightsHome"
         component={InsightsHomeScreen}
       />
-      <InsightsStack.Screen 
-        name="MissedRewards" 
+      <InsightsStack.Screen
+        name="MissedRewards"
         component={MissedRewardsScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="RewardsIQ" 
+      <InsightsStack.Screen
+        name="RewardsIQ"
         component={RewardsIQScreen}
         options={{ animation: 'slide_from_right' }}
       />
@@ -125,57 +127,62 @@ function InsightsNavigator() {
         options={{ animation: 'slide_from_right' }}
       />
       <InsightsStack.Screen 
+        name="WalletOptimizer" 
+        component={WalletOptimizerScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
         name="SpendingInsights" 
         component={SpendingInsightsScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="CardTracker" 
+      <InsightsStack.Screen
+        name="CardTracker"
         component={CardTrackerScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="CardBenefits" 
+      <InsightsStack.Screen
+        name="CardBenefits"
         component={CardBenefitsScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="SUBTracker" 
+      <InsightsStack.Screen
+        name="SUBTracker"
         component={SUBTrackerScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="CardCompare" 
+      <InsightsStack.Screen
+        name="CardCompare"
         component={CardCompareScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="SpendingLog" 
+      <InsightsStack.Screen
+        name="SpendingLog"
         component={SpendingLogScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="Recurring" 
+      <InsightsStack.Screen
+        name="Recurring"
         component={RecurringScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="AnnualFee" 
+      <InsightsStack.Screen
+        name="AnnualFee"
         component={AnnualFeeScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="RedemptionGuide" 
+      <InsightsStack.Screen
+        name="RedemptionGuide"
         component={RedemptionGuideScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="CardRecommendations" 
+      <InsightsStack.Screen
+        name="CardRecommendations"
         component={CardRecommendationsScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="SavingsReport" 
+      <InsightsStack.Screen
+        name="SavingsReport"
         component={SavingsReportScreen}
         options={{ animation: 'slide_from_right' }}
       />
@@ -419,17 +426,17 @@ export default function AppNavigator() {
       try {
         // Initialize preferences
         await initializePreferences();
-        
+
         // Initialize subscription service
         await initializeSubscription();
-        
+
         // Initialize AutoPilot service
         await initializeAutoPilot();
-        
+
         // Check for existing user
         const currentUser = await getCurrentUser();
         setUser(currentUser);
-        
+
         if (currentUser) {
           // User exists, check onboarding
           const onboardingDone = isOnboardingComplete();
@@ -545,16 +552,16 @@ function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignI
       <RootStack.Screen name="MainTabs">
         {() => <MainTabs onSignOut={onSignOut} onSignIn={onSignIn} />}
       </RootStack.Screen>
-      <RootStack.Screen 
-        name="Upgrade" 
+      <RootStack.Screen
+        name="Upgrade"
         component={UpgradeScreen}
         options={{
           presentation: 'modal',
           animation: 'slide_from_bottom',
         }}
       />
-      <RootStack.Screen 
-        name="Notifications" 
+      <RootStack.Screen
+        name="Notifications"
         component={NotificationsScreen}
         options={{
           presentation: 'modal',

@@ -9,7 +9,7 @@
  */
 
 import { Card, SpendingCategory, RewardType } from '../types';
-import { getCards, getCardByIdFromPortfolio } from './CardPortfolioManager';
+import { getCards, getCardFromPortfolio } from './CardPortfolioManager';
 import { getAllCardsSync, getCardByIdSync } from './CardDataService';
 import { getApplicableMultiplier, pointsToCad } from './RewardsCalculatorService';
 
