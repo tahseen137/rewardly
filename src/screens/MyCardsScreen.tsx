@@ -44,6 +44,7 @@ import { getAllCards, searchCards, getCardByIdSync } from '../services/CardDataS
 import { getCurrentTierSync, getCardLimitSync } from '../services/SubscriptionService';
 import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { formatUpToRate, formatBestForCategories } from '../utils/rewardFormatUtils';
 
 function formatRewardRate(value: number, type: RewardType, unit: 'percent' | 'multiplier'): string {
   if (unit === 'percent') {
@@ -431,12 +432,16 @@ function CardPickerItem({
           {formatAnnualFee(card.annualFee)}
         </Text>
         <Text style={[styles.pickerItemReward, isOwned && styles.pickerItemTextDisabled]}>
-          {formatRewardRate(
-            card.baseRewardRate.value,
-            card.baseRewardRate.type,
-            card.baseRewardRate.unit
-          )}
+          {formatUpToRate(card)}
         </Text>
+        {(() => {
+          const bestFor = formatBestForCategories(card, 3);
+          return bestFor ? (
+            <Text style={[styles.pickerItemBestFor, isOwned && styles.pickerItemTextDisabled]}>
+              {bestFor}
+            </Text>
+          ) : null;
+        })()}
       </View>
       {isOwned && <Text style={styles.ownedBadge}>Owned</Text>}
     </TouchableOpacity>
@@ -1048,6 +1053,11 @@ const styles = StyleSheet.create({
   pickerItemReward: {
     fontSize: 11,
     color: colors.primary.main,
+  },
+  pickerItemBestFor: {
+    fontSize: 11,
+    color: colors.text.secondary,
+    marginTop: 2,
   },
   pickerItemAnnualFee: {
     fontSize: 11,

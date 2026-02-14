@@ -19,6 +19,7 @@ import { colors } from '../../theme/colors';
 import { Card, RewardType } from '../../types';
 import { handleApplyNow } from '../../services/AffiliateService';
 import { getCurrentTierSync } from '../../services/SubscriptionService';
+import { getHighestRewardRate, formatBestForCategories } from '../../utils/rewardFormatUtils';
 
 export interface CardRecommendationCardProps {
   /** The recommended card */
@@ -107,8 +108,13 @@ export const CardRecommendationCard: React.FC<CardRecommendationCardProps> = ({
   onApply,
 }) => {
   const gradientColors = useMemo(() => getCardGradient(card.issuer), [card.issuer]);
+  const highestRate = useMemo(() => getHighestRewardRate(card), [card]);
+  const bestForText = useMemo(() => formatBestForCategories(card, 3), [card]);
   const rewardTypeText = formatRewardType(card.baseRewardRate.type);
+  // Use the provided rewardRate (which may be category-specific), but show the highest if it's higher
+  const displayRate = Math.max(rewardRate, highestRate.value);
   const rateUnit = card.baseRewardRate.unit === 'percent' ? '%' : 'x';
+  const showUpTo = displayRate > card.baseRewardRate.value && !category;
   
   return (
     <Animated.View
@@ -151,11 +157,18 @@ export const CardRecommendationCard: React.FC<CardRecommendationCardProps> = ({
         </LinearGradient>
       </View>
       
+      {/* Best for subtitle */}
+      {bestForText && !category ? (
+        <View style={styles.bestForContainer}>
+          <Text style={styles.bestForText}>{bestForText}</Text>
+        </View>
+      ) : null}
+
       {/* Reward info */}
       <View style={styles.rewardInfo}>
         <View style={styles.rewardMain}>
           <Text style={styles.rewardRate}>
-            {rewardRate}{rateUnit}
+            {showUpTo ? 'Up to ' : ''}{displayRate}{rateUnit}
           </Text>
           <Text style={styles.rewardLabel}>{rewardTypeText}</Text>
         </View>
@@ -293,6 +306,14 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.7)',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  bestForContainer: {
+    marginBottom: 8,
+  },
+  bestForText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.text.secondary,
   },
   rewardInfo: {
     flexDirection: 'row',

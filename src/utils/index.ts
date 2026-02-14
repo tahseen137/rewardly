@@ -16,6 +16,13 @@ export {
   formatAnnualFee,
   REWARD_TYPE_LABELS,
   REWARD_TYPE_ICONS,
+  getHighestRewardRate,
+  getTopCategoryRewards,
+  formatRewardRate,
+  formatUpToRate,
+  formatCategoryName,
+  formatBestForCategories,
+  formatTopCategoryRates,
 } from './rewardFormatUtils';
 
 // Platform utilities - web-safe native module wrappers

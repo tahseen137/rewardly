@@ -10,6 +10,7 @@ import { useTheme, Theme } from '../theme';
 import { Button } from './Button';
 import { Card, RewardType } from '../types';
 import { ApplyNowButton } from './ApplyNowButton';
+import { formatUpToRate } from '../utils/rewardFormatUtils';
 
 interface CardDetailModalProps {
   /** The card to display details for */
@@ -71,6 +72,20 @@ export function CardDetailModal({
             <Text style={styles.cardName}>{card.name}</Text>
             <Text style={styles.cardIssuer}>{card.issuer}</Text>
             <Text style={styles.cardProgram}>{card.rewardProgram}</Text>
+            {/* Headline reward rate — shows "Up to X%" */}
+            <View style={styles.upToRateContainer}>
+              <Text style={styles.upToRateText}>{formatUpToRate(card)}</Text>
+            </View>
+            {card.categoryRewards.length > 0 && card.baseRewardRate.value < (card.categoryRewards.reduce(
+              (max, cr) => Math.max(max, cr.rewardRate.value), 0
+            )) && (
+              <Text style={styles.baseRateSecondary}>
+                {card.baseRewardRate.unit === 'percent'
+                  ? `${card.baseRewardRate.value}%`
+                  : `${card.baseRewardRate.value}x`}{' '}
+                on everything else
+              </Text>
+            )}
             <View style={styles.feeContainer}>
               <Text style={styles.feeLabel}>{t('cardDetail.annualFee')}</Text>
               <Text style={styles.feeValue}>
@@ -255,7 +270,26 @@ const createStyles = (theme: Theme) =>
     cardProgram: {
       ...theme.textStyles.label,
       color: theme.colors.primary.main,
+      marginBottom: theme.spacing.sm,
+    },
+    upToRateContainer: {
+      backgroundColor: theme.colors.primary.main + '15',
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.borderRadius.md,
+      marginBottom: theme.spacing.xs,
+    },
+    upToRateText: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: theme.colors.primary.main,
+      textAlign: 'center',
+    },
+    baseRateSecondary: {
+      ...theme.textStyles.bodySmall,
+      color: theme.colors.text.tertiary,
       marginBottom: theme.spacing.md,
+      textAlign: 'center',
     },
     feeContainer: {
       flexDirection: 'row',

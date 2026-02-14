@@ -9,8 +9,8 @@ import { Card } from './Card';
 import { Badge } from './Badge';
 import { useTheme } from '../theme';
 import { RewardCalculationResult } from '../services/RewardsCalculatorService';
-import { formatRewardEarned, formatAnnualFee, REWARD_TYPE_ICONS } from '../utils/rewardFormatUtils';
-import { Card as CardType } from '../types';
+import { formatRewardEarned, formatAnnualFee, REWARD_TYPE_ICONS, formatCategoryName } from '../utils/rewardFormatUtils';
+import { Card as CardType, SpendingCategory } from '../types';
 
 interface CardRewardItemProps {
   result: RewardCalculationResult;
@@ -18,9 +18,11 @@ interface CardRewardItemProps {
   onPress?: () => void;
   onViewOptions?: () => void;
   card?: CardType;
+  /** The spending category being calculated (for display) */
+  category?: SpendingCategory;
 }
 
-export function CardRewardItem({ result, isBestValue, onPress, onViewOptions, card }: CardRewardItemProps) {
+export function CardRewardItem({ result, isBestValue, onPress, onViewOptions, card, category }: CardRewardItemProps) {
   const theme = useTheme();
 
   const rewardIcon = REWARD_TYPE_ICONS[result.rewardCurrency];
@@ -97,16 +99,28 @@ export function CardRewardItem({ result, isBestValue, onPress, onViewOptions, ca
         </View>
       </View>
 
+      {/* Rate badge — shows which rate is being used */}
+      <View style={styles.rateBadgeRow}>
+        {result.isBaseRate ? (
+          <View style={[styles.rateBadge, styles.rateBadgeBase]}>
+            <Text style={[styles.rateBadgeText, { color: theme.colors.text.tertiary }]}>
+              {result.multiplierUsed}{result.isCashback ? '%' : 'x'} Base Rate
+            </Text>
+          </View>
+        ) : (
+          <View style={[styles.rateBadge, styles.rateBadgeBonus]}>
+            <Text style={[styles.rateBadgeText, { color: theme.colors.success.main }]}>
+              ✨ {result.multiplierUsed}{result.isCashback ? '%' : 'x'}{category ? ` ${formatCategoryName(category)}` : ''} Bonus
+            </Text>
+          </View>
+        )}
+      </View>
+
       {/* Footer with annual fee */}
       <View style={styles.footer}>
         <Text style={[styles.annualFee, { color: theme.colors.text.tertiary }]}>
           {formatAnnualFee(result.annualFee)}
         </Text>
-        {result.isBaseRate && (
-          <Text style={[styles.baseRateNote, { color: theme.colors.text.tertiary }]}>
-            Base rate
-          </Text>
-        )}
         {card?.programDetails && onViewOptions && (
           <TouchableOpacity onPress={onViewOptions} style={styles.viewOptionsButton}>
             <Text style={[styles.viewOptionsText, { color: theme.colors.primary.main }]}>
@@ -237,6 +251,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   viewOptionsText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  rateBadgeRow: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  rateBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  rateBadgeBonus: {
+    backgroundColor: 'rgba(52, 199, 89, 0.12)',
+  },
+  rateBadgeBase: {
+    backgroundColor: 'rgba(142, 142, 147, 0.12)',
+  },
+  rateBadgeText: {
     fontSize: 12,
     fontWeight: '600',
   },

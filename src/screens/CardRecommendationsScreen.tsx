@@ -28,6 +28,7 @@ import {
   RecommendationAnalysis,
 } from '../services/CardRecommendationEngine';
 import { handleApplyNow, getApplicationUrl } from '../services/AffiliateService';
+import { formatUpToRate, formatTopCategoryRates, formatBestForCategories } from '../utils/rewardFormatUtils';
 
 // ============================================================================
 // Recommendation Card Component
@@ -40,6 +41,9 @@ interface RecommendationCardProps {
 
 function RecommendationCard({ recommendation, showAffiliateLink }: RecommendationCardProps) {
   const { card, reason, estimatedAnnualRewards, signupBonus, affiliateUrl } = recommendation;
+  const upToRate = formatUpToRate(card);
+  const categoryRates = formatTopCategoryRates(card, 3);
+  const bestFor = formatBestForCategories(card, 3);
 
   const handleApply = useCallback(() => {
     const tier = getCurrentTierSync();
@@ -53,7 +57,22 @@ function RecommendationCard({ recommendation, showAffiliateLink }: Recommendatio
           <Text style={styles.cardName}>{card.name}</Text>
           <Text style={styles.cardIssuer}>{card.issuer}</Text>
         </View>
+        {/* Headline rate badge */}
+        <View style={styles.rateBadge}>
+          <Text style={styles.rateBadgeText}>{upToRate}</Text>
+        </View>
       </View>
+
+      {/* Category context — shows WHY this card is recommended */}
+      {categoryRates ? (
+        <View style={styles.categoryContext}>
+          <Text style={styles.categoryContextText}>{categoryRates}</Text>
+        </View>
+      ) : bestFor ? (
+        <View style={styles.categoryContext}>
+          <Text style={styles.categoryContextText}>{bestFor}</Text>
+        </View>
+      ) : null}
 
       <Text style={styles.reason}>{reason}</Text>
 
@@ -294,10 +313,38 @@ const styles = StyleSheet.create({
     borderColor: colors.border.light,
   },
   recommendationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 12,
   },
   recommendationInfo: {
+    flex: 1,
     marginBottom: 8,
+  },
+  rateBadge: {
+    backgroundColor: colors.primary.main + '15',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  rateBadgeText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.primary.main,
+  },
+  categoryContext: {
+    backgroundColor: colors.success.main + '12',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginBottom: 10,
+  },
+  categoryContextText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.success.main,
   },
   cardName: {
     fontSize: 18,

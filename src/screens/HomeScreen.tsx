@@ -27,6 +27,7 @@ import {
   SkeletonCard,
   Skeleton,
 } from '../components';
+import { formatTopCategoryRates, formatUpToRate } from '../utils/rewardFormatUtils';
 import { StoreSelector } from '../components/StoreSelectorNew';
 import { CategoryGrid, CategoryType } from '../components/CategoryGrid';
 import { useTheme, Theme } from '../theme';
@@ -497,6 +498,7 @@ export default function HomeScreen() {
               isEmpty={!hasCards}
               amount={state.amount || 0}
               cards={getAllCardsSync()}
+              category={state.selectedCategory || undefined}
             />
           </View>
         ) : state.selectedCategory && state.amount ? (
@@ -543,30 +545,43 @@ export default function HomeScreen() {
               </View>
             ) : recommendations.length > 0 ? (
               <View style={styles.recommendationsList}>
-                {recommendations.map((rec, index) => (
-                  <TouchableOpacity 
-                    key={rec.card.id}
-                    style={styles.recommendationItem}
-                    onPress={() => navigation.navigate('CardRecommendations' as never)}
-                  >
-                    <View style={styles.recommendationRank}>
-                      <Text style={styles.rankText}>{index + 1}</Text>
-                    </View>
-                    <View style={styles.recommendationContent}>
-                      <Text style={styles.recommendationCardName} numberOfLines={1}>
-                        {rec.card.name}
-                      </Text>
-                      <Text style={styles.recommendationReason} numberOfLines={1}>
-                        {rec.reason}
-                      </Text>
-                    </View>
-                    <View style={styles.recommendationValue}>
-                      <Text style={styles.rewardValue}>
-                        ${rec.estimatedAnnualRewards.toFixed(0)}/yr
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                {recommendations.map((rec, index) => {
+                  const categoryRates = formatTopCategoryRates(rec.card, 2);
+                  const upToRate = formatUpToRate(rec.card);
+                  return (
+                    <TouchableOpacity 
+                      key={rec.card.id}
+                      style={styles.recommendationItem}
+                      onPress={() => navigation.navigate('CardRecommendations' as never)}
+                    >
+                      <View style={styles.recommendationRank}>
+                        <Text style={styles.rankText}>{index + 1}</Text>
+                      </View>
+                      <View style={styles.recommendationContent}>
+                        <Text style={styles.recommendationCardName} numberOfLines={1}>
+                          {rec.card.name}
+                        </Text>
+                        {categoryRates ? (
+                          <Text style={styles.recommendationCategoryRate} numberOfLines={1}>
+                            {categoryRates}
+                          </Text>
+                        ) : (
+                          <Text style={styles.recommendationReason} numberOfLines={1}>
+                            {upToRate}
+                          </Text>
+                        )}
+                        <Text style={styles.recommendationReason} numberOfLines={1}>
+                          {rec.reason}
+                        </Text>
+                      </View>
+                      <View style={styles.recommendationValue}>
+                        <Text style={styles.rewardValue}>
+                          ${rec.estimatedAnnualRewards.toFixed(0)}/yr
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             ) : (
               <View style={styles.noRecommendations}>
@@ -795,6 +810,12 @@ const createStyles = (theme: Theme) =>
       fontSize: 14,
       fontWeight: '600',
       color: colors.text.primary,
+      marginBottom: 2,
+    },
+    recommendationCategoryRate: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.success.main,
       marginBottom: 2,
     },
     recommendationReason: {
