@@ -18,7 +18,7 @@ const corsHeaders = {
 };
 
 interface CheckoutRequest {
-  tier: 'pro' | 'max';
+  tier: 'pro' | 'max' | 'lifetime';
   interval: 'month' | 'year';
 }
 
@@ -79,37 +79,73 @@ serve(async (req) => {
     }
 
     // Get price ID from environment variables
-    const priceKey = `STRIPE_PRICE_${tier.toUpperCase()}_${interval === 'year' ? 'ANNUAL' : 'MONTHLY'}`;
-    const priceId = Deno.env.get(priceKey);
-
-    if (!priceId) {
-      throw new Error(`Price ID not configured for ${tier} ${interval}`);
+    const isLifetime = tier === 'lifetime';
+    let priceId: string | undefined;
+    
+    if (isLifetime) {
+      priceId = Deno.env.get('STRIPE_PRICE_LIFETIME');
+    } else {
+      const priceKey = `STRIPE_PRICE_${tier.toUpperCase()}_${interval === 'year' ? 'ANNUAL' : 'MONTHLY'}`;
+      priceId = Deno.env.get(priceKey);
     }
 
-    // Create Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
+    if (!priceId) {
+      throw new Error(`Price ID not configured for ${tier}${isLifetime ? '' : ` ${interval}`}`);
+    }
+
+    // Create Checkout Session — different config for lifetime (one-time) vs subscription
+    let session;
+    
+    if (isLifetime) {
+      // One-time payment for lifetime deal
+      session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${Deno.env.get('APP_URL')}/subscription/success?session_id={CHECKOUT_SESSION_ID}&lifetime=true`,
+        cancel_url: `${Deno.env.get('APP_URL')}/subscription/cancel`,
+        metadata: {
+          supabase_user_id: user.id,
+          tier: 'lifetime',
         },
-      ],
-      mode: 'subscription',
-      success_url: `${Deno.env.get('APP_URL')}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${Deno.env.get('APP_URL')}/subscription/cancel`,
-      metadata: {
-        supabase_user_id: user.id,
-        tier,
-      },
-      subscription_data: {
+        payment_intent_data: {
+          metadata: {
+            supabase_user_id: user.id,
+            tier: 'lifetime',
+          },
+        },
+      });
+    } else {
+      // Recurring subscription
+      session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        mode: 'subscription',
+        success_url: `${Deno.env.get('APP_URL')}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${Deno.env.get('APP_URL')}/subscription/cancel`,
         metadata: {
           supabase_user_id: user.id,
           tier,
         },
-        trial_period_days: 7, // 7-day free trial
-      },
-    });
+        subscription_data: {
+          metadata: {
+            supabase_user_id: user.id,
+            tier,
+          },
+          trial_period_days: 7, // 7-day free trial
+        },
+      });
+    }
 
     return new Response(
       JSON.stringify({ url: session.url }),

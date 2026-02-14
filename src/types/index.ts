@@ -76,6 +76,8 @@ export interface Card {
   signupBonus?: SignupBonus; // Signup bonus details
   pointValuation?: number; // Value of one point in CAD cents
   programDetails?: ProgramDetails; // Detailed reward program information
+  applicationUrl?: string; // Direct bank application URL for this specific card
+  affiliateUrl?: string; // Affiliate/referral tracking URL (monetization)
 }
 
 /**

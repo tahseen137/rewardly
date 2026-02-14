@@ -88,7 +88,7 @@ describe('SubscriptionService - Tier Definitions', () => {
 
   describe('getTierConfig', () => {
     it('should return correct config for each tier', () => {
-      const tiers: SubscriptionTier[] = ['free', 'pro', 'max', 'admin'];
+      const tiers: SubscriptionTier[] = ['free', 'pro', 'max', 'lifetime', 'admin'];
       tiers.forEach(tier => {
         const config = getTierConfig(tier);
         expect(config).toBeDefined();
@@ -98,10 +98,10 @@ describe('SubscriptionService - Tier Definitions', () => {
   });
 
   describe('getAllTierConfigs', () => {
-    it('should return exactly 3 tiers (excludes admin)', () => {
+    it('should return exactly 4 tiers (excludes admin)', () => {
       const configs = getAllTierConfigs();
-      expect(configs.length).toBe(3);
-      expect(configs.map(c => c.id)).toEqual(['free', 'pro', 'max']);
+      expect(configs.length).toBe(4);
+      expect(configs.map(c => c.id)).toEqual(['free', 'pro', 'max', 'lifetime']);
     });
   });
 });
@@ -143,6 +143,10 @@ describe('SubscriptionService - Feature Access', () => {
       expect(maxFeatures).toContain('family_sharing');
     });
 
+    it('should have Lifetime tier with same features as Max', () => {
+      expect(TIER_FEATURES.lifetime).toEqual(TIER_FEATURES.max);
+    });
+
     it('should have Admin tier with same features as Max', () => {
       expect(TIER_FEATURES.admin).toEqual(TIER_FEATURES.max);
     });
@@ -182,6 +186,10 @@ describe('SubscriptionService - Card Limits', () => {
       expect(CARD_LIMITS.max).toBe(Infinity);
     });
 
+    it('should have unlimited cards for Lifetime tier', () => {
+      expect(CARD_LIMITS.lifetime).toBe(Infinity);
+    });
+
     it('should have unlimited cards for Admin tier', () => {
       expect(CARD_LIMITS.admin).toBe(Infinity);
     });
@@ -192,6 +200,7 @@ describe('SubscriptionService - Card Limits', () => {
       expect(SUBSCRIPTION_TIERS.free.limits.cardsInPortfolio).toBe(CARD_LIMITS.free);
       expect(SUBSCRIPTION_TIERS.pro.limits.cardsInPortfolio).toBe(CARD_LIMITS.pro);
       expect(SUBSCRIPTION_TIERS.max.limits.cardsInPortfolio).toBe(CARD_LIMITS.max);
+      expect(SUBSCRIPTION_TIERS.lifetime.limits.cardsInPortfolio).toBe(CARD_LIMITS.lifetime);
       expect(SUBSCRIPTION_TIERS.admin.limits.cardsInPortfolio).toBe(CARD_LIMITS.admin);
     });
   });
@@ -215,6 +224,10 @@ describe('SubscriptionService - Sage Limits', () => {
       expect(SAGE_LIMITS.max).toBeNull();
     });
 
+    it('should have unlimited chats for Lifetime tier (null)', () => {
+      expect(SAGE_LIMITS.lifetime).toBeNull();
+    });
+
     it('should have unlimited chats for Admin tier (null)', () => {
       expect(SAGE_LIMITS.admin).toBeNull();
     });
@@ -225,6 +238,7 @@ describe('SubscriptionService - Sage Limits', () => {
       expect(SUBSCRIPTION_TIERS.free.limits.sageChatsPerMonth).toBe(SAGE_LIMITS.free);
       expect(SUBSCRIPTION_TIERS.pro.limits.sageChatsPerMonth).toBe(SAGE_LIMITS.pro);
       expect(SUBSCRIPTION_TIERS.max.limits.sageChatsPerMonth).toBe(SAGE_LIMITS.max);
+      expect(SUBSCRIPTION_TIERS.lifetime.limits.sageChatsPerMonth).toBe(SAGE_LIMITS.lifetime);
       expect(SUBSCRIPTION_TIERS.admin.limits.sageChatsPerMonth).toBe(SAGE_LIMITS.admin);
     });
   });
@@ -332,6 +346,57 @@ describe('SubscriptionService - Admin Email Detection', () => {
       const emails2 = getAdminEmails();
       expect(emails1).not.toBe(emails2);
       expect(emails1).toEqual(emails2);
+    });
+  });
+});
+
+// ============================================================================
+// Lifetime Tier Tests
+// ============================================================================
+
+describe('SubscriptionService - Lifetime Tier', () => {
+  describe('SUBSCRIPTION_TIERS.lifetime', () => {
+    it('should have Lifetime tier correctly configured', () => {
+      const lifetime = SUBSCRIPTION_TIERS.lifetime;
+      expect(lifetime.id).toBe('lifetime');
+      expect(lifetime.name).toBe('Lifetime');
+      expect(lifetime.monthlyPrice).toBe(0);
+      expect(lifetime.annualPrice).toBe(0);
+    });
+
+    it('should have all Max-level features', () => {
+      const lifetimeFeatures = TIER_FEATURES.lifetime;
+      const maxFeatures = TIER_FEATURES.max;
+      maxFeatures.forEach(feature => {
+        expect(lifetimeFeatures).toContain(feature);
+      });
+    });
+
+    it('should have unlimited card limit', () => {
+      expect(CARD_LIMITS.lifetime).toBe(Infinity);
+    });
+
+    it('should have unlimited Sage chats', () => {
+      expect(SAGE_LIMITS.lifetime).toBeNull();
+    });
+
+    it('should include feature descriptions', () => {
+      expect(SUBSCRIPTION_TIERS.lifetime.featureDescriptions.length).toBeGreaterThan(0);
+      const descriptions = SUBSCRIPTION_TIERS.lifetime.featureDescriptions.join(' ');
+      expect(descriptions.toLowerCase()).toMatch(/forever/);
+    });
+  });
+
+  describe('getPriceDisplay for lifetime', () => {
+    it('should display $49.99 for lifetime tier', () => {
+      expect(getPriceDisplay('lifetime', 'monthly')).toBe('$49.99');
+      expect(getPriceDisplay('lifetime', 'annual')).toBe('$49.99');
+    });
+  });
+
+  describe('getAnnualSavings for lifetime', () => {
+    it('should return 0 for Lifetime tier (one-time)', () => {
+      expect(getAnnualSavings('lifetime')).toBe(0);
     });
   });
 });

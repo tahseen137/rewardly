@@ -35,7 +35,7 @@ import { getSpendingProfileSync } from '../services/SpendingProfileService';
 import { calculateFeeBreakeven } from '../services/FeeBreakevenService';
 import { calculateSignupBonusROI } from '../services/SignupBonusService';
 import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
-import { LockedFeature, FeeBreakevenCard, SignupBonusCard } from '../components';
+import { LockedFeature, FeeBreakevenCard, SignupBonusCard, ApplyNowButton } from '../components';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -290,6 +290,18 @@ export default function CardBenefitsScreen() {
           </View>
         )}
 
+        {/* Apply Now CTA */}
+        {card && (
+          <View style={styles.applyNowSection}>
+            <ApplyNowButton
+              card={card}
+              sourceScreen="CardBenefits"
+              variant="primary"
+              showDisclosure
+            />
+          </View>
+        )}
+
         {/* Locked Benefits Banner */}
         {!hasAccess && lockedCount > 0 && (
           <View style={styles.lockedBanner}>
@@ -492,5 +504,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: colors.background.primary,
+  },
+  applyNowSection: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
   },
 });

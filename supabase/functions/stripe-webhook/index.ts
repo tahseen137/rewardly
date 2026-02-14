@@ -112,14 +112,43 @@ async function handleCheckoutCompleted(
   session: Stripe.Checkout.Session
 ) {
   const userId = session.metadata?.supabase_user_id;
-  const tier = session.metadata?.tier as 'pro' | 'max';
+  const tier = session.metadata?.tier as 'pro' | 'max' | 'lifetime';
 
   if (!userId || !tier) {
     console.error('Missing metadata in checkout session');
     return;
   }
 
-  // Get subscription details
+  // Handle lifetime one-time payment separately
+  if (tier === 'lifetime') {
+    // Create subscription record with lifetime status (no expiry)
+    await supabase.from('subscriptions').upsert({
+      user_id: userId,
+      stripe_subscription_id: `lifetime_${session.payment_intent || session.id}`,
+      stripe_customer_id: session.customer as string,
+      tier: 'lifetime',
+      status: 'lifetime',
+      current_period_start: new Date().toISOString(),
+      current_period_end: null, // Never expires
+      cancel_at_period_end: false,
+    }, {
+      onConflict: 'user_id',
+    });
+
+    // Update profile tier to lifetime (maps to max/premium features)
+    await supabase
+      .from('profiles')
+      .update({ 
+        tier: 'lifetime',
+        stripe_customer_id: session.customer as string,
+      })
+      .eq('user_id', userId);
+
+    console.log(`Lifetime deal activated for user ${userId}`);
+    return;
+  }
+
+  // Get subscription details for recurring subscriptions
   const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
 
   // Create or update subscription record
@@ -229,12 +258,18 @@ async function handleSubscriptionDeleted(
   // Find user by Stripe customer ID
   const { data: profile } = await supabase
     .from('profiles')
-    .select('user_id')
+    .select('user_id, tier')
     .eq('stripe_customer_id', subscription.customer)
     .single();
 
   if (!profile) {
     console.error('Could not find user for deleted subscription');
+    return;
+  }
+
+  // Don't downgrade lifetime users — their access is permanent
+  if (profile.tier === 'lifetime') {
+    console.log(`Skipping downgrade for lifetime user ${profile.user_id}`);
     return;
   }
 

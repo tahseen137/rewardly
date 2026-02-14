@@ -377,6 +377,56 @@ function PricingCard({
   );
 }
 
+function LifetimeBanner({ onGetStarted }: { onGetStarted: () => void }) {
+  return (
+    <View style={styles.lifetimeBanner}>
+      <LinearGradient
+        colors={['#FFD70015', '#FF8C0008']}
+        style={styles.lifetimeBannerGradient}
+      >
+        <View style={styles.lifetimeBannerBadge}>
+          <Text style={styles.lifetimeBannerBadgeText}>🔥 EARLY ADOPTER SPECIAL</Text>
+        </View>
+        <Text style={styles.lifetimeBannerTitle}>Lifetime Deal</Text>
+        <View style={styles.lifetimeBannerPriceRow}>
+          <Text style={styles.lifetimeBannerPrice}>$49.99</Text>
+          <Text style={styles.lifetimeBannerOnce}> one-time</Text>
+        </View>
+        <Text style={styles.lifetimeBannerDesc}>
+          Get all Premium features forever. No monthly payments. Saves $155+/year.
+        </Text>
+        <View style={styles.lifetimeBannerFeatures}>
+          <View style={styles.pricingFeatureRow}>
+            <Check size={16} color="#FFD700" />
+            <Text style={styles.pricingFeatureText}>Everything in Premium — forever</Text>
+          </View>
+          <View style={styles.pricingFeatureRow}>
+            <Check size={16} color="#FFD700" />
+            <Text style={styles.pricingFeatureText}>Unlimited Sage AI + AutoPilot</Text>
+          </View>
+          <View style={styles.pricingFeatureRow}>
+            <Check size={16} color="#FFD700" />
+            <Text style={styles.pricingFeatureText}>All future features included</Text>
+          </View>
+          <View style={styles.pricingFeatureRow}>
+            <Check size={16} color="#FFD700" />
+            <Text style={styles.pricingFeatureText}>Pay once, never again</Text>
+          </View>
+        </View>
+        <Text style={styles.lifetimeBannerUrgency}>⏳ Only available for first 100 users</Text>
+        <TouchableOpacity onPress={onGetStarted} activeOpacity={0.9}>
+          <LinearGradient
+            colors={['#FFD700', '#FF8C00']}
+            style={styles.pricingButton}
+          >
+            <Text style={styles.pricingButtonTextHighlighted}>Claim Lifetime Access</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </LinearGradient>
+    </View>
+  );
+}
+
 function PricingSection({ onGetStarted }: { onGetStarted: () => void }) {
   const plans = [
     {
@@ -431,6 +481,9 @@ function PricingSection({ onGetStarted }: { onGetStarted: () => void }) {
       <Text style={styles.pricingSublabel}>
         Start free. Upgrade when you're ready.
       </Text>
+
+      {/* Lifetime Deal Banner — above the pricing grid */}
+      <LifetimeBanner onGetStarted={onGetStarted} />
 
       <View style={styles.pricingGrid}>
         {plans.map((plan) => (
@@ -858,6 +911,75 @@ const styles = StyleSheet.create({
     marginTop: -32,
     marginBottom: 48,
     textAlign: 'center',
+  },
+  // Lifetime Banner
+  lifetimeBanner: {
+    width: '100%',
+    maxWidth: SCREEN_WIDTH > 768 ? '100%' : 360,
+    marginBottom: 32,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#FFD70060',
+    overflow: 'hidden',
+    alignSelf: 'center',
+  },
+  lifetimeBannerGradient: {
+    padding: 28,
+    alignItems: 'center',
+  },
+  lifetimeBannerBadge: {
+    backgroundColor: '#FFD700',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  lifetimeBannerBadgeText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1A1A2E',
+  },
+  lifetimeBannerTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: colors.text.primary,
+    marginBottom: 8,
+  },
+  lifetimeBannerPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 12,
+  },
+  lifetimeBannerPrice: {
+    fontSize: 44,
+    fontWeight: '800',
+    color: '#FFD700',
+  },
+  lifetimeBannerOnce: {
+    fontSize: 18,
+    color: colors.text.secondary,
+  },
+  lifetimeBannerDesc: {
+    fontSize: 15,
+    color: colors.text.secondary,
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 22,
+    maxWidth: 400,
+  },
+  lifetimeBannerFeatures: {
+    gap: 10,
+    alignSelf: 'flex-start',
+    width: '100%',
+    maxWidth: 360,
+    marginBottom: 20,
+    alignItems: 'flex-start',
+  },
+  lifetimeBannerUrgency: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FF6B6B',
+    marginBottom: 20,
   },
   pricingGrid: {
     flexDirection: SCREEN_WIDTH > 768 ? 'row' : 'column',

@@ -28,7 +28,7 @@ import {
 import { getCards } from '../services/CardPortfolioManager';
 import { getCardByIdSync } from '../services/CardDataService';
 import { getCurrentTierSync } from '../services/SubscriptionService';
-import { LockedFeature } from '../components';
+import { LockedFeature, ApplyNowButton } from '../components';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -217,6 +217,25 @@ export default function CardCompareScreen() {
               );
             })}
         </View>
+
+        {/* Apply Now CTA for the winner */}
+        {comparison.winner && (() => {
+          const winnerCard = getCardByIdSync(comparison.winner);
+          if (!winnerCard) return null;
+          return (
+            <View style={styles.applySection}>
+              <Text style={styles.applyLabel}>
+                🏆 {winnerCard.name} wins! Interested?
+              </Text>
+              <ApplyNowButton
+                card={winnerCard}
+                sourceScreen="CardCompare"
+                variant="primary"
+                showDisclosure
+              />
+            </View>
+          );
+        })()}
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -464,5 +483,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.text.secondary,
     marginTop: 2,
+  },
+  applySection: {
+    paddingHorizontal: 20,
+    marginTop: 16,
+  },
+  applyLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text.primary,
+    marginBottom: 12,
+    textAlign: 'center',
   },
 });

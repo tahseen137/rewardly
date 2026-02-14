@@ -8,6 +8,7 @@ import { getAllCardsSync, getCardByIdSync } from './CardDataService';
 import { getCards } from './CardPortfolioManager';
 import { supabase } from './supabase/client';
 import { SubscriptionTier, getCurrentTierSync } from './SubscriptionService';
+import { getApplicationUrl } from './AffiliateService';
 
 // ============================================================================
 // Types
@@ -208,8 +209,13 @@ export function getAffiliateUrl(cardId: string, tier: SubscriptionTier): string 
   // Only Max tier gets affiliate links
   if (tier !== 'max') return undefined;
   
-  // In production, these would come from a database
-  // For now, return placeholder
+  // Resolve the full application URL with UTM tracking
+  const card = getCardByIdSync(cardId);
+  if (card) {
+    return getApplicationUrl(card);
+  }
+  
+  // Fallback for cards not in cache
   return `https://rewardly.app/cards/${cardId}/apply`;
 }
 

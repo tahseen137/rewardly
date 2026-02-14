@@ -29,6 +29,7 @@ import {
   BillingPeriod,
   SUBSCRIPTION_TIERS,
   TierConfig,
+  STRIPE_PRICE_IDS,
   getAnnualSavings,
   setTier,
   createCheckoutSession,
@@ -62,6 +63,8 @@ function getTierIcon(tier: SubscriptionTier) {
       return <Zap size={20} color={colors.primary.main} />;
     case 'max':
       return <Crown size={20} color={colors.warning.main} />;
+    case 'lifetime':
+      return <Star size={20} color="#FFD700" />;
     default:
       return <Sparkles size={20} color={colors.text.secondary} />;
   }
@@ -76,6 +79,8 @@ function getTierGradient(tier: SubscriptionTier): string[] {
       return [colors.primary.main, colors.primary.dark];
     case 'max':
       return [colors.warning.main, colors.warning.dark];
+    case 'lifetime':
+      return ['#FFD700', '#FF8C00'];
     default:
       return [colors.neutral.gray600, colors.neutral.gray700];
   }
@@ -94,8 +99,10 @@ export default function Paywall({
   const [selectedTier, setSelectedTier] = useState<SubscriptionTier>(defaultTier);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Only show Pro and Max tiers
+  // Show Pro, Max, and Lifetime tiers
   const tiers = [SUBSCRIPTION_TIERS.pro, SUBSCRIPTION_TIERS.max];
+
+  const isLifetimeSelected = selectedTier === 'lifetime';
 
   const handleSubscribe = useCallback(async () => {
     setIsProcessing(true);
@@ -111,7 +118,7 @@ export default function Paywall({
       
       // Call create-checkout edge function to get Stripe Checkout URL
       const result = await createCheckoutSession(
-        selectedTier,
+        selectedTier as 'pro' | 'max' | 'lifetime',
         billingPeriod === 'annual' ? 'year' : 'month'
       );
       
@@ -288,6 +295,71 @@ export default function Paywall({
           contentContainerStyle={styles.tierListContent}
           showsVerticalScrollIndicator={false}
         >
+          {/* 🔥 Lifetime Deal Banner */}
+          <TouchableOpacity
+            style={[
+              styles.lifetimeCard,
+              isLifetimeSelected && styles.lifetimeCardSelected,
+            ]}
+            onPress={() => setSelectedTier('lifetime')}
+            activeOpacity={0.7}
+          >
+            <LinearGradient
+              colors={['#FFD70015', '#FF8C0010']}
+              style={styles.lifetimeGradient}
+            >
+              <View style={styles.lifetimeBadgeRow}>
+                <View style={styles.lifetimeFireBadge}>
+                  <Text style={styles.lifetimeFireBadgeText}>🔥 EARLY ADOPTER SPECIAL</Text>
+                </View>
+                {isLifetimeSelected && (
+                  <View style={styles.selectedIndicator}>
+                    <Check size={20} color="#FFD700" />
+                  </View>
+                )}
+              </View>
+              
+              <View style={styles.lifetimeHeader}>
+                <Star size={24} color="#FFD700" />
+                <Text style={styles.lifetimeName}>Lifetime Deal</Text>
+              </View>
+              
+              <View style={styles.lifetimePricing}>
+                <Text style={styles.lifetimePrice}>$49.99</Text>
+                <Text style={styles.lifetimeOnce}> once</Text>
+              </View>
+              
+              <View style={styles.lifetimeSavings}>
+                <Text style={styles.lifetimeSavingsText}>
+                  💰 Saves $155+/year vs Premium monthly
+                </Text>
+              </View>
+              
+              <View style={styles.lifetimeFeatures}>
+                <View style={styles.featureRow}>
+                  <Check size={16} color="#FFD700" />
+                  <Text style={styles.lifetimeFeatureText}>Everything in Max — forever</Text>
+                </View>
+                <View style={styles.featureRow}>
+                  <Check size={16} color="#FFD700" />
+                  <Text style={styles.lifetimeFeatureText}>Unlimited Sage AI + AutoPilot</Text>
+                </View>
+                <View style={styles.featureRow}>
+                  <Check size={16} color="#FFD700" />
+                  <Text style={styles.lifetimeFeatureText}>All future features included</Text>
+                </View>
+                <View style={styles.featureRow}>
+                  <Check size={16} color="#FFD700" />
+                  <Text style={styles.lifetimeFeatureText}>Pay once, never again</Text>
+                </View>
+              </View>
+              
+              <View style={styles.lifetimeUrgency}>
+                <Text style={styles.lifetimeUrgencyText}>⏳ Only available for first 100 users</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+
           {tiers.map(renderTierCard)}
         </ScrollView>
 
@@ -305,13 +377,21 @@ export default function Paywall({
               style={styles.ctaButton}
             >
               <Text style={styles.ctaButtonText}>
-                {isProcessing ? 'Processing...' : `Subscribe to ${SUBSCRIPTION_TIERS[selectedTier].name}`}
+                {isProcessing 
+                  ? 'Processing...' 
+                  : isLifetimeSelected 
+                    ? 'Get Lifetime Access — $49.99' 
+                    : `Subscribe to ${SUBSCRIPTION_TIERS[selectedTier].name}`
+                }
               </Text>
             </LinearGradient>
           </TouchableOpacity>
 
           <Text style={styles.trialNote}>
-            7-day free trial • Cancel anytime
+            {isLifetimeSelected 
+              ? 'One-time payment • Lifetime access • No recurring charges' 
+              : '7-day free trial • Cancel anytime'
+            }
           </Text>
 
           <View style={styles.legalLinks}>
@@ -526,15 +606,104 @@ const styles = StyleSheet.create({
     marginLeft: 26,
   },
   selectedIndicator: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
     width: 28,
     height: 28,
     borderRadius: 14,
     backgroundColor: colors.primary.bg20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Lifetime Deal styles
+  lifetimeCard: {
+    borderRadius: borderRadius.lg,
+    borderWidth: 2,
+    borderColor: '#FFD70060',
+    overflow: 'hidden',
+    marginBottom: 4,
+  },
+  lifetimeCardSelected: {
+    borderColor: '#FFD700',
+    borderWidth: 2,
+  },
+  lifetimeGradient: {
+    padding: 20,
+  },
+  lifetimeBadgeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  lifetimeFireBadge: {
+    backgroundColor: '#FFD700',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: borderRadius.sm,
+  },
+  lifetimeFireBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#1A1A2E',
+  },
+  lifetimeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  lifetimeName: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text.primary,
+  },
+  lifetimePricing: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 8,
+  },
+  lifetimePrice: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: '#FFD700',
+  },
+  lifetimeOnce: {
+    fontSize: 16,
+    color: colors.text.secondary,
+    marginLeft: 4,
+  },
+  lifetimeSavings: {
+    backgroundColor: '#FFD70020',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: borderRadius.sm,
+    alignSelf: 'flex-start',
+    marginBottom: 16,
+  },
+  lifetimeSavingsText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFD700',
+  },
+  lifetimeFeatures: {
+    gap: 8,
+    marginBottom: 12,
+  },
+  lifetimeFeatureText: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    flex: 1,
+  },
+  lifetimeUrgency: {
+    backgroundColor: '#FF4D4D20',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: borderRadius.sm,
+    alignItems: 'center',
+  },
+  lifetimeUrgencyText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FF6B6B',
   },
   footer: {
     paddingHorizontal: 24,

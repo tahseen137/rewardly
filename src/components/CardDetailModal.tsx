@@ -9,6 +9,7 @@ import { TrendingUp, DollarSign, Info } from 'lucide-react-native';
 import { useTheme, Theme } from '../theme';
 import { Button } from './Button';
 import { Card, RewardType } from '../types';
+import { ApplyNowButton } from './ApplyNowButton';
 
 interface CardDetailModalProps {
   /** The card to display details for */
@@ -176,6 +177,16 @@ export function CardDetailModal({
               </View>
             </View>
           )}
+
+          {/* Apply Now Button */}
+          <View style={styles.applyNowSection}>
+            <ApplyNowButton
+              card={card}
+              sourceScreen="CardDetailModal"
+              variant="primary"
+              showDisclosure
+            />
+          </View>
 
           {/* Spacer for action button */}
           {actionButton && <View style={{ height: 80 }} />}
@@ -398,6 +409,10 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background.secondary,
       borderTopWidth: 1,
       borderTopColor: theme.colors.border.light,
+    },
+    applyNowSection: {
+      marginTop: theme.spacing.xl,
+      marginBottom: theme.spacing.lg,
     },
   });
 

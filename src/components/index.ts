@@ -91,3 +91,7 @@ export { TransactionReviewList } from './TransactionReviewList';
 
 // Cycle 5 - Achievements & Gamification
 export { UnlockToast } from './UnlockToast';
+
+// Affiliate / Monetization
+export { ApplyNowButton } from './ApplyNowButton';
+export type { ApplyNowButtonProps } from './ApplyNowButton';

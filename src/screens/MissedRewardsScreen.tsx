@@ -31,7 +31,7 @@ import { AlertTriangle, TrendingDown, ArrowRight, DollarSign, ChevronRight } fro
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
-import { GradientText } from '../components';
+import { GradientText, ApplyNowButton } from '../components';
 import { MissedRewardsAnalysis, CategoryMissedRewards, MissedReward } from '../types/rewards-iq';
 import { analyzeMissedRewards } from '../services/RewardsIQService';
 import { CATEGORY_INFO } from '../services/MockTransactionData';
@@ -352,6 +352,25 @@ export default function MissedRewardsScreen() {
         </View>
       )}
       
+      {/* Top Missed Card Apply CTA */}
+      {analysis.topMissedTransactions.length > 0 && analysis.topMissedTransactions[0].optimalCard && (
+        <Animated.View 
+          entering={FadeInUp.delay(500).duration(500)}
+          style={styles.applyCtaContainer}
+        >
+          <Text style={styles.applyCtaTitle}>
+            💡 Stop missing rewards — get the right card
+          </Text>
+          <ApplyNowButton
+            card={analysis.topMissedTransactions[0].optimalCard}
+            sourceScreen="MissedRewards"
+            variant="outline"
+            label={`Apply for ${analysis.topMissedTransactions[0].optimalCard.name}`}
+            showDisclosure
+          />
+        </Animated.View>
+      )}
+
       {/* CTA Button */}
       <Animated.View 
         entering={FadeInUp.delay(600).duration(500)}
@@ -666,6 +685,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.text.tertiary,
     marginTop: 12,
+    textAlign: 'center',
+  },
+  applyCtaContainer: {
+    marginHorizontal: 16,
+    marginBottom: 24,
+    padding: 20,
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.primary.main + '30',
+  },
+  applyCtaTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text.primary,
+    marginBottom: 16,
     textAlign: 'center',
   },
 });

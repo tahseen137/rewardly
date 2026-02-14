@@ -27,6 +27,7 @@ import {
   CardRecommendation,
   RecommendationAnalysis,
 } from '../services/CardRecommendationEngine';
+import { handleApplyNow, getApplicationUrl } from '../services/AffiliateService';
 
 // ============================================================================
 // Recommendation Card Component
@@ -41,13 +42,9 @@ function RecommendationCard({ recommendation, showAffiliateLink }: Recommendatio
   const { card, reason, estimatedAnnualRewards, signupBonus, affiliateUrl } = recommendation;
 
   const handleApply = useCallback(() => {
-    if (affiliateUrl) {
-      Linking.openURL(affiliateUrl);
-    } else {
-      // Open generic card page
-      Linking.openURL(`https://www.google.com/search?q=${encodeURIComponent(card.name)}`);
-    }
-  }, [affiliateUrl, card.name]);
+    const tier = getCurrentTierSync();
+    handleApplyNow(card, 'CardRecommendations', tier);
+  }, [card]);
 
   return (
     <Animated.View entering={FadeInDown.duration(400)} style={styles.recommendationCard}>

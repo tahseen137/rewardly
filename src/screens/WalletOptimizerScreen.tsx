@@ -38,7 +38,7 @@ import { getSpendingProfileSync, saveSpendingProfile } from '../services/Spendin
 import { getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
 import { getCards } from '../services/CardPortfolioManager';
 import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
-import { LockedFeature } from '../components';
+import { LockedFeature, ApplyNowButton } from '../components';
 
 type Step = 1 | 2 | 3;
 
@@ -525,6 +525,21 @@ function WalletCombinationCard({ combination, index, isLocked }: WalletCombinati
           </View>
         </View>
       )}
+
+      {/* Apply Now CTAs for recommended cards */}
+      {!isLocked && (
+        <View style={styles.applyCardsSection}>
+          {combination.cards.map((card) => (
+            <ApplyNowButton
+              key={card.id}
+              card={card}
+              sourceScreen="WalletOptimizer"
+              variant="compact"
+              label={`Apply: ${card.name.length > 25 ? card.name.substring(0, 25) + '…' : card.name}`}
+            />
+          ))}
+        </View>
+      )}
     </Animated.View>
   );
 }
@@ -927,5 +942,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: colors.text.secondary,
+  },
+  applyCardsSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.border.light,
+    gap: 8,
   },
 });

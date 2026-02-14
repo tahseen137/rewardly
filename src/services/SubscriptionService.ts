@@ -18,7 +18,7 @@ import { getCurrentUser } from './AuthService';
 // Types
 // ============================================================================
 
-export type SubscriptionTier = 'free' | 'pro' | 'max' | 'admin';
+export type SubscriptionTier = 'free' | 'pro' | 'max' | 'lifetime' | 'admin';
 
 export type BillingPeriod = 'monthly' | 'annual';
 
@@ -89,6 +89,7 @@ export const STRIPE_PRICE_IDS = {
   pro_annual: '', // Annual pricing not yet created
   max_monthly: 'price_1T0kcdAJmUBqj9CQeRMyl9h6',
   max_annual: '', // Annual pricing not yet created
+  lifetime: 'price_1T0lIRAJmUBqj9CQ9CgKkCKk', // One-time $49.99 CAD
 } as const;
 
 /**
@@ -98,6 +99,7 @@ export const TIER_FEATURES: Record<SubscriptionTier, Feature[]> = {
   free: ['sage_ai'],
   pro: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai'],
   max: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
+  lifetime: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
   admin: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
 };
 
@@ -108,6 +110,7 @@ export const CARD_LIMITS: Record<SubscriptionTier, number> = {
   free: 3,
   pro: Infinity,
   max: Infinity,
+  lifetime: Infinity,
   admin: Infinity,
 };
 
@@ -118,6 +121,7 @@ export const SAGE_LIMITS: Record<SubscriptionTier, number | null> = {
   free: 3, // Free users get 3 chats/month to try Sage
   pro: 10,
   max: null, // Unlimited
+  lifetime: null, // Unlimited — same as Max
   admin: null, // Unlimited
 };
 
@@ -177,6 +181,27 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
       'Family sharing (up to 5)',
       'Export reports',
       'Priority support',
+    ],
+    limits: {
+      cardsInPortfolio: Infinity,
+      sageChatsPerMonth: null,
+    },
+  },
+  lifetime: {
+    id: 'lifetime',
+    name: 'Lifetime',
+    monthlyPrice: 0,
+    annualPrice: 0,
+    features: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
+    featureDescriptions: [
+      'Everything in Max — forever',
+      'Sage AI (Unlimited)',
+      'AutoPilot',
+      'Multi-country (CA + US)',
+      'Family sharing (up to 5)',
+      'Export reports',
+      'Priority support',
+      'All future features included',
     ],
     limits: {
       cardsInPortfolio: Infinity,
@@ -282,20 +307,22 @@ async function loadSubscription(): Promise<SubscriptionState> {
             .from('subscriptions')
             .select('*')
             .eq('user_id', user.id)
-            .in('status', ['active', 'trialing'])
+            .in('status', ['active', 'trialing', 'lifetime'])
             .single();
           
           const profileData = profile as any;
           const subscriptionData = subscription as any;
+          const resolvedTier = (profileData.is_admin ? 'admin' : profileData.tier || 'free') as SubscriptionTier;
+          const isLifetime = resolvedTier === 'lifetime' || subscriptionData?.status === 'lifetime';
           
           return {
-            tier: (profileData.is_admin ? 'admin' : profileData.tier || 'free') as SubscriptionTier,
+            tier: resolvedTier,
             isAdmin: profileData.is_admin || false,
-            billingPeriod: subscriptionData?.current_period_end 
+            billingPeriod: isLifetime ? null : (subscriptionData?.current_period_end 
               ? (new Date(subscriptionData.current_period_end).getTime() - new Date(subscriptionData.current_period_start).getTime() > 45 * 24 * 60 * 60 * 1000 ? 'annual' : 'monthly')
-              : null,
-            expiresAt: subscriptionData?.current_period_end || null,
-            cancelAtPeriodEnd: subscriptionData?.cancel_at_period_end || false,
+              : null),
+            expiresAt: isLifetime ? null : (subscriptionData?.current_period_end || null),
+            cancelAtPeriodEnd: isLifetime ? false : (subscriptionData?.cancel_at_period_end || false),
             stripeCustomerId: profileData.stripe_customer_id || null,
             stripeSubscriptionId: subscriptionData?.stripe_subscription_id || null,
           };
@@ -460,7 +487,7 @@ export function getTierConfig(tier: SubscriptionTier): TierConfig {
  * Get all tier configurations (excluding admin)
  */
 export function getAllTierConfigs(): TierConfig[] {
-  return [SUBSCRIPTION_TIERS.free, SUBSCRIPTION_TIERS.pro, SUBSCRIPTION_TIERS.max];
+  return [SUBSCRIPTION_TIERS.free, SUBSCRIPTION_TIERS.pro, SUBSCRIPTION_TIERS.max, SUBSCRIPTION_TIERS.lifetime];
 }
 
 /**
@@ -530,8 +557,8 @@ export async function canUseSage(): Promise<{allowed: boolean; remaining: number
   // Free users get limited access (3 chats/month)
   // Falls through to the Pro limit check below
   
-  // Max and Admin have unlimited access
-  if (tier === 'max' || tier === 'admin') {
+  // Max, Lifetime, and Admin have unlimited access
+  if (tier === 'max' || tier === 'lifetime' || tier === 'admin') {
     return { allowed: true, remaining: null };
   }
   
@@ -638,12 +665,13 @@ export async function setTier(
   }
 ): Promise<void> {
   const isAdminTier = tier === 'admin';
+  const isLifetimeTier = tier === 'lifetime';
   
   subscriptionCache = {
     tier,
     isAdmin: isAdminTier,
-    billingPeriod: billingPeriod ?? (tier === 'free' ? null : 'monthly'),
-    expiresAt: options?.expiresAt ?? (tier === 'free' ? null : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()),
+    billingPeriod: billingPeriod ?? (tier === 'free' || isLifetimeTier ? null : 'monthly'),
+    expiresAt: options?.expiresAt ?? (tier === 'free' || isLifetimeTier ? null : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()),
     cancelAtPeriodEnd: options?.cancelAtPeriodEnd ?? false,
     stripeCustomerId: options?.stripeCustomerId ?? null,
     stripeSubscriptionId: options?.stripeSubscriptionId ?? null,
@@ -672,6 +700,7 @@ export async function resetToFreeTier(): Promise<void> {
 export function getPriceDisplay(tier: SubscriptionTier, period: BillingPeriod): string {
   const config = SUBSCRIPTION_TIERS[tier];
   if (tier === 'free' || tier === 'admin') return 'Free';
+  if (tier === 'lifetime') return '$49.99';
   
   if (period === 'annual') {
     const monthlyEquivalent = config.annualPrice / 12;
@@ -703,7 +732,7 @@ export async function refreshSubscription(): Promise<SubscriptionState> {
  * Create a Stripe Checkout session for subscription purchase
  */
 export async function createCheckoutSession(
-  tier: 'pro' | 'max',
+  tier: 'pro' | 'max' | 'lifetime',
   interval: 'month' | 'year'
 ): Promise<{ url: string } | { error: string }> {
   try {

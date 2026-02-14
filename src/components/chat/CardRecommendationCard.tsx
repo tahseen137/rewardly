@@ -17,6 +17,8 @@ import { CreditCard, TrendingUp, Info, ExternalLink } from 'lucide-react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../../theme/colors';
 import { Card, RewardType } from '../../types';
+import { handleApplyNow } from '../../services/AffiliateService';
+import { getCurrentTierSync } from '../../services/SubscriptionService';
 
 export interface CardRecommendationCardProps {
   /** The recommended card */
@@ -193,10 +195,17 @@ export const CardRecommendationCard: React.FC<CardRecommendationCardProps> = ({
           </TouchableOpacity>
         )}
         
-        {isNewCardSuggestion && onApply && (
+        {isNewCardSuggestion && (
           <TouchableOpacity
             style={styles.primaryButton}
-            onPress={onApply}
+            onPress={() => {
+              if (onApply) {
+                onApply();
+              } else {
+                const tier = getCurrentTierSync();
+                handleApplyNow(card, 'SageChat', tier);
+              }
+            }}
             accessibilityLabel="Apply for this card"
           >
             <Text style={styles.primaryButtonText}>Apply Now</Text>

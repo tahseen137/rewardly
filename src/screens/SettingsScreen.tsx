@@ -371,14 +371,19 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
               </SettingsRow>
 
               <SettingsRow
-                icon={<Crown size={20} color={subscriptionState?.isAdmin ? colors.warning.main : tierConfig.id === 'free' ? colors.text.secondary : colors.primary.main} />}
-                title={t('settings.subscription')}
-                description={subscriptionState?.isAdmin ? 'Admin Access' : tierConfig.name}
+                icon={<Crown size={20} color={subscriptionTier === 'lifetime' ? '#FFD700' : subscriptionState?.isAdmin ? colors.warning.main : tierConfig.id === 'free' ? colors.text.secondary : colors.primary.main} />}
+                title={subscriptionTier === 'lifetime' ? 'Lifetime Member ✨' : t('settings.subscription')}
+                description={subscriptionTier === 'lifetime' ? 'All Premium features — forever' : subscriptionState?.isAdmin ? 'Admin Access' : tierConfig.name}
                 isLast={subscriptionTier !== 'pro'}
                 onPress={subscriptionTier === 'free' ? handleUpgrade : undefined}
               >
                 {subscriptionTier === 'free' && (
                   <Text style={styles.upgradeText}>{t('settings.upgrade')}</Text>
+                )}
+                {subscriptionTier === 'lifetime' && (
+                  <View style={styles.lifetimeBadge}>
+                    <Text style={styles.lifetimeBadgeText}>LIFETIME</Text>
+                  </View>
                 )}
                 {subscriptionState?.isAdmin && (
                   <View style={styles.adminBadge}>
@@ -727,6 +732,18 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     color: colors.background.primary,
+  },
+  // Lifetime badge
+  lifetimeBadge: {
+    backgroundColor: '#FFD700',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  lifetimeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#1A1A2E',
   },
   // Manage subscription button
   manageButton: {

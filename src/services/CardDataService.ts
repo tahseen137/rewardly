@@ -58,6 +58,8 @@ function transformCardRow(
     categoryRewards: categoryRewards
       .filter((cr) => cr.card_id === row.id)
       .map((cr) => transformCategoryReward(cr)),
+    applicationUrl: (row as any).application_url || undefined,
+    affiliateUrl: (row as any).affiliate_url || undefined,
   };
 
   if (signupBonus) {
@@ -100,6 +102,8 @@ function transformCardWithProgramDetails(
     categoryRewards: categoryRewards
       .filter((cr) => cr.card_id === row.id)
       .map((cr) => transformCategoryReward(cr)),
+    applicationUrl: (row as any).application_url || undefined,
+    affiliateUrl: (row as any).affiliate_url || undefined,
     // Add program details if available
     programDetails: row.program_name ? {
       programName: row.program_name,
