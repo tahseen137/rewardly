@@ -35,3 +35,7 @@ export { default as RedemptionGuideScreen } from './RedemptionGuideScreen';
 export { default as CardRecommendationsScreen } from './CardRecommendationsScreen';
 export { default as NotificationsScreen } from './NotificationsScreen';
 export { default as SavingsReportScreen } from './SavingsReportScreen';
+
+// Cycle 4 Features (CSV Statement Upload + Insights)
+export { default as StatementUploadScreen } from './StatementUploadScreen';
+export { default as InsightsDashboardScreen } from './InsightsDashboardScreen';

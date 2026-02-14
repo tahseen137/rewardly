@@ -308,6 +308,42 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
+        {/* Statement Upload Card */}
+        <TouchableOpacity
+          style={styles.uploadCard}
+          onPress={() => navigation.navigate('StatementUpload' as never)}
+          activeOpacity={0.8}
+        >
+          <View style={styles.uploadContent}>
+            <Text style={styles.uploadEmoji}>📄</Text>
+            <View style={styles.uploadText}>
+              <Text style={styles.uploadTitle}>Upload Statement</Text>
+              <Text style={styles.uploadSubtitle}>
+                Get insights from your real transactions
+              </Text>
+            </View>
+          </View>
+          <ChevronRight size={20} color={colors.primary.main} />
+        </TouchableOpacity>
+
+        {/* Insights Dashboard Card */}
+        <TouchableOpacity
+          style={styles.uploadCard}
+          onPress={() => navigation.navigate('InsightsDashboard' as never)}
+          activeOpacity={0.8}
+        >
+          <View style={styles.uploadContent}>
+            <Text style={styles.uploadEmoji}>📊</Text>
+            <View style={styles.uploadText}>
+              <Text style={styles.uploadTitle}>Spending Insights</Text>
+              <Text style={styles.uploadSubtitle}>
+                See optimization score and trends
+              </Text>
+            </View>
+          </View>
+          <ChevronRight size={20} color={colors.primary.main} />
+        </TouchableOpacity>
+
         {/* Calculator Section */}
         {/* Store Selector */}
         <View style={styles.section}>
@@ -532,6 +568,40 @@ const createStyles = (theme: Theme) =>
     },
     heroArrow: {
       marginLeft: 8,
+    },
+    uploadCard: {
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 24,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    uploadContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      gap: 12,
+    },
+    uploadEmoji: {
+      fontSize: 32,
+    },
+    uploadText: {
+      flex: 1,
+    },
+    uploadTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: 2,
+    },
+    uploadSubtitle: {
+      fontSize: 13,
+      color: colors.text.secondary,
+      lineHeight: 18,
     },
     section: {
       marginBottom: 16, // space-y-4 (16px gap)

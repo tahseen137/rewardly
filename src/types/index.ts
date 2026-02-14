@@ -632,6 +632,287 @@ export type FeeBreakevenError =
   | { type: 'CARD_NOT_FOUND'; cardId: string };
 
 // ============================================================================
+// Cycle 4: CSV Statement Upload + Spending Insights Types
+// ============================================================================
+
+/**
+ * F24: Supported banks for CSV parsing
+ */
+export type SupportedBank = 
+  | 'td'
+  | 'rbc'
+  | 'cibc'
+  | 'scotiabank'
+  | 'bmo'
+  | 'tangerine'
+  | 'pc_financial'
+  | 'amex_canada';
+
+/**
+ * F24: Bank detection result
+ */
+export interface BankDetectionResult {
+  bank: SupportedBank | null;
+  confidence: number;           // 0-100
+  matchedPatterns: string[];    // Which patterns matched
+  suggestedBank?: SupportedBank; // If confidence < 80, suggest for user confirmation
+}
+
+/**
+ * F24: Category confidence levels
+ */
+export type CategoryConfidence = 'high' | 'medium' | 'low';
+
+/**
+ * F24: Single parsed transaction
+ */
+export interface ParsedTransaction {
+  id: string;
+  date: Date;
+  description: string;          // Raw from CSV
+  normalizedMerchant: string;   // Cleaned merchant name
+  amount: number;               // Always positive for purchases
+  isCredit: boolean;            // true = payment/refund, false = purchase
+  category: SpendingCategory;
+  categoryConfidence: CategoryConfidence;
+  userCorrected: boolean;       // true if user manually changed category
+  sourceBank: SupportedBank;
+  cardLast4?: string;           // If available from CSV
+}
+
+/**
+ * F24: Statement upload metadata
+ */
+export interface StatementUpload {
+  id: string;
+  userId: string | null;        // null for anonymous/local-only
+  fileName: string;
+  bank: SupportedBank;
+  uploadDate: Date;
+  periodStart: Date;
+  periodEnd: Date;
+  transactionCount: number;
+  totalSpend: number;           // Sum of non-credit transactions
+  totalCredits: number;         // Sum of credits/payments
+}
+
+/**
+ * F24: Full statement with transactions
+ */
+export interface StatementWithTransactions extends StatementUpload {
+  transactions: ParsedTransaction[];
+}
+
+/**
+ * F24: Merchant pattern for categorization
+ */
+export interface MerchantPattern {
+  pattern: RegExp;
+  category: SpendingCategory;
+  merchantName: string;         // Normalized display name
+  confidence: CategoryConfidence;
+}
+
+/**
+ * F24: User custom merchant mapping
+ */
+export interface UserMerchantMapping {
+  id: string;
+  userId: string;
+  pattern: string;              // Stored as string, converted to RegExp
+  category: SpendingCategory;
+  merchantName: string;
+  createdAt: Date;
+}
+
+/**
+ * F24: CSV parsing result
+ */
+export interface CSVParseResult {
+  success: boolean;
+  transactions: ParsedTransaction[];
+  bank: SupportedBank;
+  periodStart: Date;
+  periodEnd: Date;
+  totalSpend: number;
+  totalCredits: number;
+  errors: CSVParseError[];
+  warnings: string[];
+}
+
+/**
+ * F24: CSV parsing error
+ */
+export interface CSVParseError {
+  line: number;
+  message: string;
+  rawLine: string;
+}
+
+/**
+ * F24: Raw CSV row (pre-normalization)
+ */
+export interface RawCSVRow {
+  date: string;
+  description: string;
+  amount: string;
+  debit?: string;
+  credit?: string;
+  balance?: string;
+  cardNumber?: string;
+  extras: Record<string, string>;
+}
+
+// ============================================================================
+// F25: Spending Insights Types
+// ============================================================================
+
+/**
+ * F25: Category breakdown with optimization analysis
+ */
+export interface CategoryBreakdown {
+  category: SpendingCategory;
+  totalSpend: number;
+  transactionCount: number;
+  percentOfTotal: number;
+  topMerchants: MerchantSummary[];
+  currentCard: Card | null;     // Which card they used (if known)
+  optimalCard: Card | null;     // Which card they SHOULD use
+  rewardsEarned: number;        // What they got (estimated)
+  rewardsPossible: number;      // What they could get with optimal
+  rewardsGap: number;           // Money left on the table
+}
+
+/**
+ * F25: Merchant spending summary
+ */
+export interface MerchantSummary {
+  name: string;
+  amount: number;
+  count: number;
+  category: SpendingCategory;
+}
+
+/**
+ * F25: Optimization score (0-100)
+ */
+export interface OptimizationScore {
+  score: number;                // 0-100
+  label: string;                // "Rewards Master", "Good Optimizer", etc.
+  emoji: string;                // 🏆, 👍, 📊, 🎯
+  actualRewards: number;        // Total rewards earned
+  maxPossibleRewards: number;   // Max with optimal cards
+  rewardsGap: number;           // Difference
+  improvementPotential: string; // Human-readable suggestion
+}
+
+/**
+ * F25: Spending trend analysis
+ */
+export interface SpendingTrend {
+  category: SpendingCategory;
+  currentMonth: number;
+  previousMonth: number;
+  changePercent: number;
+  changeAmount: number;
+  direction: 'up' | 'down' | 'stable';
+  alert?: SmartAlert;           // Alert if significant change
+}
+
+/**
+ * F25: Smart alert types
+ */
+export type SmartAlertType = 
+  | 'spending_increase'
+  | 'spending_decrease'
+  | 'card_switch'
+  | 'category_cap'
+  | 'new_opportunity'
+  | 'seasonal';
+
+/**
+ * F25: Smart alert
+ */
+export interface SmartAlert {
+  id: string;
+  type: SmartAlertType;
+  priority: 'high' | 'medium' | 'low';
+  title: string;
+  message: string;
+  category?: SpendingCategory;
+  suggestedAction?: string;
+  potentialSavings?: number;
+  createdAt: Date;
+  dismissed: boolean;
+}
+
+/**
+ * F25: Full insights result
+ */
+export interface SpendingInsights {
+  periodStart: Date;
+  periodEnd: Date;
+  totalSpend: number;
+  transactionCount: number;
+  categoryBreakdown: CategoryBreakdown[];
+  optimizationScore: OptimizationScore;
+  trends: SpendingTrend[];
+  alerts: SmartAlert[];
+  moneyLeftOnTable: number;
+  topMerchants: MerchantSummary[];
+}
+
+/**
+ * F25: Monthly summary for trend analysis
+ */
+export interface MonthlySummary {
+  month: Date;                  // First day of month
+  totalSpend: number;
+  byCategory: Record<SpendingCategory, number>;
+  transactionCount: number;
+}
+
+// ============================================================================
+// Cycle 4 Error Types
+// ============================================================================
+
+export type StatementParseError =
+  | { type: 'INVALID_FILE'; message: string }
+  | { type: 'UNSUPPORTED_BANK'; detectedFormat?: string }
+  | { type: 'EMPTY_FILE' }
+  | { type: 'PARSE_FAILED'; errors: CSVParseError[] }
+  | { type: 'NO_TRANSACTIONS' }
+  | { type: 'STORAGE_ERROR'; message: string };
+
+export type InsightsError =
+  | { type: 'NO_TRANSACTIONS'; message: string }
+  | { type: 'INSUFFICIENT_DATA'; transactionCount: number; minimumRequired: number }
+  | { type: 'DATE_RANGE_ERROR'; message: string }
+  | { type: 'CALCULATION_ERROR'; message: string };
+
+// ============================================================================
+// Cycle 4 Date Range Filter
+// ============================================================================
+
+export interface DateRange {
+  start: Date;
+  end: Date;
+}
+
+/**
+ * Filter options for transaction queries
+ */
+export interface TransactionFilter {
+  dateRange?: DateRange;
+  categories?: SpendingCategory[];
+  banks?: SupportedBank[];
+  minAmount?: number;
+  maxAmount?: number;
+  searchTerm?: string;
+  excludeCredits?: boolean;
+}
+
+// ============================================================================
 // Helper Functions
 // ============================================================================
 

@@ -37,6 +37,8 @@ import {
   CardRecommendationsScreen,
   NotificationsScreen,
   SavingsReportScreen,
+  StatementUploadScreen,
+  InsightsDashboardScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
@@ -68,6 +70,8 @@ export type InsightsStackParamList = {
   RedemptionGuide: { programId: string; cardId?: string };
   CardRecommendations: undefined;
   SavingsReport: { reportId?: string };
+  StatementUpload: undefined;
+  InsightsDashboard: undefined;
 };
 
 export type RootTabParamList = {
@@ -184,6 +188,16 @@ function InsightsNavigator() {
       <InsightsStack.Screen
         name="SavingsReport"
         component={SavingsReportScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="StatementUpload"
+        component={StatementUploadScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="InsightsDashboard"
+        component={InsightsDashboardScreen}
         options={{ animation: 'slide_from_right' }}
       />
     </InsightsStack.Navigator>

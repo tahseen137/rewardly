@@ -350,6 +350,32 @@ export function resetSpendingProfileCache(): void {
   isInitialized = false;
 }
 
+/**
+ * CYCLE 4 INTEGRATION: Update spending profile from parsed transactions
+ * Auto-calculates monthly averages from real transaction data
+ */
+export async function updateFromParsedTransactions(
+  transactions: Array<{ amount: number; category: import('../types').SpendingCategory; transactionDate: Date; isCredit: boolean }>
+): Promise<Result<SpendingProfile, SpendingProfileError>> {
+  if (!isInitialized) await initializeSpendingProfile();
+
+  // Filter to purchases only
+  const purchases = transactions.filter(t => !t.isCredit);
+  
+  if (purchases.length === 0) {
+    return failure({
+      type: 'STORAGE_ERROR',
+      message: 'No purchase transactions found',
+    });
+  }
+
+  // Use aggregateSpendingEntries to calculate monthly averages
+  const profileData = aggregateSpendingEntries(purchases);
+
+  // Save the updated profile
+  return saveSpendingProfile(profileData);
+}
+
 // ============================================================================
 // Storage Functions
 // ============================================================================
