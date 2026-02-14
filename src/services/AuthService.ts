@@ -25,6 +25,7 @@ export interface AuthResult {
   success: boolean;
   user: AuthUser | null;
   error: string | null;
+  needsEmailConfirmation?: boolean;
 }
 
 export type AuthStateChangeCallback = (event: AuthChangeEvent, user: AuthUser | null) => void;
@@ -116,7 +117,9 @@ export async function signUp(email: string, password: string): Promise<AuthResul
       email,
       password,
       options: {
-        emailRedirectTo: undefined, // No email confirmation for now
+        emailRedirectTo: Platform.OS === 'web' 
+          ? window.location.origin 
+          : 'rewardly://auth/callback',
       },
     });
 
@@ -131,10 +134,14 @@ export async function signUp(email: string, password: string): Promise<AuthResul
     // Clear any guest user
     await clearGuestUser();
 
+    // Check if email confirmation is required
+    const needsConfirmation = data.user && !data.session;
+
     return {
       success: true,
       user: transformUser(data.user),
       error: null,
+      needsEmailConfirmation: needsConfirmation || false,
     };
   } catch (err) {
     return {

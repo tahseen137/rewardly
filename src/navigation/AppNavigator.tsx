@@ -46,7 +46,7 @@ import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
 import { getCurrentUser, onAuthStateChange, AuthUser } from '../services/AuthService';
 import { isOnboardingComplete, initializePreferences } from '../services/PreferenceManager';
-import { initializeSubscription, canAccessFeatureSync, getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
+import { initializeSubscription, refreshSubscription, canAccessFeatureSync, getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
 import { initializeAutoPilot } from '../services/AutoPilotService';
 
 // Stack navigator for Insights screens
@@ -462,9 +462,15 @@ export default function AppNavigator() {
 
   // Listen for auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChange((event, authUser) => {
+    const unsubscribe = onAuthStateChange(async (event, authUser) => {
       if (event === 'SIGNED_IN' && authUser) {
         setUser(authUser);
+        // Refresh subscription tier so features unlock immediately
+        try {
+          await refreshSubscription();
+        } catch (e) {
+          console.warn('Failed to refresh subscription on sign-in:', e);
+        }
         const onboardingDone = isOnboardingComplete();
         setAppState(onboardingDone ? 'main' : 'onboarding');
       } else if (event === 'SIGNED_OUT') {

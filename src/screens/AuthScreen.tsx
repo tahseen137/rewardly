@@ -83,7 +83,18 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       }
 
       if (result.success) {
-        onAuthSuccess();
+        if (result.needsEmailConfirmation) {
+          Alert.alert(
+            'Check Your Email ✉️',
+            `We've sent a confirmation link to ${email.trim()}. Please verify your email to complete sign up.`,
+            [{ text: 'OK' }]
+          );
+          setMode('signin');
+          setPassword('');
+          setConfirmPassword('');
+        } else {
+          onAuthSuccess();
+        }
       } else {
         setError(result.error ?? t('auth.errors.unknown'));
       }

@@ -16,6 +16,7 @@ import {
   Alert,
   ActivityIndicator,
   Linking,
+  Platform,
 } from 'react-native';
 import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, LogIn, User, Crown, Navigation } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -207,10 +208,38 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
     i18n.changeLanguage(lang);
   };
 
+  const performCountrySwitch = async (country: Country) => {
+    setIsLoading(true);
+    setCurrentCountry(country);
+    await setCountry(country);
+    await onCountryChange();
+    
+    // Reload cards for new country
+    try {
+      const cardStats = await getTotalCardCount();
+      setCardCount(cardStats.total);
+      setCardCountDetail(`${cardStats.us} US + ${cardStats.ca} CA`);
+    } catch {
+      setCardCount(0);
+      setCardCountDetail('');
+    }
+    
+    // Notify other screens (HomeScreen) that country has changed
+    CountryChangeEmitter.emit();
+    
+    setIsLoading(false);
+  };
+
   const handleCountryChange = async (country: Country) => {
     if (country === currentCountry) return;
     
-    // Show confirmation
+    // On web, Alert.alert callbacks don't work reliably — switch directly
+    if (Platform.OS === 'web') {
+      await performCountrySwitch(country);
+      return;
+    }
+    
+    // On native, show confirmation dialog
     Alert.alert(
       t('settings.changeCountryTitle'),
       t('settings.changeCountryMessage', { country: getCountryName(country) }),
@@ -218,27 +247,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
         { text: t('common.cancel'), style: 'cancel' },
         {
           text: t('common.ok'),
-          onPress: async () => {
-            setIsLoading(true);
-            setCurrentCountry(country);
-            await setCountry(country);
-            await onCountryChange();
-            
-            // Reload cards for new country
-            try {
-              const cardStats = await getTotalCardCount();
-              setCardCount(cardStats.total);
-              setCardCountDetail(`${cardStats.us} US + ${cardStats.ca} CA`);
-            } catch {
-              setCardCount(0);
-              setCardCountDetail('');
-            }
-            
-            // Notify other screens (HomeScreen) that country has changed
-            CountryChangeEmitter.emit();
-            
-            setIsLoading(false);
-          },
+          onPress: () => performCountrySwitch(country),
         },
       ]
     );
