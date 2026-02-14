@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase, isSupabaseConfigured } from './supabase';
 import { getCurrentUser } from './AuthService';
 import { getSpendingEntries } from './SpendingLogService';
+import { AchievementEventEmitter } from './AchievementEventEmitter';
 import {
   SpendingProfile,
   SpendingProfileInput,
@@ -280,6 +281,9 @@ export async function saveSpendingProfile(
   if (userId && isSupabaseConfigured()) {
     await syncToSupabase(profile);
   }
+
+  // Track achievement
+  AchievementEventEmitter.track('spending_profile_saved', {});
 
   return success(profile);
 }

@@ -32,6 +32,7 @@ import { getTransactions } from '../services/StatementStorageService';
 import { getCards } from '../services/CardPortfolioManager';
 import { getAllCardsSync } from '../services/CardDataService';
 import { generateSpendingInsights } from '../services/InsightsService';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { SpendingInsights, SpendingCategory } from '../types';
 
 const CATEGORY_LABELS: Record<SpendingCategory, string> = {
@@ -51,6 +52,11 @@ export default function InsightsDashboardScreen() {
   const [loading, setLoading] = useState(true);
   const [insights, setInsights] = useState<SpendingInsights | null>(null);
   const [error, setError] = useState<string>('');
+
+  // Track achievement on mount
+  useEffect(() => {
+    AchievementEventEmitter.track('insights_viewed', {});
+  }, []);
 
   useEffect(() => {
     loadInsights();

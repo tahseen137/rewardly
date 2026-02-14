@@ -913,6 +913,306 @@ export interface TransactionFilter {
 }
 
 // ============================================================================
+// Cycle 5: Achievements & 5/24 Tracker Types
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// F15: Achievements & Gamification System
+// ----------------------------------------------------------------------------
+
+/**
+ * Achievement category types
+ */
+export type AchievementCategory = 
+  | 'getting_started'
+  | 'optimization'
+  | 'data_insights'
+  | 'engagement'
+  | 'mastery';
+
+/**
+ * Achievement definition (static, never changes)
+ */
+export interface AchievementDefinition {
+  id: string;                          // e.g., "GS1", "OP1"
+  name: string;                        // Display name
+  description: string;                 // What user did to earn it
+  category: AchievementCategory;
+  icon: string;                        // Emoji
+  progressTarget?: number;             // For progressive achievements (e.g., 5 cards)
+  secret?: boolean;                    // Hidden until unlocked
+}
+
+/**
+ * User's progress on a specific achievement
+ */
+export interface AchievementProgress {
+  achievementId: string;
+  unlockedAt?: Date;                   // null if locked
+  progress: number;                    // Current progress value
+  progressTarget: number;              // Target value (from definition)
+  isUnlocked: boolean;
+  percentComplete: number;             // 0-100
+}
+
+/**
+ * User's complete achievement state
+ */
+export interface UserAchievements {
+  userId: string | null;               // null for anonymous/local-only
+  achievements: Record<string, AchievementProgress>;
+  currentStreak: number;               // Consecutive days opened app
+  longestStreak: number;               // Best streak ever
+  lastVisitDate: string;               // YYYY-MM-DD format
+  rank: number;                        // 1-6
+  rankTitle: string;                   // "Beginner", "Card Curious", etc.
+  totalUnlocked: number;               // Count of unlocked achievements
+  totalAchievements: number;           // Total available achievements
+  screensVisited: string[];            // For "Explorer" achievement
+  cardBenefitsViewed: string[];        // Card IDs viewed for "Card Scholar"
+  sageChatsCount: number;              // For "Sage Seeker"
+  statementsUploaded: number;          // For "Statement Pro" / "Data Driven"
+  comparisonsCount: number;            // For "Comparer"
+  updatedAt: Date;
+}
+
+/**
+ * Achievement unlock event (for animation/notification)
+ */
+export interface AchievementUnlockEvent {
+  achievement: AchievementDefinition;
+  progress: AchievementProgress;
+  newRank?: { rank: number; title: string }; // If rank changed
+  timestamp: Date;
+}
+
+/**
+ * Rank definition
+ */
+export interface RankDefinition {
+  rank: number;
+  title: string;
+  minAchievements: number;
+  maxAchievements: number;
+  emoji: string;
+}
+
+/**
+ * Achievement event types for tracking
+ */
+export type AchievementEventType =
+  | 'card_added'
+  | 'card_removed'
+  | 'spending_profile_saved'
+  | 'sage_chat'
+  | 'wallet_optimizer_used'
+  | 'fee_breakeven_viewed'
+  | 'signup_roi_viewed'
+  | 'gaps_found'
+  | 'optimization_score_calculated'
+  | 'statement_uploaded'
+  | 'insights_viewed'
+  | 'trends_viewed'
+  | 'money_left_on_table_calculated'
+  | 'app_opened'
+  | 'card_comparison_viewed'
+  | 'screen_visited'
+  | 'card_benefits_viewed';
+
+/**
+ * Achievement event payload
+ */
+export interface AchievementEvent {
+  type: AchievementEventType;
+  data?: {
+    cardCount?: number;
+    screenName?: string;
+    cardId?: string;
+    optimizationScore?: number;
+    moneyLeftOnTable?: number;
+    gapsCount?: number;
+    [key: string]: any;
+  };
+  timestamp: Date;
+}
+
+// ----------------------------------------------------------------------------
+// F16: Credit Card 5/24 Tracker
+// ----------------------------------------------------------------------------
+
+/**
+ * Application status
+ */
+export type ApplicationStatus = 'approved' | 'pending' | 'denied';
+
+/**
+ * Single card application record
+ */
+export interface CardApplication {
+  id: string;
+  cardId: string;                      // Reference to card in DB
+  cardName: string;                    // Denormalized for display
+  issuer: string;                      // Issuer name
+  applicationDate: Date;
+  approvalDate?: Date;                 // May differ from application date
+  status: ApplicationStatus;
+  fallOffDate: Date;                   // applicationDate + 24 months
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Input for adding new application
+ */
+export interface CardApplicationInput {
+  cardId: string;
+  cardName: string;
+  issuer: string;
+  applicationDate: Date;
+  status: ApplicationStatus;
+  notes?: string;
+}
+
+/**
+ * Issuer-specific cooldown rule
+ */
+export interface IssuerRule {
+  issuer: string;
+  cooldownDays: number;                // 0 = no cooldown
+  isStrict: boolean;                   // Strict = auto-denial, Soft = may flag review
+  description: string;
+  maxAppsPerPeriod?: number;           // e.g., 5/24 = 5 apps per 24 months
+  periodMonths?: number;               // For maxAppsPerPeriod
+  welcomeBonusRule?: string;           // "once per lifetime", etc.
+}
+
+/**
+ * Issuer cooldown status
+ */
+export interface IssuerCooldownStatus {
+  issuer: string;
+  isEligible: boolean;
+  lastApplicationDate?: Date;
+  nextEligibleDate?: Date;
+  daysUntilEligible: number;           // 0 if eligible now
+  rule: IssuerRule;
+  applicationCountInPeriod: number;    // How many apps to this issuer in period
+}
+
+/**
+ * Card-specific eligibility check result
+ */
+export interface CardEligibility {
+  cardId: string;
+  cardName: string;
+  issuer: string;
+  isEligible: boolean;
+  reasons: string[];                   // All reasons (may be multiple)
+  eligibleDate?: Date;                 // When they'll become eligible
+  daysUntilEligible: number;
+  cooldownStatus: IssuerCooldownStatus;
+  previousApplications: CardApplication[]; // Past apps for this card
+  welcomeBonusEligible: boolean;       // Based on issuer rules
+}
+
+/**
+ * Timeline event (for UI display)
+ */
+export interface ApplicationTimelineEvent {
+  date: Date;
+  type: 'application' | 'falloff' | 'eligible';
+  application?: CardApplication;
+  description: string;
+  isInFuture: boolean;
+}
+
+/**
+ * Strategy advice for applying to a card
+ */
+export interface StrategyAdvice {
+  cardId: string;
+  cardName: string;
+  issuer: string;
+  recommendation: 'apply_now' | 'wait' | 'caution' | 'not_recommended';
+  reasons: string[];
+  suggestedDate?: Date;                // If "wait", when to apply
+  priority: number;                    // Lower = apply first
+  impact: {
+    will524Increase: boolean;          // Will applying increase 5/24 count?
+    new524Count: number;               // What 5/24 count would be after
+    affectedIssuers: string[];         // Which issuer cooldowns would start
+  };
+}
+
+/**
+ * Full application tracker state
+ */
+export interface ApplicationTracker {
+  userId: string | null;
+  applications: CardApplication[];
+  countLast24Months: number;           // The "X/24" number
+  countLast12Months: number;           // Additional tracking
+  issuerCooldowns: IssuerCooldownStatus[];
+  upcoming: ApplicationTimelineEvent[];// Future falloffs and eligibility dates
+  alerts: TrackerAlert[];              // Active alerts
+  updatedAt: Date;
+}
+
+/**
+ * Tracker alert
+ */
+export interface TrackerAlert {
+  id: string;
+  type: 'approaching_limit' | 'now_eligible' | 'cooldown_ending' | 'falloff_soon';
+  title: string;
+  message: string;
+  issuer?: string;
+  cardId?: string;
+  date: Date;                          // When the event occurs
+  dismissed: boolean;
+  createdAt: Date;
+}
+
+/**
+ * Wanted card for strategy planning
+ */
+export interface WantedCard {
+  cardId: string;
+  cardName: string;
+  issuer: string;
+  priority: 'high' | 'medium' | 'low';
+  addedAt: Date;
+}
+
+/**
+ * Full strategy result
+ */
+export interface ApplicationStrategy {
+  wantedCards: WantedCard[];
+  advice: StrategyAdvice[];
+  timeline: ApplicationTimelineEvent[];
+  warnings: string[];
+  summary: string;                     // Human-readable summary
+}
+
+// ----------------------------------------------------------------------------
+// Error Types
+// ----------------------------------------------------------------------------
+
+export type AchievementError =
+  | { type: 'STORAGE_ERROR'; message: string }
+  | { type: 'INVALID_EVENT'; event: string }
+  | { type: 'ACHIEVEMENT_NOT_FOUND'; achievementId: string };
+
+export type ApplicationTrackerError =
+  | { type: 'STORAGE_ERROR'; message: string }
+  | { type: 'INVALID_APPLICATION'; message: string }
+  | { type: 'APPLICATION_NOT_FOUND'; applicationId: string }
+  | { type: 'CARD_NOT_FOUND'; cardId: string }
+  | { type: 'DUPLICATE_APPLICATION'; cardId: string; date: string };
+
+// ============================================================================
 // Helper Functions
 // ============================================================================
 

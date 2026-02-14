@@ -39,6 +39,8 @@ import {
   SavingsReportScreen,
   StatementUploadScreen,
   InsightsDashboardScreen,
+  AchievementsScreen,
+  ApplicationTrackerScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
@@ -51,6 +53,7 @@ import { getCurrentUser, onAuthStateChange, AuthUser } from '../services/AuthSer
 import { isOnboardingComplete, initializePreferences } from '../services/PreferenceManager';
 import { initializeSubscription, refreshSubscription, canAccessFeatureSync, getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
 import { initializeAutoPilot } from '../services/AutoPilotService';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 
 // Stack navigator for Insights screens
 export type InsightsStackParamList = {
@@ -72,6 +75,8 @@ export type InsightsStackParamList = {
   SavingsReport: { reportId?: string };
   StatementUpload: undefined;
   InsightsDashboard: undefined;
+  Achievements: undefined;
+  ApplicationTracker: undefined;
 };
 
 export type RootTabParamList = {
@@ -198,6 +203,16 @@ function InsightsNavigator() {
       <InsightsStack.Screen
         name="InsightsDashboard"
         component={InsightsDashboardScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="Achievements"
+        component={AchievementsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="ApplicationTracker"
+        component={ApplicationTrackerScreen}
         options={{ animation: 'slide_from_right' }}
       />
     </InsightsStack.Navigator>
@@ -446,6 +461,9 @@ export default function AppNavigator() {
 
         // Initialize AutoPilot service
         await initializeAutoPilot();
+
+        // Track app open for streak achievement
+        AchievementEventEmitter.track('app_opened', {});
 
         // Check for existing user
         const currentUser = await getCurrentUser();

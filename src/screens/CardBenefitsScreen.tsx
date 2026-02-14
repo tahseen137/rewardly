@@ -34,6 +34,7 @@ import { getCurrentTierSync } from '../services/SubscriptionService';
 import { getSpendingProfileSync } from '../services/SpendingProfileService';
 import { calculateFeeBreakeven } from '../services/FeeBreakevenService';
 import { calculateSignupBonusROI } from '../services/SignupBonusService';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { LockedFeature, FeeBreakevenCard, SignupBonusCard } from '../components';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
 
@@ -131,6 +132,11 @@ export default function CardBenefitsScreen() {
   const [loadingAnalysis, setLoadingAnalysis] = useState(true);
 
   const card = useMemo(() => getCardByIdSync(cardId), [cardId]);
+
+  // Track achievement on mount
+  useEffect(() => {
+    AchievementEventEmitter.track('card_benefits_viewed', { cardId });
+  }, [cardId]);
 
   useEffect(() => {
     const allBenefits = getBenefitsForCard(cardId);

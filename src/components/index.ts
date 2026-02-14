@@ -88,3 +88,6 @@ export { default as ConfettiAnimation } from './ConfettiAnimation';
 
 // Cycle 4 - CSV Statement Upload Components
 export { TransactionReviewList } from './TransactionReviewList';
+
+// Cycle 5 - Achievements & Gamification
+export { UnlockToast } from './UnlockToast';

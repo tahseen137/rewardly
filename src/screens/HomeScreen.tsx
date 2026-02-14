@@ -16,7 +16,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { ChevronRight, Sparkles } from 'lucide-react-native';
+import { ChevronRight, Sparkles, Trophy } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import {
   AmountInput,
@@ -38,6 +38,8 @@ import {
   CalculatorInput,
   CalculatorOutput,
 } from '../services/RewardsCalculatorService';
+import { getAchievements, initializeAchievements } from '../services/AchievementService';
+import { UserAchievements } from '../types';
 
 // Map CategoryType to SpendingCategory
 const categoryTypeToSpendingCategory = (cat: CategoryType): SpendingCategory => {
@@ -110,6 +112,7 @@ export default function HomeScreen() {
   const [hasCards, setHasCards] = useState(false);
   const [recommendations, setRecommendations] = useState<CardRecommendation[]>([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+  const [achievements, setAchievements] = useState<UserAchievements | null>(null);
 
   // Function to load data
   const loadData = useCallback(async () => {
@@ -118,6 +121,15 @@ export default function HomeScreen() {
       const portfolio = getCards();
       setHasCards(portfolio.length > 0);
       setState((prev) => ({ ...prev, isLoading: false, loadError: null }));
+      
+      // Load achievements
+      try {
+        await initializeAchievements();
+        const userAchievements = await getAchievements();
+        setAchievements(userAchievements);
+      } catch (err) {
+        console.warn('Failed to load achievements:', err);
+      }
       
       // Load recommendations if user has cards
       if (portfolio.length > 0) {
@@ -338,6 +350,55 @@ export default function HomeScreen() {
               <Text style={styles.uploadTitle}>Spending Insights</Text>
               <Text style={styles.uploadSubtitle}>
                 See optimization score and trends
+              </Text>
+            </View>
+          </View>
+          <ChevronRight size={20} color={colors.primary.main} />
+        </TouchableOpacity>
+
+        {/* Achievements Card */}
+        {achievements && (
+          <TouchableOpacity
+            style={styles.achievementsCard}
+            onPress={() => navigation.navigate('Achievements' as never)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.achievementsContent}>
+              <View style={styles.achievementsIconContainer}>
+                <Trophy size={24} color={colors.primary.main} />
+              </View>
+              <View style={styles.achievementsText}>
+                <Text style={styles.achievementsTitle}>
+                  {achievements.rankTitle}
+                </Text>
+                <Text style={styles.achievementsSubtitle}>
+                  {achievements.totalUnlocked}/{achievements.totalAchievements} achievements unlocked
+                </Text>
+                {achievements.currentStreak > 0 && (
+                  <View style={styles.streakBadge}>
+                    <Text style={styles.streakText}>
+                      🔥 {achievements.currentStreak} day streak
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+            <ChevronRight size={20} color={colors.primary.main} />
+          </TouchableOpacity>
+        )}
+
+        {/* Application Tracker Card */}
+        <TouchableOpacity
+          style={styles.uploadCard}
+          onPress={() => navigation.navigate('ApplicationTracker' as never)}
+          activeOpacity={0.8}
+        >
+          <View style={styles.uploadContent}>
+            <Text style={styles.uploadEmoji}>📋</Text>
+            <View style={styles.uploadText}>
+              <Text style={styles.uploadTitle}>Application Tracker</Text>
+              <Text style={styles.uploadSubtitle}>
+                Track credit card applications and 5/24 status
               </Text>
             </View>
           </View>
@@ -726,5 +787,52 @@ const createStyles = (theme: Theme) =>
       fontSize: 13,
       color: colors.text.tertiary,
       textAlign: 'center',
+    },
+    achievementsCard: {
+      backgroundColor: colors.primary.bg20,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 24,
+      borderWidth: 2,
+      borderColor: colors.primary.main,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    achievementsContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      gap: 12,
+    },
+    achievementsIconContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colors.primary.main,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    achievementsText: {
+      flex: 1,
+    },
+    achievementsTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.primary.dark,
+      marginBottom: 2,
+    },
+    achievementsSubtitle: {
+      fontSize: 13,
+      color: colors.primary.dark,
+      lineHeight: 18,
+    },
+    streakBadge: {
+      marginTop: 4,
+    },
+    streakText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.primary.dark,
     },
   });

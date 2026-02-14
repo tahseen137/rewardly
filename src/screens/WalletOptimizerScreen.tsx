@@ -37,6 +37,7 @@ import { optimizeWallet } from '../services/WalletOptimizerService';
 import { getSpendingProfileSync, saveSpendingProfile } from '../services/SpendingProfileService';
 import { getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
 import { getCards } from '../services/CardPortfolioManager';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { LockedFeature } from '../components';
 
 type Step = 1 | 2 | 3;
@@ -108,6 +109,9 @@ export default function WalletOptimizerScreen() {
       if (optimizerResult.success) {
         setResult(optimizerResult.value);
         setStep(3);
+        
+        // Track achievement
+        AchievementEventEmitter.track('wallet_optimizer_used', {});
       } else {
         // Handle error
         const errorMsg = optimizerResult.error;
