@@ -126,7 +126,7 @@ export default function CardDetailScreen() {
 
   // Track achievement on mount
   useEffect(() => {
-    AchievementEventEmitter.track('card_benefits_viewed', { cardId });
+    try { AchievementEventEmitter.track('card_benefits_viewed', { cardId }); } catch (_e) { /* setImmediate not available on web */ }
   }, [cardId]);
 
   // Load fee breakeven and signup bonus analysis
