@@ -266,5 +266,250 @@
     "unauthorized": "Please sign in to continue",
     "limitReached": "You've reached your limit",
     "upgradeRequired": "Upgrade to access this feature"
+  },
+  "benefits": {
+    "title": "Card Benefits",
+    "categories": {
+      "travel": "Travel Benefits",
+      "purchase": "Purchase Protection",
+      "insurance": "Insurance Coverage",
+      "lifestyle": "Lifestyle Perks"
+    },
+    "noBenefits": "No benefits data available for this card",
+    "viewAll": "View All Benefits",
+    "lockedTitle": "Unlock All Benefits",
+    "lockedDesc": "Upgrade to Pro to see all {{count}} benefits"
+  },
+  "subTracker": {
+    "title": "Sign-Up Bonus Tracker",
+    "subtitle": "Track your spending toward signup bonuses",
+    "addSUB": "Add Bonus to Track",
+    "editSUB": "Edit Bonus",
+    "deleteSUB": "Remove Tracking",
+    "deleteConfirm": "Stop tracking this bonus?",
+    "progress": {
+      "spent": "Spent",
+      "of": "of",
+      "remaining": "{{amount}} to go",
+      "daysLeft": "{{days}} days left",
+      "daysLeftOne": "1 day left",
+      "onTrack": "On track!",
+      "behindSchedule": "Spend {{amount}}/day to hit goal",
+      "completed": "Completed!",
+      "expired": "Expired"
+    },
+    "empty": {
+      "title": "No Bonuses Being Tracked",
+      "description": "Add a sign-up bonus to track your progress",
+      "cta": "Add Your First Bonus"
+    }
+  },
+  "cardCompare": {
+    "title": "Compare Cards",
+    "subtitle": "See which card wins",
+    "selectCards": "Select cards to compare",
+    "addCard": "Add Card",
+    "removeCard": "Remove",
+    "maxCards": "Compare up to {{count}} cards",
+    "upgradeFor3": "Upgrade to compare 3 cards",
+    "winner": "Winner",
+    "overallScore": "Overall Score",
+    "noFee": "No fee",
+    "noBenefits": "None"
+  },
+  "spendingLog": {
+    "title": "Spending Log",
+    "subtitle": "Track your purchases and rewards",
+    "addEntry": "Log Purchase",
+    "editEntry": "Edit Purchase",
+    "deleteEntry": "Delete",
+    "deleteConfirm": "Delete this transaction?",
+    "form": {
+      "amount": "Amount",
+      "store": "Store (optional)",
+      "category": "Category",
+      "card": "Card Used",
+      "date": "Date",
+      "notes": "Notes (optional)"
+    },
+    "summary": {
+      "totalSpend": "Total Spent",
+      "earned": "Rewards Earned",
+      "missed": "Rewards Missed"
+    },
+    "optimal": "Optimal: {{card}}",
+    "earnedLabel": "+{{amount}}",
+    "missedLabel": "-{{amount}} missed",
+    "limitReached": {
+      "title": "Free Limit Reached",
+      "message": "Upgrade to Pro for unlimited history",
+      "cta": "Upgrade"
+    },
+    "empty": {
+      "title": "No Transactions Yet",
+      "description": "Log your first purchase to start tracking rewards",
+      "cta": "Log Purchase"
+    }
+  },
+  "recurring": {
+    "title": "Recurring Charges",
+    "subtitle": "Optimize your subscriptions",
+    "addCharge": "Add Subscription",
+    "editCharge": "Edit",
+    "deleteCharge": "Remove",
+    "summary": {
+      "totalCharges": "Monthly Total",
+      "currentRewards": "Current Rewards",
+      "potentialRewards": "Potential Rewards",
+      "monthlySavings": "Monthly Savings",
+      "yearlySavings": "That's {{amount}}/year!"
+    },
+    "sections": {
+      "needsOptimization": "Needs Optimization",
+      "optimized": "Already Optimized"
+    },
+    "card": {
+      "current": "Current",
+      "optimal": "Use",
+      "savings": "+{{amount}}/mo"
+    },
+    "empty": {
+      "title": "No Recurring Charges",
+      "description": "Add your subscriptions to see which cards earn the most",
+      "cta": "Add Subscription"
+    }
+  },
+  "annualFee": {
+    "title": "Annual Fees",
+    "subtitle": "Are your cards worth keeping?",
+    "summary": {
+      "totalFees": "Total Annual Fees",
+      "rewardsEarned": "Est. Rewards Earned",
+      "netValue": "Net Value",
+      "worthKeeping": "{{count}} worth keeping",
+      "needsReview": "{{count}} to review"
+    },
+    "upcomingRenewals": "Upcoming Renewals",
+    "allCardsWithFees": "All Cards with Fees",
+    "card": {
+      "fee": "{{amount}}/year",
+      "renewsIn": "Renews in {{days}} days",
+      "renewsOn": "Renews {{date}}",
+      "renewalUnknown": "Set renewal date",
+      "earned": "~{{amount}} earned",
+      "netValue": "Net: {{amount}}",
+      "setOpenDate": "Set Card Open Date"
+    },
+    "worth": {
+      "yes": "Worth Keeping",
+      "maybe": "Review Needed",
+      "no": "Consider Canceling",
+      "reasonPositive": "Rewards exceed fee",
+      "reasonBreakeven": "Close to break-even",
+      "reasonNegative": "Fee exceeds rewards"
+    },
+    "noFeeCards": "No cards with annual fees",
+    "renewalAlert": "{{card}} renewal in {{days}} days"
+  },
+  "redemption": {
+    "title": "Redemption Guide",
+    "subtitle": "Maximize your point value",
+    "cppLabel": "Cents per Point",
+    "directRate": "Direct Redemption",
+    "optimalRate": "Optimal Value",
+    "optimalMethod": "Best Method",
+    "transferPartners": "Transfer Partners",
+    "otherRedemptions": "Other Redemptions",
+    "partner": {
+      "ratio": "{{ratio}}:1",
+      "instant": "Instant",
+      "time": "{{time}} transfer",
+      "sweetSpots": "Sweet Spots",
+      "viewSweetSpots": "View deals"
+    },
+    "options": {
+      "portal": "Travel Portal",
+      "statement": "Statement Credit",
+      "giftCard": "Gift Cards",
+      "merchandise": "Merchandise"
+    },
+    "rating": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "poor": "Poor"
+    }
+  },
+  "recommendations": {
+    "title": "Card Recommendations",
+    "subtitle": "Cards that match your spending",
+    "analysis": {
+      "topCategories": "Your Top Categories",
+      "gapsFound": "{{count}} categories could be optimized",
+      "potentialGain": "+{{amount}}/year potential"
+    },
+    "card": {
+      "reason": "Why this card?",
+      "basedOn": {
+        "spending": "Based on your spending",
+        "gap": "Fills a gap in your wallet",
+        "upgrade": "Upgrade from your current card",
+        "signup_bonus": "Great sign-up bonus"
+      },
+      "estimatedRewards": "~{{amount}}/year",
+      "signupBonus": "{{amount}} bonus",
+      "apply": "Learn More",
+      "applyAffiliate": "Apply Now"
+    },
+    "refresh": "Refresh Recommendations",
+    "disclaimer": "Card details may change. Verify terms before applying.",
+    "empty": {
+      "title": "Need More Data",
+      "description": "Log some purchases to get personalized recommendations"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "filters": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "types": {
+      "sub_deadline": "Bonus Deadline",
+      "fee_renewal": "Fee Renewal",
+      "bonus_category": "Bonus Category",
+      "monthly_report": "Monthly Report",
+      "new_card_offer": "New Offer",
+      "spending_alert": "Spending Alert",
+      "general": "General"
+    },
+    "empty": {
+      "title": "No Notifications",
+      "unread": "All caught up!",
+      "all": "You have no notifications"
+    }
+  },
+  "savingsReport": {
+    "title": "Monthly Savings Report",
+    "shareReport": "Share Report",
+    "optimizationScore": "Optimization Score",
+    "totalSpent": "Total Spent",
+    "earned": "Earned",
+    "missed": "Missed",
+    "bestPerformer": "Best Performer",
+    "underperformer": "Underperformer",
+    "categoryBreakdown": "Category Breakdown",
+    "pastReports": "Past Reports",
+    "scoreRating": {
+      "excellent": "Excellent!",
+      "good": "Good!",
+      "needsWork": "Needs Work",
+      "improve": "Lots of room to improve"
+    },
+    "empty": {
+      "title": "No Report Available",
+      "description": "Log some purchases to generate your first monthly report"
+    }
   }
 }

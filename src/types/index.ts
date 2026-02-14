@@ -248,6 +248,155 @@ export type RecommendationError =
 export type Result<T, E> = { success: true; value: T } | { success: false; error: E };
 
 // ============================================================================
+// Cycle 1 Features (F1-F10)
+// ============================================================================
+
+/**
+ * F1: Card Benefits
+ */
+export type BenefitCategory = 'travel' | 'purchase' | 'insurance' | 'lifestyle';
+
+export interface Benefit {
+  name: string;
+  description: string;
+  category: BenefitCategory;
+  value?: string; // "$500,000 coverage"
+}
+
+/**
+ * F2: SUB (Sign-Up Bonus) Tracking
+ */
+export type SUBStatus = 'active' | 'completed' | 'expired' | 'cancelled';
+
+export interface SUBTracking {
+  id: string;
+  userId: string;
+  cardId: string;
+  targetAmount: number;
+  currentAmount: number;
+  startDate: Date;
+  deadlineDate: Date;
+  bonusDescription?: string;
+  bonusAmount?: number;
+  bonusCurrency?: string;
+  status: SUBStatus;
+  completedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SUBProgress {
+  sub: SUBTracking;
+  percentComplete: number;
+  amountRemaining: number;
+  daysRemaining: number;
+  dailyTargetNeeded: number; // To hit goal
+  isOnTrack: boolean;
+  isUrgent: boolean; // <7 days and under target
+}
+
+/**
+ * F4: Spending Log
+ */
+export interface SpendingEntry {
+  id: string;
+  userId: string;
+  amount: number;
+  category: SpendingCategory;
+  storeName?: string;
+  cardUsed: string; // cardId
+  optimalCard?: string;
+  rewardsEarned: number;
+  rewardsMissed: number;
+  transactionDate: Date;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SpendingFilter {
+  cardId?: string;
+  category?: SpendingCategory;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export interface SpendingSummary {
+  totalSpend: number;
+  totalRewardsEarned: number;
+  totalRewardsMissed: number;
+  transactionCount: number;
+}
+
+/**
+ * F5: Recurring Charges
+ */
+export interface RecurringCharge {
+  id: string;
+  userId: string;
+  name: string;
+  amount: number;
+  category: SpendingCategory;
+  billingDay?: number;
+  currentCard?: string;
+  optimalCard?: string;
+  currentRewards: number;
+  optimalRewards: number;
+  monthlySavings: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface RecurringSummary {
+  totalMonthlyCharges: number;
+  totalCurrentRewards: number;
+  totalOptimalRewards: number;
+  totalMonthlySavings: number;
+  optimizedCount: number; // charges not on optimal card
+}
+
+/**
+ * F3: Card Comparison
+ */
+export interface ComparisonResult {
+  cards: Card[];
+  categoryComparisons: CategoryComparison[];
+  overallScores: { cardId: string; score: number }[];
+  winner: string; // cardId
+}
+
+export interface CategoryComparison {
+  category: SpendingCategory | 'annual_fee' | 'signup_bonus' | 'benefits_count';
+  values: { cardId: string; value: number | string; isWinner: boolean }[];
+}
+
+/**
+ * F9: Notifications
+ */
+export type NotificationType = 
+  | 'sub_deadline' 
+  | 'fee_renewal' 
+  | 'bonus_category' 
+  | 'monthly_report' 
+  | 'new_card_offer'
+  | 'spending_alert'
+  | 'general';
+
+export interface AppNotification {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  isRead: boolean;
+  actionUrl?: string; // Screen name or deep link
+  actionData?: Record<string, any>;
+  expiresAt?: Date;
+  createdAt: Date;
+}
+
+// ============================================================================
 // Helper Functions
 // ============================================================================
 

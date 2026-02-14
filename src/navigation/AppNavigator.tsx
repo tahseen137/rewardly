@@ -26,6 +26,16 @@ import {
   PortfolioOptimizerScreen,
   SpendingInsightsScreen,
   CardTrackerScreen,
+  CardBenefitsScreen,
+  SUBTrackerScreen,
+  CardCompareScreen,
+  SpendingLogScreen,
+  RecurringScreen,
+  AnnualFeeScreen,
+  RedemptionGuideScreen,
+  CardRecommendationsScreen,
+  NotificationsScreen,
+  SavingsReportScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
@@ -47,6 +57,15 @@ export type InsightsStackParamList = {
   PortfolioOptimizer: undefined;
   SpendingInsights: undefined;
   CardTracker: undefined;
+  CardBenefits: { cardId: string };
+  SUBTracker: undefined;
+  CardCompare: { preselectedCards?: string[] };
+  SpendingLog: undefined;
+  Recurring: undefined;
+  AnnualFee: undefined;
+  RedemptionGuide: { programId: string; cardId?: string };
+  CardRecommendations: undefined;
+  SavingsReport: { reportId?: string };
 };
 
 export type RootTabParamList = {
@@ -58,13 +77,14 @@ export type RootTabParamList = {
   Settings: undefined;
 };
 
-// Root Stack for modals (Upgrade screen)
+// Root Stack for modals (Upgrade screen, Notifications)
 export type RootStackParamList = {
   MainTabs: undefined;
   Upgrade: { 
     feature?: string; 
     source?: string;
   };
+  Notifications: undefined;
 };
 
 type AppState = 'loading' | 'auth' | 'onboarding' | 'main';
@@ -112,6 +132,51 @@ function InsightsNavigator() {
       <InsightsStack.Screen 
         name="CardTracker" 
         component={CardTrackerScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="CardBenefits" 
+        component={CardBenefitsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="SUBTracker" 
+        component={SUBTrackerScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="CardCompare" 
+        component={CardCompareScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="SpendingLog" 
+        component={SpendingLogScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="Recurring" 
+        component={RecurringScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="AnnualFee" 
+        component={AnnualFeeScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="RedemptionGuide" 
+        component={RedemptionGuideScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="CardRecommendations" 
+        component={CardRecommendationsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
+        name="SavingsReport" 
+        component={SavingsReportScreen}
         options={{ animation: 'slide_from_right' }}
       />
     </InsightsStack.Navigator>
@@ -489,6 +554,14 @@ function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignI
       <RootStack.Screen 
         name="Upgrade" 
         component={UpgradeScreen}
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+        }}
+      />
+      <RootStack.Screen 
+        name="Notifications" 
+        component={NotificationsScreen}
         options={{
           presentation: 'modal',
           animation: 'slide_from_bottom',
