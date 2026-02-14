@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Rewardly Admin Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💳</text></svg>"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0E1F;--bg2:#0F1528;--bg3:#1D2639;--bg4:#171D30;
+  --green:#1DDB82;--green-d:#14B66F;--green-bg:rgba(29,219,130,0.1);--green-bg2:rgba(29,219,130,0.2);
+  --purple:#8B5CF6;--purple-bg:rgba(139,92,246,0.1);
+  --red:#F04438;--red-bg:rgba(240,68,56,0.1);
+  --yellow:#F79009;--yellow-bg:rgba(247,144,9,0.1);
+  --blue:#0BA5EC;--blue-bg:rgba(11,165,236,0.1);
+  --text:#F8FAFC;--text2:#7C8BA1;--text3:#64748B;--text4:#475569;
+  --border:#212B3E;--border2:#2D3B54;
+  --radius:10px;--radius-sm:6px;
+}
+html{font-size:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+input,select,textarea,button{font-family:inherit;font-size:inherit}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+.auth-gate{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.auth-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:40px;max-width:400px;width:100%;text-align:center}
+.auth-box h1{font-size:2rem;margin-bottom:8px}
+.auth-box p{color:var(--text2);margin-bottom:24px}
+.auth-input{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:1rem;outline:none;transition:border-color .2s}
+.auth-input:focus{border-color:var(--green)}
+.auth-btn{width:100%;padding:12px;background:var(--green);color:var(--bg);border:none;border-radius:var(--radius-sm);font-size:1rem;font-weight:600;cursor:pointer;margin-top:12px;transition:background .2s}
+.auth-btn:hover{background:var(--green-d)}
+.auth-error{color:var(--red);margin-top:12px;font-size:.9rem}
+.app{max-width:1400px;margin:0 auto;padding:16px}
+.header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.header h1{font-size:1.6rem;display:flex;align-items:center;gap:8px}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 16px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-weight:600;font-size:.85rem;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--green);color:var(--bg)}
+.btn-primary:hover{background:var(--green-d)}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--text3)}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid transparent}
+.btn-danger:hover{border-color:var(--red)}
+.btn-sm{padding:5px 10px;font-size:.8rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
+.stat-value{font-size:1.8rem;font-weight:700;margin-bottom:2px}
+.stat-label{color:var(--text2);font-size:.85rem}
+.stat-green .stat-value{color:var(--green)}
+.stat-yellow .stat-value{color:var(--yellow)}
+.stat-red .stat-value{color:var(--red)}
+.tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border);overflow-x:auto}
+.tab{padding:10px 20px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-weight:500;transition:all .2s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--green);border-bottom-color:var(--green)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;align-items:center}
+.search-box{flex:1;min-width:250px;position:relative}
+.search-box input{width:100%;padding:10px 14px 10px 38px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);outline:none;transition:border-color .2s}
+.search-box input:focus{border-color:var(--green)}
+.search-box .si{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3)}
+.filter-group{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:6px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;cursor:pointer;font-size:.8rem;color:var(--text2);transition:all .2s;white-space:nowrap}
+.chip:hover{border-color:var(--text3);color:var(--text)}
+.chip.active{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.sort-select{padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);outline:none;cursor:pointer}
+.card-count{color:var(--text2);font-size:.85rem;margin-bottom:10px}
+.table-wrap{overflow-x:auto;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:12px 14px;color:var(--text2);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:var(--bg2);z-index:1}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(29,219,130,0.03)}
+tr.selected td{background:var(--green-bg)}
+.card-name{font-weight:600;cursor:pointer;color:var(--green);transition:color .2s}
+.card-name:hover{text-decoration:underline}
+.checkbox{width:18px;height:18px;cursor:pointer;accent-color:var(--green)}
+.badge{padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:600;display:inline-block}
+.badge-verified{background:var(--green-bg);color:var(--green)}
+.badge-review{background:var(--yellow-bg);color:var(--yellow)}
+.badge-outdated{background:var(--red-bg);color:var(--red)}
+.badge-ca{background:var(--blue-bg);color:var(--blue)}
+.badge-us{background:var(--purple-bg);color:var(--purple)}
+.pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px}
+.page-btn{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text2);cursor:pointer;transition:all .2s}
+.page-btn:hover{border-color:var(--text3);color:var(--text)}
+.page-btn.active{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.page-btn:disabled{opacity:.4;cursor:not-allowed}
+.panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;opacity:0;transition:opacity .3s;pointer-events:none}
+.panel-overlay.open{opacity:1;pointer-events:auto}
+.panel{position:fixed;top:0;right:0;bottom:0;width:min(600px,90vw);background:var(--bg);border-left:1px solid var(--border);z-index:101;transform:translateX(100%);transition:transform .3s;overflow-y:auto;display:flex;flex-direction:column}
+.panel.open{transform:translateX(0)}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:1}
+.panel-header h2{font-size:1.3rem}
+.panel-body{padding:20px;flex:1;overflow-y:auto}
+.panel-footer{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--bg)}
+.form-section{margin-bottom:24px}
+.form-section h3{font-size:1rem;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-row.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:.8rem;color:var(--text2);font-weight:500}
+.form-group input,.form-group select,.form-group textarea{padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--green)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-group .error{border-color:var(--red)}
+.form-group .error-msg{color:var(--red);font-size:.75rem}
+.form-hint{color:var(--text3);font-size:.75rem;margin-top:2px}
+.cat-reward-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm)}
+.cat-reward-row select,.cat-reward-row input{flex:1;min-width:0}
+.cat-reward-row .remove-btn{color:var(--red);cursor:pointer;padding:4px;border:none;background:none;font-size:1.2rem;line-height:1}
+.preview-card{background:linear-gradient(135deg,var(--bg3),var(--bg2));border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.preview-card .pc-name{font-size:1rem;font-weight:700;margin-bottom:4px}
+.preview-card .pc-issuer{color:var(--text2);font-size:.85rem;margin-bottom:12px}
+.preview-card .pc-rates{display:flex;flex-wrap:wrap;gap:8px}
+.preview-card .pc-rate{background:var(--green-bg);padding:4px 10px;border-radius:12px;font-size:.8rem;color:var(--green)}
+.validation-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:20px}
+.validation-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.validation-card h4{font-size:.95rem;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.validation-card .count{font-size:1.5rem;font-weight:700;margin-bottom:4px}
+.validation-card .desc{color:var(--text2);font-size:.8rem}
+.validation-card ul{list-style:none;max-height:200px;overflow-y:auto}
+.validation-card li{padding:6px 0;border-bottom:1px solid var(--border);font-size:.85rem;cursor:pointer;color:var(--text2)}
+.validation-card li:hover{color:var(--green)}
+.validation-card li:last-child{border-bottom:none}
+.toast-container{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px}
+.toast{padding:12px 20px;border-radius:var(--radius-sm);font-size:.9rem;animation:slideIn .3s ease;display:flex;align-items:center;gap:8px;min-width:280px;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.toast-success{background:var(--green);color:var(--bg)}
+.toast-error{background:var(--red);color:white}
+.toast-info{background:var(--blue);color:white}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.loading{display:flex;align-items:center;justify-content:center;padding:60px}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:768px){
+  .form-row{grid-template-columns:1fr}
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+  .header{flex-direction:column;align-items:flex-start}
+  .toolbar{flex-direction:column}
+  .search-box{min-width:auto;width:100%}
+  .table-wrap{font-size:.85rem}
+  th,td{padding:8px 10px}
+  .cat-reward-row{flex-wrap:wrap}
+  html{font-size:13px}
+}
+@media(max-width:480px){
+  .stats-bar{grid-template-columns:1fr}
+  .app{padding:10px}
+}
+</style>
+</head>
+<body>
+<div id="root"><div class="loading"><div class="spinner"></div></div></div>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3/dist/htm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+
+const html = htm.bind(React.createElement);
+const { useState, useEffect, useCallback, useMemo, useRef } = React;
+const SB_URL = 'https://zdlozhpmqrtvvhdzbmrv.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbG96aHBtcXJ0dnZoZHpibXJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxODYwMTEsImV4cCI6MjA4Mzc2MjAxMX0.o7xqSfwRtvxsPoAe7e0kJzb5TXoFyCzDEQqOWkLNkos';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+const PASSWORD = 'motu2026';
+const AUTH_KEY = 'rewardly_admin_auth';
+const PER_PAGE = 25;
+const CATEGORIES = ['groceries','gas','dining','travel','online_shopping','entertainment','drugstores','home_improvement','transit','other'];
+const CATEGORY_LABELS = {groceries:'Groceries',gas:'Gas',dining:'Dining',travel:'Travel',online_shopping:'Online Shopping',entertainment:'Entertainment',drugstores:'Pharmacy',home_improvement:'Home',transit:'Transportation',other:'Other'};
+const REWARD_CURRENCIES = [{v:'cashback',l:'Cash Back'},{v:'points',l:'Points'},{v:'airline_miles',l:'Airline Miles'},{v:'hotel_points',l:'Hotel Points'}];
+
+let toastId = 0;
+let setToastsGlobal = null;
+function showToast(message, type) {
+  type = type || 'success';
+  if (!setToastsGlobal) return;
+  const id = ++toastId;
+  setToastsGlobal(function(prev) { return prev.concat([{id:id, message:message, type:type}]); });
+  setTimeout(function() { setToastsGlobal(function(prev) { return prev.filter(function(t) { return t.id !== id; }); }); }, 3500);
+}
+
+function ToastContainer() {
+  const [toasts, setToasts] = useState([]);
+  setToastsGlobal = setToasts;
+  if (!toasts.length) return null;
+  return html`<div class="toast-container">
+    ${toasts.map(function(t) { return html`<div key=${t.id} class=${'toast toast-'+t.type}>${t.type==='success'?'\u2705':t.type==='error'?'\u274C':'\u2139\uFE0F'} ${t.message}</div>`; })}
+  </div>`;
+}
+
+function AuthGate(props) {
+  const [pw, setPw] = useState('');
+  const [err, setErr] = useState('');
+  function submit(e) {
+    e.preventDefault();
+    if (pw === PASSWORD) { localStorage.setItem(AUTH_KEY, Date.now().toString()); props.onAuth(); }
+    else { setErr('Incorrect password'); }
+  }
+  return html`<div class="auth-gate">
+    <form class="auth-box" onSubmit=${submit}>
+      <div style=${{fontSize:'3rem',marginBottom:'12px'}}>\uD83D\uDCB3</div>
+      <h1>Rewardly Admin</h1>
+      <p>Enter the admin password to continue</p>
+      <input class="auth-input" type="password" placeholder="Password" value=${pw} onChange=${function(e){setPw(e.target.value);setErr('');}} autoFocus />
+      <button class="auth-btn" type="submit">Sign In</button>
+      ${err && html`<div class="auth-error">${err}</div>`}
+    </form>
+  </div>`;
+}
+
+function checkAuth() {
+  var ts = localStorage.getItem(AUTH_KEY);
+  if (!ts) return false;
+  return (Date.now() - parseInt(ts)) < 86400000;
+}
+
+async function loadAllCards() {
+  var res = await sb.from('cards').select('*').eq('is_active', true).order('name');
+  if (res.error) throw res.error;
+  var cards = res.data;
+  var ids = cards.map(function(c) { return c.id; });
+  var allCR = [];
+  for (var i = 0; i < ids.length; i += 100) {
+    var chunk = ids.slice(i, i + 100);
+    var r = await sb.from('category_rewards').select('*').in('card_id', chunk);
+    if (r.error) throw r.error;
+    allCR = allCR.concat(r.data || []);
+  }
+  var allSB = [];
+  for (var i = 0; i < ids.length; i += 100) {
+    var chunk = ids.slice(i, i + 100);
+    var r = await sb.from('signup_bonuses').select('*').in('card_id', chunk);
+    if (r.error) throw r.error;
+    allSB = allSB.concat(r.data || []);
+  }
+  return cards.map(function(c) {
+    return Object.assign({}, c, {
+      _categoryRewards: allCR.filter(function(cr) { return cr.card_id === c.id; }),
+      _signupBonuses: allSB.filter(function(s) { return s.card_id === c.id; }),
+    });
+  });
+}
+
+function getStatus(card) {
+  var d = card.updated_at ? new Date(card.updated_at) : null;
+  if (!d) return 'outdated';
+  var days = (Date.now() - d.getTime()) / 86400000;
+  if (days <= 30) return 'verified';
+  if (days <= 90) return 'review';
+  return 'outdated';
+}
+function statusLabel(s) { return s === 'verified' ? 'Verified' : s === 'review' ? 'Needs Review' : 'Outdated'; }
+function statusEmoji(s) { return s === 'verified' ? '\uD83D\uDFE2' : s === 'review' ? '\uD83D\uDFE1' : '\uD83D\uDD34'; }
+function getBestRate(card) {
+  var rates = [card.base_reward_rate].concat((card._categoryRewards || []).map(function(cr) { return cr.multiplier; }));
+  return Math.max.apply(null, rates.concat([0]));
+}
+function formatDate(d) {
+  if (!d) return '\u2014';
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function formatFee(f) {
+  if (f === 0) return 'Free';
+  return '$' + (f || 0).toFixed(0);
+}
+
+function cardToCSVRow(c) {
+  var cr = (c._categoryRewards || []).map(function(r) {
+    return (CATEGORY_LABELS[r.category]||r.category) + ': ' + r.multiplier + (r.reward_unit==='percent'?'%':'x');
+  }).join('; ');
+  return [c.name, c.issuer, c.country, c.annual_fee, c.base_reward_rate, c.reward_currency, cr, c.application_url||'', getStatus(c), formatDate(c.updated_at)].map(function(v) { return '"' + String(v||'').replace(/"/g,'""') + '"'; }).join(',');
+}
+
+function downloadCSV(cards) {
+  var header = 'Name,Issuer,Country,Annual Fee,Base Rate,Reward Type,Category Rates,Application URL,Status,Last Updated';
+  var rows = cards.map(cardToCSVRow);
+  var csv = [header].concat(rows).join('\n');
+  var blob = new Blob([csv], {type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'rewardly-cards-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+function StatsBar(props) {
+  var cards = props.cards;
+  var total = cards.length;
+  var verified = cards.filter(function(c){return getStatus(c)==='verified';}).length;
+  var review = cards.filter(function(c){return getStatus(c)==='review';}).length;
+  var outdated = cards.filter(function(c){return getStatus(c)==='outdated';}).length;
+  return html`<div class="stats-bar">
+    <div class="stat-card"><div class="stat-value" style=${{color:'var(--text)'}}>${total}</div><div class="stat-label">Total Cards</div></div>
+    <div class="stat-card stat-green"><div class="stat-value">${verified}</div><div class="stat-label">\u2705 Verified</div></div>
+    <div class="stat-card stat-yellow"><div class="stat-value">${review}</div><div class="stat-label">\u26A0\uFE0F Needs Review</div></div>
+    <div class="stat-card stat-red"><div class="stat-value">${outdated}</div><div class="stat-label">\uD83D\uDD34 Outdated</div></div>
+  </div>`;
+}
+
+function CardPreview(props) {
+  var form = props.form;
+  var rates = (form._categoryRewards || []).filter(function(r){return r.category && r.multiplier;});
+  var sb0 = form._signupBonuses && form._signupBonuses[0];
+  return html`<div class="preview-card">
+    <div style=${{fontSize:'.7rem',color:'var(--text3)',marginBottom:'8px',textTransform:'uppercase',letterSpacing:'1px'}}>Live Preview</div>
+    <div class="pc-name">${form.name || 'Card Name'}</div>
+    <div class="pc-issuer">${form.issuer || 'Issuer'} \u00B7 ${form.country || '\u2014'} \u00B7 ${formatFee(form.annual_fee)}/yr</div>
+    <div class="pc-rates">
+      <div class="pc-rate">Base: ${form.base_reward_rate || 0}${form.base_reward_unit==='percent'?'%':'x'}</div>
+      ${rates.map(function(r,i) { return html`<div key=${i} class="pc-rate">${CATEGORY_LABELS[r.category]||r.category}: ${r.multiplier}${r.reward_unit==='percent'?'%':'x'}</div>`; })}
+    </div>
+    ${sb0 && sb0.bonus_amount ? html`<div style=${{marginTop:'10px',fontSize:'.8rem',color:'var(--yellow)'}}>\uD83C\uDF81 Sign-up: ${sb0.bonus_amount} ${sb0.bonus_currency} (spend $${sb0.spend_requirement} in ${Math.round((sb0.timeframe_days||90)/30)} mo)</div>` : null}
+  </div>`;
+}
+
+function CategoryRewardEditor(props) {
+  var rewards = props.rewards;
+  var onChange = props.onChange;
+  function add() { onChange(rewards.concat([{category:'groceries',multiplier:2,reward_unit:'percent',description:''}])); }
+  function update(i, field, val) {
+    var next = rewards.map(function(r,j) { return j===i ? Object.assign({}, r, (function(){var o={};o[field]=field==='multiplier'?parseFloat(val)||0:val;return o;})()) : r; });
+    onChange(next);
+  }
+  function remove(i) { onChange(rewards.filter(function(_,j){return j!==i;})); }
+  return html`<div>
+    ${rewards.map(function(r,i) { return html`<div key=${i} class="cat-reward-row">
+      <select value=${r.category} onChange=${function(e){update(i,'category',e.target.value);}}>
+        ${CATEGORIES.map(function(c) { return html`<option key=${c} value=${c}>${CATEGORY_LABELS[c]}</option>`; })}
+      </select>
+      <input type="number" step="0.01" min="0" value=${r.multiplier} onChange=${function(e){update(i,'multiplier',e.target.value);}} style=${{maxWidth:'80px'}} placeholder="Rate"/>
+      <select value=${r.reward_unit||'percent'} onChange=${function(e){update(i,'reward_unit',e.target.value);}} style=${{maxWidth:'120px'}}>
+        <option value="percent">Cash Back %</option>
+        <option value="multiplier">Points \u00D7</option>
+      </select>
+      <button class="remove-btn" onClick=${function(){remove(i);}} title="Remove">\u2715</button>
+    </div>`; })}
+    <button class="btn btn-secondary btn-sm" onClick=${add}>+ Add Category Rate</button>
+  </div>`;
+}
+
+function CardPanel(props) {
+  var card = props.card;
+  var isNew = props.isNew;
+  var onClose = props.onClose;
+  var onSave = props.onSave;
+  const [form, setForm] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  useEffect(function() {
+    if (card) {
+      setForm(Object.assign({}, card, {
+        _categoryRewards: (card._categoryRewards || []).slice(),
+        _signupBonuses: card._signupBonuses && card._signupBonuses.length ? card._signupBonuses.slice() : [{bonus_amount:0,bonus_currency:'cashback',spend_requirement:0,timeframe_days:90,is_active:true}],
+      }));
+    } else if (isNew) {
+      setForm({
+        card_key:'',name:'',issuer:'',country:'CA',reward_program:'Cash Back',reward_currency:'cashback',
+        annual_fee:0,base_reward_rate:1,base_reward_unit:'percent',point_valuation:1,
+        is_active:true,application_url:'',affiliate_url:'',image_url:'',apply_url:'',
+        _categoryRewards:[],
+        _signupBonuses:[{bonus_amount:0,bonus_currency:'cashback',spend_requirement:0,timeframe_days:90,is_active:true}],
+      });
+    }
+    setErrors({});
+  }, [card, isNew]);
+
+  if (!form) return null;
+
+  function validate() {
+    var e = {};
+    if (!form.name || !form.name.trim()) e.name = 'Card name is required';
+    if (!form.issuer || !form.issuer.trim()) e.issuer = 'Issuer is required';
+    if (form.annual_fee < 0) e.annual_fee = 'Cannot be negative';
+    if (form.base_reward_rate < 0) e.base_reward_rate = 'Must be positive';
+    for (var i = 0; i < form._categoryRewards.length; i++) {
+      if (form._categoryRewards[i].multiplier <= 0) { e.cat_rate = 'All rates must be positive'; break; }
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  }
+
+  async function handleSave() {
+    if (!validate()) return;
+    setSaving(true);
+    try {
+      var cardData = {
+        name: form.name.trim(), issuer: form.issuer.trim(), country: form.country,
+        reward_program: form.reward_program, reward_currency: form.reward_currency,
+        annual_fee: parseFloat(form.annual_fee) || 0, base_reward_rate: parseFloat(form.base_reward_rate) || 0,
+        base_reward_unit: form.base_reward_unit, point_valuation: parseFloat(form.point_valuation) || 1,
+        application_url: form.application_url || null, affiliate_url: form.affiliate_url || null,
+        is_active: true, updated_at: new Date().toISOString(),
+      };
+      var cardId = form.id;
+      if (isNew) {
+        cardData.card_key = form.name.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+$/,'');
+        var res = await sb.from('cards').insert(cardData).select().single();
+        if (res.error) throw res.error;
+        cardId = res.data.id;
+      } else {
+        var res = await sb.from('cards').update(cardData).eq('id', form.id);
+        if (res.error) throw res.error;
+      }
+      if (!isNew) { await sb.from('category_rewards').delete().eq('card_id', cardId); }
+      var crInserts = form._categoryRewards.filter(function(cr){return cr.multiplier > 0;}).map(function(cr) {
+        return { card_id: cardId, category: cr.category, multiplier: parseFloat(cr.multiplier), reward_unit: cr.reward_unit || 'percent', description: cr.description || (CATEGORY_LABELS[cr.category] || cr.category) + ' rate' };
+      });
+      if (crInserts.length > 0) {
+        var r = await sb.from('category_rewards').insert(crInserts);
+        if (r.error) throw r.error;
+      }
+      var bonus = form._signupBonuses && form._signupBonuses[0];
+      if (bonus && bonus.bonus_amount > 0) {
+        if (!isNew) { await sb.from('signup_bonuses').delete().eq('card_id', cardId); }
+        var r = await sb.from('signup_bonuses').insert({
+          card_id: cardId, bonus_amount: parseFloat(bonus.bonus_amount),
+          bonus_currency: bonus.bonus_currency || 'cashback',
+          spend_requirement: parseFloat(bonus.spend_requirement) || 0,
+          timeframe_days: parseInt(bonus.timeframe_days) || 90, is_active: true,
+        });
+        if (r.error) throw r.error;
+      } else if (!isNew) {
+        await sb.from('signup_bonuses').delete().eq('card_id', cardId);
+      }
+      showToast(isNew ? 'Card created successfully!' : 'Card updated successfully!');
+      onSave();
+    } catch (err) {
+      console.error('Save error:', err);
+      showToast(err.message || 'Failed to save card', 'error');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function markVerified() {
+    if (!form.id) return;
+    var now = new Date().toISOString();
+    var r = await sb.from('cards').update({ updated_at: now }).eq('id', form.id);
+    if (r.error) { showToast('Failed to mark verified', 'error'); return; }
+    setForm(function(f) { return Object.assign({}, f, {updated_at: now}); });
+    showToast('Marked as verified \u2705');
+  }
+
+  function f(field, val) { setForm(function(prev) { var o = {}; o[field] = val; return Object.assign({}, prev, o); }); }
+  var sb0 = (form._signupBonuses && form._signupBonuses[0]) || {};
+  function setSB(field, val) {
+    var next = [Object.assign({}, sb0)]; next[0][field] = val;
+    setForm(function(prev) { return Object.assign({}, prev, {_signupBonuses: next}); });
+  }
+  var st = getStatus(form);
+
+  return html`<div>
+    <div class=${'panel-overlay' + (card||isNew?' open':'')} onClick=${onClose}></div>
+    <div class=${'panel' + (card||isNew?' open':'')}>
+      <div class="panel-header">
+        <h2>${isNew?'Add New Card':'Edit Card'}</h2>
+        <button class="btn btn-secondary btn-sm" onClick=${onClose}>\u2715 Close</button>
+      </div>
+      <div class="panel-body">
+        <${CardPreview} form=${form}/>
+        <div class="form-section">
+          <h3>\uD83D\uDCCB Basic Info</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Card Name *</label>
+              <input class=${errors.name?'error':''} value=${form.name} onChange=${function(e){f('name',e.target.value);}} placeholder="e.g. Cobalt Card"/>
+              ${errors.name && html`<div class="error-msg">${errors.name}</div>`}
+            </div>
+            <div class="form-group">
+              <label>Issuer *</label>
+              <input class=${errors.issuer?'error':''} value=${form.issuer} onChange=${function(e){f('issuer',e.target.value);}} placeholder="e.g. American Express"/>
+              ${errors.issuer && html`<div class="error-msg">${errors.issuer}</div>`}
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Country</label>
+              <select value=${form.country} onChange=${function(e){f('country',e.target.value);}}>
+                <option value="CA">\uD83C\uDDE8\uD83C\uDDE6 Canada</option>
+                <option value="US">\uD83C\uDDFA\uD83C\uDDF8 United States</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Annual Fee ($)</label>
+              <input type="number" min="0" step="1" class=${errors.annual_fee?'error':''} value=${form.annual_fee} onChange=${function(e){f('annual_fee',parseFloat(e.target.value)||0);}}/>
+              ${errors.annual_fee && html`<div class="error-msg">${errors.annual_fee}</div>`}
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Reward Program</label>
+              <input value=${form.reward_program} onChange=${function(e){f('reward_program',e.target.value);}} placeholder="e.g. Aeroplan"/>
+            </div>
+            <div class="form-group">
+              <label>Reward Type</label>
+              <select value=${form.reward_currency} onChange=${function(e){f('reward_currency',e.target.value);}}>
+                ${REWARD_CURRENCIES.map(function(rc) { return html`<option key=${rc.v} value=${rc.v}>${rc.l}</option>`; })}
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Point Valuation (cents per point)</label>
+              <input type="number" step="0.1" min="0" value=${form.point_valuation} onChange=${function(e){f('point_valuation',parseFloat(e.target.value)||1);}}/>
+              <div class="form-hint">For cash back cards, use 1.0</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h3>\uD83D\uDCB0 Reward Rates</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Base Rate \u2014 applied to all other purchases</label>
+              <input type="number" step="0.01" min="0" class=${errors.base_reward_rate?'error':''} value=${form.base_reward_rate} onChange=${function(e){f('base_reward_rate',parseFloat(e.target.value)||0);}}/>
+            </div>
+            <div class="form-group">
+              <label>Base Rate Unit</label>
+              <select value=${form.base_reward_unit} onChange=${function(e){f('base_reward_unit',e.target.value);}}>
+                <option value="percent">Cash Back %</option>
+                <option value="multiplier">Points Multiplier</option>
+              </select>
+            </div>
+          </div>
+          <div style=${{marginTop:'12px'}}>
+            <label style=${{fontSize:'.85rem',color:'var(--text2)',marginBottom:'8px',display:'block'}}>Category Bonus Rates</label>
+            <${CategoryRewardEditor} rewards=${form._categoryRewards} onChange=${function(r){setForm(function(prev){return Object.assign({},prev,{_categoryRewards:r});});}}/>
+          </div>
+        </div>
+        <div class="form-section">
+          <h3>\uD83C\uDF81 Sign-Up Bonus</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bonus Amount</label>
+              <input type="number" min="0" value=${sb0.bonus_amount||0} onChange=${function(e){setSB('bonus_amount',parseFloat(e.target.value)||0);}}/>
+            </div>
+            <div class="form-group">
+              <label>Bonus Type</label>
+              <select value=${sb0.bonus_currency||'cashback'} onChange=${function(e){setSB('bonus_currency',e.target.value);}}>
+                ${REWARD_CURRENCIES.map(function(rc) { return html`<option key=${rc.v} value=${rc.v}>${rc.l}</option>`; })}
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Spend Requirement ($)</label>
+              <input type="number" min="0" value=${sb0.spend_requirement||0} onChange=${function(e){setSB('spend_requirement',parseFloat(e.target.value)||0);}}/>
+            </div>
+            <div class="form-group">
+              <label>Timeframe (days)</label>
+              <input type="number" min="1" value=${sb0.timeframe_days||90} onChange=${function(e){setSB('timeframe_days',parseInt(e.target.value)||90);}}/>
+              <div class="form-hint">${Math.round((sb0.timeframe_days||90)/30)} months</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h3>\uD83D\uDD17 URLs</h3>
+          <div class="form-row full">
+            <div class="form-group">
+              <label>Application URL</label>
+              <input value=${form.application_url||''} onChange=${function(e){f('application_url',e.target.value);}} placeholder="https://..." />
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="form-group">
+              <label>Affiliate URL</label>
+              <input value=${form.affiliate_url||''} onChange=${function(e){f('affiliate_url',e.target.value);}} placeholder="https://..." />
+            </div>
+          </div>
+        </div>
+        ${!isNew && html`<div class="form-section">
+          <h3>\uD83D\uDD50 Verification</h3>
+          <div style=${{display:'flex',alignItems:'center',gap:'12px',flexWrap:'wrap'}}>
+            <span style=${{color:'var(--text2)'}}>Last Updated: ${formatDate(form.updated_at)}</span>
+            <span class=${'badge badge-'+(st==='verified'?'verified':st==='review'?'review':'outdated')}>${statusEmoji(st)} ${statusLabel(st)}</span>
+            <button class="btn btn-primary btn-sm" onClick=${markVerified}>\u2705 Mark as Verified</button>
+          </div>
+        </div>`}
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-secondary" onClick=${onClose}>Cancel</button>
+        <button class="btn btn-primary" onClick=${handleSave} disabled=${saving}>${saving ? 'Saving...' : isNew ? 'Create Card' : 'Save Changes'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function ValidationDashboard(props) {
+  var cards = props.cards;
+  var onClickCard = props.onClickCard;
+  var missingRates = cards.filter(function(c){return !c._categoryRewards || c._categoryRewards.length === 0;});
+  var noURL = cards.filter(function(c){return !c.application_url && !c.apply_url;});
+  var zeroFee = cards.filter(function(c){return c.annual_fee === 0 && c.reward_currency !== 'cashback' && c.base_reward_rate > 1;});
+  var dupes = [];
+  var seen = {};
+  cards.forEach(function(c) {
+    var key = c.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (seen[key]) { dupes.push({a: seen[key], b: c}); } else { seen[key] = c; }
+  });
+  function makeList(arr, max) {
+    var items = arr.slice(0, max||10).map(function(c) {
+      return html`<li key=${c.id} onClick=${function(){onClickCard(c);}}>${c.name}</li>`;
+    });
+    if (arr.length > (max||10)) items.push(html`<li key="more" style=${{color:'var(--text3)'}}>...and ${arr.length-(max||10)} more</li>`);
+    return items;
+  }
+  return html`<div class="validation-grid">
+    <div class="validation-card">
+      <h4>\u26A0\uFE0F No Category Rates</h4>
+      <div class="count" style=${{color:'var(--yellow)'}}>${missingRates.length}</div>
+      <div class="desc">Cards with only a base rate, no category bonuses</div>
+      <ul>${makeList(missingRates)}</ul>
+    </div>
+    <div class="validation-card">
+      <h4>\uD83D\uDD17 Missing Application URL</h4>
+      <div class="count" style=${{color:'var(--red)'}}>${noURL.length}</div>
+      <div class="desc">Cards without an application or apply URL</div>
+      <ul>${makeList(noURL)}</ul>
+    </div>
+    <div class="validation-card">
+      <h4>\uD83D\uDCB0 $0 Fee \u2014 Worth Checking</h4>
+      <div class="count" style=${{color:'var(--blue)'}}>${zeroFee.length}</div>
+      <div class="desc">Non-cashback cards with $0 fee and higher base rate</div>
+      <ul>${makeList(zeroFee)}</ul>
+    </div>
+    <div class="validation-card">
+      <h4>\uD83D\uDC6F Possible Duplicates</h4>
+      <div class="count" style=${{color:'var(--purple)'}}>${dupes.length}</div>
+      <div class="desc">Cards with very similar names</div>
+      <ul>${dupes.slice(0,10).map(function(d,i) { return html`<li key=${i} onClick=${function(){onClickCard(d.b);}}>${d.a.name} \u2194 ${d.b.name}</li>`; })}</ul>
+    </div>
+  </div>`;
+}
+
+function AdminApp() {
+  const [authed, setAuthed] = useState(checkAuth());
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState('cards');
+  const [search, setSearch] = useState('');
+  const [filterCountry, setFilterCountry] = useState('');
+  const [filterIssuer, setFilterIssuer] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterType, setFilterType] = useState('');
+  const [sort, setSort] = useState('name');
+  const [page, setPage] = useState(1);
+  const [editCard, setEditCard] = useState(null);
+  const [addNew, setAddNew] = useState(false);
+  const [selected, setSelected] = useState(new Set());
+
+  var reload = useCallback(async function() {
+    setLoading(true);
+    try {
+      var data = await loadAllCards();
+      setCards(data);
+    } catch (err) {
+      showToast('Failed to load cards: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(function() { if (authed) reload(); }, [authed, reload]);
+
+  var topIssuers = useMemo(function() {
+    var counts = {};
+    cards.forEach(function(c) { counts[c.issuer] = (counts[c.issuer]||0)+1; });
+    return Object.entries(counts).filter(function(e){return e[1]>=5;}).sort(function(a,b){return b[1]-a[1];}).map(function(e){return e[0];});
+  }, [cards]);
+
+  var filtered = useMemo(function() {
+    var f = cards.slice();
+    if (search) {
+      var q = search.toLowerCase();
+      f = f.filter(function(c){return c.name.toLowerCase().includes(q) || c.issuer.toLowerCase().includes(q) || (c.reward_program||'').toLowerCase().includes(q);});
+    }
+    if (filterCountry) f = f.filter(function(c){return c.country===filterCountry;});
+    if (filterIssuer) f = f.filter(function(c){return c.issuer===filterIssuer;});
+    if (filterStatus) f = f.filter(function(c){return getStatus(c)===filterStatus;});
+    if (filterType) f = f.filter(function(c){return c.reward_currency===filterType;});
+    f.sort(function(a,b) {
+      switch(sort) {
+        case 'name': return a.name.localeCompare(b.name);
+        case 'issuer': return a.issuer.localeCompare(b.issuer);
+        case 'fee': return (a.annual_fee||0)-(b.annual_fee||0);
+        case 'fee-desc': return (b.annual_fee||0)-(a.annual_fee||0);
+        case 'rate': return getBestRate(b)-getBestRate(a);
+        case 'updated': return new Date(b.updated_at||0)-new Date(a.updated_at||0);
+        default: return 0;
+      }
+    });
+    return f;
+  }, [cards, search, filterCountry, filterIssuer, filterStatus, filterType, sort]);
+
+  var totalPages = Math.ceil(filtered.length / PER_PAGE);
+  var paginated = filtered.slice((page-1)*PER_PAGE, page*PER_PAGE);
+
+  useEffect(function() { setPage(1); }, [search, filterCountry, filterIssuer, filterStatus, filterType, sort]);
+
+  async function bulkVerify() {
+    if (selected.size === 0) return;
+    var now = new Date().toISOString();
+    try {
+      var ids = Array.from(selected);
+      for (var i = 0; i < ids.length; i += 50) {
+        var chunk = ids.slice(i, i+50);
+        var r = await sb.from('cards').update({ updated_at: now }).in('id', chunk);
+        if (r.error) throw r.error;
+      }
+      showToast('Marked ' + selected.size + ' cards as verified \u2705');
+      setSelected(new Set());
+      reload();
+    } catch (err) {
+      showToast('Bulk verify failed: ' + err.message, 'error');
+    }
+  }
+
+  function toggleSelect(id) {
+    setSelected(function(prev) {
+      var next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function selectAll() {
+    if (selected.size === paginated.length && paginated.length > 0) { setSelected(new Set()); }
+    else { setSelected(new Set(paginated.map(function(c){return c.id;}))); }
+  }
+
+  function handlePanelClose() { setEditCard(null); setAddNew(false); }
+  function handleSave() { handlePanelClose(); reload(); }
+
+  if (!authed) return html`<${AuthGate} onAuth=${function(){setAuthed(true);}}/>`;
+
+  function renderPagination() {
+    if (totalPages <= 1) return null;
+    var btns = [];
+    var startP, endP;
+    if (totalPages <= 7) { startP = 1; endP = totalPages; }
+    else if (page <= 4) { startP = 1; endP = 7; }
+    else if (page >= totalPages - 3) { startP = totalPages - 6; endP = totalPages; }
+    else { startP = page - 3; endP = page + 3; }
+    for (var p = startP; p <= endP; p++) {
+      (function(pp) {
+        btns.push(html`<button key=${pp} class=${'page-btn'+(pp===page?' active':'')} onClick=${function(){setPage(pp);}}>${pp}</button>`);
+      })(p);
+    }
+    return html`<div class="pagination">
+      <button class="page-btn" disabled=${page===1} onClick=${function(){setPage(page-1);}}>← Prev</button>
+      ${btns}
+      <button class="page-btn" disabled=${page>=totalPages} onClick=${function(){setPage(page+1);}}>Next →</button>
+    </div>`;
+  }
+
+  function renderTable() {
+    if (loading) return html`<div class="loading"><div class="spinner"></div></div>`;
+    return html`<div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th><input type="checkbox" class="checkbox" checked=${selected.size===paginated.length&&paginated.length>0} onChange=${selectAll}/></th>
+            <th>Card Name</th>
+            <th>Issuer</th>
+            <th>Country</th>
+            <th>Best Rate</th>
+            <th>Annual Fee</th>
+            <th>Last Updated</th>
+            <th>Status</th>
+          </tr></thead>
+          <tbody>
+            ${paginated.map(function(c) {
+              var s = getStatus(c);
+              return html`<tr key=${c.id} class=${selected.has(c.id)?'selected':''}>
+                <td><input type="checkbox" class="checkbox" checked=${selected.has(c.id)} onChange=${function(){toggleSelect(c.id);}}/></td>
+                <td><span class="card-name" onClick=${function(){setEditCard(c);}}>${c.name}</span></td>
+                <td>${c.issuer}</td>
+                <td><span class=${'badge badge-'+(c.country==='CA'?'ca':'us')}>${c.country==='CA'?'\uD83C\uDDE8\uD83C\uDDE6 CA':'\uD83C\uDDFA\uD83C\uDDF8 US'}</span></td>
+                <td style=${{fontWeight:'600',color:'var(--green)'}}>${getBestRate(c).toFixed(1)}${c.base_reward_unit==='percent'?'%':'\u00D7'}</td>
+                <td>${formatFee(c.annual_fee)}</td>
+                <td style=${{color:'var(--text2)'}}>${formatDate(c.updated_at)}</td>
+                <td><span class=${'badge badge-'+s}>${statusEmoji(s)} ${statusLabel(s)}</span></td>
+              </tr>`;
+            })}
+            ${paginated.length === 0 && html`<tr><td colspan="8" style=${{textAlign:'center',padding:'40px',color:'var(--text3)'}}>No cards found matching your filters</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+      ${renderPagination()}
+    </div>`;
+  }
+
+  return html`<div>
+    <${ToastContainer}/>
+    <div class="app">
+      <div class="header">
+        <h1>\uD83D\uDCB3 Rewardly Admin</h1>
+        <div class="header-actions">
+          <button class="btn btn-primary" onClick=${function(){setAddNew(true);}}>+ Add Card</button>
+          <button class="btn btn-secondary" onClick=${function(){downloadCSV(filtered);}}>📥 Export CSV (${filtered.length})</button>
+          ${selected.size > 0 && html`<button class="btn btn-primary" onClick=${bulkVerify}>\u2705 Verify Selected (${selected.size})</button>`}
+          <button class="btn btn-secondary" onClick=${reload} disabled=${loading}>${loading?'\u23F3':'\uD83D\uDD04'} Refresh</button>
+          <button class="btn btn-secondary btn-sm" onClick=${function(){localStorage.removeItem(AUTH_KEY);setAuthed(false);}}>Sign Out</button>
+        </div>
+      </div>
+      <${StatsBar} cards=${cards}/>
+      <div class="tabs">
+        <div class=${'tab'+(tab==='cards'?' active':'')} onClick=${function(){setTab('cards');}}>\uD83D\uDCCB All Cards</div>
+        <div class=${'tab'+(tab==='validation'?' active':'')} onClick=${function(){setTab('validation');}}>\uD83D\uDD0D Data Quality</div>
+      </div>
+      ${tab === 'validation' && html`<${ValidationDashboard} cards=${cards} onClickCard=${function(c){setEditCard(c);}}/>`}
+      ${tab === 'cards' && html`<div>
+        <div class="toolbar">
+          <div class="search-box">
+            <span class="si">\uD83D\uDD0D</span>
+            <input placeholder="Search cards by name, issuer, or program..." value=${search} onChange=${function(e){setSearch(e.target.value);}}/>
+          </div>
+          <select class="sort-select" value=${sort} onChange=${function(e){setSort(e.target.value);}}>
+            <option value="name">Sort: Name A-Z</option>
+            <option value="issuer">Sort: Issuer</option>
+            <option value="fee">Sort: Fee Low\u2192High</option>
+            <option value="fee-desc">Sort: Fee High\u2192Low</option>
+            <option value="rate">Sort: Best Rate</option>
+            <option value="updated">Sort: Last Updated</option>
+          </select>
+        </div>
+        <div class="filter-group" style=${{marginBottom:'12px'}}>
+          <div class=${'chip'+(filterCountry===''?' active':'')} onClick=${function(){setFilterCountry('');}}>All Countries</div>
+          <div class=${'chip'+(filterCountry==='CA'?' active':'')} onClick=${function(){setFilterCountry(filterCountry==='CA'?'':'CA');}}>\uD83C\uDDE8\uD83C\uDDE6 Canada</div>
+          <div class=${'chip'+(filterCountry==='US'?' active':'')} onClick=${function(){setFilterCountry(filterCountry==='US'?'':'US');}}>\uD83C\uDDFA\uD83C\uDDF8 USA</div>
+          <span style=${{color:'var(--border2)'}}>\u2502</span>
+          <div class=${'chip'+(filterStatus===''?' active':'')} onClick=${function(){setFilterStatus('');}}>All Status</div>
+          <div class=${'chip'+(filterStatus==='verified'?' active':'')} onClick=${function(){setFilterStatus(filterStatus==='verified'?'':'verified');}}>\uD83D\uDFE2 Verified</div>
+          <div class=${'chip'+(filterStatus==='review'?' active':'')} onClick=${function(){setFilterStatus(filterStatus==='review'?'':'review');}}>\uD83D\uDFE1 Review</div>
+          <div class=${'chip'+(filterStatus==='outdated'?' active':'')} onClick=${function(){setFilterStatus(filterStatus==='outdated'?'':'outdated');}}>\uD83D\uDD34 Outdated</div>
+          <span style=${{color:'var(--border2)'}}>\u2502</span>
+          <div class=${'chip'+(filterType===''?' active':'')} onClick=${function(){setFilterType('');}}>All Types</div>
+          <div class=${'chip'+(filterType==='cashback'?' active':'')} onClick=${function(){setFilterType(filterType==='cashback'?'':'cashback');}}>\uD83D\uDCB5 Cash Back</div>
+          <div class=${'chip'+(filterType==='points'?' active':'')} onClick=${function(){setFilterType(filterType==='points'?'':'points');}}>\u2B50 Points</div>
+          <div class=${'chip'+(filterType==='airline_miles'?' active':'')} onClick=${function(){setFilterType(filterType==='airline_miles'?'':'airline_miles');}}>\u2708\uFE0F Miles</div>
+          <div class=${'chip'+(filterType==='hotel_points'?' active':'')} onClick=${function(){setFilterType(filterType==='hotel_points'?'':'hotel_points');}}>\uD83C\uDFE8 Hotel</div>
+        </div>
+        ${filterIssuer ? html`<div style=${{marginBottom:'10px'}}><div class="chip active" onClick=${function(){setFilterIssuer('');}}>\u2715 Issuer: ${filterIssuer}</div></div>` : html`
+          <div class="filter-group" style=${{marginBottom:'12px'}}>
+            ${topIssuers.slice(0,12).map(function(iss) { return html`<div key=${iss} class="chip" onClick=${function(){setFilterIssuer(iss);}}>${iss}</div>`; })}
+          </div>
+        `}
+        <div class="card-count">Showing ${filtered.length} of ${cards.length} cards${selected.size > 0 ? ' \u00B7 ' + selected.size + ' selected' : ''}</div>
+        ${renderTable()}
+      </div>`}
+      <${CardPanel} card=${editCard} isNew=${addNew} onClose=${handlePanelClose} onSave=${handleSave}/>
+    </div>
+  </div>`;
+}
+
+try {
+  ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(AdminApp));
+} catch(e) {
+  document.getElementById('root').innerHTML = '<div style="color:red;padding:40px"><h2>Error</h2><pre>' + e.message + '\n' + e.stack + '</pre></div>';
+}
+
+</script>
+</body>
+</html>
