@@ -80,14 +80,15 @@ const ADMIN_EMAILS = [
 ];
 
 /**
- * Stripe Price IDs (set in Supabase env vars, but defined here for reference)
- * These should match the env vars: STRIPE_PRICE_PRO_MONTHLY, etc.
+ * Stripe Price IDs
+ * These are live Stripe price IDs for Rewardly subscriptions (CAD)
+ * The edge functions also use env vars: STRIPE_PRICE_PRO_MONTHLY, STRIPE_PRICE_MAX_MONTHLY
  */
 export const STRIPE_PRICE_IDS = {
-  pro_monthly: process.env.STRIPE_PRICE_PRO_MONTHLY || 'price_pro_monthly_placeholder',
-  pro_annual: process.env.STRIPE_PRICE_PRO_ANNUAL || 'price_pro_annual_placeholder',
-  max_monthly: process.env.STRIPE_PRICE_MAX_MONTHLY || 'price_max_monthly_placeholder',
-  max_annual: process.env.STRIPE_PRICE_MAX_ANNUAL || 'price_max_annual_placeholder',
+  pro_monthly: 'price_1T0kbiAJmUBqj9CQPd8dhYEu',
+  pro_annual: '', // Annual pricing not yet created
+  max_monthly: 'price_1T0kcdAJmUBqj9CQeRMyl9h6',
+  max_annual: '', // Annual pricing not yet created
 } as const;
 
 /**

@@ -45,12 +45,12 @@ interface PaywallProps {
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// Stripe price IDs (to be set in production)
+// Stripe price IDs (live)
 const STRIPE_PRICES = {
-  pro_monthly: 'price_pro_monthly', // Replace with actual Stripe price IDs
-  pro_annual: 'price_pro_annual',
-  max_monthly: 'price_max_monthly',
-  max_annual: 'price_max_annual',
+  pro_monthly: 'price_1T0kbiAJmUBqj9CQPd8dhYEu',
+  pro_annual: '', // Annual pricing not yet created
+  max_monthly: 'price_1T0kcdAJmUBqj9CQeRMyl9h6',
+  max_annual: '', // Annual pricing not yet created
 };
 
 /**
