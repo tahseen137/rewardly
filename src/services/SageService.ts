@@ -10,6 +10,7 @@ import { getCardByIdSync } from './CardDataService';
 import { generateSageSystemPrompt, SageUserContext } from '../data/sage_system_prompt';
 import { supabase } from './supabase/client';
 import { getValidSession, isGuestUser, getCurrentUser } from './AuthService';
+import { getCountry } from './PreferenceManager';
 
 // ============================================================================
 // Constants
@@ -164,7 +165,7 @@ class SageServiceClass {
       cards: enrichedPortfolio,
       preferences,
       pointBalances,
-      country: 'CA', // TODO: Get from preferences
+      country: getCountry(),
       subscriptionTier: 'free',
     };
     

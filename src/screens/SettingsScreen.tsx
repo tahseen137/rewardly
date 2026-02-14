@@ -730,6 +730,9 @@ const styles = StyleSheet.create({
   },
   // Manage subscription button
   manageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: colors.background.tertiary,
     paddingHorizontal: 12,
     paddingVertical: 6,

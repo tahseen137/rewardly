@@ -14,6 +14,8 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useAnimatedStyle,
@@ -34,6 +36,9 @@ import { MissedRewardsAnalysis, CategoryMissedRewards, MissedReward } from '../t
 import { analyzeMissedRewards } from '../services/RewardsIQService';
 import { CATEGORY_INFO } from '../services/MockTransactionData';
 import { SpendingCategory } from '../types';
+import { InsightsStackParamList } from '../navigation/AppNavigator';
+
+type NavigationProp = NativeStackNavigationProp<InsightsStackParamList>;
 
 // ============================================================================
 // Animated Counter Component
@@ -182,6 +187,7 @@ function MissedTransactionItem({ missed, index }: MissedTransactionProps) {
 // ============================================================================
 
 export default function MissedRewardsScreen() {
+  const navigation = useNavigation<NavigationProp>();
   const [analysis, setAnalysis] = useState<MissedRewardsAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -321,7 +327,7 @@ export default function MissedRewardsScreen() {
             key={cat.category}
             category={cat}
             index={index}
-            onPress={() => {/* Navigate to category detail */}}
+            onPress={() => navigation.navigate('PortfolioOptimizer')}
           />
         ))}
       </View>
@@ -351,7 +357,7 @@ export default function MissedRewardsScreen() {
         entering={FadeInUp.delay(600).duration(500)}
         style={styles.ctaContainer}
       >
-        <TouchableOpacity activeOpacity={0.9}>
+        <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate('PortfolioOptimizer')}>
           <LinearGradient
             colors={[colors.primary.main, colors.primary.dark]}
             start={{ x: 0, y: 0 }}

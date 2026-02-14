@@ -22,6 +22,7 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { MessageCircle, Plus, History, Sparkles, LogIn, Crown, ArrowRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
 import { 
@@ -165,6 +166,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
 export const SageScreen: React.FC = () => {
   const theme = useTheme();
+  const navigation = useNavigation();
   const flatListRef = useRef<FlatList>(null);
   
   // State
@@ -375,8 +377,12 @@ export const SageScreen: React.FC = () => {
   
   // Card recommendation action handlers
   const handleCardLearnMore = useCallback((cardId: string) => {
-    // TODO: Navigate to card detail modal
-    console.log('Learn more about card:', cardId);
+    // Navigate to the card detail view (CardBenefits within Insights stack)
+    // Using type-cast since Sage is in a different tab
+    const nav = navigation as any;
+    if (nav?.navigate) {
+      nav.navigate('Insights', { screen: 'CardBenefits', params: { cardId } });
+    }
   }, []);
   
   // Handle sign in navigation
