@@ -24,6 +24,8 @@ import {
   RewardsDisplay,
   EmptyState,
   GradientText,
+  SkeletonCard,
+  Skeleton,
 } from '../components';
 import { StoreSelector } from '../components/StoreSelectorNew';
 import { CategoryGrid, CategoryType } from '../components/CategoryGrid';
@@ -268,11 +270,21 @@ export default function HomeScreen() {
     }
   }, [state.selectedCategory, state.amount]);
 
-  // Show loading state
+  // Show loading state with skeleton UI
   if (state.isLoading) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={styles.subtitle}>{t('common.loading') || 'Loading...'}</Text>
+      <View style={styles.container}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          <View style={styles.header}>
+            <Skeleton width="60%" height={28} borderRadius={8} style={{ alignSelf: 'center', marginBottom: 8 }} />
+            <Skeleton width="80%" height={14} borderRadius={4} style={{ alignSelf: 'center' }} />
+          </View>
+          <SkeletonCard style={{ marginBottom: 16 }} />
+          <SkeletonCard style={{ marginBottom: 16 }} />
+          <SkeletonCard style={{ marginBottom: 16 }} />
+          <Skeleton width="40%" height={14} borderRadius={4} style={{ marginBottom: 12 }} />
+          <Skeleton width="100%" height={100} borderRadius={12} style={{ marginBottom: 16 }} />
+        </ScrollView>
       </View>
     );
   }
