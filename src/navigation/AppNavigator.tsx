@@ -19,7 +19,7 @@ import {
   MyCardsScreen,
   SettingsScreen,
   SageScreen,
-  AutoPilotScreen,
+  SmartWalletScreen,
   InsightsHomeScreen,
   MissedRewardsScreen,
   RewardsIQScreen,
@@ -41,6 +41,7 @@ import {
   InsightsDashboardScreen,
   AchievementsScreen,
   ApplicationTrackerScreen,
+  ExploreCardsScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
@@ -78,13 +79,14 @@ export type InsightsStackParamList = {
   InsightsDashboard: undefined;
   Achievements: undefined;
   ApplicationTracker: undefined;
+  ExploreCards: undefined;
 };
 
 export type RootTabParamList = {
   Home: undefined;
   Insights: undefined;
   Sage: undefined;
-  AutoPilot: undefined;
+  SmartWallet: undefined;
   MyCards: undefined;
   Settings: undefined;
 };
@@ -216,6 +218,11 @@ function InsightsNavigator() {
         component={ApplicationTrackerScreen}
         options={{ animation: 'slide_from_right' }}
       />
+      <InsightsStack.Screen
+        name="ExploreCards"
+        component={ExploreCardsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
     </InsightsStack.Navigator>
   );
 }
@@ -252,7 +259,7 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
     case 'Sage':
       IconComponent = Sparkles;
       break;
-    case 'AutoPilot':
+    case 'SmartWallet':
       IconComponent = Navigation;
       break;
     case 'MyCards':
@@ -339,13 +346,13 @@ function SettingsScreenWithErrorBoundary({ onSignOut, onSignIn }: { onSignOut: (
   );
 }
 
-function AutoPilotScreenWithErrorBoundary() {
+function SmartWalletScreenWithErrorBoundary() {
   return (
     <ErrorBoundary
-      fallbackTitle="Unable to load AutoPilot"
-      fallbackMessage="There was a problem loading AutoPilot. Please try again."
+      fallbackTitle="Unable to load Smart Wallet"
+      fallbackMessage="There was a problem loading Smart Wallet. Please try again."
     >
-      <AutoPilotScreen />
+      <SmartWalletScreen />
     </ErrorBoundary>
   );
 }
@@ -420,10 +427,10 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         }}
       />
       <Tab.Screen
-        name="AutoPilot"
-        component={AutoPilotScreenWithErrorBoundary}
+        name="SmartWallet"
+        component={SmartWalletScreenWithErrorBoundary}
         options={{
-          tabBarLabel: 'AutoPilot',
+          tabBarLabel: 'Smart Wallet',
         }}
       />
       <Tab.Screen
@@ -460,7 +467,7 @@ export default function AppNavigator() {
         // Initialize subscription service
         await initializeSubscription();
 
-        // Initialize AutoPilot service
+        // Initialize Smart Wallet service (uses AutoPilot service internally)
         await initializeAutoPilot();
 
         // Track app open for streak achievement

@@ -5,7 +5,7 @@
  * 1. Value Prop - "Stop leaving money on the table"
  * 2. Add Your Cards - Select from portfolio
  * 3. Spending Habits - Category sliders for budget
- * 4. Enable AutoPilot - Location-based recommendations
+ * 4. Enable Smart Wallet - Location-based recommendations
  * 5. See Your Rewards IQ - Immediate gratification
  */
 
@@ -162,7 +162,7 @@ function ValuePropStep({ onNext }: { onNext: () => void }) {
             <Navigation size={20} color={colors.primary.main} />
           </View>
           <View style={styles.featureText}>
-            <Text style={styles.featureTitle}>AutoPilot Mode</Text>
+            <Text style={styles.featureTitle}>Smart Wallet</Text>
             <Text style={styles.featureDesc}>Get notified when you arrive at stores</Text>
           </View>
         </View>
@@ -459,16 +459,16 @@ function SpendingStep({ spending, onUpdateSpending, onNext, onBack }: SpendingSt
 }
 
 // ============================================================================
-// Step 4: AutoPilot Setup
+// Step 4: Smart Wallet Setup
 // ============================================================================
 
-interface AutoPilotStepProps {
+interface SmartWalletStepProps {
   onEnable: () => Promise<void>;
   onSkip: () => void;
   onBack: () => void;
 }
 
-function AutoPilotStep({ onEnable, onSkip, onBack }: AutoPilotStepProps) {
+function SmartWalletStep({ onEnable, onSkip, onBack }: SmartWalletStepProps) {
   const [isEnabling, setIsEnabling] = useState(false);
   
   const handleEnable = async () => {
@@ -487,7 +487,7 @@ function AutoPilotStep({ onEnable, onSkip, onBack }: AutoPilotStepProps) {
           <View style={styles.iconCircleAccent}>
             <Navigation size={28} color={colors.accent.main} />
           </View>
-          <Text style={styles.stepTitle}>Enable AutoPilot</Text>
+          <Text style={styles.stepTitle}>Enable Smart Wallet</Text>
           <Text style={styles.stepSubtitle}>
             Get automatic card recommendations when you arrive at stores
           </Text>
@@ -495,32 +495,32 @@ function AutoPilotStep({ onEnable, onSkip, onBack }: AutoPilotStepProps) {
       </Animated.View>
       
       {/* Features */}
-      <Animated.View entering={FadeInUp.delay(300).duration(500)} style={styles.autoPilotFeatures}>
-        <View style={styles.autoPilotFeature}>
+      <Animated.View entering={FadeInUp.delay(300).duration(500)} style={styles.smartWalletFeatures}>
+        <View style={styles.smartWalletFeature}>
           <MapPin size={24} color={colors.primary.main} />
-          <View style={styles.autoPilotFeatureText}>
-            <Text style={styles.autoPilotFeatureTitle}>Location-Based</Text>
-            <Text style={styles.autoPilotFeatureDesc}>
+          <View style={styles.smartWalletFeatureText}>
+            <Text style={styles.smartWalletFeatureTitle}>Location-Based</Text>
+            <Text style={styles.smartWalletFeatureDesc}>
               Detects when you're at a store like Costco or Tim Hortons
             </Text>
           </View>
         </View>
         
-        <View style={styles.autoPilotFeature}>
+        <View style={styles.smartWalletFeature}>
           <Bell size={24} color={colors.primary.main} />
-          <View style={styles.autoPilotFeatureText}>
-            <Text style={styles.autoPilotFeatureTitle}>Smart Notifications</Text>
-            <Text style={styles.autoPilotFeatureDesc}>
+          <View style={styles.smartWalletFeatureText}>
+            <Text style={styles.smartWalletFeatureTitle}>Smart Notifications</Text>
+            <Text style={styles.smartWalletFeatureDesc}>
               Shows the best card to use before you pay
             </Text>
           </View>
         </View>
         
-        <View style={styles.autoPilotFeature}>
+        <View style={styles.smartWalletFeature}>
           <Shield size={24} color={colors.primary.main} />
-          <View style={styles.autoPilotFeatureText}>
-            <Text style={styles.autoPilotFeatureTitle}>Privacy First</Text>
-            <Text style={styles.autoPilotFeatureDesc}>
+          <View style={styles.smartWalletFeatureText}>
+            <Text style={styles.smartWalletFeatureTitle}>Privacy First</Text>
+            <Text style={styles.smartWalletFeatureDesc}>
               Location data stays on your device
             </Text>
           </View>
@@ -528,7 +528,7 @@ function AutoPilotStep({ onEnable, onSkip, onBack }: AutoPilotStepProps) {
       </Animated.View>
       
       {/* Buttons */}
-      <Animated.View entering={FadeInUp.delay(500).duration(500)} style={styles.autoPilotButtons}>
+      <Animated.View entering={FadeInUp.delay(500).duration(500)} style={styles.smartWalletButtons}>
         <TouchableOpacity
           onPress={handleEnable}
           activeOpacity={0.9}
@@ -542,7 +542,7 @@ function AutoPilotStep({ onEnable, onSkip, onBack }: AutoPilotStepProps) {
           >
             <Navigation size={20} color="#fff" />
             <Text style={styles.enableButtonText}>
-              {isEnabling ? 'Enabling...' : 'Enable AutoPilot'}
+              {isEnabling ? 'Enabling...' : 'Enable Smart Wallet'}
             </Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -732,7 +732,7 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
     });
   }, []);
   
-  const handleEnableAutoPilot = useCallback(async () => {
+  const handleEnableSmartWallet = useCallback(async () => {
     try {
       const locationGranted = await requestLocationPermission();
       const notificationGranted = await requestNotificationPermission();
@@ -741,12 +741,12 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
       }
       setCurrentStep(4);
     } catch (e) {
-      console.error('AutoPilot setup failed:', e);
+      console.error('Smart Wallet setup failed:', e);
       setCurrentStep(4);
     }
   }, []);
   
-  const handleSkipAutoPilot = useCallback(() => {
+  const handleSkipSmartWallet = useCallback(() => {
     setCurrentStep(4);
   }, []);
   
@@ -849,9 +849,9 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
       )}
       
       {currentStep === 3 && (
-        <AutoPilotStep
-          onEnable={handleEnableAutoPilot}
-          onSkip={handleSkipAutoPilot}
+        <SmartWalletStep
+          onEnable={handleEnableSmartWallet}
+          onSkip={handleSkipSmartWallet}
           onBack={() => setCurrentStep(2)}
         />
       )}
@@ -1273,31 +1273,31 @@ const styles = StyleSheet.create({
     color: colors.primary.main,
   },
   
-  // AutoPilot Step
-  autoPilotFeatures: {
+  // Smart Wallet Step
+  smartWalletFeatures: {
     gap: 20,
     marginVertical: 32,
   },
-  autoPilotFeature: {
+  smartWalletFeature: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 16,
   },
-  autoPilotFeatureText: {
+  smartWalletFeatureText: {
     flex: 1,
   },
-  autoPilotFeatureTitle: {
+  smartWalletFeatureTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: colors.text.primary,
     marginBottom: 4,
   },
-  autoPilotFeatureDesc: {
+  smartWalletFeatureDesc: {
     fontSize: 14,
     color: colors.text.secondary,
     lineHeight: 20,
   },
-  autoPilotButtons: {
+  smartWalletButtons: {
     gap: 16,
     marginBottom: 24,
   },

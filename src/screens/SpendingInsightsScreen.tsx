@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   Dimensions,
+  SafeAreaView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
@@ -29,10 +30,12 @@ import {
   TrendingDown,
   Lightbulb,
   ChevronRight,
+  ChevronLeft,
   PieChart,
   BarChart2,
   Calendar,
 } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -255,6 +258,7 @@ function TrendCard({ category, currentAmount, previousAmount, index }: TrendCard
 // ============================================================================
 
 export default function SpendingInsightsScreen() {
+  const navigation = useNavigation();
   const [spending, setSpending] = useState<Map<SpendingCategory, number>>(new Map());
   const [missedRewards, setMissedRewards] = useState<MissedRewardsAnalysis | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<SpendingCategory | null>(null);
@@ -367,27 +371,41 @@ export default function SpendingInsightsScreen() {
   }
   
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      refreshControl={
-        <RefreshControl
-          refreshing={isRefreshing}
-          onRefresh={handleRefresh}
-          tintColor={colors.primary.main}
-        />
-      }
-    >
-      {/* Header */}
-      <Animated.View 
-        entering={FadeInDown.duration(400)}
-        style={styles.header}
+    <SafeAreaView style={styles.container}>
+      {/* Back Button Header */}
+      <View style={styles.backHeader}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+          accessibilityLabel="Go back"
+          accessibilityRole="button"
+        >
+          <ChevronLeft size={24} color={colors.text.primary} />
+          <Text style={styles.backButtonText}>Back</Text>
+        </TouchableOpacity>
+      </View>
+      
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary.main}
+          />
+        }
       >
-        <Text style={styles.headerTitle}>Spending Insights</Text>
-        <Text style={styles.headerSubtitle}>
-          Understand your spending patterns
-        </Text>
-      </Animated.View>
+        {/* Header */}
+        <Animated.View 
+          entering={FadeInDown.duration(400)}
+          style={styles.header}
+        >
+          <Text style={styles.headerTitle}>Spending Insights</Text>
+          <Text style={styles.headerSubtitle}>
+            Understand your spending patterns
+          </Text>
+        </Animated.View>
       
       {/* Pie Chart */}
       <Animated.View entering={FadeInDown.delay(100).duration(500)}>
@@ -455,9 +473,10 @@ export default function SpendingInsightsScreen() {
         </View>
       </View>
       
-      {/* Bottom padding */}
-      <View style={{ height: 100 }} />
-    </ScrollView>
+        {/* Bottom padding */}
+        <View style={{ height: 100 }} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -470,8 +489,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background.primary,
   },
+  backHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: colors.text.primary,
+    fontWeight: '500',
+  },
+  scrollView: {
+    flex: 1,
+  },
   content: {
-    paddingTop: 60,
+    paddingTop: 16,
     paddingHorizontal: 16,
   },
   loadingContainer: {

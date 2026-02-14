@@ -191,7 +191,7 @@ export default function RewardsIQWidget({ onPress, compact = false }: RewardsIQW
               ]}>
                 {score.autoPilotScore > 0 ? score.autoPilotScore : 'Off'}
               </Text>
-              <Text style={styles.statLabel}>AutoPilot</Text>
+              <Text style={styles.statLabel}>Smart Wallet</Text>
             </View>
           </View>
           

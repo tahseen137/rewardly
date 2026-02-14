@@ -1,8 +1,8 @@
 /**
- * AutoPilotScreen - Main AutoPilot management screen
+ * SmartWalletScreen - Main Smart Wallet management screen
  * 
  * Includes:
- * - AutoPilot toggle
+ * - Smart Wallet toggle
  * - Merchant search and pinning
  * - Active geofences list
  * - Privacy dashboard
@@ -23,6 +23,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
   RefreshControl,
+  Linking,
 } from 'react-native';
 import {
   MapPin,
@@ -77,7 +78,7 @@ interface MerchantWithBestCard extends SeedMerchant {
 // Main Component
 // ============================================================================
 
-export default function AutoPilotScreen() {
+export default function SmartWalletScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [status, setStatus] = useState<AutoPilotStatus | null>(null);
@@ -95,7 +96,7 @@ export default function AutoPilotScreen() {
         await refreshSubscription();
         const tier = getCurrentTierSync();
         setCurrentTier(tier);
-        setHasAccess(canAccessFeatureSync('autopilot'));
+        setHasAccess(canAccessFeatureSync('smartwallet'));
       };
       checkAccess();
     }, [])
@@ -128,7 +129,7 @@ export default function AutoPilotScreen() {
       );
       setMerchantsWithCards(merchantCards);
     } catch (error) {
-      console.error('Failed to load AutoPilot data:', error);
+      console.error('Failed to load Smart Wallet data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -147,7 +148,7 @@ export default function AutoPilotScreen() {
         if (!success) {
           Alert.alert(
             'Permission Required',
-            'AutoPilot needs location and notification permissions to work. Please enable them in Settings.',
+            'Smart Wallet needs location and notification permissions to work. Please enable them in Settings.',
             [{ text: 'OK' }]
           );
           return;
@@ -159,7 +160,7 @@ export default function AutoPilotScreen() {
       const currentStatus = await getAutoPilotStatus();
       setStatus(currentStatus);
     } catch (error) {
-      console.error('Failed to toggle AutoPilot:', error);
+      console.error('Failed to toggle Smart Wallet:', error);
     }
   };
 
@@ -247,13 +248,13 @@ export default function AutoPilotScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <LockedFeature
-          feature="autopilot"
-          title="Unlock AutoPilot"
-          description="Get automatic card recommendations when you arrive at stores. AutoPilot uses geofencing to notify you which card to use for maximum rewards."
+          feature="smartwallet"
+          title="Unlock Smart Wallet"
+          description="Get automatic card recommendations when you arrive at stores. Smart Wallet uses geofencing to notify you which card to use for maximum rewards."
           icon={<Navigation size={56} color={colors.warning.main} />}
           variant="inline"
           onSubscribe={() => {
-            setHasAccess(canAccessFeatureSync('autopilot'));
+            setHasAccess(canAccessFeatureSync('smartwallet'));
             setCurrentTier(getCurrentTierSync());
           }}
         />
@@ -271,7 +272,7 @@ export default function AutoPilotScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>AutoPilot</Text>
+          <Text style={styles.title}>Smart Wallet</Text>
           <Text style={styles.subtitle}>
             Get alerts with the best card to use at your favorite stores
           </Text>
@@ -284,7 +285,7 @@ export default function AutoPilotScreen() {
               <Navigation size={24} color={colors.primary.main} />
             </View>
             <View style={styles.toggleText}>
-              <Text style={styles.toggleTitle}>Enable AutoPilot</Text>
+              <Text style={styles.toggleTitle}>Enable Smart Wallet</Text>
               <Text style={styles.toggleDescription}>
                 {status?.enabled
                   ? `Monitoring ${status.activeGeofences} stores`
@@ -415,12 +416,28 @@ export default function AutoPilotScreen() {
 
           <TouchableOpacity
             style={styles.privacyLink}
-            onPress={() => {
-              Alert.alert(
-                'Privacy Details',
-                'AutoPilot uses geofencing technology to detect when you enter a monitored store. Your exact location is never stored or transmitted. All processing happens on your device.\n\nYou control which stores are monitored. You can disable AutoPilot or remove individual stores at any time.\n\nWe do not sell your data to third parties.',
-                [{ text: 'Got it' }]
-              );
+            onPress={async () => {
+              const privacyUrl = 'https://rewardly.app/privacy';
+              try {
+                const supported = await Linking.canOpenURL(privacyUrl);
+                if (supported) {
+                  await Linking.openURL(privacyUrl);
+                } else {
+                  // Fallback: show info in alert if URL can't be opened
+                  Alert.alert(
+                    'Privacy Details',
+                    'Smart Wallet uses geofencing technology to detect when you enter a monitored store. Your exact location is never stored or transmitted. All processing happens on your device.\n\nYou control which stores are monitored. You can disable Smart Wallet or remove individual stores at any time.\n\nWe do not sell your data to third parties.\n\nVisit rewardly.app/privacy for full details.',
+                    [{ text: 'Got it' }]
+                  );
+                }
+              } catch (error) {
+                console.error('Failed to open privacy URL:', error);
+                Alert.alert(
+                  'Privacy Details',
+                  'Smart Wallet uses geofencing technology to detect when you enter a monitored store. Your exact location is never stored or transmitted. All processing happens on your device.\n\nYou control which stores are monitored. You can disable Smart Wallet or remove individual stores at any time.\n\nWe do not sell your data to third parties.\n\nVisit rewardly.app/privacy for full details.',
+                  [{ text: 'Got it' }]
+                );
+              }
             }}
           >
             <Text style={styles.privacyLinkText}>Learn more about privacy</Text>
