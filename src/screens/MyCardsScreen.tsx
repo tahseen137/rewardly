@@ -42,6 +42,7 @@ import {
 } from '../services/CardPortfolioManager';
 import { getAllCards, searchCards, getCardByIdSync } from '../services/CardDataService';
 import { getCurrentTierSync, getCardLimitSync } from '../services/SubscriptionService';
+import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
 function formatRewardRate(value: number, type: RewardType, unit: 'percent' | 'multiplier'): string {
@@ -493,6 +494,14 @@ export default function MyCardsScreen() {
 
   useEffect(() => {
     loadPortfolio();
+  }, [loadPortfolio]);
+
+  // Re-load when country changes so card lookups resolve correctly
+  useEffect(() => {
+    const unsubscribe = CountryChangeEmitter.subscribe(() => {
+      loadPortfolio();
+    });
+    return unsubscribe;
   }, [loadPortfolio]);
 
   useEffect(() => {

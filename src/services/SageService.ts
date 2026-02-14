@@ -16,6 +16,7 @@ import { getValidSession, isGuestUser, getCurrentUser } from './AuthService';
 // ============================================================================
 
 const SUPABASE_PROJECT_REF = 'zdlozhpmqrtvvhdzbmrv';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbG96aHBtcXJ0dnZoZHpibXJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxODYwMTEsImV4cCI6MjA4Mzc2MjAxMX0.o7xqSfwRtvxsPoAe7e0kJzb5TXoFyCzDEQqOWkLNkos';
 const SAGE_FUNCTION_URL = `https://${SUPABASE_PROJECT_REF}.supabase.co/functions/v1/sage-chat-stream`;
 const MAX_HISTORY = 10; // Keep last 10 messages in conversation
 
@@ -200,6 +201,7 @@ class SageServiceClass {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'apikey': SUPABASE_ANON_KEY,
           'Content-Type': 'application/json',
           'Accept': 'text/event-stream',
         },
