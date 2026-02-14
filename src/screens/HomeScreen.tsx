@@ -17,7 +17,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { ChevronRight, Sparkles, Trophy } from 'lucide-react-native';
+import { ChevronRight, Sparkles } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import {
   AmountInput,
@@ -27,14 +27,14 @@ import {
   SkeletonCard,
   Skeleton,
 } from '../components';
-import { formatTopCategoryRates, formatUpToRate } from '../utils/rewardFormatUtils';
+import { formatUpToRate } from '../utils/rewardFormatUtils';
 import { StoreSelector } from '../components/StoreSelectorNew';
 import { CategoryGrid, CategoryType } from '../components/CategoryGrid';
 import { useTheme, Theme } from '../theme';
 import { colors } from '../theme/colors';
 import { Store, SpendingCategory } from '../types';
 import { getCards } from '../services/CardPortfolioManager';
-import { getAllCardsSync, getAllCards } from '../services/CardDataService';
+import { getAllCardsSync, getAllCards, refreshCards } from '../services/CardDataService';
 import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
 import { analyzeAndRecommend, CardRecommendation } from '../services/CardRecommendationEngine';
 import {
@@ -42,8 +42,7 @@ import {
   CalculatorInput,
   CalculatorOutput,
 } from '../services/RewardsCalculatorService';
-import { getAchievements, initializeAchievements } from '../services/AchievementService';
-import { UserAchievements } from '../types';
+// Achievement imports removed - achievements section moved to Insights tab
 
 // Map CategoryType to SpendingCategory
 const categoryTypeToSpendingCategory = (cat: CategoryType): SpendingCategory => {
@@ -101,11 +100,11 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
-  // Initialize state
+  // Initialize state with sensible defaults for immediate value
   const [state, setState] = useState<CalculatorState>({
     selectedStore: null,
-    selectedCategory: null,
-    amount: null,
+    selectedCategory: SpendingCategory.GROCERIES, // Default to groceries - most common spend
+    amount: 100, // Default to $100 - realistic everyday purchase amount
     amountError: null,
     results: null,
     isCalculating: false,
@@ -116,8 +115,10 @@ export default function HomeScreen() {
   const [hasCards, setHasCards] = useState(false);
   const [recommendations, setRecommendations] = useState<CardRecommendation[]>([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
-  const [achievements, setAchievements] = useState<UserAchievements | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Top cards for category - shown when user has no portfolio
+  const [topCardsForCategory, setTopCardsForCategory] = useState<CalculatorOutput | null>(null);
 
   // Function to load data
   const loadData = useCallback(async () => {
@@ -126,15 +127,6 @@ export default function HomeScreen() {
       const portfolio = getCards();
       setHasCards(portfolio.length > 0);
       setState((prev) => ({ ...prev, isLoading: false, loadError: null }));
-      
-      // Load achievements
-      try {
-        await initializeAchievements();
-        const userAchievements = await getAchievements();
-        setAchievements(userAchievements);
-      } catch (err) {
-        console.warn('Failed to load achievements:', err);
-      }
       
       // Load recommendations if user has cards
       if (portfolio.length > 0) {
@@ -168,9 +160,15 @@ export default function HomeScreen() {
 
   // Subscribe to country changes
   useEffect(() => {
-    const unsubscribe = CountryChangeEmitter.subscribe(() => {
-      // Re-fetch data when country changes
-      setState((prev) => ({ ...prev, isLoading: true }));
+    const unsubscribe = CountryChangeEmitter.subscribe(async () => {
+      // Re-fetch data when country changes - use refreshCards to clear cache
+      setState((prev) => ({ ...prev, isLoading: true, results: null }));
+      setRecommendations([]);
+      try {
+        await refreshCards(); // Clears cache and fetches new country's cards
+      } catch (err) {
+        console.warn('Failed to refresh cards for new country:', err);
+      }
       loadData();
     });
     return unsubscribe;
@@ -217,36 +215,66 @@ export default function HomeScreen() {
 
   // Calculate rewards when inputs are ready
   useEffect(() => {
-    const { selectedCategory, amount } = state;
+    const { selectedCategory, amount, isLoading } = state;
+
+    // Wait until loading is complete before calculating
+    if (isLoading) {
+      return;
+    }
 
     // Check if we have all required inputs
     if (!selectedCategory || !amount || amount <= 0) {
       setState((prev) => ({ ...prev, results: null }));
+      setTopCardsForCategory(null);
       return;
     }
 
-    // Get portfolio cards
+    const allCards = getAllCardsSync();
+    if (allCards.length === 0) {
+      setState((prev) => ({ ...prev, results: null }));
+      setTopCardsForCategory(null);
+      return;
+    }
+
+    // Build point valuations map
+    const pointValuations = new Map<string, number>();
+    allCards.forEach((card) => {
+      if (card.pointValuation) {
+        pointValuations.set(card.id, card.pointValuation);
+      }
+    });
+
+    // Always calculate top cards for category (from ALL database cards)
+    // This powers the "discover cards" experience for users without a portfolio
+    try {
+      const allCardIds = allCards.map((c) => c.id);
+      const topCardsInput: CalculatorInput = {
+        category: selectedCategory,
+        amount,
+        portfolioCardIds: allCardIds,
+      };
+      const topCardsOutput = calculateRewards(topCardsInput, allCards, pointValuations);
+      // Limit to top 5 cards for cleaner display
+      topCardsOutput.results = topCardsOutput.results.slice(0, 5);
+      setTopCardsForCategory(topCardsOutput);
+    } catch (error) {
+      console.error('Top cards calculation error:', error);
+      setTopCardsForCategory(null);
+    }
+
+    // Get portfolio cards for personalized results
     const portfolio = getCards();
     if (portfolio.length === 0) {
-      setState((prev) => ({ ...prev, results: null }));
+      setState((prev) => ({ ...prev, results: null, isCalculating: false }));
       return;
     }
 
     // Set calculating state
     setState((prev) => ({ ...prev, isCalculating: true }));
 
-    // Perform calculation
+    // Perform calculation for portfolio cards
     try {
-      const allCards = getAllCardsSync();
       const portfolioCardIds = portfolio.map((uc) => uc.cardId);
-
-      // Build point valuations map
-      const pointValuations = new Map<string, number>();
-      allCards.forEach((card) => {
-        if (card.pointValuation) {
-          pointValuations.set(card.id, card.pointValuation);
-        }
-      });
 
       const input: CalculatorInput = {
         category: selectedCategory,
@@ -269,7 +297,7 @@ export default function HomeScreen() {
         isCalculating: false,
       }));
     }
-  }, [state.selectedCategory, state.amount]);
+  }, [state.selectedCategory, state.amount, state.isLoading]);
 
   // Show loading state with skeleton UI
   if (state.isLoading) {
@@ -332,7 +360,7 @@ export default function HomeScreen() {
         {/* Wallet Optimizer Hero Banner */}
         <TouchableOpacity
           style={styles.heroCard}
-          onPress={() => navigation.navigate('WalletOptimizer' as never)}
+          onPress={() => navigation.navigate('Insights', { screen: 'WalletOptimizer' } as never)}
           activeOpacity={0.8}
         >
           <View style={styles.heroContent}>
@@ -351,90 +379,33 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* Statement Upload Card */}
-        <TouchableOpacity
-          style={styles.uploadCard}
-          onPress={() => navigation.navigate('StatementUpload' as never)}
-          activeOpacity={0.8}
-        >
-          <View style={styles.uploadContent}>
-            <Text style={styles.uploadEmoji}>📄</Text>
-            <View style={styles.uploadText}>
-              <Text style={styles.uploadTitle}>Upload Statement</Text>
-              <Text style={styles.uploadSubtitle}>
-                Get insights from your real transactions
-              </Text>
-            </View>
-          </View>
-          <ChevronRight size={20} color={colors.primary.main} />
-        </TouchableOpacity>
-
-        {/* Insights Dashboard Card */}
-        <TouchableOpacity
-          style={styles.uploadCard}
-          onPress={() => navigation.navigate('InsightsDashboard' as never)}
-          activeOpacity={0.8}
-        >
-          <View style={styles.uploadContent}>
-            <Text style={styles.uploadEmoji}>📊</Text>
-            <View style={styles.uploadText}>
-              <Text style={styles.uploadTitle}>Spending Insights</Text>
-              <Text style={styles.uploadSubtitle}>
-                See optimization score and trends
-              </Text>
-            </View>
-          </View>
-          <ChevronRight size={20} color={colors.primary.main} />
-        </TouchableOpacity>
-
-        {/* Achievements Card */}
-        {achievements && (
+        {/* Quick Actions Row */}
+        <View style={styles.quickActionsRow}>
           <TouchableOpacity
-            style={styles.achievementsCard}
-            onPress={() => navigation.navigate('Achievements' as never)}
+            style={styles.quickActionButton}
+            onPress={() => navigation.navigate('Insights', { screen: 'CardCompare' } as never)}
             activeOpacity={0.8}
           >
-            <View style={styles.achievementsContent}>
-              <View style={styles.achievementsIconContainer}>
-                <Trophy size={24} color={colors.primary.main} />
-              </View>
-              <View style={styles.achievementsText}>
-                <Text style={styles.achievementsTitle}>
-                  {achievements.rankTitle}
-                </Text>
-                <Text style={styles.achievementsSubtitle}>
-                  {achievements.totalUnlocked}/{achievements.totalAchievements} achievements unlocked
-                </Text>
-                {achievements.currentStreak > 0 && (
-                  <View style={styles.streakBadge}>
-                    <Text style={styles.streakText}>
-                      🔥 {achievements.currentStreak} day streak
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </View>
-            <ChevronRight size={20} color={colors.primary.main} />
+            <Text style={styles.quickActionEmoji}>⚖️</Text>
+            <Text style={styles.quickActionLabel}>Compare</Text>
           </TouchableOpacity>
-        )}
-
-        {/* Application Tracker Card */}
-        <TouchableOpacity
-          style={styles.uploadCard}
-          onPress={() => navigation.navigate('ApplicationTracker' as never)}
-          activeOpacity={0.8}
-        >
-          <View style={styles.uploadContent}>
-            <Text style={styles.uploadEmoji}>📋</Text>
-            <View style={styles.uploadText}>
-              <Text style={styles.uploadTitle}>Application Tracker</Text>
-              <Text style={styles.uploadSubtitle}>
-                Track credit card applications and 5/24 status
-              </Text>
-            </View>
-          </View>
-          <ChevronRight size={20} color={colors.primary.main} />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickActionButton}
+            onPress={() => navigation.navigate('Insights', { screen: 'ExploreCards' } as never)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.quickActionEmoji}>💳</Text>
+            <Text style={styles.quickActionLabel}>Apply</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickActionButton}
+            onPress={() => navigation.navigate('Sage' as never)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.quickActionEmoji}>✨</Text>
+            <Text style={styles.quickActionLabel}>Ask Sage</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Calculator Section */}
         {/* Store Selector */}
@@ -479,13 +450,48 @@ export default function HomeScreen() {
 
         {/* Results Section */}
         {!hasCards ? (
-          <EmptyState
-            icon="💳"
-            title={t('home.noCardsTitle') || 'No Cards in Portfolio'}
-            description={
-              t('home.noCardsMessage') || 'Add cards to your portfolio to see rewards'
-            }
-          />
+          // When user has no portfolio, show top cards from database for selected category
+          state.selectedCategory && topCardsForCategory && topCardsForCategory.results.length > 0 ? (
+            <View>
+              {/* Personalization hint banner */}
+              <TouchableOpacity
+                style={styles.personalizationBanner}
+                onPress={() => navigation.navigate('MyCards' as never)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.bannerEmoji}>💡</Text>
+                <View style={styles.bannerTextContainer}>
+                  <Text style={styles.bannerText}>
+                    Add your cards for personalized recommendations
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={colors.primary.main} />
+              </TouchableOpacity>
+
+              <Text style={styles.resultsHeader}>
+                {t('home.topCardsTitle') || `Top Cards for ${state.selectedCategory?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'This Category'}`}
+              </Text>
+              <RewardsDisplay
+                results={topCardsForCategory.results}
+                bestCard={topCardsForCategory.bestCard}
+                isLoading={false}
+                isEmpty={false}
+                amount={state.amount || 100}
+                cards={getAllCardsSync()}
+                category={state.selectedCategory || undefined}
+                onCardPress={(result) => navigation.navigate('CardDetail' as never, { cardId: result.cardId } as never)}
+              />
+            </View>
+          ) : (
+            <EmptyState
+              icon="🔍"
+              title={t('home.getStartedTitle') || 'Get Started'}
+              description={
+                t('home.getStartedMessage') ||
+                'Select a category above to discover the best cards'
+              }
+            />
+          )
         ) : state.results ? (
           <View>
             <Text style={styles.resultsHeader}>
@@ -499,6 +505,7 @@ export default function HomeScreen() {
               amount={state.amount || 0}
               cards={getAllCardsSync()}
               category={state.selectedCategory || undefined}
+              onCardPress={(result) => navigation.navigate('CardDetail' as never, { cardId: result.cardId } as never)}
             />
           </View>
         ) : state.selectedCategory && state.amount ? (
@@ -531,7 +538,7 @@ export default function HomeScreen() {
               </View>
               <TouchableOpacity 
                 style={styles.seeAllButton}
-                onPress={() => navigation.navigate('CardRecommendations' as never)}
+                onPress={() => navigation.navigate('Insights', { screen: 'CardRecommendations' } as never)}
               >
                 <Text style={styles.seeAllText}>{t('home.seeAll') || 'See All'}</Text>
                 <ChevronRight size={16} color={colors.primary.main} />
@@ -546,13 +553,12 @@ export default function HomeScreen() {
             ) : recommendations.length > 0 ? (
               <View style={styles.recommendationsList}>
                 {recommendations.map((rec, index) => {
-                  const categoryRates = formatTopCategoryRates(rec.card, 2);
                   const upToRate = formatUpToRate(rec.card);
                   return (
                     <TouchableOpacity 
                       key={rec.card.id}
                       style={styles.recommendationItem}
-                      onPress={() => navigation.navigate('CardRecommendations' as never)}
+                      onPress={() => navigation.navigate('CardDetail' as never, { cardId: rec.card.id } as never)}
                     >
                       <View style={styles.recommendationRank}>
                         <Text style={styles.rankText}>{index + 1}</Text>
@@ -561,15 +567,9 @@ export default function HomeScreen() {
                         <Text style={styles.recommendationCardName} numberOfLines={1}>
                           {rec.card.name}
                         </Text>
-                        {categoryRates ? (
-                          <Text style={styles.recommendationCategoryRate} numberOfLines={1}>
-                            {categoryRates}
-                          </Text>
-                        ) : (
-                          <Text style={styles.recommendationReason} numberOfLines={1}>
-                            {upToRate}
-                          </Text>
-                        )}
+                        <Text style={styles.recommendationCategoryRate} numberOfLines={1}>
+                          {upToRate}
+                        </Text>
                         <Text style={styles.recommendationReason} numberOfLines={1}>
                           {rec.reason}
                         </Text>
@@ -674,6 +674,29 @@ const createStyles = (theme: Theme) =>
     },
     heroArrow: {
       marginLeft: 8,
+    },
+    quickActionsRow: {
+      flexDirection: 'row',
+      gap: 12,
+      marginBottom: 24,
+    },
+    quickActionButton: {
+      flex: 1,
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      padding: 16,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    quickActionEmoji: {
+      fontSize: 24,
+      marginBottom: 8,
+    },
+    quickActionLabel: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text.primary,
     },
     uploadCard: {
       backgroundColor: colors.background.secondary,
@@ -884,6 +907,29 @@ const createStyles = (theme: Theme) =>
     streakText: {
       fontSize: 12,
       fontWeight: '600',
+      color: colors.primary.dark,
+    },
+    // Personalization banner styles
+    personalizationBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.primary.bg20,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.primary.main,
+      padding: 12,
+      marginBottom: 16,
+      gap: 8,
+    },
+    bannerEmoji: {
+      fontSize: 20,
+    },
+    bannerTextContainer: {
+      flex: 1,
+    },
+    bannerText: {
+      fontSize: 13,
+      fontWeight: '500',
       color: colors.primary.dark,
     },
   });

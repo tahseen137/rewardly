@@ -28,7 +28,7 @@ export type Feature =
   | 'points_valuator'
   | 'balance_tracking'
   | 'sage_ai'
-  | 'autopilot'
+  | 'smartwallet'
   | 'multi_country'
   | 'export'
   | 'family_sharing';
@@ -98,9 +98,9 @@ export const STRIPE_PRICE_IDS = {
 export const TIER_FEATURES: Record<SubscriptionTier, Feature[]> = {
   free: ['sage_ai'],
   pro: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai'],
-  max: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
-  lifetime: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
-  admin: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
+  max: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
+  lifetime: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
+  admin: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
 };
 
 /**
@@ -172,11 +172,11 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     name: 'Max',
     monthlyPrice: 12.99,
     annualPrice: 99.99,
-    features: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
+    features: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
     featureDescriptions: [
       'Everything in Pro',
       'Sage AI (Unlimited)',
-      'AutoPilot',
+      'Smart Wallet',
       'Multi-country (CA + US)',
       'Family sharing (up to 5)',
       'Export reports',
@@ -192,11 +192,11 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     name: 'Lifetime',
     monthlyPrice: 0,
     annualPrice: 0,
-    features: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
+    features: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
     featureDescriptions: [
       'Everything in Max — forever',
       'Sage AI (Unlimited)',
-      'AutoPilot',
+      'Smart Wallet',
       'Multi-country (CA + US)',
       'Family sharing (up to 5)',
       'Export reports',
@@ -213,7 +213,7 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     name: 'Admin',
     monthlyPrice: 0,
     annualPrice: 0,
-    features: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'autopilot', 'multi_country', 'export', 'family_sharing'],
+    features: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
     featureDescriptions: ['All features unlocked', 'Internal use only'],
     limits: {
       cardsInPortfolio: Infinity,
@@ -640,8 +640,8 @@ export function getRequiredTierForFeature(feature: Feature): SubscriptionTier {
  * Check which tier unlocks a specific feature
  */
 export function getFeatureUnlockTier(feature: Feature): SubscriptionTier {
-  // AutoPilot and multi-country require Max
-  if (feature === 'autopilot' || feature === 'multi_country' || feature === 'export' || feature === 'family_sharing') {
+  // Smart Wallet and multi-country require Max
+  if (feature === 'smartwallet' || feature === 'multi_country' || feature === 'export' || feature === 'family_sharing') {
     return 'max';
   }
   // All other premium features require Pro

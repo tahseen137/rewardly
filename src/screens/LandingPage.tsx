@@ -204,7 +204,7 @@ function FeaturesSection() {
     },
     {
       icon: <Navigation size={28} color={colors.accent.main} />,
-      title: 'AutoPilot Mode',
+      title: 'Smart Wallet',
       description:
         'Get automatic notifications when you arrive at stores, telling you exactly which card to pull out.',
     },
@@ -402,7 +402,7 @@ function LifetimeBanner({ onGetStarted }: { onGetStarted: () => void }) {
           </View>
           <View style={styles.pricingFeatureRow}>
             <Check size={16} color="#FFD700" />
-            <Text style={styles.pricingFeatureText}>Unlimited Sage AI + AutoPilot</Text>
+            <Text style={styles.pricingFeatureText}>Unlimited Sage AI + Smart Wallet</Text>
           </View>
           <View style={styles.pricingFeatureRow}>
             <Check size={16} color="#FFD700" />
@@ -462,7 +462,7 @@ function PricingSection({ onGetStarted }: { onGetStarted: () => void }) {
       period: '/mo',
       features: [
         'Everything in Pro',
-        'AutoPilot mode',
+        'Smart Wallet',
         'Unlimited Sage AI',
         'Statement upload & analysis',
         'Portfolio optimizer',

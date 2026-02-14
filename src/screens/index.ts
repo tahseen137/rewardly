@@ -9,7 +9,7 @@ export { default as SageScreen } from './SageScreen';
 export { default as AuthScreen } from './AuthScreen';
 export { default as OnboardingScreen } from './OnboardingScreen';
 export { default as PointsCalculatorScreen } from './PointsCalculatorScreen';
-export { default as AutoPilotScreen } from './AutoPilotScreen';
+export { default as SmartWalletScreen } from './AutoPilotScreen';
 export { default as AutoPilotSetupScreen } from './AutoPilotSetupScreen';
 
 // Tier 1 - Mega Build Features
@@ -44,5 +44,11 @@ export { default as InsightsDashboardScreen } from './InsightsDashboardScreen';
 export { default as AchievementsScreen } from './AchievementsScreen';
 export { default as ApplicationTrackerScreen } from './ApplicationTrackerScreen';
 
+// Cycle 6 Features (Card Application & Exploration)
+export { default as ExploreCardsScreen } from './ExploreCardsScreen';
+
 // Web Landing Page
 export { default as LandingPage } from './LandingPage';
+
+// Root-level screens (accessible from anywhere)
+export { default as CardDetailScreen } from './CardDetailScreen';

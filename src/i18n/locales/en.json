@@ -53,10 +53,14 @@
     "tapForDetails": "Tap for details",
     "googlePlacesEnabled": "Enhanced store search enabled",
     "rewardsComparison": "Rewards Comparison",
-    "cardsInPortfolio": "{{count}} card in your portfolio",
-    "cardsInPortfolio_plural": "{{count}} cards in your portfolio",
+    "cardsInPortfolio_one": "{{count}} card in your portfolio",
+    "cardsInPortfolio_other": "{{count}} cards in your portfolio",
     "noResultsTitle": "No Results",
-    "noResultsMessage": "Unable to calculate rewards. Please try again."
+    "noResultsMessage": "Unable to calculate rewards. Please try again.",
+    "recommendedCards": "Recommended Cards",
+    "seeAll": "See All",
+    "topCardsTitle": "Top Cards for This Category",
+    "noRecommendations": "Add spending data to get personalized recommendations"
   },
   "productSearch": {
     "title": "Product Search",
@@ -135,12 +139,12 @@
     "refreshErrorMessage": "Failed to refresh cards. Please check your connection.",
     "supabaseNotConfigured": "Database connection not configured. Using local data.",
     "footerText": "Made with 💳 for smart spenders",
-    "autoPilot": "AUTOPILOT",
-    "autoPilotEnabled": "AutoPilot",
-    "autoPilotDescription": "Get notified with the best card to use when you arrive at a store",
-    "autoPilotActiveDescription": "Monitoring {{count}} stores near you",
-    "autoPilotPermissionTitle": "Permission Required",
-    "autoPilotPermissionMessage": "AutoPilot needs location and notification permissions to work. Please enable them in your device settings."
+    "smartWallet": "SMART WALLET",
+    "smartWalletEnabled": "Smart Wallet",
+    "smartWalletDescription": "Get notified with the best card to use when you arrive at a store",
+    "smartWalletActiveDescription": "Monitoring {{count}} stores near you",
+    "smartWalletPermissionTitle": "Permission Required",
+    "smartWalletPermissionMessage": "Smart Wallet needs location and notification permissions to work. Please enable them in your device settings."
   },
   "rewardTypes": {
     "cashback": "Cash Back",
@@ -452,7 +456,7 @@
       "reason": "Why this card?",
       "basedOn": {
         "spending": "Based on your spending",
-        "gap": "Fills a gap in your wallet",
+        "gap": "Great for this spending category",
         "upgrade": "Upgrade from your current card",
         "signup_bonus": "Great sign-up bonus"
       },

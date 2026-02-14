@@ -377,11 +377,10 @@ export const SageScreen: React.FC = () => {
   
   // Card recommendation action handlers
   const handleCardLearnMore = useCallback((cardId: string) => {
-    // Navigate to the card detail view (CardBenefits within Insights stack)
-    // Using type-cast since Sage is in a different tab
+    // Navigate to the card detail modal (root-level screen accessible from anywhere)
     const nav = navigation as any;
     if (nav?.navigate) {
-      nav.navigate('Insights', { screen: 'CardBenefits', params: { cardId } });
+      nav.navigate('CardDetail', { cardId });
     }
   }, []);
   

@@ -56,21 +56,23 @@
       "reward_program": "Membership Rewards",
       "point_value_cad": 2.1,
       "point_value_usd": 1.5555555555555556,
-      "annual_fee": 155.88,
+      "annual_fee": 191.88,
       "foreign_transaction_fee": 0.025,
       "earning_rates": {
         "base": 1.0,
         "dining": 5.0,
         "groceries": 5.0,
-        "entertainment": 3.0,
+        "streaming": 3.0,
         "gas": 2.0,
-        "travel": 2.0
+        "transit": 2.0
       },
       "signup_bonus": {
         "points": 15000,
         "spend_requirement": 9000,
         "months": 12
-      }
+      },
+      "applicationUrl": "https://www.americanexpress.com/en-ca/credit-cards/cobalt-card/",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "American Express Platinum Card",
@@ -151,19 +153,20 @@
       "reward_program": "Cashback",
       "point_value_cad": 1.0,
       "point_value_usd": 0.7407407407407407,
-      "annual_fee": 99.0,
+      "annual_fee": 119.88,
       "foreign_transaction_fee": 0.025,
       "earning_rates": {
-        "base": 1.25,
-        "gas": 4.0,
+        "base": 2.0,
         "groceries": 4.0,
-        "dining": 4.0
+        "gas": 4.0
       },
       "signup_bonus": {
-        "points": 400,
+        "amount": 250,
         "spend_requirement": 3000,
-        "months": 3
-      }
+        "months": 4
+      },
+      "applicationUrl": "https://www.americanexpress.com/en-ca/credit-cards/simply-cash-preferred/",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "SimplyCash Card from American Express",
@@ -184,7 +187,9 @@
         "points": 200,
         "spend_requirement": 2000,
         "months": 3
-      }
+      },
+      "applicationUrl": "https://www.americanexpress.com/en-ca/credit-cards/simply-cash/",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "American Express Aeroplan Card",
@@ -267,16 +272,17 @@
       "foreign_transaction_fee": 0.025,
       "earning_rates": {
         "base": 1.0,
-        "travel": 1.5,
         "groceries": 1.5,
         "gas": 1.5,
-        "dining": 1.5
+        "air_canada": 1.5
       },
       "signup_bonus": {
         "points": 40000,
-        "spend_requirement": 3000,
-        "months": 3
-      }
+        "spend_requirement": 7500,
+        "months": 12
+      },
+      "applicationUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/aeroplan/aeroplan-visa-infinite-card",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "TD Aeroplan Visa Infinite Privilege Card",
@@ -301,7 +307,9 @@
         "points": 100000,
         "spend_requirement": 10000,
         "months": 6
-      }
+      },
+      "applicationUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/aeroplan/aeroplan-visa-infinite-privilege-card",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "TD First Class Travel Visa Infinite Card",
@@ -316,17 +324,21 @@
       "annual_fee": 139.0,
       "foreign_transaction_fee": 0.025,
       "earning_rates": {
-        "base": 1.5,
-        "travel": 3.0,
-        "groceries": 1.5,
-        "gas": 1.5,
-        "dining": 1.5
+        "base": 2.0,
+        "travel_booked": 8.0,
+        "groceries": 6.0,
+        "dining": 6.0,
+        "transit": 6.0,
+        "recurring_bills": 4.0,
+        "streaming": 4.0
       },
       "signup_bonus": {
         "points": 165000,
         "spend_requirement": 7500,
         "months": 6
-      }
+      },
+      "applicationUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/travel-rewards/first-class-travel-visa-infinite-card",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "TD Cash Back Visa Infinite Card",
@@ -343,14 +355,16 @@
       "earning_rates": {
         "base": 0.5,
         "groceries": 3.0,
-        "gas": 3.0,
-        "recurring_bills": 3.0
+        "gas": 2.0,
+        "recurring_bills": 1.0
       },
       "signup_bonus": {
         "points": 350,
         "spend_requirement": 3500,
         "months": 3
-      }
+      },
+      "applicationUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/cash-back/cash-back-visa-infinite-card",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "TD Rewards Visa Card",
@@ -382,17 +396,15 @@
       "foreign_transaction_fee": 0.025,
       "earning_rates": {
         "base": 1.0,
-        "travel": 1.25,
-        "groceries": 1.25,
-        "gas": 1.25,
-        "dining": 1.25,
-        "drugstores": 1.25
+        "travel": 1.25
       },
       "signup_bonus": {
         "points": 35000,
         "spend_requirement": 5000,
         "months": 6
-      }
+      },
+      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/travel/rbc-avion-visa-infinite.html",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "RBC Avion Visa Infinite Privilege Card",
@@ -418,7 +430,9 @@
         "points": 55000,
         "spend_requirement": 7000,
         "months": 6
-      }
+      },
+      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/travel/rbc-avion-visa-infinite-privilege.html",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "RBC WestJet World Elite Mastercard",
@@ -442,7 +456,9 @@
         "points": 450,
         "spend_requirement": 5000,
         "months": 3
-      }
+      },
+      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/travel/rbc-westjet-world-elite-mastercard.html",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "RBC Cash Back Mastercard",
@@ -475,15 +491,17 @@
       "foreign_transaction_fee": 0.025,
       "earning_rates": {
         "base": 1.0,
-        "gas": 3.0,
-        "groceries": 2.0,
-        "subscriptions": 2.0
+        "groceries": 1.5,
+        "gas": 1.5,
+        "transit": 1.5
       },
       "signup_bonus": {
         "points": 10000,
         "spend_requirement": 1000,
         "months": 3
-      }
+      },
+      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/rewards/rbc-ion-plus-visa.html",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "CIBC Aeroplan Visa Infinite Card",
@@ -595,7 +613,7 @@
       "reward_program": "Cashback",
       "point_value_cad": 1.0,
       "point_value_usd": 0.7407407407407407,
-      "annual_fee": 139.0,
+      "annual_fee": 120,
       "foreign_transaction_fee": 0.025,
       "earning_rates": {
         "base": 1.0,
@@ -607,7 +625,9 @@
         "points": 10,
         "spend_requirement": 3000,
         "months": 4
-      }
+      },
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-cards/dividend-visa-infinite-card.html",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "CIBC Select Visa Card",
@@ -649,7 +669,9 @@
         "points": 50000,
         "spend_requirement": 3000,
         "months": 3
-      }
+      },
+      "applicationUrl": "https://www.bmo.com/en-ca/main/personal/credit-cards/bmo-eclipse-visa-infinite/",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "BMO Ascend World Elite Mastercard",
@@ -690,15 +712,17 @@
       "earning_rates": {
         "base": 1.0,
         "groceries": 5.0,
-        "gas": 5.0,
-        "dining": 2.0,
-        "recurring_bills": 2.0
+        "gas": 4.0,
+        "transit": 4.0,
+        "recurring_bills": 3.0
       },
       "signup_bonus": {
         "points": 400,
         "spend_requirement": 3000,
         "months": 3
-      }
+      },
+      "applicationUrl": "https://www.bmo.com/en-ca/main/personal/credit-cards/bmo-cashback-world-elite-mastercard/",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "BMO Rewards Mastercard",
@@ -727,20 +751,21 @@
       "point_value_cad": 1.0,
       "point_value_usd": 0.7407407407407407,
       "annual_fee": 139.0,
-      "foreign_transaction_fee": 0.025,
+      "foreign_transaction_fee": 0,
       "earning_rates": {
         "base": 1.0,
-        "travel": 5.0,
-        "dining": 5.0,
-        "entertainment": 3.0,
-        "groceries": 2.0,
+        "groceries": 3.0,
+        "dining": 2.0,
+        "entertainment": 2.0,
         "transit": 2.0
       },
       "signup_bonus": {
-        "points": 60000,
-        "spend_requirement": 5000,
-        "months": 4
-      }
+        "points": 50000,
+        "spend_requirement": 10000,
+        "months": 6
+      },
+      "applicationUrl": "https://www.scotiabank.com/ca/en/personal/credit-cards/visa/passport-infinite-card.html",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "Scotiabank Gold American Express Card",
@@ -753,19 +778,21 @@
       "point_value_cad": 1.0,
       "point_value_usd": 0.7407407407407407,
       "annual_fee": 120.0,
-      "foreign_transaction_fee": 0.025,
+      "foreign_transaction_fee": 0,
       "earning_rates": {
         "base": 1.0,
+        "dining": 6.0,
+        "entertainment": 6.0,
         "groceries": 5.0,
-        "dining": 5.0,
-        "entertainment": 3.0,
-        "recurring_bills": 2.0
+        "transit": 3.0
       },
       "signup_bonus": {
-        "points": 50000,
-        "spend_requirement": 1000,
-        "months": 3
-      }
+        "points": 45000,
+        "spend_requirement": 7500,
+        "months": 12
+      },
+      "applicationUrl": "https://www.scotiabank.com/ca/en/personal/credit-cards/american-express/gold-card.html",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "Scotiabank Scene+ Visa Card",
@@ -806,15 +833,17 @@
       "earning_rates": {
         "base": 1.0,
         "groceries": 4.0,
-        "gas": 4.0,
-        "recurring_bills": 2.0,
-        "drugstores": 2.0
+        "recurring_bills": 4.0,
+        "gas": 2.0,
+        "transit": 2.0
       },
       "signup_bonus": {
         "points": 100,
         "spend_requirement": 2000,
         "months": 3
-      }
+      },
+      "applicationUrl": "https://www.scotiabank.com/ca/en/personal/credit-cards/visa/momentum-infinite-card.html",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "Tangerine Money-Back Credit Card",
@@ -1284,7 +1313,9 @@
         "base": 1.0,
         "groceries": 3.0,
         "gas": 2.0
-      }
+      },
+      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/cash-back/cashback-preferred-world-elite-mastercard.html",
+      "lastVerified": "2026-02-14"
     },
     {
       "name": "RBC ION Visa",
@@ -1628,7 +1659,7 @@
       }
     },
     {
-      "name": "National Bank \u00e0 la carte Mastercard",
+      "name": "National Bank à la carte Mastercard",
       "issuer": "National Bank",
       "country": "CA",
       "currency": "CAD",

@@ -5,6 +5,8 @@
  * Auth-optional: works for both authenticated and anonymous users.
  * 
  * Performance Target: <400ms TTFB, <2s total response
+ * 
+ * UPDATED: Now queries Supabase for full card database to provide accurate recommendations
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -37,6 +39,7 @@ interface CardContext {
   annualFee?: number;
   pointValuation?: number;
   welcomeBonus?: { value: number; description?: string };
+  applicationUrl?: string;
 }
 
 interface UserContext {
@@ -48,6 +51,129 @@ interface UserContext {
   pointBalances?: Record<string, number>;
   country?: "US" | "CA";
   subscriptionTier?: string;
+}
+
+// Database row types
+interface DbCard {
+  id: number;
+  card_key: string;
+  name: string;
+  issuer: string;
+  reward_program: string;
+  base_reward_rate: number;
+  base_reward_unit: string;
+  reward_currency: string;
+  annual_fee: number;
+  point_valuation: number | null;
+  country: string;
+  application_url?: string;
+}
+
+interface DbCategoryReward {
+  card_id: number;
+  category: string;
+  multiplier: number;
+  reward_unit: string;
+}
+
+interface DbSignupBonus {
+  card_id: number;
+  bonus_amount: number;
+  bonus_currency: string;
+  spend_requirement: number;
+  timeframe_days: number;
+}
+
+// Cache for card data (edge function instance lifetime)
+let cardDataCache: { cards: DbCard[]; categoryRewards: DbCategoryReward[]; signupBonuses: DbSignupBonus[]; timestamp: number } | null = null;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+// ============================================================================
+// Database Functions - Query Supabase for card data
+// ============================================================================
+
+async function fetchCardData(supabase: any, country: "US" | "CA"): Promise<{
+  cards: DbCard[];
+  categoryRewards: DbCategoryReward[];
+  signupBonuses: DbSignupBonus[];
+}> {
+  // Check cache
+  if (cardDataCache && Date.now() - cardDataCache.timestamp < CACHE_TTL_MS) {
+    return cardDataCache;
+  }
+
+  try {
+    // Fetch all cards for the country
+    const { data: cards, error: cardsError } = await supabase
+      .from('cards')
+      .select('*')
+      .eq('is_active', true)
+      .eq('country', country);
+
+    if (cardsError) {
+      console.error('[Sage] Cards fetch error:', cardsError);
+      return { cards: [], categoryRewards: [], signupBonuses: [] };
+    }
+
+    if (!cards || cards.length === 0) {
+      return { cards: [], categoryRewards: [], signupBonuses: [] };
+    }
+
+    const cardIds = cards.map((c: DbCard) => c.id);
+
+    // Fetch category rewards
+    const { data: categoryRewards, error: crError } = await supabase
+      .from('category_rewards')
+      .select('*')
+      .in('card_id', cardIds);
+
+    if (crError) {
+      console.error('[Sage] Category rewards fetch error:', crError);
+    }
+
+    // Fetch signup bonuses
+    const { data: signupBonuses, error: sbError } = await supabase
+      .from('signup_bonuses')
+      .select('*')
+      .eq('is_active', true)
+      .in('card_id', cardIds);
+
+    if (sbError) {
+      console.error('[Sage] Signup bonuses fetch error:', sbError);
+    }
+
+    const result = {
+      cards: cards || [],
+      categoryRewards: categoryRewards || [],
+      signupBonuses: signupBonuses || [],
+      timestamp: Date.now(),
+    };
+
+    cardDataCache = result;
+    return result;
+  } catch (err) {
+    console.error('[Sage] Database fetch error:', err);
+    return { cards: [], categoryRewards: [], signupBonuses: [] };
+  }
+}
+
+function formatDbCardForPrompt(
+  card: DbCard,
+  categoryRewards: DbCategoryReward[],
+  signupBonus?: DbSignupBonus
+): string {
+  const cardRewards = categoryRewards.filter(cr => cr.card_id === card.id);
+  const baseRate = `${card.base_reward_rate}${card.base_reward_unit === 'percent' ? '%' : 'x'}`;
+  
+  const bonuses = cardRewards
+    .map(cr => `${cr.category}: ${cr.multiplier}${cr.reward_unit === 'percent' ? '%' : 'x'}`)
+    .join(", ");
+  
+  const fee = card.annual_fee > 0 ? `$${card.annual_fee}/yr` : "no fee";
+  const valuation = card.point_valuation ? ` (~${card.point_valuation}¢/pt)` : "";
+  const signup = signupBonus ? ` | SUB: ${signupBonus.bonus_amount.toLocaleString()} ${signupBonus.bonus_currency} after $${signupBonus.spend_requirement} in ${signupBonus.timeframe_days} days` : "";
+  
+  return `• ${card.name} (${card.issuer}) - ${fee}${valuation}\n  Base: ${baseRate}${bonuses ? ` | Bonuses: ${bonuses}` : ""}${signup}`;
 }
 
 // ============================================================================
@@ -66,11 +192,14 @@ function formatCardRewards(card: CardContext): string {
   return bonuses ? `Base: ${baseRate}; ${bonuses}` : `Base: ${baseRate}`;
 }
 
-function generateSystemPrompt(userContext: UserContext | undefined): string {
+function generateSystemPrompt(
+  userContext: UserContext | undefined,
+  dbData?: { cards: DbCard[]; categoryRewards: DbCategoryReward[]; signupBonuses: DbSignupBonus[] }
+): string {
   const country = userContext?.country || "CA";
   const countryName = country === "CA" ? "Canadian" : "US";
   
-  // Build card portfolio summary
+  // Build user's card portfolio summary
   let cardSummary = "User has not added any cards yet.";
   if (userContext?.cards && userContext.cards.length > 0) {
     cardSummary = userContext.cards.map(card => {
@@ -88,6 +217,55 @@ function generateSystemPrompt(userContext: UserContext | undefined): string {
       .join("\n");
   }
 
+  // Build database card reference (top cards by category)
+  let databaseReference = "";
+  if (dbData && dbData.cards.length > 0) {
+    // Group cards by best category and include top performers
+    const categoryBests: Record<string, { card: DbCard; rate: number; category: string }[]> = {};
+    
+    for (const cr of dbData.categoryRewards) {
+      const card = dbData.cards.find(c => c.id === cr.card_id);
+      if (!card) continue;
+      
+      if (!categoryBests[cr.category]) {
+        categoryBests[cr.category] = [];
+      }
+      categoryBests[cr.category].push({ card, rate: cr.multiplier, category: cr.category });
+    }
+    
+    // Sort and take top 3 per category
+    const topCardsByCategory = Object.entries(categoryBests)
+      .map(([category, cards]) => {
+        const top = cards.sort((a, b) => b.rate - a.rate).slice(0, 3);
+        return `**${category}**: ${top.map(t => `${t.card.name} (${t.rate}x)`).join(", ")}`;
+      })
+      .slice(0, 8) // Limit categories to keep prompt manageable
+      .join("\n");
+
+    // Cards with best signup bonuses
+    const topSignupBonuses = dbData.signupBonuses
+      .sort((a, b) => b.bonus_amount - a.bonus_amount)
+      .slice(0, 5)
+      .map(sb => {
+        const card = dbData.cards.find(c => c.id === sb.card_id);
+        if (!card) return null;
+        return `• ${card.name}: ${sb.bonus_amount.toLocaleString()} ${sb.bonus_currency} (spend $${sb.spend_requirement} in ${sb.timeframe_days} days)`;
+      })
+      .filter(Boolean)
+      .join("\n");
+
+    databaseReference = `
+## ${countryName} Card Database Reference (${dbData.cards.length} cards)
+
+### Top Cards by Category
+${topCardsByCategory}
+
+### Best Current Sign-up Bonuses
+${topSignupBonuses || "No active signup bonuses"}
+
+When recommending NEW cards (not in user's wallet), tell them to tap "Explore Cards" in the app to apply.`;
+  }
+
   return `You are Sage, a friendly ${countryName} credit card rewards expert. Help users maximize their rewards with specific, actionable advice.
 
 ## User's Card Portfolio
@@ -95,6 +273,7 @@ ${cardSummary}
 
 ## User's Point Balances
 ${balancesSummary}
+${databaseReference}
 
 ## Key ${countryName} Point Valuations
 - Aeroplan: 1.8-2.2¢/pt (book flights via Aeroplan)
@@ -113,10 +292,12 @@ ${balancesSummary}
 - **Card Comparisons**: Use a clear structured format with categories
 
 ## What You Do
-- Recommend best card for specific purchases (show calculation)
-- Compare cards from their portfolio
+- Recommend best card from their portfolio for specific purchases (show calculation)
+- Suggest NEW cards from the database if user asks or if significantly better
+- Compare cards (from portfolio OR database)
 - Explain point values and redemption tips
 - Calculate reward returns with real math
+- Mention signup bonuses when recommending new cards
 
 ## What You Don't Do
 - Write essays (keep it brief!)
@@ -248,8 +429,19 @@ serve(async (req) => {
       throw new Error("No API key configured");
     }
 
-    // Build system prompt
-    const systemPrompt = generateSystemPrompt(userContext);
+    // Fetch card data from Supabase for comprehensive recommendations
+    const country = userContext?.country || "CA";
+    let dbData: { cards: DbCard[]; categoryRewards: DbCategoryReward[]; signupBonuses: DbSignupBonus[] } | undefined;
+    
+    try {
+      dbData = await fetchCardData(supabase, country);
+      console.log(`[Sage] Loaded ${dbData.cards.length} cards from database`);
+    } catch (dbErr) {
+      console.warn('[Sage] Database fetch failed, continuing with user context only:', dbErr);
+    }
+
+    // Build system prompt with database context
+    const systemPrompt = generateSystemPrompt(userContext, dbData);
     
     // Build messages
     const messages: Message[] = [];

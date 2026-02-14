@@ -333,7 +333,7 @@ export default function RewardsIQScreen() {
         />
         
         <ScoreComponent
-          label="AutoPilot"
+          label="Smart Wallet"
           score={scoreData.autoPilotScore}
           icon={<Navigation size={20} color={colors.info.main} />}
           weight="15% weight"
@@ -384,7 +384,7 @@ export default function RewardsIQScreen() {
               <Navigation size={20} color={colors.info.main} />
             </View>
             <View style={styles.tipContent}>
-              <Text style={styles.tipTitle}>Enable AutoPilot</Text>
+              <Text style={styles.tipTitle}>Enable Smart Wallet</Text>
               <Text style={styles.tipText}>
                 Get automatic card recommendations when you arrive at stores
               </Text>

@@ -311,8 +311,8 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
       const success = await enableAutoPilot();
       if (!success) {
         Alert.alert(
-          t('settings.autoPilotPermissionTitle') || 'Permission Required',
-          t('settings.autoPilotPermissionMessage') || 'AutoPilot needs location and notification permissions to work. Please enable them in your device settings.',
+          t('settings.smartWalletPermissionTitle') || 'Permission Required',
+          t('settings.smartWalletPermissionMessage') || 'Smart Wallet needs location and notification permissions to work. Please enable them in your device settings.',
           [{ text: t('common.ok') || 'OK' }]
         );
         return;
@@ -499,16 +499,16 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
           </SettingsRow>
         </View>
 
-        {/* AutoPilot Section */}
-        <SectionHeader title={t('settings.autoPilot') || 'AutoPilot'} />
+        {/* Smart Wallet Section */}
+        <SectionHeader title={t('settings.smartWallet') || 'Smart Wallet'} />
         <View style={styles.section}>
           <SettingsRow
             icon={<Navigation size={20} color={autoPilotStatus?.enabled ? colors.primary.main : colors.text.secondary} />}
-            title={t('settings.autoPilotEnabled') || 'Enable AutoPilot'}
+            title={t('settings.smartWalletEnabled') || 'Enable Smart Wallet'}
             description={
               autoPilotStatus?.enabled
-                ? t('settings.autoPilotActiveDescription', { count: autoPilotStatus.activeGeofences })
-                : t('settings.autoPilotDescription')
+                ? t('settings.smartWalletActiveDescription', { count: autoPilotStatus.activeGeofences })
+                : t('settings.smartWalletDescription')
             }
             isLast={true}
           >
@@ -517,7 +517,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
               onValueChange={handleAutoPilotToggle}
               trackColor={{ false: colors.border.light, true: colors.success.main }}
               thumbColor={colors.background.secondary}
-              accessibilityLabel={t('settings.autoPilotEnabled') || 'Enable AutoPilot'}
+              accessibilityLabel={t('settings.smartWalletEnabled') || 'Enable Smart Wallet'}
               accessibilityRole="switch"
             />
           </SettingsRow>

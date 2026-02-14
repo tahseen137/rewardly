@@ -348,7 +348,9 @@ describe('CardRecommendationEngine - Recommendation Ranking', () => {
       const recommendations = rankRecommendations([mockCard3], topCategories, gaps);
       
       if (recommendations[0].basedOn === 'gap') {
-        expect(recommendations[0].reason).toContain('gap');
+        // New reason format: "Great for [Category] purchases"
+        expect(recommendations[0].reason).toContain('Great for');
+        expect(recommendations[0].reason).toContain('purchases');
       }
     });
 

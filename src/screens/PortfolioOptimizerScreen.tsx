@@ -432,7 +432,7 @@ export default function PortfolioOptimizerScreen() {
         </TouchableOpacity>
         
         <Text style={styles.ctaHint}>
-          Enable AutoPilot to always use the best card
+          Enable Smart Wallet to always use the best card
         </Text>
       </Animated.View>
       

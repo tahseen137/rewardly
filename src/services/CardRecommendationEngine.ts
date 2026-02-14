@@ -176,7 +176,14 @@ export function rankRecommendations(
     } else if (gaps.some(gap => card.categoryRewards.some(cr => cr.category === gap && cr.rewardRate.value >= 2))) {
       basedOn = 'gap';
       priority = 3;
-      reason = 'Fills a gap in your current card portfolio';
+      // Find which gap category this card covers
+      const coveredGap = gaps.find(gap => 
+        card.categoryRewards.some(cr => cr.category === gap && cr.rewardRate.value >= 2)
+      );
+      const categoryName = coveredGap 
+        ? coveredGap.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+        : 'this category';
+      reason = `Great for ${categoryName} purchases`;
     } else if (card.signupBonus && card.signupBonus.amount >= 50000) {
       basedOn = 'signup_bonus';
       priority = 3;

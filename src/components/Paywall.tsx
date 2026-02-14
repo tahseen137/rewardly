@@ -342,7 +342,7 @@ export default function Paywall({
                 </View>
                 <View style={styles.featureRow}>
                   <Check size={16} color="#FFD700" />
-                  <Text style={styles.lifetimeFeatureText}>Unlimited Sage AI + AutoPilot</Text>
+                  <Text style={styles.lifetimeFeatureText}>Unlimited Sage AI + Smart Wallet</Text>
                 </View>
                 <View style={styles.featureRow}>
                   <Check size={16} color="#FFD700" />

@@ -219,12 +219,12 @@ describe('AchievementService', () => {
     });
 
     it('should return true when all main screens visited', () => {
-      const allScreens = ['Home', 'Insights', 'Sage', 'AutoPilot', 'MyCards', 'Settings'];
+      const allScreens = ['Home', 'Insights', 'Sage', 'SmartWallet', 'MyCards', 'Settings'];
       expect(checkAllScreensVisited(allScreens)).toBe(true);
     });
 
     it('should return true with extra screens visited', () => {
-      const screens = ['Home', 'Insights', 'Sage', 'AutoPilot', 'MyCards', 'Settings', 'CardTracker'];
+      const screens = ['Home', 'Insights', 'Sage', 'SmartWallet', 'MyCards', 'Settings', 'CardTracker'];
       expect(checkAllScreensVisited(screens)).toBe(true);
     });
   });
@@ -562,7 +562,7 @@ describe('AchievementService', () => {
 
     it('should unlock EN4 when all screens visited', () => {
       const state = createDefaultUserAchievements(null);
-      state.screensVisited = ['Home', 'Insights', 'Sage', 'AutoPilot', 'MyCards'];
+      state.screensVisited = ['Home', 'Insights', 'Sage', 'SmartWallet', 'MyCards'];
       
       const event: AchievementEvent = {
         type: 'screen_visited',

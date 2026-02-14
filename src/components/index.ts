@@ -67,8 +67,8 @@ export type { ChatBubbleProps, ChatInputProps, QuickActionsProps, QuickAction, C
 export { default as Paywall } from './Paywall';
 export { default as LockedFeature } from './LockedFeature';
 
-// AutoPilot Components
-export { default as AutoPilotNotificationCard } from './AutoPilotNotificationCard';
+// Smart Wallet Components
+export { default as SmartWalletNotificationCard } from './AutoPilotNotificationCard';
 
 // Tier 1 - Mega Build Widgets
 export { default as RewardsIQWidget } from './RewardsIQWidget';

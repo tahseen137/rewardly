@@ -315,7 +315,7 @@ export default function InsightsHomeScreen() {
                     ]}>
                       {rewardsIQ.autoPilotScore > 0 ? rewardsIQ.autoPilotScore : 'Off'}
                     </Text>
-                    <Text style={styles.componentLabel}>AutoPilot</Text>
+                    <Text style={styles.componentLabel}>Smart Wallet</Text>
                   </View>
                 </View>
               </LinearGradient>

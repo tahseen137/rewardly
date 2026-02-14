@@ -18,14 +18,15 @@ describe('AppNavigator - Navigation Structure', () => {
       const expectedTabs: (keyof RootTabParamList)[] = [
         'Home',
         'Insights',
-        'AutoPilot',
+        'Sage',
+        'SmartWallet',
         'MyCards',
         'Settings',
       ];
 
       // Verify type exists (compile-time check)
       const tabNames: (keyof RootTabParamList)[] = expectedTabs;
-      expect(tabNames.length).toBe(5);
+      expect(tabNames.length).toBe(6);
     });
 
     it('should have Home tab labeled correctly', () => {
