@@ -479,7 +479,7 @@ export default function HomeScreen() {
                 amount={state.amount || 100}
                 cards={getAllCardsSync()}
                 category={state.selectedCategory || undefined}
-                onCardPress={(result) => navigation.navigate('Insights', { screen: 'CardBenefits', params: { cardId: result.cardId } } as never)}
+                onCardPress={(result) => navigation.navigate('CardDetail' as never, { cardId: result.cardId } as never)}
               />
             </View>
           ) : (
@@ -505,7 +505,7 @@ export default function HomeScreen() {
               amount={state.amount || 0}
               cards={getAllCardsSync()}
               category={state.selectedCategory || undefined}
-              onCardPress={(result) => navigation.navigate('Insights', { screen: 'CardBenefits', params: { cardId: result.cardId } } as never)}
+              onCardPress={(result) => navigation.navigate('CardDetail' as never, { cardId: result.cardId } as never)}
             />
           </View>
         ) : state.selectedCategory && state.amount ? (
@@ -558,7 +558,7 @@ export default function HomeScreen() {
                     <TouchableOpacity 
                       key={rec.card.id}
                       style={styles.recommendationItem}
-                      onPress={() => navigation.navigate('Insights', { screen: 'CardBenefits', params: { cardId: rec.card.id } } as never)}
+                      onPress={() => navigation.navigate('CardDetail' as never, { cardId: rec.card.id } as never)}
                     >
                       <View style={styles.recommendationRank}>
                         <Text style={styles.rankText}>{index + 1}</Text>

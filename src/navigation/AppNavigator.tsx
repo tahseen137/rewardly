@@ -42,6 +42,7 @@ import {
   AchievementsScreen,
   ApplicationTrackerScreen,
   ExploreCardsScreen,
+  CardDetailScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
@@ -91,7 +92,7 @@ export type RootTabParamList = {
   Settings: undefined;
 };
 
-// Root Stack for modals (Upgrade screen, Notifications)
+// Root Stack for modals (Upgrade screen, Notifications) and global screens
 export type RootStackParamList = {
   MainTabs: undefined;
   Upgrade: {
@@ -99,6 +100,9 @@ export type RootStackParamList = {
     source?: string;
   };
   Notifications: undefined;
+  CardDetail: {
+    cardId: string;
+  };
 };
 
 type AppState = 'loading' | 'landing' | 'auth' | 'onboarding' | 'main';
@@ -612,6 +616,14 @@ function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignI
       <RootStack.Screen
         name="Notifications"
         component={NotificationsScreen}
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+        }}
+      />
+      <RootStack.Screen
+        name="CardDetail"
+        component={CardDetailScreen}
         options={{
           presentation: 'modal',
           animation: 'slide_from_bottom',
