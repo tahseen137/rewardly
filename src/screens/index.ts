@@ -43,3 +43,6 @@ export { default as InsightsDashboardScreen } from './InsightsDashboardScreen';
 // Cycle 5 Features (Achievements & 5/24 Tracker)
 export { default as AchievementsScreen } from './AchievementsScreen';
 export { default as ApplicationTrackerScreen } from './ApplicationTrackerScreen';
+
+// Web Landing Page
+export { default as LandingPage } from './LandingPage';

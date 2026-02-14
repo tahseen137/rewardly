@@ -803,11 +803,26 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
     </View>
   );
   
+  const handleSkipAll = useCallback(async () => {
+    try {
+      await setOnboardingComplete(true);
+      onComplete();
+    } catch (e) {
+      onComplete();
+    }
+  }, [onComplete]);
+
   return (
     <View style={styles.container}>
-      {/* Progress indicator */}
+      {/* Progress indicator with skip */}
       <View style={styles.headerBar}>
-        {renderProgressDots()}
+        <View style={styles.headerBarInner}>
+          <View style={styles.headerSpacer} />
+          {renderProgressDots()}
+          <TouchableOpacity onPress={handleSkipAll} style={styles.skipAllButton}>
+            <Text style={styles.skipAllText}>Skip</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       
       {/* Steps */}
@@ -864,6 +879,24 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 24,
     paddingBottom: 16,
+  },
+  headerBarInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerSpacer: {
+    width: 50,
+  },
+  skipAllButton: {
+    width: 50,
+    alignItems: 'flex-end',
+    paddingVertical: 8,
+  },
+  skipAllText: {
+    fontSize: 15,
+    color: colors.text.secondary,
+    fontWeight: '500',
   },
   progressContainer: {
     flexDirection: 'row',

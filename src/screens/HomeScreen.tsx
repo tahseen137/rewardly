@@ -14,6 +14,7 @@ import {
   Platform,
   TouchableOpacity,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ChevronRight, Sparkles, Trophy } from 'lucide-react-native';
@@ -113,6 +114,7 @@ export default function HomeScreen() {
   const [recommendations, setRecommendations] = useState<CardRecommendation[]>([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [achievements, setAchievements] = useState<UserAchievements | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Function to load data
   const loadData = useCallback(async () => {
@@ -152,6 +154,13 @@ export default function HomeScreen() {
   // Initialize data on mount - fetch cards from database
   useEffect(() => {
     loadData();
+  }, [loadData]);
+
+  // Pull-to-refresh handler
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
   }, [loadData]);
 
   // Subscribe to country changes
@@ -287,6 +296,15 @@ export default function HomeScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary.main}
+            colors={[colors.primary.main]}
+            progressBackgroundColor={colors.background.secondary}
+          />
+        }
       >
         {/* Header - Redesigned with GradientText */}
         <View style={styles.header}>

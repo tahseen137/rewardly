@@ -46,6 +46,7 @@ import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import PremiumOnboardingScreen from '../screens/PremiumOnboardingScreen';
 import UpgradeScreen from '../screens/UpgradeScreen';
+import LandingPage from '../screens/LandingPage';
 import { ErrorBoundary } from '../components';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
@@ -98,7 +99,7 @@ export type RootStackParamList = {
   Notifications: undefined;
 };
 
-type AppState = 'loading' | 'auth' | 'onboarding' | 'main';
+type AppState = 'loading' | 'landing' | 'auth' | 'onboarding' | 'main';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const InsightsStack = createNativeStackNavigator<InsightsStackParamList>();
@@ -474,8 +475,8 @@ export default function AppNavigator() {
           const onboardingDone = isOnboardingComplete();
           setAppState(onboardingDone ? 'main' : 'onboarding');
         } else {
-          // No user, show auth
-          setAppState('auth');
+          // No user — show landing page on web, auth on mobile
+          setAppState(Platform.OS === 'web' ? 'landing' : 'auth');
         }
       } catch (error) {
         console.error('Failed to initialize app:', error);
@@ -502,7 +503,7 @@ export default function AppNavigator() {
         setAppState(onboardingDone ? 'main' : 'onboarding');
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
-        setAppState('auth');
+        setAppState(Platform.OS === 'web' ? 'landing' : 'auth');
       }
     });
 
@@ -520,10 +521,14 @@ export default function AppNavigator() {
 
   const handleSignOut = useCallback(() => {
     setUser(null);
-    setAppState('auth');
+    setAppState(Platform.OS === 'web' ? 'landing' : 'auth');
   }, []);
 
   const handleSignIn = useCallback(() => {
+    setAppState('auth');
+  }, []);
+
+  const handleLandingGetStarted = useCallback(() => {
     setAppState('auth');
   }, []);
 
@@ -555,6 +560,11 @@ export default function AppNavigator() {
   // Show loading screen while initializing
   if (appState === 'loading') {
     return <LoadingScreen />;
+  }
+
+  // Show web landing page
+  if (appState === 'landing') {
+    return <LandingPage onGetStarted={handleLandingGetStarted} />;
   }
 
   // Show auth screen if not logged in
