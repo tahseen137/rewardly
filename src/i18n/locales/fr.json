@@ -53,8 +53,8 @@
     "tapForDetails": "Appuyez pour plus de détails",
     "googlePlacesEnabled": "Recherche de magasin améliorée activée",
     "rewardsComparison": "Comparaison des Récompenses",
-    "cardsInPortfolio": "{{count}} carte dans votre portefeuille",
-    "cardsInPortfolio_plural": "{{count}} cartes dans votre portefeuille",
+    "cardsInPortfolio_one": "{{count}} carte dans votre portefeuille",
+    "cardsInPortfolio_other": "{{count}} cartes dans votre portefeuille",
     "noResultsTitle": "Aucun Résultat",
     "noResultsMessage": "Impossible de calculer les récompenses. Veuillez réessayer."
   },

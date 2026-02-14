@@ -167,8 +167,15 @@ const SB_URL = 'https://zdlozhpmqrtvvhdzbmrv.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbG96aHBtcXJ0dnZoZHpibXJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxODYwMTEsImV4cCI6MjA4Mzc2MjAxMX0.o7xqSfwRtvxsPoAe7e0kJzb5TXoFyCzDEQqOWkLNkos';
 const sb = supabase.createClient(SB_URL, SB_KEY);
 const PASSWORD = 'motu2026';
-const AUTH_KEY = 'rewardly_admin_auth';
 const PER_PAGE = 25;
+
+/**
+ * Format number with thousand separators
+ */
+function formatNumber(n) {
+  if (n === null || n === undefined) return '0';
+  return n.toLocaleString('en-US');
+}
 const CATEGORIES = ['groceries','gas','dining','travel','online_shopping','entertainment','drugstores','home_improvement','transit','other'];
 const CATEGORY_LABELS = {groceries:'Groceries',gas:'Gas',dining:'Dining',travel:'Travel',online_shopping:'Online Shopping',entertainment:'Entertainment',drugstores:'Pharmacy',home_improvement:'Home',transit:'Transportation',other:'Other'};
 const REWARD_CURRENCIES = [{v:'cashback',l:'Cash Back'},{v:'points',l:'Points'},{v:'airline_miles',l:'Airline Miles'},{v:'hotel_points',l:'Hotel Points'}];
@@ -197,7 +204,7 @@ function AuthGate(props) {
   const [err, setErr] = useState('');
   function submit(e) {
     e.preventDefault();
-    if (pw === PASSWORD) { localStorage.setItem(AUTH_KEY, Date.now().toString()); props.onAuth(); }
+    if (pw === PASSWORD) { props.onAuth(); }
     else { setErr('Incorrect password'); }
   }
   return html`<div class="auth-gate">
@@ -210,12 +217,6 @@ function AuthGate(props) {
       ${err && html`<div class="auth-error">${err}</div>`}
     </form>
   </div>`;
-}
-
-function checkAuth() {
-  var ts = localStorage.getItem(AUTH_KEY);
-  if (!ts) return false;
-  return (Date.now() - parseInt(ts)) < 86400000;
 }
 
 async function loadAllCards() {
@@ -293,10 +294,10 @@ function StatsBar(props) {
   var review = cards.filter(function(c){return getStatus(c)==='review';}).length;
   var outdated = cards.filter(function(c){return getStatus(c)==='outdated';}).length;
   return html`<div class="stats-bar">
-    <div class="stat-card"><div class="stat-value" style=${{color:'var(--text)'}}>${total}</div><div class="stat-label">Total Cards</div></div>
-    <div class="stat-card stat-green"><div class="stat-value">${verified}</div><div class="stat-label">\u2705 Verified</div></div>
-    <div class="stat-card stat-yellow"><div class="stat-value">${review}</div><div class="stat-label">\u26A0\uFE0F Needs Review</div></div>
-    <div class="stat-card stat-red"><div class="stat-value">${outdated}</div><div class="stat-label">\uD83D\uDD34 Outdated</div></div>
+    <div class="stat-card"><div class="stat-value" style=${{color:'var(--text)'}}>${formatNumber(total)}</div><div class="stat-label">Total Cards</div></div>
+    <div class="stat-card stat-green"><div class="stat-value">${formatNumber(verified)}</div><div class="stat-label">\u2705 Verified</div></div>
+    <div class="stat-card stat-yellow"><div class="stat-value">${formatNumber(review)}</div><div class="stat-label">\u26A0\uFE0F Needs Review</div></div>
+    <div class="stat-card stat-red"><div class="stat-value">${formatNumber(outdated)}</div><div class="stat-label">\uD83D\uDD34 Outdated</div></div>
   </div>`;
 }
 
@@ -636,7 +637,8 @@ function ValidationDashboard(props) {
 }
 
 function AdminApp() {
-  const [authed, setAuthed] = useState(checkAuth());
+  // Auth is session-only (React state). Refreshing or closing tab requires re-authentication.
+  const [authed, setAuthed] = useState(false);
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('cards');
@@ -710,7 +712,7 @@ function AdminApp() {
         var r = await sb.from('cards').update({ updated_at: now }).in('id', chunk);
         if (r.error) throw r.error;
       }
-      showToast('Marked ' + selected.size + ' cards as verified \u2705');
+      showToast('Marked ' + formatNumber(selected.size) + ' card' + (selected.size === 1 ? '' : 's') + ' as verified \u2705');
       setSelected(new Set());
       reload();
     } catch (err) {
@@ -800,10 +802,10 @@ function AdminApp() {
         <h1>\uD83D\uDCB3 Rewardly Admin</h1>
         <div class="header-actions">
           <button class="btn btn-primary" onClick=${function(){setAddNew(true);}}>+ Add Card</button>
-          <button class="btn btn-secondary" onClick=${function(){downloadCSV(filtered);}}>📥 Export CSV (${filtered.length})</button>
-          ${selected.size > 0 && html`<button class="btn btn-primary" onClick=${bulkVerify}>\u2705 Verify Selected (${selected.size})</button>`}
+          <button class="btn btn-secondary" onClick=${function(){downloadCSV(filtered);}}>📥 Export CSV (${formatNumber(filtered.length)})</button>
+          ${selected.size > 0 && html`<button class="btn btn-primary" onClick=${bulkVerify}>\u2705 Verify Selected (${formatNumber(selected.size)})</button>`}
           <button class="btn btn-secondary" onClick=${reload} disabled=${loading}>${loading?'\u23F3':'\uD83D\uDD04'} Refresh</button>
-          <button class="btn btn-secondary btn-sm" onClick=${function(){localStorage.removeItem(AUTH_KEY);setAuthed(false);}}>Sign Out</button>
+          <button class="btn btn-secondary btn-sm" onClick=${function(){setAuthed(false);}}>Sign Out</button>
         </div>
       </div>
       <${StatsBar} cards=${cards}/>
@@ -848,7 +850,7 @@ function AdminApp() {
             ${topIssuers.slice(0,12).map(function(iss) { return html`<div key=${iss} class="chip" onClick=${function(){setFilterIssuer(iss);}}>${iss}</div>`; })}
           </div>
         `}
-        <div class="card-count">Showing ${filtered.length} of ${cards.length} cards${selected.size > 0 ? ' \u00B7 ' + selected.size + ' selected' : ''}</div>
+        <div class="card-count">Showing ${formatNumber(filtered.length)} of ${formatNumber(cards.length)} card${cards.length === 1 ? '' : 's'}${selected.size > 0 ? ' \u00B7 ' + formatNumber(selected.size) + ' selected' : ''}</div>
         ${renderTable()}
       </div>`}
       <${CardPanel} card=${editCard} isNew=${addNew} onClose=${handlePanelClose} onSave=${handleSave}/>
