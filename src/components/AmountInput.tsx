@@ -4,7 +4,7 @@
  * Requirements: 3.1, 3.2, 3.3, 3.4
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { DollarSign } from 'lucide-react-native';
 import { validateAmount, formatCurrency } from '../utils/amountUtils';
@@ -30,53 +30,84 @@ export function AmountInput({
   const theme = useTheme();
   const [inputValue, setInputValue] = useState<string>('');
   const [internalError, setInternalError] = useState<string | null>(null);
-  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize input value from prop
+  // Only sync from prop when NOT focused (prevents overwriting user input)
   useEffect(() => {
-    if (value !== null && value !== undefined) {
-      setInputValue(formatCurrency(value));
-    } else if (value === null) {
-      setInputValue('');
+    if (!isFocused) {
+      if (value !== null && value !== undefined) {
+        // Format for display when not focused (without $ prefix since icon shows it)
+        setInputValue(value.toFixed(2));
+      } else if (value === null) {
+        setInputValue('');
+      }
     }
-  }, [value]);
+  }, [value, isFocused]);
+
+  // Handle focus - switch to raw input mode
+  const handleFocus = useCallback(() => {
+    setIsFocused(true);
+    // Remove formatting when user focuses (strip non-numeric except decimal)
+    const numericValue = inputValue.replace(/[^0-9.]/g, '');
+    setInputValue(numericValue);
+  }, [inputValue]);
+
+  // Handle blur - format the display value
+  const handleBlur = useCallback(() => {
+    setIsFocused(false);
+    // Validate and format when user leaves the field
+    const validation = validateAmount(inputValue);
+    if (validation.isValid && validation.value !== null) {
+      setInputValue(validation.value.toFixed(2));
+      setInternalError(null);
+      onChange(validation.value);
+    } else if (inputValue.trim() === '') {
+      setInputValue('');
+      setInternalError(null);
+      onChange(null);
+    }
+  }, [inputValue, onChange]);
 
   // Debounced validation and onChange
   const handleChangeText = useCallback(
     (text: string) => {
-      setInputValue(text);
+      // Strip $ prefix and other non-numeric characters except decimal point
+      const cleanText = text.replace(/^\$/, '').replace(/[^0-9.]/g, '');
+      setInputValue(cleanText);
 
       // Clear existing timer
-      if (debounceTimer) {
-        clearTimeout(debounceTimer);
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
       }
 
       // Set new timer for debounced validation
-      const timer = setTimeout(() => {
-        const validation = validateAmount(text);
+      debounceTimerRef.current = setTimeout(() => {
+        const validation = validateAmount(cleanText);
         
         if (validation.isValid && validation.value !== null) {
           setInternalError(null);
           onChange(validation.value);
+        } else if (cleanText.trim() === '') {
+          setInternalError(null);
+          onChange(null);
         } else {
           setInternalError(validation.error);
           onChange(null);
         }
       }, 500); // 500ms debounce
-
-      setDebounceTimer(timer);
     },
-    [debounceTimer, onChange]
+    [onChange]
   );
 
   // Cleanup timer on unmount
   useEffect(() => {
     return () => {
-      if (debounceTimer) {
-        clearTimeout(debounceTimer);
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [debounceTimer]);
+  }, []);
 
   // Use external error if provided, otherwise use internal error
   const displayError = externalError || internalError;
@@ -100,12 +131,14 @@ export function AmountInput({
         <TextInput
           value={inputValue}
           onChangeText={handleChangeText}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           placeholder={placeholder}
           placeholderTextColor={colors.text.tertiary}
           keyboardType="decimal-pad"
           style={styles.input}
           accessibilityLabel={label}
-          accessibilityHint="Enter the purchase amount in Canadian dollars"
+          accessibilityHint="Enter the purchase amount"
         />
       </View>
       {displayError && (

@@ -12,7 +12,11 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { ChevronRight, Sparkles } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import {
   AmountInput,
@@ -27,6 +31,8 @@ import { colors } from '../theme/colors';
 import { Store, SpendingCategory } from '../types';
 import { getCards } from '../services/CardPortfolioManager';
 import { getAllCardsSync, getAllCards } from '../services/CardDataService';
+import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
+import { analyzeAndRecommend, CardRecommendation } from '../services/CardRecommendationEngine';
 import {
   calculateRewards,
   CalculatorInput,
@@ -86,6 +92,7 @@ interface CalculatorState {
 export default function HomeScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const navigation = useNavigation();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   // Initialize state
@@ -101,22 +108,49 @@ export default function HomeScreen() {
   });
 
   const [hasCards, setHasCards] = useState(false);
+  const [recommendations, setRecommendations] = useState<CardRecommendation[]>([]);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+
+  // Function to load data
+  const loadData = useCallback(async () => {
+    try {
+      await getAllCards();
+      const portfolio = getCards();
+      setHasCards(portfolio.length > 0);
+      setState((prev) => ({ ...prev, isLoading: false, loadError: null }));
+      
+      // Load recommendations if user has cards
+      if (portfolio.length > 0) {
+        setRecommendationsLoading(true);
+        try {
+          const analysis = await analyzeAndRecommend();
+          setRecommendations(analysis.recommendations.slice(0, 3)); // Top 3
+        } catch (err) {
+          console.warn('Failed to load recommendations:', err);
+        } finally {
+          setRecommendationsLoading(false);
+        }
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load card data';
+      setState((prev) => ({ ...prev, isLoading: false, loadError: errorMessage }));
+    }
+  }, []);
 
   // Initialize data on mount - fetch cards from database
   useEffect(() => {
-    const initializeData = async () => {
-      try {
-        await getAllCards();
-        const portfolio = getCards();
-        setHasCards(portfolio.length > 0);
-        setState((prev) => ({ ...prev, isLoading: false, loadError: null }));
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to load card data';
-        setState((prev) => ({ ...prev, isLoading: false, loadError: errorMessage }));
-      }
-    };
-    initializeData();
-  }, []);
+    loadData();
+  }, [loadData]);
+
+  // Subscribe to country changes
+  useEffect(() => {
+    const unsubscribe = CountryChangeEmitter.subscribe(() => {
+      // Re-fetch data when country changes
+      setState((prev) => ({ ...prev, isLoading: true }));
+      loadData();
+    });
+    return unsubscribe;
+  }, [loadData]);
 
   // Handle store selection - auto-set category from store
   const handleStoreSelect = useCallback((store: Store | null) => {
@@ -332,6 +366,68 @@ export default function HomeScreen() {
             }
           />
         )}
+
+        {/* Recommended Cards Section */}
+        {hasCards && (
+          <View style={styles.recommendationsSection}>
+            <View style={styles.divider} />
+            <View style={styles.recommendationsHeader}>
+              <View style={styles.recommendationsTitle}>
+                <Sparkles size={18} color={colors.primary.main} />
+                <Text style={styles.resultsHeader}>
+                  {t('home.recommendedCards') || 'Recommended Cards'}
+                </Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.seeAllButton}
+                onPress={() => navigation.navigate('CardRecommendations' as never)}
+              >
+                <Text style={styles.seeAllText}>{t('home.seeAll') || 'See All'}</Text>
+                <ChevronRight size={16} color={colors.primary.main} />
+              </TouchableOpacity>
+            </View>
+
+            {recommendationsLoading ? (
+              <View style={styles.recommendationsLoading}>
+                <ActivityIndicator size="small" color={colors.primary.main} />
+                <Text style={styles.loadingText}>Finding best cards for you...</Text>
+              </View>
+            ) : recommendations.length > 0 ? (
+              <View style={styles.recommendationsList}>
+                {recommendations.map((rec, index) => (
+                  <TouchableOpacity 
+                    key={rec.card.id}
+                    style={styles.recommendationItem}
+                    onPress={() => navigation.navigate('CardRecommendations' as never)}
+                  >
+                    <View style={styles.recommendationRank}>
+                      <Text style={styles.rankText}>{index + 1}</Text>
+                    </View>
+                    <View style={styles.recommendationContent}>
+                      <Text style={styles.recommendationCardName} numberOfLines={1}>
+                        {rec.card.name}
+                      </Text>
+                      <Text style={styles.recommendationReason} numberOfLines={1}>
+                        {rec.reason}
+                      </Text>
+                    </View>
+                    <View style={styles.recommendationValue}>
+                      <Text style={styles.rewardValue}>
+                        ${rec.estimatedAnnualRewards.toFixed(0)}/yr
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            ) : (
+              <View style={styles.noRecommendations}>
+                <Text style={styles.noRecommendationsText}>
+                  {t('home.noRecommendations') || 'Add spending data to get personalized recommendations'}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -399,6 +495,98 @@ const createStyles = (theme: Theme) =>
     },
     emptyText: {
       fontSize: 15,
+      color: colors.text.tertiary,
+      textAlign: 'center',
+    },
+    // Recommendations section styles
+    recommendationsSection: {
+      marginTop: 8,
+    },
+    recommendationsHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    recommendationsTitle: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    seeAllButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    seeAllText: {
+      fontSize: 13,
+      fontWeight: '500',
+      color: colors.primary.main,
+    },
+    recommendationsLoading: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      paddingVertical: 24,
+    },
+    loadingText: {
+      fontSize: 13,
+      color: colors.text.secondary,
+    },
+    recommendationsList: {
+      gap: 8,
+    },
+    recommendationItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+      padding: 12,
+      gap: 12,
+    },
+    recommendationRank: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: colors.primary.bg20,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    rankText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.primary.main,
+    },
+    recommendationContent: {
+      flex: 1,
+    },
+    recommendationCardName: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: 2,
+    },
+    recommendationReason: {
+      fontSize: 12,
+      color: colors.text.secondary,
+    },
+    recommendationValue: {
+      alignItems: 'flex-end',
+    },
+    rewardValue: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.success.main,
+    },
+    noRecommendations: {
+      paddingVertical: 24,
+      alignItems: 'center',
+    },
+    noRecommendationsText: {
+      fontSize: 13,
       color: colors.text.tertiary,
       textAlign: 'center',
     },

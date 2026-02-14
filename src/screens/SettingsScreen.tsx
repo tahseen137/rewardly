@@ -36,6 +36,7 @@ import {
   Country,
 } from '../services/PreferenceManager';
 import { refreshCards, getLastSyncTime, getAllCards, onCountryChange, getTotalCardCount } from '../services/CardDataService';
+import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
 import { isSupabaseConfigured } from '../services/supabase';
 import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
 import { 
@@ -232,6 +233,9 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
               setCardCount(0);
               setCardCountDetail('');
             }
+            
+            // Notify other screens (HomeScreen) that country has changed
+            CountryChangeEmitter.emit();
             
             setIsLoading(false);
           },
