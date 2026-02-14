@@ -30,6 +30,7 @@ import {
   continueAsGuest,
   AuthResult,
 } from '../services/AuthService';
+import { supabase } from '../services/supabase/client';
 
 interface AuthScreenProps {
   onAuthSuccess: () => void;
@@ -82,7 +83,18 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       }
 
       if (result.success) {
-        onAuthSuccess();
+        if (result.needsEmailConfirmation) {
+          Alert.alert(
+            'Check Your Email ✉️',
+            `We've sent a confirmation link to ${email.trim()}. Please verify your email to complete sign up.`,
+            [{ text: 'OK' }]
+          );
+          setMode('signin');
+          setPassword('');
+          setConfirmPassword('');
+        } else {
+          onAuthSuccess();
+        }
       } else {
         setError(result.error ?? t('auth.errors.unknown'));
       }
@@ -154,6 +166,61 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
     setConfirmPassword('');
   }, [mode]);
 
+  const handleForgotPassword = useCallback(() => {
+    Alert.prompt(
+      t('auth.forgotPasswordTitle') || 'Forgot Password',
+      t('auth.forgotPasswordMessage') || 'Enter your email address to receive a password reset link.',
+      [
+        {
+          text: t('common.cancel') || 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: t('auth.sendResetLink') || 'Send Reset Link',
+          onPress: async (emailInput) => {
+            if (!emailInput || !emailInput.trim()) {
+              Alert.alert(
+                t('auth.errors.title') || 'Error',
+                t('auth.errors.emailRequired') || 'Please enter your email address.'
+              );
+              return;
+            }
+
+            setIsLoading(true);
+            try {
+              if (!supabase) {
+                throw new Error('Supabase not configured');
+              }
+              
+              const { error } = await supabase.auth.resetPasswordForEmail(emailInput.trim(), {
+                redirectTo: 'rewardly://reset-password',
+              });
+
+              if (error) {
+                throw error;
+              }
+
+              Alert.alert(
+                t('auth.resetEmailSentTitle') || 'Email Sent',
+                t('auth.resetEmailSentMessage') || 'Password reset email sent! Check your inbox.'
+              );
+            } catch (err) {
+              const errorMessage = err instanceof Error ? err.message : 'Failed to send reset email';
+              Alert.alert(
+                t('auth.errors.title') || 'Error',
+                errorMessage
+              );
+            } finally {
+              setIsLoading(false);
+            }
+          },
+        },
+      ],
+      'plain-text',
+      email // Pre-fill with current email if entered
+    );
+  }, [email, t]);
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -216,6 +283,19 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
               )}
             </TouchableOpacity>
           </View>
+
+          {/* Forgot Password (Sign In only) */}
+          {mode === 'signin' && (
+            <TouchableOpacity
+              style={styles.forgotPasswordButton}
+              onPress={handleForgotPassword}
+              disabled={isLoading}
+            >
+              <Text style={styles.forgotPasswordText}>
+                {t('auth.forgotPassword') || 'Forgot Password?'}
+              </Text>
+            </TouchableOpacity>
+          )}
 
           {/* Confirm Password (Sign Up only) */}
           {mode === 'signup' && (
@@ -393,6 +473,17 @@ const styles = StyleSheet.create({
   },
   eyeButton: {
     padding: 8,
+  },
+  forgotPasswordButton: {
+    alignSelf: 'flex-end',
+    marginTop: -8,
+    marginBottom: 16,
+    paddingVertical: 4,
+  },
+  forgotPasswordText: {
+    fontSize: 13,
+    color: colors.primary.main,
+    fontWeight: '500',
   },
   errorContainer: {
     backgroundColor: colors.error.background,

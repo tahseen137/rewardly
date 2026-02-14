@@ -83,3 +83,4 @@ supabase/.temp/
 # SQL query files (development only)
 check_data.sql
 .vercel
+coverage/

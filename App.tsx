@@ -74,21 +74,32 @@ function AppContent() {
       <View
         style={{
           flex: 1,
-          backgroundColor: theme.colors.background.secondary,
+          backgroundColor: theme.colors.background.primary,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <ActivityIndicator size="large" color={theme.colors.primary.main} />
+        <Text style={{ fontSize: 56, marginBottom: 16 }}>💳</Text>
         <Text
           style={{
-            marginTop: 10,
-            fontSize: 16,
-            color: theme.colors.text.secondary,
+            fontSize: 28,
+            fontWeight: '700',
+            color: theme.colors.text.primary,
+            marginBottom: 8,
           }}
         >
-          Loading...
+          Rewardly
         </Text>
+        <Text
+          style={{
+            fontSize: 14,
+            color: theme.colors.text.secondary,
+            marginBottom: 24,
+          }}
+        >
+          Maximize every swipe
+        </Text>
+        <ActivityIndicator size="small" color={theme.colors.primary.main} />
         <StatusBar style={theme.isDark ? 'light' : 'dark'} />
       </View>
     );

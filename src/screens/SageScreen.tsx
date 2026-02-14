@@ -19,8 +19,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
-import { MessageCircle, Plus, History, Sparkles, LogIn } from 'lucide-react-native';
+import { MessageCircle, Plus, History, Sparkles, LogIn, Crown, ArrowRight } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
 import { 
@@ -30,6 +32,7 @@ import {
   CardRecommendationCard 
 } from '../components/chat';
 import { GlassCard } from '../components';
+import Paywall from '../components/Paywall';
 import { 
   SageService, 
   SageMessage, 
@@ -43,6 +46,14 @@ import { getPreferences } from '../services/PreferenceManager';
 import { getCardByIdSync } from '../services/CardDataService';
 import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
 import { UserPreferences, Card } from '../types';
+import { 
+  canUseSage, 
+  getSageUsage, 
+  incrementSageUsage, 
+  getCurrentTierSync,
+  SAGE_LIMITS,
+  SageUsage,
+} from '../services/SubscriptionService';
 
 // ============================================================================
 // Types
@@ -155,6 +166,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
 export const SageScreen: React.FC = () => {
   const theme = useTheme();
+  const navigation = useNavigation();
   const flatListRef = useRef<FlatList>(null);
   
   // State
@@ -169,6 +181,10 @@ export const SageScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [authCheckLoading, setAuthCheckLoading] = useState(true);
+  const [sageUsage, setSageUsage] = useState<SageUsage | null>(null);
+  const [chatLimitReached, setChatLimitReached] = useState(false);
+  const [chatLimitReason, setChatLimitReason] = useState<string | null>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
   
   // Check authentication status
   useEffect(() => {
@@ -200,6 +216,22 @@ export const SageScreen: React.FC = () => {
     loadHistory();
   }, []);
   
+  // Load Sage usage on mount and after each message
+  useEffect(() => {
+    const loadSageUsage = async () => {
+      const usage = await getSageUsage();
+      setSageUsage(usage);
+      
+      // Check if limit reached
+      const canUse = await canUseSage();
+      setChatLimitReached(!canUse.allowed);
+      if (canUse.reason) {
+        setChatLimitReason(canUse.reason);
+      }
+    };
+    loadSageUsage();
+  }, [messages.length]);
+  
   // Scroll to bottom when messages change
   useEffect(() => {
     if (messages.length > 0) {
@@ -212,6 +244,18 @@ export const SageScreen: React.FC = () => {
   // Send message handler
   const handleSendMessage = useCallback(async (messageText: string) => {
     if (!messageText.trim() || isLoading || !preferences) return;
+    
+    // Check if user can use Sage
+    const canUse = await canUseSage();
+    if (!canUse.allowed) {
+      setError({
+        code: 'RATE_LIMIT',
+        message: canUse.reason || 'Sage limit reached',
+        retryable: false,
+      });
+      setChatLimitReached(true);
+      return;
+    }
     
     setError(null);
     setIsLoading(true);
@@ -257,6 +301,10 @@ export const SageScreen: React.FC = () => {
       if (!conversationId) {
         setConversationId(result.conversationId);
       }
+      
+      // Increment Sage usage after successful chat
+      const updatedUsage = await incrementSageUsage();
+      setSageUsage(updatedUsage);
       
       // Update final message with metadata (recommendations, etc.)
       setMessages(prev => 
@@ -329,8 +377,12 @@ export const SageScreen: React.FC = () => {
   
   // Card recommendation action handlers
   const handleCardLearnMore = useCallback((cardId: string) => {
-    // TODO: Navigate to card detail modal
-    console.log('Learn more about card:', cardId);
+    // Navigate to the card detail view (CardBenefits within Insights stack)
+    // Using type-cast since Sage is in a different tab
+    const nav = navigation as any;
+    if (nav?.navigate) {
+      nav.navigate('Insights', { screen: 'CardBenefits', params: { cardId } });
+    }
   }, []);
   
   // Handle sign in navigation
@@ -433,48 +485,8 @@ export const SageScreen: React.FC = () => {
     );
   }
   
-  // Show sign-in overlay if user is not authenticated or is a guest
-  const isAuthenticated = currentUser && !currentUser.isAnonymous;
-  
-  if (!isAuthenticated) {
-    return (
-      <SafeAreaView style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerButton} />
-          <View style={styles.headerTitleContainer}>
-            <Sparkles size={18} color={colors.primary.main} />
-            <Text style={styles.headerTitle}>Sage</Text>
-          </View>
-          <View style={styles.headerButton} />
-        </View>
-        
-        {/* Sign-in overlay */}
-        <View style={styles.authOverlay}>
-          <View style={styles.authOverlayContent}>
-            <View style={styles.authIcon}>
-              <LogIn size={48} color={colors.primary.main} />
-            </View>
-            <Text style={styles.authTitle}>Sign In to Chat with Sage</Text>
-            <Text style={styles.authSubtitle}>
-              Create an account or sign in to get personalized credit card advice from your AI rewards advisor.
-            </Text>
-            <TouchableOpacity
-              style={styles.signInButton}
-              onPress={handleSignIn}
-              activeOpacity={0.8}
-            >
-              <LogIn size={20} color={colors.background.primary} />
-              <Text style={styles.signInButtonText}>Sign In or Create Account</Text>
-            </TouchableOpacity>
-            <Text style={styles.authFooter}>
-              Free to use • Personalized recommendations • Secure & private
-            </Text>
-          </View>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  // Auth is now optional — Sage works for all users
+  // Signed-in users get personalized advice, guests get general advice
   
   // Main chat view
   return (
@@ -492,6 +504,18 @@ export const SageScreen: React.FC = () => {
         <View style={styles.headerTitleContainer}>
           <Sparkles size={18} color={colors.primary.main} />
           <Text style={styles.headerTitle}>Sage</Text>
+          {/* Show chat counter for Pro users (limited chats) */}
+          {sageUsage && sageUsage.limit !== null && sageUsage.remaining !== null && (
+            <View style={styles.chatCounterBadge}>
+              <Text style={[
+                styles.chatCounterText,
+                sageUsage.remaining <= 2 && styles.chatCounterTextWarning,
+                sageUsage.remaining === 0 && styles.chatCounterTextDanger,
+              ]}>
+                {sageUsage.remaining}/{sageUsage.limit}
+              </Text>
+            </View>
+          )}
         </View>
         
         <TouchableOpacity
@@ -540,18 +564,64 @@ export const SageScreen: React.FC = () => {
         />
       )}
       
+      {/* Chat limit reached overlay */}
+      {chatLimitReached && (
+        <Animated.View entering={FadeIn.duration(300)} style={styles.limitReachedOverlay}>
+          <View style={styles.limitReachedContent}>
+            <Crown size={32} color={colors.warning.main} />
+            <Text style={styles.limitReachedTitle}>
+              {chatLimitReason?.includes('requires Pro') ? 'Upgrade to Unlock Sage' : 'Monthly Limit Reached'}
+            </Text>
+            <Text style={styles.limitReachedText}>
+              {chatLimitReason || 'Upgrade to Max for unlimited AI conversations.'}
+            </Text>
+            <TouchableOpacity
+              style={styles.upgradeButton}
+              onPress={() => setShowPaywall(true)}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={[colors.warning.main, colors.warning.dark]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.upgradeButtonGradient}
+              >
+                <Text style={styles.upgradeButtonText}>Upgrade to Max</Text>
+                <ArrowRight size={18} color={colors.background.primary} />
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      )}
+      
       {/* Input bar */}
       <ChatInput
         onSend={handleSendMessage}
-        disabled={!preferences}
+        disabled={!preferences || chatLimitReached}
         isLoading={isLoading}
-        placeholder={portfolio.length === 0 
-          ? "Add cards to get personalized advice..." 
-          : "Ask Sage anything..."}
+        placeholder={chatLimitReached
+          ? "Chat limit reached - upgrade for unlimited"
+          : portfolio.length === 0 
+            ? "Add cards to get personalized advice..." 
+            : "Ask Sage anything..."}
       />
       
       {/* Bottom safe area padding for tab bar */}
       <View style={styles.bottomPadding} />
+      
+      {/* Paywall Modal */}
+      <Paywall
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        defaultTier="max"
+        onSubscribe={async (tier) => {
+          // Refresh Sage usage after subscription
+          const usage = await getSageUsage();
+          setSageUsage(usage);
+          const canUse = await canUseSage();
+          setChatLimitReached(!canUse.allowed);
+        }}
+      />
     </SafeAreaView>
   );
 };
@@ -588,6 +658,24 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: colors.text.primary,
+  },
+  chatCounterBadge: {
+    backgroundColor: colors.background.secondary,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    marginLeft: 8,
+  },
+  chatCounterText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.text.secondary,
+  },
+  chatCounterTextWarning: {
+    color: colors.warning.main,
+  },
+  chatCounterTextDanger: {
+    color: colors.error.main,
   },
   headerSpacer: {
     width: 36,
@@ -802,6 +890,53 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 24,
     lineHeight: 18,
+  },
+  
+  // Chat limit reached styles
+  limitReachedOverlay: {
+    backgroundColor: colors.background.secondary,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.warning.main + '40',
+    overflow: 'hidden',
+  },
+  limitReachedContent: {
+    alignItems: 'center',
+    padding: 20,
+  },
+  limitReachedTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text.primary,
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  limitReachedText: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  upgradeButton: {
+    overflow: 'hidden',
+    borderRadius: 12,
+    width: '100%',
+  },
+  upgradeButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    gap: 8,
+  },
+  upgradeButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.background.primary,
   },
 });
 

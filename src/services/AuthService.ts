@@ -25,6 +25,7 @@ export interface AuthResult {
   success: boolean;
   user: AuthUser | null;
   error: string | null;
+  needsEmailConfirmation?: boolean;
 }
 
 export type AuthStateChangeCallback = (event: AuthChangeEvent, user: AuthUser | null) => void;
@@ -116,7 +117,9 @@ export async function signUp(email: string, password: string): Promise<AuthResul
       email,
       password,
       options: {
-        emailRedirectTo: undefined, // No email confirmation for now
+        emailRedirectTo: Platform.OS === 'web' 
+          ? window.location.origin 
+          : 'rewardly://auth/callback',
       },
     });
 
@@ -131,10 +134,14 @@ export async function signUp(email: string, password: string): Promise<AuthResul
     // Clear any guest user
     await clearGuestUser();
 
+    // Check if email confirmation is required
+    const needsConfirmation = data.user && !data.session;
+
     return {
       success: true,
       user: transformUser(data.user),
       error: null,
+      needsEmailConfirmation: needsConfirmation || false,
     };
   } catch (err) {
     return {
@@ -441,6 +448,79 @@ export async function getSession(): Promise<Session | null> {
     return session;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Get a valid session, attempting to refresh if expired
+ * Returns null for guest users (who don't have sessions)
+ */
+export async function getValidSession(): Promise<Session | null> {
+  if (!isSupabaseConfigured() || !supabase) {
+    return null;
+  }
+
+  try {
+    // Get current session
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error('Session error:', error);
+      // Attempt to refresh the session
+      const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+      return refreshedSession;
+    }
+    
+    // Check if session is about to expire (within 60 seconds)
+    if (session && session.expires_at) {
+      const expiresAt = session.expires_at * 1000; // Convert to milliseconds
+      const now = Date.now();
+      const timeUntilExpiry = expiresAt - now;
+      
+      // If expiring soon or already expired, refresh it
+      if (timeUntilExpiry < 60000) {
+        const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+        return refreshedSession;
+      }
+    }
+    
+    return session;
+  } catch (error) {
+    console.error('Failed to get valid session:', error);
+    return null;
+  }
+}
+
+/**
+ * Check if current user is a guest (no authentication)
+ */
+export function isGuestUser(user: AuthUser | null): boolean {
+  return user !== null && user.isAnonymous === true;
+}
+
+/**
+ * Validate session before making authenticated API calls
+ * Returns true if user has valid session OR is a guest
+ * Throws error only for expired authenticated sessions
+ */
+export async function validateSessionForApiCall(): Promise<boolean> {
+  const currentUser = await getCurrentUser();
+  
+  // Guest users don't need a session
+  if (isGuestUser(currentUser)) {
+    return true;
+  }
+  
+  // Authenticated users need a valid session
+  if (!isSupabaseConfigured() || !supabase) {
+    return false;
+  }
+  
+  try {
+    const session = await getValidSession();
+    return session !== null;
+  } catch {
+    return false;
   }
 }
 

@@ -11,7 +11,7 @@ import { RedemptionOptionsModal } from './RedemptionOptionsModal';
 import { EmptyState } from './EmptyState';
 import { useTheme } from '../theme';
 import { RewardCalculationResult } from '../services/RewardsCalculatorService';
-import { Card } from '../types';
+import { Card, SpendingCategory } from '../types';
 
 interface RewardsDisplayProps {
   results: RewardCalculationResult[];
@@ -20,6 +20,8 @@ interface RewardsDisplayProps {
   isEmpty: boolean;
   amount: number;
   cards: Card[];
+  /** The spending category being displayed (for rate badge) */
+  category?: SpendingCategory;
   onCardPress?: (result: RewardCalculationResult) => void;
 }
 
@@ -30,6 +32,7 @@ export function RewardsDisplay({
   isEmpty,
   amount,
   cards,
+  category,
   onCardPress,
 }: RewardsDisplayProps) {
   const { t } = useTranslation();
@@ -103,6 +106,7 @@ export function RewardsDisplay({
               result={item}
               isBestValue={bestCard?.cardId === item.cardId}
               card={card}
+              category={category}
               onPress={onCardPress ? () => onCardPress(item) : undefined}
               onViewOptions={() => handleViewOptions(item.cardId)}
             />

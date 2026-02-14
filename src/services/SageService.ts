@@ -9,12 +9,15 @@ import { Card, UserCard, UserPreferences } from '../types';
 import { getCardByIdSync } from './CardDataService';
 import { generateSageSystemPrompt, SageUserContext } from '../data/sage_system_prompt';
 import { supabase } from './supabase/client';
+import { getValidSession, isGuestUser, getCurrentUser } from './AuthService';
+import { getCountry } from './PreferenceManager';
 
 // ============================================================================
 // Constants
 // ============================================================================
 
 const SUPABASE_PROJECT_REF = 'zdlozhpmqrtvvhdzbmrv';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbG96aHBtcXJ0dnZoZHpibXJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxODYwMTEsImV4cCI6MjA4Mzc2MjAxMX0.o7xqSfwRtvxsPoAe7e0kJzb5TXoFyCzDEQqOWkLNkos';
 const SAGE_FUNCTION_URL = `https://${SUPABASE_PROJECT_REF}.supabase.co/functions/v1/sage-chat-stream`;
 const MAX_HISTORY = 10; // Keep last 10 messages in conversation
 
@@ -162,35 +165,29 @@ class SageServiceClass {
       cards: enrichedPortfolio,
       preferences,
       pointBalances,
-      country: 'CA', // TODO: Get from preferences
+      country: getCountry(),
       subscriptionTier: 'free',
     };
     
-    // Get session for auth - MUST have valid user session
-    const { data: { session } } = await supabase?.auth.getSession() || { data: { session: null } };
-    
-    if (!session?.access_token) {
-      throw {
-        code: 'AUTH_ERROR' as const,
-        message: 'Please sign in to use Sage',
-        retryable: false
-      } as SageError;
-    }
-    
-    const token = session.access_token;
+    // MVP: Use anon key for auth — edge function handles personalization server-side
+    const token: string | null = null;
 
     // Get conversation history (last 10 messages)
     const history = this.conversationHistory.get(convId) || [];
     const recentHistory = history.slice(-MAX_HISTORY);
 
     try {
+      const headers: Record<string, string> = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream',
+        // Always send Authorization header — use user token if available, anon key otherwise
+        'Authorization': `Bearer ${token || SUPABASE_ANON_KEY}`,
+      };
+      
       const response = await fetch(SAGE_FUNCTION_URL, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'text/event-stream',
-        },
+        headers,
         body: JSON.stringify({
           message,
           conversationId: convId,

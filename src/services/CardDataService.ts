@@ -58,6 +58,8 @@ function transformCardRow(
     categoryRewards: categoryRewards
       .filter((cr) => cr.card_id === row.id)
       .map((cr) => transformCategoryReward(cr)),
+    applicationUrl: (row as any).application_url || undefined,
+    affiliateUrl: (row as any).affiliate_url || undefined,
   };
 
   if (signupBonus) {
@@ -100,6 +102,8 @@ function transformCardWithProgramDetails(
     categoryRewards: categoryRewards
       .filter((cr) => cr.card_id === row.id)
       .map((cr) => transformCategoryReward(cr)),
+    applicationUrl: (row as any).application_url || undefined,
+    affiliateUrl: (row as any).affiliate_url || undefined,
     // Add program details if available
     programDetails: row.program_name ? {
       programName: row.program_name,
@@ -462,6 +466,32 @@ export function getCachedCountry(): Country | null {
 }
 
 /**
+ * Get total card count across all countries (US + CA)
+ * Used for displaying database statistics in Settings
+ */
+export async function getTotalCardCount(): Promise<{ total: number; us: number; ca: number }> {
+  if (!isSupabaseConfigured()) {
+    return { total: 0, us: 0, ca: 0 };
+  }
+
+  try {
+    const [usCards, caCards] = await Promise.all([
+      getCardsByCountry('US'),
+      getCardsByCountry('CA'),
+    ]);
+
+    return {
+      total: usCards.length + caCards.length,
+      us: usCards.length,
+      ca: caCards.length,
+    };
+  } catch (error) {
+    console.error('Failed to get total card count:', error);
+    return { total: 0, us: 0, ca: 0 };
+  }
+}
+
+/**
  * Get a card by its ID
  */
 export async function getCardById(id: string): Promise<Card | null> {
@@ -537,11 +567,13 @@ export async function refreshCards(): Promise<Card[]> {
 }
 
 /**
- * Called when country preference changes - invalidates cache
+ * Called when country preference changes - invalidates cache and reloads cards
  */
 export async function onCountryChange(): Promise<void> {
   memoryCache = null;
   memoryCacheCountry = null;
+  // Reload cards for the new country
+  await getAllCards();
 }
 
 /**

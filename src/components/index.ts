@@ -65,6 +65,7 @@ export type { ChatBubbleProps, ChatInputProps, QuickActionsProps, QuickAction, C
 
 // Subscription Components
 export { default as Paywall } from './Paywall';
+export { default as LockedFeature } from './LockedFeature';
 
 // AutoPilot Components
 export { default as AutoPilotNotificationCard } from './AutoPilotNotificationCard';
@@ -73,9 +74,24 @@ export { default as AutoPilotNotificationCard } from './AutoPilotNotificationCar
 export { default as RewardsIQWidget } from './RewardsIQWidget';
 export { default as MissedRewardsWidget } from './MissedRewardsWidget';
 
+// Cycle 3 - Smart Recommendations Components
+export { default as SpendingProfileForm } from './SpendingProfileForm';
+export { default as FeeBreakevenCard } from './FeeBreakevenCard';
+export { default as SignupBonusCard } from './SignupBonusCard';
+
 // Tier 2 - Social Sharing
 export { default as SocialShareCard } from './SocialShareCard';
 
 // Tier 3 - Polish & Animations
 export { default as AnimatedNumber, AnimatedCurrency, AnimatedPoints, AnimatedPercent } from './AnimatedNumber';
 export { default as ConfettiAnimation } from './ConfettiAnimation';
+
+// Cycle 4 - CSV Statement Upload Components
+export { TransactionReviewList } from './TransactionReviewList';
+
+// Cycle 5 - Achievements & Gamification
+export { UnlockToast } from './UnlockToast';
+
+// Affiliate / Monetization
+export { ApplyNowButton } from './ApplyNowButton';
+export type { ApplyNowButtonProps } from './ApplyNowButton';

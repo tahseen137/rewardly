@@ -293,6 +293,7 @@
 | Point Valuations | 🔥🔥 | ⚡ Low | P0 | Week 2-3 |
 | Location-Based Recs | 🔥🔥 | 🔨 Med | P1 | Week 5-6 |
 | Travel Redemption Planner | 🔥🔥🔥 | 🏋️ High | P1 | Week 6-8 |
+| Agentic Commerce Readiness (ACP) | 🔥🔥🔥 | 🔨 Med | P1 | Week 7-9 |
 | Expert Consultation Booking | 🔥🔥 | 🔨 Med | P2 | Week 8-10 |
 | Subscription/Payments | 🔥🔥🔥 | 🔨 Med | P0 | Week 4-5 |
 | Benefits Tracking | 🔥 | 🏋️ High | P3 | v1.5 |
@@ -514,7 +515,40 @@ Never:
 
 ---
 
-#### 3.2.8 Expert Consultation Booking (P2)
+#### 3.2.8 Agentic Commerce Readiness (P1)
+
+**Description:** Implementation of the **Agentic Commerce Protocol (ACP)** to make Rewardly discoverable and actionable by other AI agents (e.g., personal assistants, travel agents). Developed by Stripe + OpenAI, ACP is the open standard for programmatic commerce.
+
+**Key Components:**
+- **Hosted ACP Endpoint:** A dedicated endpoint (`/api/acp`) that follows the open standard.
+- **Product Syndication:** Expose the Rewardly "Plus" and "Pro" subscriptions as products discoverable by AI agents.
+- **In-Context Transactions:** Allow AI agents to initiate a Rewardly subscription or booking via **Shared Payment Tokens (SPTs)**. This allows an agent to pay on behalf of a user without handling raw credit card data.
+- **Agent-Ready Catalog:** Standardized JSON catalog of Rewardly services compatible with ACP/UCP (Universal Commerce Protocol).
+
+**User Value:**
+- "Siri, find me the best credit card rewards optimizer." → Siri finds Rewardly via ACP and can initiate sign-up.
+- "Assistant, book a rewards consultation on Rewardly." → Assistant completes the booking and payment autonomously using an SPT.
+
+---
+
+#### 3.2.10 Next.js 16 & DevTools MCP Integration (P2)
+
+**Description:** Leverage Next.js 16's Model Context Protocol (MCP) support to allow AI agents (like Gandalf or local coding assistants) to deeply understand the Rewardly web application state.
+
+**Key Features:**
+- **Explicit Caching:** Use the new `cache()` components to make data fetching and caching behavior transparent to both developers and AI agents.
+- **DevTools MCP Server:** Enable the Next.js MCP server to provide agents access to:
+    - Current routes and page structure.
+    - Application state and context.
+    - Rendering strategies (PPR, Static, Dynamic).
+    - Cache hit/miss status for debugging.
+- **Performance:** Utilize stable **Turbopack** for 5-10x faster development cycles, allowing for rapid iteration on AI features.
+
+**User Value:** Faster feature delivery, more reliable AI interactions, and a "smarter" development environment where Gandalf can diagnose issues autonomously via MCP.
+
+---
+
+#### 3.2.11 Expert Consultation Booking (P2)
 
 **Description:** Connect users with human rewards experts for complex strategy sessions.
 

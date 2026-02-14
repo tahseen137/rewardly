@@ -75,6 +75,22 @@ export function getApplicableMultiplier(card: Card, category: SpendingCategory):
 }
 
 /**
+ * Calculate reward value for a single card purchase
+ * Simple helper that combines multiplier lookup and CAD conversion
+ *
+ * @param card - The credit card
+ * @param category - The spending category
+ * @param amount - The purchase amount in CAD
+ * @returns CAD value of rewards earned
+ */
+export function calculateReward(card: Card, category: SpendingCategory, amount: number): number {
+  const multiplier = getApplicableMultiplier(card, category);
+  const pointsEarned = amount * multiplier;
+  const pointValuation = card.programDetails?.optimalRateCents ?? card.pointValuation ?? 100;
+  return pointsToCad(pointsEarned, card, pointValuation);
+}
+
+/**
  * Convert reward points to CAD value
  * Uses optimal rate from program details if available
  * For cashback cards with percentage rates, divides by 100 to get actual dollar value

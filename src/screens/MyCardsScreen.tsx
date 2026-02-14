@@ -27,6 +27,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Plus, Search, Trash2, ChevronRight, X, Wallet, TrendingUp, Edit3 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme, Theme } from '../theme';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -39,6 +41,10 @@ import {
   updatePointBalance,
 } from '../services/CardPortfolioManager';
 import { getAllCards, searchCards, getCardByIdSync } from '../services/CardDataService';
+import { getCurrentTierSync, getCardLimitSync } from '../services/SubscriptionService';
+import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
+import { RootStackParamList } from '../navigation/AppNavigator';
+import { formatUpToRate, formatBestForCategories } from '../utils/rewardFormatUtils';
 
 function formatRewardRate(value: number, type: RewardType, unit: 'percent' | 'multiplier'): string {
   if (unit === 'percent') {
@@ -426,12 +432,16 @@ function CardPickerItem({
           {formatAnnualFee(card.annualFee)}
         </Text>
         <Text style={[styles.pickerItemReward, isOwned && styles.pickerItemTextDisabled]}>
-          {formatRewardRate(
-            card.baseRewardRate.value,
-            card.baseRewardRate.type,
-            card.baseRewardRate.unit
-          )}
+          {formatUpToRate(card)}
         </Text>
+        {(() => {
+          const bestFor = formatBestForCategories(card, 3);
+          return bestFor ? (
+            <Text style={[styles.pickerItemBestFor, isOwned && styles.pickerItemTextDisabled]}>
+              {bestFor}
+            </Text>
+          ) : null;
+        })()}
       </View>
       {isOwned && <Text style={styles.ownedBadge}>Owned</Text>}
     </TouchableOpacity>
@@ -439,6 +449,7 @@ function CardPickerItem({
 }
 
 export default function MyCardsScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [portfolio, setPortfolio] = useState<UserCard[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -490,6 +501,14 @@ export default function MyCardsScreen() {
     loadPortfolio();
   }, [loadPortfolio]);
 
+  // Re-load when country changes so card lookups resolve correctly
+  useEffect(() => {
+    const unsubscribe = CountryChangeEmitter.subscribe(() => {
+      loadPortfolio();
+    });
+    return unsubscribe;
+  }, [loadPortfolio]);
+
   useEffect(() => {
     if (isModalVisible) loadAvailableCards();
   }, [isModalVisible, loadAvailableCards]);
@@ -507,8 +526,27 @@ export default function MyCardsScreen() {
       setIsModalVisible(false);
       setSearchQuery('');
     } else {
-      if (result.error.type === 'DUPLICATE_CARD') {
+      // Handle different error types
+      if (result.error.type === 'LIMIT_REACHED') {
+        // Show upgrade prompt for card limit reached
+        Alert.alert(
+          'Card Limit Reached',
+          result.error.message,
+          [
+            { text: 'Maybe Later', style: 'cancel' },
+            { 
+              text: 'Upgrade to Pro', 
+              onPress: () => {
+                setIsModalVisible(false);
+                navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards' });
+              }
+            },
+          ]
+        );
+      } else if (result.error.type === 'DUPLICATE_CARD') {
         Alert.alert('Duplicate Card', `${result.error.cardName} is already in your portfolio.`);
+      } else if (result.error.type === 'CARD_NOT_FOUND') {
+        Alert.alert('Card Not Found', 'The selected card could not be found.');
       } else {
         Alert.alert('Error', 'Failed to add card. Please try again.');
       }
@@ -612,15 +650,34 @@ export default function MyCardsScreen() {
     );
   }
 
+  // Get subscription tier and limits
+  const tier = getCurrentTierSync();
+  const limit = getCardLimitSync();
+  const showLimit = tier === 'free' && limit !== Infinity;
+  const atLimit = showLimit && portfolio.length >= limit;
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerText}>
           <Text style={styles.title}>My Cards</Text>
-          <Text style={styles.subtitle}>
-            {portfolio.length} card{portfolio.length !== 1 ? 's' : ''} in portfolio
-          </Text>
+          <View style={styles.subtitleRow}>
+            <Text style={styles.subtitle}>
+              {showLimit 
+                ? `${portfolio.length}/${limit} cards`
+                : `${portfolio.length} card${portfolio.length !== 1 ? 's' : ''}`
+              }
+            </Text>
+            {atLimit && (
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards_header' })}
+                hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
+              >
+                <Text style={styles.upgradeLink}>Upgrade for unlimited</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
         <TouchableOpacity
           style={styles.addButton}
@@ -770,6 +827,17 @@ const styles = StyleSheet.create({
     fontSize: 13, // text-sm
     color: colors.text.secondary,
     marginTop: 2,
+  },
+  subtitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 2,
+  },
+  upgradeLink: {
+    fontSize: 12,
+    color: colors.primary.main,
+    fontWeight: '600',
   },
   addButton: {
     flexDirection: 'row',
@@ -985,6 +1053,11 @@ const styles = StyleSheet.create({
   pickerItemReward: {
     fontSize: 11,
     color: colors.primary.main,
+  },
+  pickerItemBestFor: {
+    fontSize: 11,
+    color: colors.text.secondary,
+    marginTop: 2,
   },
   pickerItemAnnualFee: {
     fontSize: 11,

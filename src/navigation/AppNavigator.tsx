@@ -2,7 +2,7 @@
  * AppNavigator - Main navigation structure with auth handling
  * Shows AuthScreen if not logged in, OnboardingScreen for new users
  * Then bottom tabs with glass morphism effect and lucide icons
- * 
+ *
  * MEGA BUILD UPDATE: Added Insights tab with MissedRewards, RewardsIQ, PortfolioOptimizer
  */
 
@@ -11,31 +11,50 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform, View, ActivityIndicator, StyleSheet, Animated } from 'react-native';
-import { Home, CreditCard, Settings, TrendingUp, Navigation, BarChart3 } from 'lucide-react-native';
+import { Home, CreditCard, Settings, Sparkles, Navigation, BarChart3 } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 
-import { 
-  MyCardsScreen, 
-  SettingsScreen, 
-  SageScreen, 
+import {
+  HomeScreen,
+  MyCardsScreen,
+  SettingsScreen,
+  SageScreen,
   AutoPilotScreen,
   InsightsHomeScreen,
   MissedRewardsScreen,
   RewardsIQScreen,
   PortfolioOptimizerScreen,
+  WalletOptimizerScreen,
   SpendingInsightsScreen,
   CardTrackerScreen,
+  CardBenefitsScreen,
+  SUBTrackerScreen,
+  CardCompareScreen,
+  SpendingLogScreen,
+  RecurringScreen,
+  AnnualFeeScreen,
+  RedemptionGuideScreen,
+  CardRecommendationsScreen,
+  NotificationsScreen,
+  SavingsReportScreen,
+  StatementUploadScreen,
+  InsightsDashboardScreen,
+  AchievementsScreen,
+  ApplicationTrackerScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import PremiumOnboardingScreen from '../screens/PremiumOnboardingScreen';
+import UpgradeScreen from '../screens/UpgradeScreen';
+import LandingPage from '../screens/LandingPage';
 import { ErrorBoundary } from '../components';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
 import { getCurrentUser, onAuthStateChange, AuthUser } from '../services/AuthService';
 import { isOnboardingComplete, initializePreferences } from '../services/PreferenceManager';
-import { initializeSubscription } from '../services/SubscriptionService';
+import { initializeSubscription, refreshSubscription, canAccessFeatureSync, getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
 import { initializeAutoPilot } from '../services/AutoPilotService';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 
 // Stack navigator for Insights screens
 export type InsightsStackParamList = {
@@ -43,22 +62,48 @@ export type InsightsStackParamList = {
   MissedRewards: undefined;
   RewardsIQ: undefined;
   PortfolioOptimizer: undefined;
+  WalletOptimizer: undefined;
   SpendingInsights: undefined;
   CardTracker: undefined;
+  CardBenefits: { cardId: string };
+  SUBTracker: undefined;
+  CardCompare: { preselectedCards?: string[] };
+  SpendingLog: undefined;
+  Recurring: undefined;
+  AnnualFee: undefined;
+  RedemptionGuide: { programId: string; cardId?: string };
+  CardRecommendations: undefined;
+  SavingsReport: { reportId?: string };
+  StatementUpload: undefined;
+  InsightsDashboard: undefined;
+  Achievements: undefined;
+  ApplicationTracker: undefined;
 };
 
 export type RootTabParamList = {
-  Sage: undefined;
+  Home: undefined;
   Insights: undefined;
+  Sage: undefined;
   AutoPilot: undefined;
   MyCards: undefined;
   Settings: undefined;
 };
 
-type AppState = 'loading' | 'auth' | 'onboarding' | 'main';
+// Root Stack for modals (Upgrade screen, Notifications)
+export type RootStackParamList = {
+  MainTabs: undefined;
+  Upgrade: {
+    feature?: string;
+    source?: string;
+  };
+  Notifications: undefined;
+};
+
+type AppState = 'loading' | 'landing' | 'auth' | 'onboarding' | 'main';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const InsightsStack = createNativeStackNavigator<InsightsStackParamList>();
+const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 /**
  * Insights Stack Navigator - Contains InsightsHome, MissedRewards, RewardsIQ, PortfolioOptimizer
@@ -72,17 +117,17 @@ function InsightsNavigator() {
       }}
       initialRouteName="InsightsHome"
     >
-      <InsightsStack.Screen 
-        name="InsightsHome" 
+      <InsightsStack.Screen
+        name="InsightsHome"
         component={InsightsHomeScreen}
       />
-      <InsightsStack.Screen 
-        name="MissedRewards" 
+      <InsightsStack.Screen
+        name="MissedRewards"
         component={MissedRewardsScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="RewardsIQ" 
+      <InsightsStack.Screen
+        name="RewardsIQ"
         component={RewardsIQScreen}
         options={{ animation: 'slide_from_right' }}
       />
@@ -92,13 +137,83 @@ function InsightsNavigator() {
         options={{ animation: 'slide_from_right' }}
       />
       <InsightsStack.Screen 
+        name="WalletOptimizer" 
+        component={WalletOptimizerScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen 
         name="SpendingInsights" 
         component={SpendingInsightsScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <InsightsStack.Screen 
-        name="CardTracker" 
+      <InsightsStack.Screen
+        name="CardTracker"
         component={CardTrackerScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="CardBenefits"
+        component={CardBenefitsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="SUBTracker"
+        component={SUBTrackerScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="CardCompare"
+        component={CardCompareScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="SpendingLog"
+        component={SpendingLogScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="Recurring"
+        component={RecurringScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="AnnualFee"
+        component={AnnualFeeScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="RedemptionGuide"
+        component={RedemptionGuideScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="CardRecommendations"
+        component={CardRecommendationsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="SavingsReport"
+        component={SavingsReportScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="StatementUpload"
+        component={StatementUploadScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="InsightsDashboard"
+        component={InsightsDashboardScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="Achievements"
+        component={AchievementsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <InsightsStack.Screen
+        name="ApplicationTracker"
+        component={ApplicationTrackerScreen}
         options={{ animation: 'slide_from_right' }}
       />
     </InsightsStack.Navigator>
@@ -128,11 +243,14 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
 
   let IconComponent;
   switch (name) {
-    case 'Sage':
+    case 'Home':
       IconComponent = Home;
       break;
     case 'Insights':
       IconComponent = BarChart3;
+      break;
+    case 'Sage':
+      IconComponent = Sparkles;
       break;
     case 'AutoPilot':
       IconComponent = Navigation;
@@ -177,6 +295,17 @@ const loadingStyles = StyleSheet.create({
 /**
  * Wrapped screen components with error boundaries
  */
+function HomeScreenWithErrorBoundary() {
+  return (
+    <ErrorBoundary
+      fallbackTitle="Unable to load calculator"
+      fallbackMessage="There was a problem loading the rewards calculator. Please try again."
+    >
+      <HomeScreen />
+    </ErrorBoundary>
+  );
+}
+
 function MyCardsScreenWithErrorBoundary() {
   return (
     <ErrorBoundary
@@ -199,13 +328,13 @@ function SageScreenWithErrorBoundary() {
   );
 }
 
-function SettingsScreenWithErrorBoundary({ onSignOut }: { onSignOut: () => void }) {
+function SettingsScreenWithErrorBoundary({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: () => void }) {
   return (
     <ErrorBoundary
       fallbackTitle="Unable to load settings"
       fallbackMessage="There was a problem loading settings. Please try again."
     >
-      <SettingsScreen onSignOut={onSignOut} />
+      <SettingsScreen onSignOut={onSignOut} onSignIn={onSignIn} />
     </ErrorBoundary>
   );
 }
@@ -224,7 +353,7 @@ function AutoPilotScreenWithErrorBoundary() {
 /**
  * Main tab navigator
  */
-function MainTabs({ onSignOut }: { onSignOut: () => void }) {
+function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: () => void }) {
   const theme = useTheme();
 
   return (
@@ -235,6 +364,8 @@ function MainTabs({ onSignOut }: { onSignOut: () => void }) {
         ),
         tabBarActiveTintColor: colors.primary.main,
         tabBarInactiveTintColor: colors.text.secondary,
+        unmountOnBlur: true, // BUG #5 FIX: Unmount inactive tabs to prevent overlap
+        lazy: true, // Don't pre-render inactive tabs
         tabBarStyle: {
           height: 64, // h-16
           backgroundColor: Platform.OS === 'web'
@@ -268,8 +399,8 @@ function MainTabs({ onSignOut }: { onSignOut: () => void }) {
       })}
     >
       <Tab.Screen
-        name="Sage"
-        component={SageScreenWithErrorBoundary}
+        name="Home"
+        component={HomeScreenWithErrorBoundary}
         options={{
           tabBarLabel: 'Home',
         }}
@@ -279,6 +410,13 @@ function MainTabs({ onSignOut }: { onSignOut: () => void }) {
         component={InsightsNavigator}
         options={{
           tabBarLabel: 'Insights',
+        }}
+      />
+      <Tab.Screen
+        name="Sage"
+        component={SageScreenWithErrorBoundary}
+        options={{
+          tabBarLabel: 'Sage',
         }}
       />
       <Tab.Screen
@@ -301,7 +439,7 @@ function MainTabs({ onSignOut }: { onSignOut: () => void }) {
           tabBarLabel: 'Settings',
         }}
       >
-        {() => <SettingsScreenWithErrorBoundary onSignOut={onSignOut} />}
+        {() => <SettingsScreenWithErrorBoundary onSignOut={onSignOut} onSignIn={onSignIn} />}
       </Tab.Screen>
     </Tab.Navigator>
   );
@@ -318,24 +456,27 @@ export default function AppNavigator() {
       try {
         // Initialize preferences
         await initializePreferences();
-        
+
         // Initialize subscription service
         await initializeSubscription();
-        
+
         // Initialize AutoPilot service
         await initializeAutoPilot();
-        
+
+        // Track app open for streak achievement
+        AchievementEventEmitter.track('app_opened', {});
+
         // Check for existing user
         const currentUser = await getCurrentUser();
         setUser(currentUser);
-        
+
         if (currentUser) {
           // User exists, check onboarding
           const onboardingDone = isOnboardingComplete();
           setAppState(onboardingDone ? 'main' : 'onboarding');
         } else {
-          // No user, show auth
-          setAppState('auth');
+          // No user — show landing page on web, auth on mobile
+          setAppState(Platform.OS === 'web' ? 'landing' : 'auth');
         }
       } catch (error) {
         console.error('Failed to initialize app:', error);
@@ -349,14 +490,20 @@ export default function AppNavigator() {
 
   // Listen for auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChange((event, authUser) => {
+    const unsubscribe = onAuthStateChange(async (event, authUser) => {
       if (event === 'SIGNED_IN' && authUser) {
         setUser(authUser);
+        // Refresh subscription tier so features unlock immediately
+        try {
+          await refreshSubscription();
+        } catch (e) {
+          console.warn('Failed to refresh subscription on sign-in:', e);
+        }
         const onboardingDone = isOnboardingComplete();
         setAppState(onboardingDone ? 'main' : 'onboarding');
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
-        setAppState('auth');
+        setAppState(Platform.OS === 'web' ? 'landing' : 'auth');
       }
     });
 
@@ -374,6 +521,14 @@ export default function AppNavigator() {
 
   const handleSignOut = useCallback(() => {
     setUser(null);
+    setAppState(Platform.OS === 'web' ? 'landing' : 'auth');
+  }, []);
+
+  const handleSignIn = useCallback(() => {
+    setAppState('auth');
+  }, []);
+
+  const handleLandingGetStarted = useCallback(() => {
     setAppState('auth');
   }, []);
 
@@ -407,6 +562,11 @@ export default function AppNavigator() {
     return <LoadingScreen />;
   }
 
+  // Show web landing page
+  if (appState === 'landing') {
+    return <LandingPage onGetStarted={handleLandingGetStarted} />;
+  }
+
   // Show auth screen if not logged in
   if (appState === 'auth') {
     return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
@@ -420,7 +580,36 @@ export default function AppNavigator() {
   // Main app with tabs
   return (
     <NavigationContainer theme={navigationTheme}>
-      <MainTabs onSignOut={handleSignOut} />
+      <RootNavigator onSignOut={handleSignOut} onSignIn={handleSignIn} />
     </NavigationContainer>
+  );
+}
+
+/**
+ * RootNavigator - Wraps MainTabs and provides modal screens (Upgrade)
+ */
+function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: () => void }) {
+  return (
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      <RootStack.Screen name="MainTabs">
+        {() => <MainTabs onSignOut={onSignOut} onSignIn={onSignIn} />}
+      </RootStack.Screen>
+      <RootStack.Screen
+        name="Upgrade"
+        component={UpgradeScreen}
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+        }}
+      />
+      <RootStack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+        }}
+      />
+    </RootStack.Navigator>
   );
 }

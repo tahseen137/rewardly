@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#007AFF"
+      "backgroundColor": "#0A0E1F"
     },
     "ios": {
       "supportsTablet": true,
@@ -27,7 +27,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#007AFF"
+        "backgroundColor": "#0A0E1F"
       },
       "package": "com.rewardsoptimizer.app",
       "versionCode": 1,
@@ -45,11 +45,11 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
       "output": "single",
-      "name": "Rewards Optimizer",
-      "shortName": "Rewards",
-      "description": "Maximize your credit card rewards with smart recommendations",
-      "themeColor": "#007AFF",
-      "backgroundColor": "#ffffff"
+      "name": "Rewardly",
+      "shortName": "Rewardly",
+      "description": "Canada's #1 credit card rewards optimizer — find the best card for every purchase and never leave money on the table",
+      "themeColor": "#1DDB82",
+      "backgroundColor": "#0A0E1F"
     },
     "extra": {
       "eas": {

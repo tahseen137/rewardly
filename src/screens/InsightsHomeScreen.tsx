@@ -1,6 +1,8 @@
 /**
  * InsightsHomeScreen - Dashboard for all analytics features
  * The "holy shit" screen that shows users their full rewards picture
+ * 
+ * Note: Requires Pro+ subscription (free users see paywall)
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -24,7 +26,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   TrendingDown,
@@ -47,8 +49,11 @@ import {
   analyzeMissedRewards,
   getPortfolioOptimization,
 } from '../services/RewardsIQService';
+import { getAllCards } from '../services/CardDataService';
 import { CATEGORY_INFO } from '../services/MockTransactionData';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
+import { canAccessFeatureSync, getCurrentTierSync, refreshSubscription, SubscriptionTier } from '../services/SubscriptionService';
+import { LockedFeature } from '../components';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -102,12 +107,30 @@ export default function InsightsHomeScreen() {
   const [optimization, setOptimization] = useState<PortfolioOptimization | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hasAccess, setHasAccess] = useState(true);
+  const [currentTier, setCurrentTier] = useState<SubscriptionTier>('free');
   
   const scoreScale = useSharedValue(0);
   const pulseScale = useSharedValue(1);
   
+  // Check subscription access on focus
+  useFocusEffect(
+    useCallback(() => {
+      const checkAccess = async () => {
+        await refreshSubscription();
+        const tier = getCurrentTierSync();
+        setCurrentTier(tier);
+        setHasAccess(canAccessFeatureSync('insights'));
+      };
+      checkAccess();
+    }, [])
+  );
+  
   const loadData = useCallback(async () => {
     try {
+      // Ensure cards are loaded first before calculating insights
+      await getAllCards();
+      
       const [iq, missed, opt] = await Promise.all([
         calculateRewardsIQ(),
         analyzeMissedRewards(),
@@ -170,6 +193,23 @@ export default function InsightsHomeScreen() {
         </Animated.View>
         <Text style={styles.loadingText}>Analyzing your rewards...</Text>
       </View>
+    );
+  }
+  
+  // Show paywall for free users
+  if (!hasAccess) {
+    return (
+      <LockedFeature
+        feature="insights"
+        title="Unlock Insights"
+        description="See where you're leaving money on the table and optimize your card usage with detailed analytics."
+        icon={<BarChart3 size={56} color={colors.primary.main} />}
+        variant="inline"
+        onSubscribe={() => {
+          setHasAccess(canAccessFeatureSync('insights'));
+          setCurrentTier(getCurrentTierSync());
+        }}
+      />
     );
   }
   

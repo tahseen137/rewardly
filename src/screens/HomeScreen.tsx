@@ -12,14 +12,22 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { ChevronRight, Sparkles, Trophy } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import {
   AmountInput,
   RewardsDisplay,
   EmptyState,
   GradientText,
+  SkeletonCard,
+  Skeleton,
 } from '../components';
+import { formatTopCategoryRates, formatUpToRate } from '../utils/rewardFormatUtils';
 import { StoreSelector } from '../components/StoreSelectorNew';
 import { CategoryGrid, CategoryType } from '../components/CategoryGrid';
 import { useTheme, Theme } from '../theme';
@@ -27,11 +35,15 @@ import { colors } from '../theme/colors';
 import { Store, SpendingCategory } from '../types';
 import { getCards } from '../services/CardPortfolioManager';
 import { getAllCardsSync, getAllCards } from '../services/CardDataService';
+import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
+import { analyzeAndRecommend, CardRecommendation } from '../services/CardRecommendationEngine';
 import {
   calculateRewards,
   CalculatorInput,
   CalculatorOutput,
 } from '../services/RewardsCalculatorService';
+import { getAchievements, initializeAchievements } from '../services/AchievementService';
+import { UserAchievements } from '../types';
 
 // Map CategoryType to SpendingCategory
 const categoryTypeToSpendingCategory = (cat: CategoryType): SpendingCategory => {
@@ -86,6 +98,7 @@ interface CalculatorState {
 export default function HomeScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const navigation = useNavigation();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   // Initialize state
@@ -101,22 +114,67 @@ export default function HomeScreen() {
   });
 
   const [hasCards, setHasCards] = useState(false);
+  const [recommendations, setRecommendations] = useState<CardRecommendation[]>([]);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+  const [achievements, setAchievements] = useState<UserAchievements | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Function to load data
+  const loadData = useCallback(async () => {
+    try {
+      await getAllCards();
+      const portfolio = getCards();
+      setHasCards(portfolio.length > 0);
+      setState((prev) => ({ ...prev, isLoading: false, loadError: null }));
+      
+      // Load achievements
+      try {
+        await initializeAchievements();
+        const userAchievements = await getAchievements();
+        setAchievements(userAchievements);
+      } catch (err) {
+        console.warn('Failed to load achievements:', err);
+      }
+      
+      // Load recommendations if user has cards
+      if (portfolio.length > 0) {
+        setRecommendationsLoading(true);
+        try {
+          const analysis = await analyzeAndRecommend();
+          setRecommendations(analysis.recommendations.slice(0, 3)); // Top 3
+        } catch (err) {
+          console.warn('Failed to load recommendations:', err);
+        } finally {
+          setRecommendationsLoading(false);
+        }
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load card data';
+      setState((prev) => ({ ...prev, isLoading: false, loadError: errorMessage }));
+    }
+  }, []);
 
   // Initialize data on mount - fetch cards from database
   useEffect(() => {
-    const initializeData = async () => {
-      try {
-        await getAllCards();
-        const portfolio = getCards();
-        setHasCards(portfolio.length > 0);
-        setState((prev) => ({ ...prev, isLoading: false, loadError: null }));
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to load card data';
-        setState((prev) => ({ ...prev, isLoading: false, loadError: errorMessage }));
-      }
-    };
-    initializeData();
-  }, []);
+    loadData();
+  }, [loadData]);
+
+  // Pull-to-refresh handler
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  }, [loadData]);
+
+  // Subscribe to country changes
+  useEffect(() => {
+    const unsubscribe = CountryChangeEmitter.subscribe(() => {
+      // Re-fetch data when country changes
+      setState((prev) => ({ ...prev, isLoading: true }));
+      loadData();
+    });
+    return unsubscribe;
+  }, [loadData]);
 
   // Handle store selection - auto-set category from store
   const handleStoreSelect = useCallback((store: Store | null) => {
@@ -213,11 +271,21 @@ export default function HomeScreen() {
     }
   }, [state.selectedCategory, state.amount]);
 
-  // Show loading state
+  // Show loading state with skeleton UI
   if (state.isLoading) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={styles.subtitle}>{t('common.loading') || 'Loading...'}</Text>
+      <View style={styles.container}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          <View style={styles.header}>
+            <Skeleton width="60%" height={28} borderRadius={8} style={{ alignSelf: 'center', marginBottom: 8 }} />
+            <Skeleton width="80%" height={14} borderRadius={4} style={{ alignSelf: 'center' }} />
+          </View>
+          <SkeletonCard style={{ marginBottom: 16 }} />
+          <SkeletonCard style={{ marginBottom: 16 }} />
+          <SkeletonCard style={{ marginBottom: 16 }} />
+          <Skeleton width="40%" height={14} borderRadius={4} style={{ marginBottom: 12 }} />
+          <Skeleton width="100%" height={100} borderRadius={12} style={{ marginBottom: 16 }} />
+        </ScrollView>
       </View>
     );
   }
@@ -241,6 +309,15 @@ export default function HomeScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary.main}
+            colors={[colors.primary.main]}
+            progressBackgroundColor={colors.background.secondary}
+          />
+        }
       >
         {/* Header - Redesigned with GradientText */}
         <View style={styles.header}>
@@ -251,6 +328,113 @@ export default function HomeScreen() {
             {t('home.subtitle') || 'Find the best card for every purchase'}
           </Text>
         </View>
+
+        {/* Wallet Optimizer Hero Banner */}
+        <TouchableOpacity
+          style={styles.heroCard}
+          onPress={() => navigation.navigate('WalletOptimizer' as never)}
+          activeOpacity={0.8}
+        >
+          <View style={styles.heroContent}>
+            <View style={styles.heroIcon}>
+              <Text style={styles.heroEmoji}>🎯</Text>
+            </View>
+            <View style={styles.heroText}>
+              <Text style={styles.heroTitle}>Find Your Perfect Wallet</Text>
+              <Text style={styles.heroSubtitle}>
+                Get personalized card recommendations based on your spending
+              </Text>
+            </View>
+          </View>
+          <View style={styles.heroArrow}>
+            <ChevronRight size={24} color={colors.primary.main} />
+          </View>
+        </TouchableOpacity>
+
+        {/* Statement Upload Card */}
+        <TouchableOpacity
+          style={styles.uploadCard}
+          onPress={() => navigation.navigate('StatementUpload' as never)}
+          activeOpacity={0.8}
+        >
+          <View style={styles.uploadContent}>
+            <Text style={styles.uploadEmoji}>📄</Text>
+            <View style={styles.uploadText}>
+              <Text style={styles.uploadTitle}>Upload Statement</Text>
+              <Text style={styles.uploadSubtitle}>
+                Get insights from your real transactions
+              </Text>
+            </View>
+          </View>
+          <ChevronRight size={20} color={colors.primary.main} />
+        </TouchableOpacity>
+
+        {/* Insights Dashboard Card */}
+        <TouchableOpacity
+          style={styles.uploadCard}
+          onPress={() => navigation.navigate('InsightsDashboard' as never)}
+          activeOpacity={0.8}
+        >
+          <View style={styles.uploadContent}>
+            <Text style={styles.uploadEmoji}>📊</Text>
+            <View style={styles.uploadText}>
+              <Text style={styles.uploadTitle}>Spending Insights</Text>
+              <Text style={styles.uploadSubtitle}>
+                See optimization score and trends
+              </Text>
+            </View>
+          </View>
+          <ChevronRight size={20} color={colors.primary.main} />
+        </TouchableOpacity>
+
+        {/* Achievements Card */}
+        {achievements && (
+          <TouchableOpacity
+            style={styles.achievementsCard}
+            onPress={() => navigation.navigate('Achievements' as never)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.achievementsContent}>
+              <View style={styles.achievementsIconContainer}>
+                <Trophy size={24} color={colors.primary.main} />
+              </View>
+              <View style={styles.achievementsText}>
+                <Text style={styles.achievementsTitle}>
+                  {achievements.rankTitle}
+                </Text>
+                <Text style={styles.achievementsSubtitle}>
+                  {achievements.totalUnlocked}/{achievements.totalAchievements} achievements unlocked
+                </Text>
+                {achievements.currentStreak > 0 && (
+                  <View style={styles.streakBadge}>
+                    <Text style={styles.streakText}>
+                      🔥 {achievements.currentStreak} day streak
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+            <ChevronRight size={20} color={colors.primary.main} />
+          </TouchableOpacity>
+        )}
+
+        {/* Application Tracker Card */}
+        <TouchableOpacity
+          style={styles.uploadCard}
+          onPress={() => navigation.navigate('ApplicationTracker' as never)}
+          activeOpacity={0.8}
+        >
+          <View style={styles.uploadContent}>
+            <Text style={styles.uploadEmoji}>📋</Text>
+            <View style={styles.uploadText}>
+              <Text style={styles.uploadTitle}>Application Tracker</Text>
+              <Text style={styles.uploadSubtitle}>
+                Track credit card applications and 5/24 status
+              </Text>
+            </View>
+          </View>
+          <ChevronRight size={20} color={colors.primary.main} />
+        </TouchableOpacity>
 
         {/* Calculator Section */}
         {/* Store Selector */}
@@ -286,6 +470,7 @@ export default function HomeScreen() {
             onChange={handleAmountChange}
             error={state.amountError}
             placeholder={t('home.enterAmount') || '0.00'}
+            label=""
           />
         </View>
 
@@ -313,6 +498,7 @@ export default function HomeScreen() {
               isEmpty={!hasCards}
               amount={state.amount || 0}
               cards={getAllCardsSync()}
+              category={state.selectedCategory || undefined}
             />
           </View>
         ) : state.selectedCategory && state.amount ? (
@@ -330,6 +516,81 @@ export default function HomeScreen() {
               'Select a category and enter an amount to find the best card'
             }
           />
+        )}
+
+        {/* Recommended Cards Section */}
+        {hasCards && (
+          <View style={styles.recommendationsSection}>
+            <View style={styles.divider} />
+            <View style={styles.recommendationsHeader}>
+              <View style={styles.recommendationsTitle}>
+                <Sparkles size={18} color={colors.primary.main} />
+                <Text style={styles.resultsHeader}>
+                  {t('home.recommendedCards') || 'Recommended Cards'}
+                </Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.seeAllButton}
+                onPress={() => navigation.navigate('CardRecommendations' as never)}
+              >
+                <Text style={styles.seeAllText}>{t('home.seeAll') || 'See All'}</Text>
+                <ChevronRight size={16} color={colors.primary.main} />
+              </TouchableOpacity>
+            </View>
+
+            {recommendationsLoading ? (
+              <View style={styles.recommendationsLoading}>
+                <ActivityIndicator size="small" color={colors.primary.main} />
+                <Text style={styles.loadingText}>Finding best cards for you...</Text>
+              </View>
+            ) : recommendations.length > 0 ? (
+              <View style={styles.recommendationsList}>
+                {recommendations.map((rec, index) => {
+                  const categoryRates = formatTopCategoryRates(rec.card, 2);
+                  const upToRate = formatUpToRate(rec.card);
+                  return (
+                    <TouchableOpacity 
+                      key={rec.card.id}
+                      style={styles.recommendationItem}
+                      onPress={() => navigation.navigate('CardRecommendations' as never)}
+                    >
+                      <View style={styles.recommendationRank}>
+                        <Text style={styles.rankText}>{index + 1}</Text>
+                      </View>
+                      <View style={styles.recommendationContent}>
+                        <Text style={styles.recommendationCardName} numberOfLines={1}>
+                          {rec.card.name}
+                        </Text>
+                        {categoryRates ? (
+                          <Text style={styles.recommendationCategoryRate} numberOfLines={1}>
+                            {categoryRates}
+                          </Text>
+                        ) : (
+                          <Text style={styles.recommendationReason} numberOfLines={1}>
+                            {upToRate}
+                          </Text>
+                        )}
+                        <Text style={styles.recommendationReason} numberOfLines={1}>
+                          {rec.reason}
+                        </Text>
+                      </View>
+                      <View style={styles.recommendationValue}>
+                        <Text style={styles.rewardValue}>
+                          ${rec.estimatedAnnualRewards.toFixed(0)}/yr
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ) : (
+              <View style={styles.noRecommendations}>
+                <Text style={styles.noRecommendationsText}>
+                  {t('home.noRecommendations') || 'Add spending data to get personalized recommendations'}
+                </Text>
+              </View>
+            )}
+          </View>
         )}
       </ScrollView>
     </KeyboardAvoidingView>
@@ -369,6 +630,85 @@ const createStyles = (theme: Theme) =>
       color: colors.text.secondary,
       textAlign: 'center',
     },
+    heroCard: {
+      backgroundColor: colors.primary.light,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 24,
+      borderWidth: 2,
+      borderColor: colors.primary.main,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    heroContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      gap: 16,
+    },
+    heroIcon: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: colors.primary.main,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    heroEmoji: {
+      fontSize: 28,
+    },
+    heroText: {
+      flex: 1,
+    },
+    heroTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.primary.dark,
+      marginBottom: 4,
+    },
+    heroSubtitle: {
+      fontSize: 13,
+      color: colors.primary.dark,
+      lineHeight: 18,
+    },
+    heroArrow: {
+      marginLeft: 8,
+    },
+    uploadCard: {
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 24,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    uploadContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      gap: 12,
+    },
+    uploadEmoji: {
+      fontSize: 32,
+    },
+    uploadText: {
+      flex: 1,
+    },
+    uploadTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: 2,
+    },
+    uploadSubtitle: {
+      fontSize: 13,
+      color: colors.text.secondary,
+      lineHeight: 18,
+    },
     section: {
       marginBottom: 16, // space-y-4 (16px gap)
     },
@@ -400,5 +740,150 @@ const createStyles = (theme: Theme) =>
       fontSize: 15,
       color: colors.text.tertiary,
       textAlign: 'center',
+    },
+    // Recommendations section styles
+    recommendationsSection: {
+      marginTop: 8,
+    },
+    recommendationsHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    recommendationsTitle: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    seeAllButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    seeAllText: {
+      fontSize: 13,
+      fontWeight: '500',
+      color: colors.primary.main,
+    },
+    recommendationsLoading: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      paddingVertical: 24,
+    },
+    loadingText: {
+      fontSize: 13,
+      color: colors.text.secondary,
+    },
+    recommendationsList: {
+      gap: 8,
+    },
+    recommendationItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+      padding: 12,
+      gap: 12,
+    },
+    recommendationRank: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: colors.primary.bg20,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    rankText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.primary.main,
+    },
+    recommendationContent: {
+      flex: 1,
+    },
+    recommendationCardName: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: 2,
+    },
+    recommendationCategoryRate: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.success.main,
+      marginBottom: 2,
+    },
+    recommendationReason: {
+      fontSize: 12,
+      color: colors.text.secondary,
+    },
+    recommendationValue: {
+      alignItems: 'flex-end',
+    },
+    rewardValue: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.success.main,
+    },
+    noRecommendations: {
+      paddingVertical: 24,
+      alignItems: 'center',
+    },
+    noRecommendationsText: {
+      fontSize: 13,
+      color: colors.text.tertiary,
+      textAlign: 'center',
+    },
+    achievementsCard: {
+      backgroundColor: colors.primary.bg20,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 24,
+      borderWidth: 2,
+      borderColor: colors.primary.main,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    achievementsContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      gap: 12,
+    },
+    achievementsIconContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colors.primary.main,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    achievementsText: {
+      flex: 1,
+    },
+    achievementsTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.primary.dark,
+      marginBottom: 2,
+    },
+    achievementsSubtitle: {
+      fontSize: 13,
+      color: colors.primary.dark,
+      lineHeight: 18,
+    },
+    streakBadge: {
+      marginTop: 4,
+    },
+    streakText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.primary.dark,
     },
   });

@@ -15,8 +15,10 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Linking,
+  Platform,
 } from 'react-native';
-import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, User, Crown, Navigation } from 'lucide-react-native';
+import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, LogIn, User, Crown, Navigation, ChevronRight } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -34,10 +36,23 @@ import {
   Language,
   Country,
 } from '../services/PreferenceManager';
-import { refreshCards, getLastSyncTime, getAllCards, onCountryChange } from '../services/CardDataService';
+import { refreshCards, getLastSyncTime, getAllCards, onCountryChange, getTotalCardCount } from '../services/CardDataService';
+import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
 import { isSupabaseConfigured } from '../services/supabase';
 import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
-import { getCurrentTier, SUBSCRIPTION_TIERS, SubscriptionTier } from '../services/SubscriptionService';
+import { 
+  getCurrentTier, 
+  SUBSCRIPTION_TIERS, 
+  SubscriptionTier,
+  getSageUsage,
+  SageUsage,
+  isAdminSync,
+  getSubscriptionState,
+  SubscriptionState,
+  SAGE_LIMITS,
+  refreshSubscription,
+  openCustomerPortal,
+} from '../services/SubscriptionService';
 import Paywall from '../components/Paywall';
 import {
   isAutoPilotEnabled,
@@ -114,9 +129,10 @@ function SettingsRow({
 
 interface SettingsScreenProps {
   onSignOut?: () => void;
+  onSignIn?: () => void;
 }
 
-export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
+export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenProps) {
   const { t, i18n } = useTranslation();
   const [newCardSuggestions, setNewCardSuggestions] = useState(true);
   const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
@@ -125,8 +141,11 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [cardCount, setCardCount] = useState<number>(0);
+  const [cardCountDetail, setCardCountDetail] = useState<string>('');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>('free');
+  const [subscriptionState, setSubscriptionState] = useState<SubscriptionState | null>(null);
+  const [sageUsage, setSageUsage] = useState<SageUsage | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [autoPilotStatus, setAutoPilotStatus] = useState<AutoPilotStatus | null>(null);
 
@@ -140,16 +159,28 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
     const currentUser = await getCurrentUser();
     setUser(currentUser);
 
-    // Load subscription tier
+    // Load subscription tier and state
+    await refreshSubscription();
     const tier = await getCurrentTier();
     setSubscriptionTier(tier);
+    
+    const subState = await getSubscriptionState();
+    setSubscriptionState(subState);
+    
+    // Load Sage usage if user has access
+    if (tier === 'pro') {
+      const usage = await getSageUsage();
+      setSageUsage(usage);
+    }
 
     // Load card count and last sync time
     try {
-      const cards = await getAllCards();
-      setCardCount(cards.length);
+      const cardStats = await getTotalCardCount();
+      setCardCount(cardStats.total);
+      setCardCountDetail(`${cardStats.us} US + ${cardStats.ca} CA`);
     } catch {
       setCardCount(0);
+      setCardCountDetail('');
     }
     const syncTime = await getLastSyncTime();
     setLastSync(syncTime);
@@ -177,10 +208,38 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
     i18n.changeLanguage(lang);
   };
 
+  const performCountrySwitch = async (country: Country) => {
+    setIsLoading(true);
+    setCurrentCountry(country);
+    await setCountry(country);
+    await onCountryChange();
+    
+    // Reload cards for new country
+    try {
+      const cardStats = await getTotalCardCount();
+      setCardCount(cardStats.total);
+      setCardCountDetail(`${cardStats.us} US + ${cardStats.ca} CA`);
+    } catch {
+      setCardCount(0);
+      setCardCountDetail('');
+    }
+    
+    // Notify other screens (HomeScreen) that country has changed
+    CountryChangeEmitter.emit();
+    
+    setIsLoading(false);
+  };
+
   const handleCountryChange = async (country: Country) => {
     if (country === currentCountry) return;
     
-    // Show confirmation
+    // On web, Alert.alert callbacks don't work reliably — switch directly
+    if (Platform.OS === 'web') {
+      await performCountrySwitch(country);
+      return;
+    }
+    
+    // On native, show confirmation dialog
     Alert.alert(
       t('settings.changeCountryTitle'),
       t('settings.changeCountryMessage', { country: getCountryName(country) }),
@@ -188,22 +247,7 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
         { text: t('common.cancel'), style: 'cancel' },
         {
           text: t('common.ok'),
-          onPress: async () => {
-            setIsLoading(true);
-            setCurrentCountry(country);
-            await setCountry(country);
-            await onCountryChange();
-            
-            // Reload cards for new country
-            try {
-              const cards = await getAllCards();
-              setCardCount(cards.length);
-            } catch {
-              setCardCount(0);
-            }
-            
-            setIsLoading(false);
-          },
+          onPress: () => performCountrySwitch(country),
         },
       ]
     );
@@ -220,13 +264,15 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
     setIsRefreshing(true);
     try {
       const cards = await refreshCards();
-      setCardCount(cards.length);
+      const cardStats = await getTotalCardCount();
+      setCardCount(cardStats.total);
+      setCardCountDetail(`${cardStats.us} US + ${cardStats.ca} CA`);
       const syncTime = await getLastSyncTime();
       setLastSync(syncTime);
 
       Alert.alert(
         t('settings.refreshSuccess'),
-        t('settings.refreshSuccessMessage', { count: cards.length }),
+        t('settings.refreshSuccessMessage', { count: cardStats.total }),
         [{ text: t('common.ok') }]
       );
     } catch (error) {
@@ -309,27 +355,86 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
               <SettingsRow
                 icon={<User size={20} color={colors.text.secondary} />}
                 title={user.displayName || user.email || t('settings.guest')}
-                description={user.isAnonymous ? t('settings.guestMode') : user.email || undefined}
+                description={user.isAnonymous ? t('settings.signInPrompt') : user.email || undefined}
                 isLast={false}
               >
-                {!user.isAnonymous && (
+                {!user.isAnonymous ? (
                   <TouchableOpacity onPress={handleSignOut}>
                     <LogOut size={20} color={colors.error.main} />
                   </TouchableOpacity>
-                )}
+                ) : onSignIn ? (
+                  <TouchableOpacity onPress={onSignIn} style={styles.signInButton}>
+                    <Text style={styles.signInText}>{t('settings.signIn')}</Text>
+                    <LogIn size={18} color={colors.primary.main} />
+                  </TouchableOpacity>
+                ) : null}
               </SettingsRow>
 
               <SettingsRow
-                icon={<Crown size={20} color={tierConfig.id === 'free' ? colors.text.secondary : colors.primary.main} />}
-                title={t('settings.subscription')}
-                description={tierConfig.name}
-                isLast={true}
+                icon={<Crown size={20} color={subscriptionTier === 'lifetime' ? '#FFD700' : subscriptionState?.isAdmin ? colors.warning.main : tierConfig.id === 'free' ? colors.text.secondary : colors.primary.main} />}
+                title={subscriptionTier === 'lifetime' ? 'Lifetime Member ✨' : t('settings.subscription')}
+                description={subscriptionTier === 'lifetime' ? 'All Premium features — forever' : subscriptionState?.isAdmin ? 'Admin Access' : tierConfig.name}
+                isLast={subscriptionTier !== 'pro'}
                 onPress={subscriptionTier === 'free' ? handleUpgrade : undefined}
               >
                 {subscriptionTier === 'free' && (
                   <Text style={styles.upgradeText}>{t('settings.upgrade')}</Text>
                 )}
+                {subscriptionTier === 'lifetime' && (
+                  <View style={styles.lifetimeBadge}>
+                    <Text style={styles.lifetimeBadgeText}>LIFETIME</Text>
+                  </View>
+                )}
+                {subscriptionState?.isAdmin && (
+                  <View style={styles.adminBadge}>
+                    <Text style={styles.adminBadgeText}>ADMIN</Text>
+                  </View>
+                )}
+                {(subscriptionTier === 'pro' || subscriptionTier === 'max') && !subscriptionState?.isAdmin && (
+                  <TouchableOpacity 
+                    style={styles.manageButton}
+                    onPress={async () => {
+                      try {
+                        const result = await openCustomerPortal();
+                        if ('error' in result) {
+                          Alert.alert('Error', result.error);
+                        } else if (result.url) {
+                          const supported = await Linking.canOpenURL(result.url);
+                          if (supported) {
+                            await Linking.openURL(result.url);
+                          } else {
+                            Alert.alert('Error', 'Unable to open settings page');
+                          }
+                        }
+                      } catch (error) {
+                        console.error('Portal error:', error);
+                        Alert.alert('Error', 'Failed to open subscription management');
+                      }
+                    }}
+                  >
+                    <Text style={styles.manageButtonText}>Manage</Text>
+                    <ChevronRight size={14} color={colors.primary.main} />
+                  </TouchableOpacity>
+                )}
               </SettingsRow>
+              
+              {/* Sage usage for Pro users */}
+              {subscriptionTier === 'pro' && sageUsage && sageUsage.limit !== null && (
+                <SettingsRow
+                  icon={<Crown size={20} color={colors.primary.main} />}
+                  title="Sage AI Usage"
+                  description={`${sageUsage.chatCount} of ${sageUsage.limit} chats used this month`}
+                  isLast={true}
+                >
+                  <Text style={[
+                    styles.usageText,
+                    sageUsage.remaining !== null && sageUsage.remaining <= 2 && styles.usageTextWarning,
+                    sageUsage.remaining !== null && sageUsage.remaining === 0 && styles.usageTextDanger,
+                  ]}>
+                    {sageUsage.remaining ?? 0} left
+                  </Text>
+                </SettingsRow>
+              )}
             </View>
           </>
         )}
@@ -402,8 +507,8 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
             title={t('settings.autoPilotEnabled') || 'Enable AutoPilot'}
             description={
               autoPilotStatus?.enabled
-                ? (t('settings.autoPilotActiveDescription') || `Monitoring ${autoPilotStatus.activeGeofences} stores`)
-                : (t('settings.autoPilotDescription') || 'Get card alerts when you arrive at stores')
+                ? t('settings.autoPilotActiveDescription', { count: autoPilotStatus.activeGeofences })
+                : t('settings.autoPilotDescription')
             }
             isLast={true}
           >
@@ -457,7 +562,13 @@ export default function SettingsScreen({ onSignOut }: SettingsScreenProps) {
           <SettingsRow
             icon={<Info size={20} color={colors.text.secondary} />}
             title={t('settings.cardsInDatabase')}
-            description={lastSync ? `${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}` : undefined}
+            description={
+              cardCountDetail
+                ? `${cardCountDetail}${lastSync ? ` • ${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}` : ''}`
+                : lastSync
+                ? `${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}`
+                : undefined
+            }
             isLast={true}
           >
             <Text style={styles.aboutValue}>{cardCount}</Text>
@@ -606,6 +717,68 @@ const styles = StyleSheet.create({
   },
   // Upgrade
   upgradeText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.primary.main,
+  },
+  // Admin badge
+  adminBadge: {
+    backgroundColor: colors.warning.main,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  adminBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.background.primary,
+  },
+  // Lifetime badge
+  lifetimeBadge: {
+    backgroundColor: '#FFD700',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  lifetimeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#1A1A2E',
+  },
+  // Manage subscription button
+  manageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.background.tertiary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  manageButtonText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.text.secondary,
+  },
+  // Usage text
+  usageText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.primary.main,
+  },
+  usageTextWarning: {
+    color: colors.warning.main,
+  },
+  usageTextDanger: {
+    color: colors.error.main,
+  },
+  // Sign In
+  signInButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  signInText: {
     fontSize: 13,
     fontWeight: '600',
     color: colors.primary.main,
