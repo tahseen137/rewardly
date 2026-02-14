@@ -215,7 +215,12 @@ export default function HomeScreen() {
 
   // Calculate rewards when inputs are ready
   useEffect(() => {
-    const { selectedCategory, amount } = state;
+    const { selectedCategory, amount, isLoading } = state;
+
+    // Wait until loading is complete before calculating
+    if (isLoading) {
+      return;
+    }
 
     // Check if we have all required inputs
     if (!selectedCategory || !amount || amount <= 0) {
@@ -292,7 +297,7 @@ export default function HomeScreen() {
         isCalculating: false,
       }));
     }
-  }, [state.selectedCategory, state.amount]);
+  }, [state.selectedCategory, state.amount, state.isLoading]);
 
   // Show loading state with skeleton UI
   if (state.isLoading) {

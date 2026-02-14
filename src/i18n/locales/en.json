@@ -56,7 +56,11 @@
     "cardsInPortfolio": "{{count}} card in your portfolio",
     "cardsInPortfolio_plural": "{{count}} cards in your portfolio",
     "noResultsTitle": "No Results",
-    "noResultsMessage": "Unable to calculate rewards. Please try again."
+    "noResultsMessage": "Unable to calculate rewards. Please try again.",
+    "recommendedCards": "Recommended Cards",
+    "seeAll": "See All",
+    "topCardsTitle": "Top Cards for This Category",
+    "noRecommendations": "Add spending data to get personalized recommendations"
   },
   "productSearch": {
     "title": "Product Search",
@@ -452,7 +456,7 @@
       "reason": "Why this card?",
       "basedOn": {
         "spending": "Based on your spending",
-        "gap": "Fills a gap in your wallet",
+        "gap": "Great for this spending category",
         "upgrade": "Upgrade from your current card",
         "signup_bonus": "Great sign-up bonus"
       },
