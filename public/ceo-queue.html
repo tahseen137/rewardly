@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEO Content Queue | Motu Inc.</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f0f1a;color:#e0e0e0;min-height:100vh}
+.header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:24px;text-align:center;border-bottom:2px solid #e94560}
+.header h1{font-size:1.8rem;color:#fff}
+.header p{color:#888;margin-top:4px;font-size:.9rem}
+.tabs{display:flex;gap:0;background:#1a1a2e;padding:0 16px;border-bottom:1px solid #333}
+.tab{padding:12px 24px;cursor:pointer;color:#888;border-bottom:2px solid transparent;transition:all .2s;font-weight:500}
+.tab.active{color:#e94560;border-bottom-color:#e94560}
+.tab:hover{color:#fff}
+.container{max-width:900px;margin:0 auto;padding:20px}
+.card{background:#1a1a2e;border:1px solid #333;border-radius:12px;padding:24px;margin-bottom:16px;position:relative}
+.card.urgent{border-color:#e94560}
+.card.posted{opacity:.5;border-color:#27ae60}
+.badge{display:inline-block;padding:4px 10px;border-radius:4px;font-size:.75rem;font-weight:600;margin-bottom:12px}
+.badge.reddit{background:#ff4500;color:#fff}
+.badge.hn{background:#ff6600;color:#fff}
+.badge.ih{background:#0e76a8;color:#fff}
+.badge.directory{background:#7c3aed;color:#fff}
+.badge.urgent{background:#e94560;color:#fff}
+.badge.ready{background:#27ae60;color:#fff}
+.platform{font-size:.85rem;color:#888;margin-bottom:8px}
+.title{font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:12px}
+.content{background:#111;border-radius:8px;padding:16px;font-size:.95rem;line-height:1.6;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-bottom:16px;border:1px solid #2a2a3a}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s}
+.btn-copy{background:#0f3460;color:#fff}
+.btn-copy:hover{background:#1a4a80}
+.btn-link{background:#333;color:#fff;text-decoration:none;display:inline-flex;align-items:center}
+.btn-link:hover{background:#444}
+.btn-done{background:#1a3a1a;color:#27ae60;border:1px solid #27ae60}
+.btn-done:hover{background:#27ae60;color:#fff}
+.empty{text-align:center;padding:60px 20px;color:#666}
+.empty h2{margin-bottom:8px}
+.stats{display:flex;gap:16px;justify-content:center;padding:16px;background:#1a1a2e;border-bottom:1px solid #333}
+.stat{text-align:center}
+.stat-num{font-size:1.5rem;font-weight:700;color:#e94560}
+.stat-label{font-size:.75rem;color:#888}
+.updated{text-align:center;color:#555;font-size:.8rem;padding:16px}
+.copy-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:12px 24px;border-radius:8px;font-weight:600;display:none;z-index:100}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🧙‍♂️ CEO Content Queue</h1>
+<p>Posts ready for you to publish. Copy → Paste → Done.</p>
+</div>
+
+<div class="stats">
+<div class="stat"><div class="stat-num" id="pending-count">5</div><div class="stat-label">Pending</div></div>
+<div class="stat"><div class="stat-num" id="posted-count">0</div><div class="stat-label">Posted</div></div>
+</div>
+
+<div class="tabs">
+<div class="tab active" onclick="filterTab('all')">All</div>
+<div class="tab" onclick="filterTab('reddit')">Reddit</div>
+<div class="tab" onclick="filterTab('hn')">Hacker News</div>
+<div class="tab" onclick="filterTab('ih')">Indie Hackers</div>
+<div class="tab" onclick="filterTab('directory')">Directories</div>
+</div>
+
+<div class="container" id="queue">
+
+<div class="card urgent" data-platform="reddit" id="item-1">
+<span class="badge urgent">🔥 HIGH PRIORITY</span>
+<span class="badge reddit">Reddit</span>
+<div class="platform">r/PersonalFinanceCanada · 1.1M members</div>
+<div class="title">I built a free app that tells you which credit card to use for every purchase (410+ Canadian cards)</div>
+<div class="content">Hey everyone,
+
+I'm a software engineer who got frustrated trying to figure out which of my credit cards gives the best rewards for different purchases. So I built Rewardly.
+
+It has 410+ Canadian credit cards in its database (TD, RBC, BMO, CIBC, Scotiabank, Amex, Neo, Brim, etc.) and instantly tells you which card earns the most for any purchase category.
+
+Features:
+- Rewards calculator — pick a category, enter amount, see which card wins
+- AI advisor (Sage) — ask it anything like "best card for groceries?" or "is the Amex Cobalt worth the annual fee?"
+- Signup bonus ROI — calculates if a card's welcome bonus is worth it based on your spending
+- Fee breakeven — tells you how much you need to spend to justify the annual fee
+- Card comparison — side-by-side comparison of any cards
+
+It's free — no account required, you can use it as a guest.
+
+Link: https://rewardly-cyan.vercel.app
+
+Would love feedback from this community. What features would make this more useful for you?</div>
+<div class="actions">
+<button class="btn btn-copy" onclick="copyContent(this)">📋 Copy Post</button>
+<a href="https://www.reddit.com/r/PersonalFinanceCanada/submit" target="_blank" class="btn btn-link">↗ Open Reddit</a>
+<button class="btn btn-done" onclick="markDone(this)">✅ Posted</button>
+</div>
+</div>
+
+<div class="card" data-platform="reddit" id="item-2">
+<span class="badge reddit">Reddit</span>
+<div class="platform">r/churningcanada</div>
+<div class="title">Tool for tracking which card to use for each spend category (410+ Canadian cards database)</div>
+<div class="content">Hey churners,
+
+Built a tool that might be useful for optimizing spend across multiple cards. Rewardly has 410+ Canadian credit cards with category-specific reward rates.
+
+Particularly useful for churning:
+- Tracks rewards by category across all your cards
+- Shows fee breakeven analysis (how much you need to spend to justify annual fees)
+- Signup bonus ROI calculator
+- AI advisor that understands Canadian card strategies
+
+It's free to use: https://rewardly-cyan.vercel.app
+
+Built it because I got tired of maintaining a spreadsheet. Happy to hear what features would make it more useful for the churning community specifically.</div>
+<div class="actions">
+<button class="btn btn-copy" onclick="copyContent(this)">📋 Copy Post</button>
+<a href="https://www.reddit.com/r/churningcanada/submit" target="_blank" class="btn btn-link">↗ Open Reddit</a>
+<button class="btn btn-done" onclick="markDone(this)">✅ Posted</button>
+</div>
+</div>
+
+<div class="card" data-platform="reddit" id="item-3">
+<span class="badge reddit">Reddit</span>
+<div class="platform">r/CreditCardsCanada</div>
+<div class="title">Free credit card rewards optimizer for Canada — compare 410+ cards instantly</div>
+<div class="content">Hey everyone,
+
+I built a free tool that helps you figure out which credit card to use for every purchase.
+
+The problem: I have 4 credit cards and could never remember which one gives the best rewards for groceries vs gas vs dining. I was definitely leaving money on the table.
+
+What I built: Rewardly — it has 410+ Canadian credit cards in its database (TD, RBC, BMO, CIBC, Scotiabank, Amex, Neo, Brim, etc.) and instantly tells you which card earns the most for any purchase category.
+
+Cool features:
+- Rewards calculator — pick a category, enter amount, see which card wins
+- AI advisor (Sage) — ask it anything like "best card for groceries?" or "is the Amex Cobalt worth the annual fee?"
+- Signup bonus ROI — calculates if a card's welcome bonus is worth it based on your spending
+- Fee breakeven — tells you how much you need to spend to justify the annual fee
+- Card comparison — side-by-side comparison of any cards
+
+It's free — no account required, you can use it as a guest.
+
+Link: https://rewardly-cyan.vercel.app
+
+Would love feedback from this community. What features would make this more useful for you?</div>
+<div class="actions">
+<button class="btn btn-copy" onclick="copyContent(this)">📋 Copy Post</button>
+<a href="https://www.reddit.com/r/CreditCardsCanada/submit" target="_blank" class="btn btn-link">↗ Open Reddit</a>
+<button class="btn btn-done" onclick="markDone(this)">✅ Posted</button>
+</div>
+</div>
+
+<div class="card" data-platform="hn" id="item-4">
+<span class="badge hn">Hacker News</span>
+<div class="platform">Show HN</div>
+<div class="title">Show HN: Rewardly – AI credit card rewards optimizer for Canada (410+ cards)</div>
+<div class="content">Hey HN,
+
+I built Rewardly because I was tired of guessing which credit card to use for different purchases. In Canada, we don't have good alternatives to US apps like MaxRewards.
+
+Tech stack: React Native + Expo, Supabase (auth + DB + edge functions), Stripe, Claude Haiku (AI advisor), Vercel.
+
+Interesting challenges:
+- Recommendation engine cross-references spending categories with 410+ card reward structures
+- AI advisor is context-aware — understands Canadian cards, fees, ROI calculations
+- Signup bonus ROI calculator factors in annual fees and actual spending patterns
+
+The whole thing was built in about 2 weeks. Free to use (freemium model).
+
+Would love technical feedback. The AI advisor is especially interesting — domain-specific chatbot for Canadian credit cards.
+
+https://rewardly-cyan.vercel.app</div>
+<div class="actions">
+<button class="btn btn-copy" onclick="copyContent(this)">📋 Copy Post</button>
+<a href="https://news.ycombinator.com/submit" target="_blank" class="btn btn-link">↗ Open HN</a>
+<button class="btn btn-done" onclick="markDone(this)">✅ Posted</button>
+</div>
+</div>
+
+<div class="card" data-platform="ih" id="item-5">
+<span class="badge ih">Indie Hackers</span>
+<div class="platform">indiehackers.com</div>
+<div class="title">Launched Rewardly — AI credit card rewards optimizer (Canada). Built it in 2 weeks.</div>
+<div class="content">The Idea: Canadians don't have a good credit card rewards optimizer. MaxRewards is US-only. SaveSage has limited Canadian data. Most people just guess or maintain a spreadsheet.
+
+What It Does: Tells you which credit card to use for every purchase. 410+ Canadian cards, AI recommendations via Sage advisor.
+
+Key features:
+- Rewards Calculator — pick category, enter amount, see which card wins
+- Sage AI — ask "best card for groceries?" and get data-driven answers
+- Signup Bonus ROI — calculates if a welcome bonus is worth the annual fee
+- Fee Breakeven — how much to spend to justify the fee
+- Card Explorer — browse and filter 410+ cards
+
+The Numbers (2 weeks in):
+- 410+ cards in database
+- 1,187 tests passing
+- 3 tiers: Free / Pro ($5.99/mo) / Max ($12.99/mo) + Lifetime ($49.99)
+- Revenue: $0 (just launched)
+- Built by 1 developer + AI agents
+
+What I Learned:
+1. Canada is underserved — US gets all the fintech love
+2. AI makes the product — Sage advisor is what makes this different from a spreadsheet
+3. Data is the moat — 410+ verified cards was the hardest part
+4. Ship fast, iterate faster — MVP in 2 weeks, not perfect, but live
+
+Link: https://rewardly-cyan.vercel.app
+
+Happy to answer questions!</div>
+<div class="actions">
+<button class="btn btn-copy" onclick="copyContent(this)">📋 Copy Post</button>
+<a href="https://www.indiehackers.com/new-post" target="_blank" class="btn btn-link">↗ Open IH</a>
+<button class="btn btn-done" onclick="markDone(this)">✅ Posted</button>
+</div>
+</div>
+
+</div>
+
+<div class="updated">Last updated by Gandalf: Feb 14, 2026 · Bookmark this page!</div>
+
+<div class="copy-toast" id="toast">✅ Copied to clipboard!</div>
+
+<script>
+function copyContent(btn){
+const card=btn.closest('.card');
+const content=card.querySelector('.content').textContent.trim();
+const title=card.querySelector('.title').textContent.trim();
+navigator.clipboard.writeText(title+'\n\n'+content).then(()=>{
+const toast=document.getElementById('toast');
+toast.style.display='block';
+setTimeout(()=>toast.style.display='none',2000);
+});
+}
+function markDone(btn){
+const card=btn.closest('.card');
+card.classList.add('posted');
+card.classList.remove('urgent');
+updateCounts();
+const key='ceo-queue-'+card.id;
+localStorage.setItem(key,'done');
+}
+function filterTab(platform){
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+event.target.classList.add('active');
+document.querySelectorAll('.card').forEach(c=>{
+if(platform==='all'||c.dataset.platform===platform)c.style.display='block';
+else c.style.display='none';
+});
+}
+function updateCounts(){
+const all=document.querySelectorAll('.card');
+let posted=0;
+all.forEach(c=>{if(c.classList.contains('posted'))posted++});
+document.getElementById('pending-count').textContent=all.length-posted;
+document.getElementById('posted-count').textContent=posted;
+}
+// Restore state
+document.querySelectorAll('.card').forEach(c=>{
+const key='ceo-queue-'+c.id;
+if(localStorage.getItem(key)==='done'){
+c.classList.add('posted');
+c.classList.remove('urgent');
+}
+});
+updateCounts();
+</script>
+</body>
+</html>
