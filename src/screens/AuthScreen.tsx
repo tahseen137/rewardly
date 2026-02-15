@@ -55,6 +55,13 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       return;
     }
     
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    
     if (!password) {
       setError(t('auth.errors.passwordRequired'));
       return;
@@ -173,6 +180,12 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
   const handleSendResetLink = useCallback(async () => {
     if (!email.trim()) {
       setError(t('auth.errors.emailRequired') || 'Please enter your email address.');
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError('Please enter a valid email address.');
       return;
     }
 
