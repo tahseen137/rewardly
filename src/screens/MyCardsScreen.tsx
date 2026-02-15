@@ -458,7 +458,10 @@ export default function MyCardsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [availableCards, setAvailableCards] = useState<Card[]>([]);
   const [isLoadingCards, setIsLoadingCards] = useState(false);
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  // Navigate to CardDetail when a card is tapped
+  const handleViewDetails = useCallback((card: Card) => {
+    navigation.navigate('CardDetail' as never, { cardId: card.id } as never);
+  }, [navigation]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const loadPortfolio = useCallback(async () => {
@@ -731,7 +734,7 @@ export default function MyCardsScreen() {
               userCard={item}
               onRemove={handleRemoveCard}
               onUpdateBalance={handleUpdateBalance}
-              onViewDetails={setSelectedCard}
+              onViewDetails={handleViewDetails}
             />
           )}
           contentContainerStyle={styles.listContent}

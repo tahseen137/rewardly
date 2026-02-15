@@ -16,6 +16,7 @@ import {
   Linking,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useNavigation } from '@react-navigation/native';
 import { TrendingUp, ExternalLink, Sparkles, Target } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
@@ -37,9 +38,10 @@ import { formatUpToRate, formatTopCategoryRates, formatBestForCategories } from 
 interface RecommendationCardProps {
   recommendation: CardRecommendation;
   showAffiliateLink: boolean;
+  onPress?: (cardId: string) => void;
 }
 
-function RecommendationCard({ recommendation, showAffiliateLink }: RecommendationCardProps) {
+function RecommendationCard({ recommendation, showAffiliateLink, onPress }: RecommendationCardProps) {
   const { card, reason, estimatedAnnualRewards, signupBonus, affiliateUrl } = recommendation;
   const upToRate = formatUpToRate(card);
   const categoryRates = formatTopCategoryRates(card, 3);
@@ -52,16 +54,22 @@ function RecommendationCard({ recommendation, showAffiliateLink }: Recommendatio
 
   return (
     <Animated.View entering={FadeInDown.duration(400)} style={styles.recommendationCard}>
-      <View style={styles.recommendationHeader}>
-        <View style={styles.recommendationInfo}>
-          <Text style={styles.cardName}>{card.name}</Text>
-          <Text style={styles.cardIssuer}>{card.issuer}</Text>
+      <TouchableOpacity 
+        onPress={() => onPress?.(card.id)}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`View ${card.name} details`}
+      >
+        <View style={styles.recommendationHeader}>
+          <View style={styles.recommendationInfo}>
+            <Text style={styles.cardName}>{card.name}</Text>
+            <Text style={styles.cardIssuer}>{card.issuer}</Text>
+          </View>
+          {/* Headline rate badge */}
+          <View style={styles.rateBadge}>
+            <Text style={styles.rateBadgeText}>{upToRate}</Text>
+          </View>
         </View>
-        {/* Headline rate badge */}
-        <View style={styles.rateBadge}>
-          <Text style={styles.rateBadgeText}>{upToRate}</Text>
-        </View>
-      </View>
 
       {/* Category context — shows WHY this card is recommended */}
       {categoryRates ? (
@@ -94,6 +102,7 @@ function RecommendationCard({ recommendation, showAffiliateLink }: Recommendatio
         )}
       </View>
 
+      </TouchableOpacity>
       <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
         <Text style={styles.applyButtonText}>
           {showAffiliateLink ? 'Apply Now' : 'Learn More'}
@@ -109,6 +118,7 @@ function RecommendationCard({ recommendation, showAffiliateLink }: Recommendatio
 // ============================================================================
 
 export default function CardRecommendationsScreen() {
+  const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [analysis, setAnalysis] = useState<RecommendationAnalysis | null>(null);
@@ -116,6 +126,10 @@ export default function CardRecommendationsScreen() {
   const hasAccess = canAccessFeatureSync('benefits_tracking'); // Pro+ feature
   const tier = getCurrentTierSync();
   const showAffiliateLinks = tier === 'max';
+
+  const handleCardPress = useCallback((cardId: string) => {
+    navigation.navigate('CardDetail' as never, { cardId } as never);
+  }, [navigation]);
 
   const loadRecommendations = useCallback(async () => {
     try {
@@ -201,6 +215,7 @@ export default function CardRecommendationsScreen() {
                 key={rec.card.id}
                 recommendation={rec}
                 showAffiliateLink={showAffiliateLinks}
+                onPress={handleCardPress}
               />
             ))}
 
