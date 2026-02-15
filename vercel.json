@@ -10,7 +10,11 @@
       "destination": "/admin.html"
     },
     {
-      "source": "/((?!admin).*)",
+      "source": "/ceo-queue",
+      "destination": "/ceo-queue.html"
+    },
+    {
+      "source": "/((?!admin|ceo-queue).*)",
       "destination": "/index.html"
     }
   ],
