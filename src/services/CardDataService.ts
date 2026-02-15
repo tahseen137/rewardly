@@ -16,7 +16,7 @@ import { getCountry, Country } from './PreferenceManager';
 // Constants
 // ============================================================================
 
-const CACHE_KEY_PREFIX = 'cards_cache_v2_'; // v2: BMO AIR MILES fix + duplicate cleanup
+const CACHE_KEY_PREFIX = 'cards_cache_v3_'; // v3: Air Miles family category rewards fix + Amex base rates
 const CACHE_TTL = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
 
 // Cache structure
