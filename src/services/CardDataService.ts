@@ -16,8 +16,8 @@ import { getCountry, Country } from './PreferenceManager';
 // Constants
 // ============================================================================
 
-const CACHE_KEY_PREFIX = 'cards_cache_';
-const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const CACHE_KEY_PREFIX = 'cards_cache_v2_'; // v2: BMO AIR MILES fix + duplicate cleanup
+const CACHE_TTL = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
 
 // Cache structure
 interface CachedData {
