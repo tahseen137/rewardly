@@ -23,6 +23,8 @@ interface RewardsDisplayProps {
   /** The spending category being displayed (for rate badge) */
   category?: SpendingCategory;
   onCardPress?: (result: RewardCalculationResult) => void;
+  /** When true, results are top cards from DB (not user's portfolio) */
+  isDiscovery?: boolean;
 }
 
 export function RewardsDisplay({
@@ -34,6 +36,7 @@ export function RewardsDisplay({
   cards,
   category,
   onCardPress,
+  isDiscovery = false,
 }: RewardsDisplayProps) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -93,7 +96,9 @@ export function RewardsDisplay({
         {t('home.rewardsComparison')}
       </Text>
       <Text style={[styles.subheader, { color: theme.colors.text.secondary }]}>
-        {t('home.cardsInPortfolio', { count: results.length })}
+        {isDiscovery
+          ? t('home.topCardsCount', { count: results.length }) || `Top ${results.length} cards`
+          : t('home.cardsInPortfolio', { count: results.length })}
       </Text>
 
       {/* Use plain View + map instead of FlatList to avoid nested scroll issues on web */}

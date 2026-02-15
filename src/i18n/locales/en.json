@@ -55,6 +55,8 @@
     "rewardsComparison": "Rewards Comparison",
     "cardsInPortfolio_one": "{{count}} card in your portfolio",
     "cardsInPortfolio_other": "{{count}} cards in your portfolio",
+    "topCardsCount_one": "Top {{count}} card",
+    "topCardsCount_other": "Top {{count}} cards",
     "noResultsTitle": "No Results",
     "noResultsMessage": "Unable to calculate rewards. Please try again.",
     "recommendedCards": "Recommended Cards",

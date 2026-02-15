@@ -55,6 +55,8 @@
     "rewardsComparison": "Comparaison des Récompenses",
     "cardsInPortfolio_one": "{{count}} carte dans votre portefeuille",
     "cardsInPortfolio_other": "{{count}} cartes dans votre portefeuille",
+    "topCardsCount_one": "Top {{count}} carte",
+    "topCardsCount_other": "Top {{count}} cartes",
     "noResultsTitle": "Aucun Résultat",
     "noResultsMessage": "Impossible de calculer les récompenses. Veuillez réessayer.",
     "recommendedCards": "Cartes Recommandées",

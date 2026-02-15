@@ -16,7 +16,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { ChevronRight, Sparkles } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import {
@@ -150,6 +150,18 @@ export default function HomeScreen() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Refresh portfolio state when tab comes into focus (e.g. after adding cards)
+  useFocusEffect(
+    useCallback(() => {
+      const portfolio = getCards();
+      const hadCards = hasCards;
+      const nowHasCards = portfolio.length > 0;
+      if (hadCards !== nowHasCards) {
+        loadData();
+      }
+    }, [hasCards, loadData])
+  );
 
   // Pull-to-refresh handler
   const handleRefresh = useCallback(async () => {
@@ -431,6 +443,7 @@ export default function HomeScreen() {
                 cards={getAllCardsSync()}
                 category={state.selectedCategory || undefined}
                 onCardPress={(result) => navigation.navigate('CardDetail' as never, { cardId: result.cardId } as never)}
+                isDiscovery={true}
               />
             </View>
           ) : (
