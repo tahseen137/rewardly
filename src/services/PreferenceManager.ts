@@ -36,6 +36,23 @@ const DEFAULT_COUNTRY: Country = 'US';
  */
 function detectCountryFromLocale(): Country {
   try {
+    // Web defaults to CA since the app is marketed as "Canada's #1 Rewards Optimizer"
+    // Most Canadian users have en-US browser locale, so locale detection is unreliable on web
+    if (Platform.OS === 'web') {
+      // Check all browser locale hints for CA
+      if (typeof navigator !== 'undefined') {
+        const languages = navigator.languages || [navigator.language || 'en-US'];
+        for (const lang of languages) {
+          const parts = lang.replace('_', '-').split('-');
+          const code = parts.length > 1 ? parts[1].toUpperCase() : '';
+          if (code === 'US') return 'US';
+          if (code === 'CA') return 'CA';
+        }
+      }
+      // Default to CA on web — our primary market
+      return 'CA';
+    }
+
     let locale = 'en-US';
     
     if (Platform.OS === 'ios') {
@@ -44,8 +61,6 @@ function detectCountryFromLocale(): Country {
                'en-US';
     } else if (Platform.OS === 'android') {
       locale = NativeModules.I18nManager?.localeIdentifier || 'en_US';
-    } else if (Platform.OS === 'web') {
-      locale = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
     }
     
     // Extract country code from locale (e.g., "en-CA" -> "CA", "en_CA" -> "CA")
@@ -58,7 +73,7 @@ function detectCountryFromLocale(): Country {
     
     return 'US';
   } catch {
-    return 'US';
+    return 'CA'; // Default to CA — our primary market
   }
 }
 
