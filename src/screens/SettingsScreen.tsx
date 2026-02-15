@@ -285,6 +285,13 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
   };
 
   const handleSignOut = async () => {
+    // On web, Alert.alert callbacks don't work reliably — sign out directly
+    if (Platform.OS === 'web') {
+      await signOut();
+      onSignOut?.();
+      return;
+    }
+
     Alert.alert(
       t('settings.signOutTitle'),
       t('settings.signOutMessage'),
