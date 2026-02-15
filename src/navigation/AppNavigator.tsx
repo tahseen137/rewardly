@@ -53,7 +53,8 @@ import { ErrorBoundary } from '../components';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
 import { getCurrentUser, onAuthStateChange, AuthUser } from '../services/AuthService';
-import { isOnboardingComplete, initializePreferences } from '../services/PreferenceManager';
+import { isOnboardingComplete, setOnboardingComplete, initializePreferences } from '../services/PreferenceManager';
+import { supabase, isSupabaseConfigured } from '../services/supabase';
 import { initializeSubscription, refreshSubscription, canAccessFeatureSync, getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
 import { initializeAutoPilot } from '../services/AutoPilotService';
 import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
@@ -516,7 +517,23 @@ export default function AppNavigator() {
         } catch (e) {
           console.warn('Failed to refresh subscription on sign-in:', e);
         }
-        const onboardingDone = isOnboardingComplete();
+        // Check onboarding: local first, then Supabase profile as fallback
+        let onboardingDone = isOnboardingComplete();
+        if (!onboardingDone && isSupabaseConfigured() && supabase && !authUser.isAnonymous) {
+          try {
+            const { data: profile } = await supabase
+              .from('user_profiles')
+              .select('onboarding_complete')
+              .eq('id', authUser.id)
+              .single();
+            if (profile?.onboarding_complete) {
+              onboardingDone = true;
+              await setOnboardingComplete(true);
+            }
+          } catch (e) {
+            console.warn('Failed to check onboarding from Supabase:', e);
+          }
+        }
         setAppState(onboardingDone ? 'main' : 'onboarding');
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
@@ -527,14 +544,41 @@ export default function AppNavigator() {
     return unsubscribe;
   }, []);
 
-  const handleAuthSuccess = useCallback(() => {
-    const onboardingDone = isOnboardingComplete();
+  const handleAuthSuccess = useCallback(async () => {
+    const currentUser = await getCurrentUser();
+    let onboardingDone = isOnboardingComplete();
+    // Check Supabase for returning users on new devices
+    if (!onboardingDone && currentUser && !currentUser.isAnonymous && isSupabaseConfigured() && supabase) {
+      try {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('onboarding_complete')
+          .eq('id', currentUser.id)
+          .single();
+        if (profile?.onboarding_complete) {
+          onboardingDone = true;
+          await setOnboardingComplete(true);
+        }
+      } catch (e) {
+        console.warn('Failed to check onboarding from Supabase:', e);
+      }
+    }
     setAppState(onboardingDone ? 'main' : 'onboarding');
   }, []);
 
-  const handleOnboardingComplete = useCallback(() => {
+  const handleOnboardingComplete = useCallback(async () => {
+    // Persist onboarding state to Supabase for cross-device sync
+    if (isSupabaseConfigured() && supabase && user && !user.isAnonymous) {
+      try {
+        await supabase
+          .from('user_profiles')
+          .upsert({ id: user.id, onboarding_complete: true, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+      } catch (e) {
+        console.warn('Failed to sync onboarding to Supabase:', e);
+      }
+    }
     setAppState('main');
-  }, []);
+  }, [user]);
 
   const handleSignOut = useCallback(() => {
     setUser(null);

@@ -1270,7 +1270,7 @@
       "annualFee": 120,
       "pointValuation": 10.5,
       "baseRewardRate": {
-        "value": 1,
+        "value": 0.1,
         "type": "airline_miles",
         "unit": "multiplier"
       },
@@ -1278,7 +1278,7 @@
         {
           "category": "groceries",
           "rewardRate": {
-            "value": 3,
+            "value": 0.25,
             "type": "airline_miles",
             "unit": "multiplier"
           }
@@ -1286,15 +1286,15 @@
         {
           "category": "gas",
           "rewardRate": {
-            "value": 3,
+            "value": 0.25,
             "type": "airline_miles",
             "unit": "multiplier"
           }
         },
         {
-          "category": "drugstores",
+          "category": "pharmacy",
           "rewardRate": {
-            "value": 1,
+            "value": 0.25,
             "type": "airline_miles",
             "unit": "multiplier"
           }
