@@ -624,7 +624,11 @@ export default function ExploreCardsScreen() {
       setCards(loadedCards);
     } catch (error) {
       console.error('Failed to load cards:', error);
-      Alert.alert('Error', 'Failed to load cards. Please try again.');
+      if (Platform.OS === 'web') {
+        window.alert('Failed to load cards. Please try again.');
+      } else {
+        Alert.alert('Error', 'Failed to load cards. Please try again.');
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -725,13 +729,21 @@ export default function ExploreCardsScreen() {
     if (card.applicationUrl) {
       Linking.openURL(card.applicationUrl).catch((err) => {
         console.error('Failed to open URL:', err);
-        Alert.alert('Error', 'Could not open application link.');
+        if (Platform.OS === 'web') {
+          window.alert('Could not open application link.');
+        } else {
+          Alert.alert('Error', 'Could not open application link.');
+        }
       });
     } else {
-      Alert.alert(
-        'Coming Soon',
-        `Application link for ${card.name} is not yet available. Check back later!`
-      );
+      if (Platform.OS === 'web') {
+        window.alert(`Application link for ${card.name} is not yet available. Check back later!`);
+      } else {
+        Alert.alert(
+          'Coming Soon',
+          `Application link for ${card.name} is not yet available. Check back later!`
+        );
+      }
     }
   }, []);
 

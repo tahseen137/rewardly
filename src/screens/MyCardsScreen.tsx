@@ -532,26 +532,45 @@ export default function MyCardsScreen() {
       // Handle different error types
       if (result.error.type === 'LIMIT_REACHED') {
         // Show upgrade prompt for card limit reached
-        Alert.alert(
-          'Card Limit Reached',
-          result.error.message,
-          [
-            { text: 'Maybe Later', style: 'cancel' },
-            { 
-              text: 'Upgrade to Pro', 
-              onPress: () => {
-                setIsModalVisible(false);
-                navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards' });
-              }
-            },
-          ]
-        );
+        if (Platform.OS === 'web') {
+          if (window.confirm(`Card Limit Reached\n\n${result.error.message}\n\nWould you like to upgrade to Pro?`)) {
+            setIsModalVisible(false);
+            navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards' });
+          }
+        } else {
+          Alert.alert(
+            'Card Limit Reached',
+            result.error.message,
+            [
+              { text: 'Maybe Later', style: 'cancel' },
+              { 
+                text: 'Upgrade to Pro', 
+                onPress: () => {
+                  setIsModalVisible(false);
+                  navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards' });
+                }
+              },
+            ]
+          );
+        }
       } else if (result.error.type === 'DUPLICATE_CARD') {
-        Alert.alert('Duplicate Card', `${result.error.cardName} is already in your portfolio.`);
+        if (Platform.OS === 'web') {
+          window.alert(`${result.error.cardName} is already in your portfolio.`);
+        } else {
+          Alert.alert('Duplicate Card', `${result.error.cardName} is already in your portfolio.`);
+        }
       } else if (result.error.type === 'CARD_NOT_FOUND') {
-        Alert.alert('Card Not Found', 'The selected card could not be found.');
+        if (Platform.OS === 'web') {
+          window.alert('The selected card could not be found.');
+        } else {
+          Alert.alert('Card Not Found', 'The selected card could not be found.');
+        }
       } else {
-        Alert.alert('Error', 'Failed to add card. Please try again.');
+        if (Platform.OS === 'web') {
+          window.alert('Failed to add card. Please try again.');
+        } else {
+          Alert.alert('Error', 'Failed to add card. Please try again.');
+        }
       }
     }
   };

@@ -39,13 +39,14 @@ interface AuthScreenProps {
 export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
   const { t } = useTranslation();
   
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgotPassword'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleEmailAuth = useCallback(async () => {
     // Validate inputs
@@ -84,11 +85,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
       if (result.success) {
         if (result.needsEmailConfirmation) {
-          Alert.alert(
-            'Check Your Email ✉️',
-            `We've sent a confirmation link to ${email.trim()}. Please verify your email to complete sign up.`,
-            [{ text: 'OK' }]
-          );
+          setSuccessMessage(`Check your email ✉️ We've sent a confirmation link to ${email.trim()}. Please verify your email to complete sign up.`);
           setMode('signin');
           setPassword('');
           setConfirmPassword('');
@@ -162,63 +159,46 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
   const toggleMode = useCallback(() => {
     setMode(mode === 'signin' ? 'signup' : 'signin');
     setError(null);
+    setSuccessMessage(null);
     setPassword('');
     setConfirmPassword('');
   }, [mode]);
 
   const handleForgotPassword = useCallback(() => {
-    Alert.prompt(
-      t('auth.forgotPasswordTitle') || 'Forgot Password',
-      t('auth.forgotPasswordMessage') || 'Enter your email address to receive a password reset link.',
-      [
-        {
-          text: t('common.cancel') || 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: t('auth.sendResetLink') || 'Send Reset Link',
-          onPress: async (emailInput) => {
-            if (!emailInput || !emailInput.trim()) {
-              Alert.alert(
-                t('auth.errors.title') || 'Error',
-                t('auth.errors.emailRequired') || 'Please enter your email address.'
-              );
-              return;
-            }
+    setMode('forgotPassword');
+    setError(null);
+    setSuccessMessage(null);
+  }, []);
 
-            setIsLoading(true);
-            try {
-              if (!supabase) {
-                throw new Error('Supabase not configured');
-              }
-              
-              const { error } = await supabase.auth.resetPasswordForEmail(emailInput.trim(), {
-                redirectTo: 'rewardly://reset-password',
-              });
+  const handleSendResetLink = useCallback(async () => {
+    if (!email.trim()) {
+      setError(t('auth.errors.emailRequired') || 'Please enter your email address.');
+      return;
+    }
 
-              if (error) {
-                throw error;
-              }
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (!supabase) {
+        throw new Error('Supabase not configured');
+      }
+      
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: 'rewardly://reset-password',
+      });
 
-              Alert.alert(
-                t('auth.resetEmailSentTitle') || 'Email Sent',
-                t('auth.resetEmailSentMessage') || 'Password reset email sent! Check your inbox.'
-              );
-            } catch (err) {
-              const errorMessage = err instanceof Error ? err.message : 'Failed to send reset email';
-              Alert.alert(
-                t('auth.errors.title') || 'Error',
-                errorMessage
-              );
-            } finally {
-              setIsLoading(false);
-            }
-          },
-        },
-      ],
-      'plain-text',
-      email // Pre-fill with current email if entered
-    );
+      if (resetError) {
+        throw resetError;
+      }
+
+      setSuccessMessage('Password reset email sent! Check your inbox. ✉️');
+      setMode('signin');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to send reset email';
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   }, [email, t]);
 
   return (
@@ -234,8 +214,14 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.logoEmoji}>💳</Text>
-          <Text style={styles.title}>{t('auth.title')}</Text>
-          <Text style={styles.subtitle}>{t('auth.subtitle')}</Text>
+          <Text style={styles.title}>
+            {mode === 'forgotPassword' ? 'Reset Password' : t('auth.title')}
+          </Text>
+          <Text style={styles.subtitle}>
+            {mode === 'forgotPassword' 
+              ? 'Enter your email to receive a reset link'
+              : t('auth.subtitle')}
+          </Text>
         </View>
 
         {/* Auth Form */}
@@ -257,32 +243,41 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
             />
           </View>
 
-          {/* Password Input */}
-          <View style={styles.inputContainer}>
-            <Lock size={20} color={colors.text.secondary} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder={t('auth.passwordPlaceholder')}
-              placeholderTextColor={colors.text.tertiary}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              autoComplete="password"
-              editable={!isLoading}
-            />
-            <TouchableOpacity
-              onPress={() => setShowPassword(!showPassword)}
-              style={styles.eyeButton}
-              disabled={isLoading}
-            >
-              {showPassword ? (
-                <EyeOff size={20} color={colors.text.secondary} />
-              ) : (
-                <Eye size={20} color={colors.text.secondary} />
-              )}
-            </TouchableOpacity>
-          </View>
+          {/* Success Message */}
+          {successMessage && (
+            <View style={styles.successContainer}>
+              <Text style={styles.successText}>{successMessage}</Text>
+            </View>
+          )}
+
+          {/* Password Input (hidden in forgotPassword mode) */}
+          {mode !== 'forgotPassword' && (
+            <View style={styles.inputContainer}>
+              <Lock size={20} color={colors.text.secondary} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder={t('auth.passwordPlaceholder')}
+                placeholderTextColor={colors.text.tertiary}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                autoComplete="password"
+                editable={!isLoading}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.eyeButton}
+                disabled={isLoading}
+              >
+                {showPassword ? (
+                  <EyeOff size={20} color={colors.text.secondary} />
+                ) : (
+                  <Eye size={20} color={colors.text.secondary} />
+                )}
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* Forgot Password (Sign In only) */}
           {mode === 'signin' && (
@@ -292,7 +287,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
               disabled={isLoading}
             >
               <Text style={styles.forgotPasswordText}>
-                {t('auth.forgotPassword') || 'Forgot Password?'}
+                {t('auth.forgotPassword') || 'Forgot password?'}
               </Text>
             </TouchableOpacity>
           )}
@@ -323,7 +318,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
           {/* Primary Button */}
           <TouchableOpacity
-            onPress={handleEmailAuth}
+            onPress={mode === 'forgotPassword' ? handleSendResetLink : handleEmailAuth}
             disabled={isLoading}
             activeOpacity={0.8}
           >
@@ -337,22 +332,28 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
                 <ActivityIndicator color={colors.background.primary} />
               ) : (
                 <Text style={styles.primaryButtonText}>
-                  {mode === 'signin' ? t('auth.signIn') : t('auth.signUp')}
+                  {mode === 'forgotPassword' 
+                    ? 'Send Reset Link'
+                    : mode === 'signin' ? t('auth.signIn') : t('auth.signUp')}
                 </Text>
               )}
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Toggle Mode */}
+          {/* Toggle Mode / Back to Sign In */}
           <TouchableOpacity
-            onPress={toggleMode}
+            onPress={mode === 'forgotPassword' 
+              ? () => { setMode('signin'); setError(null); setSuccessMessage(null); }
+              : toggleMode}
             style={styles.toggleButton}
             disabled={isLoading}
           >
             <Text style={styles.toggleText}>
-              {mode === 'signin'
-                ? t('auth.noAccount')
-                : t('auth.hasAccount')}
+              {mode === 'forgotPassword'
+                ? '← Back to Sign In'
+                : mode === 'signin'
+                  ? t('auth.noAccount')
+                  : t('auth.hasAccount')}
             </Text>
           </TouchableOpacity>
 
@@ -484,6 +485,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.primary.main,
     fontWeight: '500',
+  },
+  successContainer: {
+    backgroundColor: 'rgba(0, 200, 100, 0.15)',
+    borderRadius: borderRadius.md,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 200, 100, 0.3)',
+  },
+  successText: {
+    color: colors.primary.main,
+    fontSize: 14,
+    textAlign: 'center',
   },
   errorContainer: {
     backgroundColor: colors.error.background,
