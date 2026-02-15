@@ -118,7 +118,17 @@ function InsightsNavigator() {
   return (
     <InsightsStack.Navigator
       screenOptions={{
-        headerShown: false,
+        headerShown: true, // BUG FIX: Enable headers for back button navigation
+        headerStyle: {
+          backgroundColor: colors.background.primary,
+        },
+        headerTintColor: colors.text.primary,
+        headerTitleStyle: {
+          fontWeight: '600',
+          fontSize: 17,
+        },
+        headerShadowVisible: false,
+        headerBackTitle: 'Back',
         contentStyle: { backgroundColor: colors.background.primary },
       }}
       initialRouteName="InsightsHome"
@@ -126,106 +136,107 @@ function InsightsNavigator() {
       <InsightsStack.Screen
         name="InsightsHome"
         component={InsightsHomeScreen}
+        options={{ headerShown: false }} // Main tab doesn't need header
       />
       <InsightsStack.Screen
         name="MissedRewards"
         component={MissedRewardsScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Missed Rewards' }}
       />
       <InsightsStack.Screen
         name="RewardsIQ"
         component={RewardsIQScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Rewards IQ' }}
       />
       <InsightsStack.Screen 
         name="PortfolioOptimizer" 
         component={PortfolioOptimizerScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Portfolio Optimizer' }}
       />
       <InsightsStack.Screen 
         name="WalletOptimizer" 
         component={WalletOptimizerScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Wallet Optimizer' }}
       />
       <InsightsStack.Screen 
         name="SpendingInsights" 
         component={SpendingInsightsScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Spending Insights' }}
       />
       <InsightsStack.Screen
         name="CardTracker"
         component={CardTrackerScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Card Tracker' }}
       />
       <InsightsStack.Screen
         name="CardBenefits"
         component={CardBenefitsScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Card Benefits' }}
       />
       <InsightsStack.Screen
         name="SUBTracker"
         component={SUBTrackerScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Sign-Up Bonus Tracker' }}
       />
       <InsightsStack.Screen
         name="CardCompare"
         component={CardCompareScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Compare Cards' }}
       />
       <InsightsStack.Screen
         name="SpendingLog"
         component={SpendingLogScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Spending Log' }}
       />
       <InsightsStack.Screen
         name="Recurring"
         component={RecurringScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Recurring Expenses' }}
       />
       <InsightsStack.Screen
         name="AnnualFee"
         component={AnnualFeeScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Annual Fee Analysis' }}
       />
       <InsightsStack.Screen
         name="RedemptionGuide"
         component={RedemptionGuideScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Redemption Guide' }}
       />
       <InsightsStack.Screen
         name="CardRecommendations"
         component={CardRecommendationsScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Card Recommendations' }}
       />
       <InsightsStack.Screen
         name="SavingsReport"
         component={SavingsReportScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Savings Report' }}
       />
       <InsightsStack.Screen
         name="StatementUpload"
         component={StatementUploadScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Upload Statement' }}
       />
       <InsightsStack.Screen
         name="InsightsDashboard"
         component={InsightsDashboardScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Insights Dashboard' }}
       />
       <InsightsStack.Screen
         name="Achievements"
         component={AchievementsScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Achievements' }}
       />
       <InsightsStack.Screen
         name="ApplicationTracker"
         component={ApplicationTrackerScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Application Tracker' }}
       />
       <InsightsStack.Screen
         name="ExploreCards"
         component={ExploreCardsScreen}
-        options={{ animation: 'slide_from_right' }}
+        options={{ animation: 'slide_from_right', title: 'Explore Cards' }}
       />
     </InsightsStack.Navigator>
   );

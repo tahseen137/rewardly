@@ -416,28 +416,13 @@ export default function SmartWalletScreen() {
 
           <TouchableOpacity
             style={styles.privacyLink}
-            onPress={async () => {
-              const privacyUrl = 'https://rewardly.app/privacy';
-              try {
-                const supported = await Linking.canOpenURL(privacyUrl);
-                if (supported) {
-                  await Linking.openURL(privacyUrl);
-                } else {
-                  // Fallback: show info in alert if URL can't be opened
-                  Alert.alert(
-                    'Privacy Details',
-                    'Smart Wallet uses geofencing technology to detect when you enter a monitored store. Your exact location is never stored or transmitted. All processing happens on your device.\n\nYou control which stores are monitored. You can disable Smart Wallet or remove individual stores at any time.\n\nWe do not sell your data to third parties.\n\nVisit rewardly.app/privacy for full details.',
-                    [{ text: 'Got it' }]
-                  );
-                }
-              } catch (error) {
-                console.error('Failed to open privacy URL:', error);
-                Alert.alert(
-                  'Privacy Details',
-                  'Smart Wallet uses geofencing technology to detect when you enter a monitored store. Your exact location is never stored or transmitted. All processing happens on your device.\n\nYou control which stores are monitored. You can disable Smart Wallet or remove individual stores at any time.\n\nWe do not sell your data to third parties.\n\nVisit rewardly.app/privacy for full details.',
-                  [{ text: 'Got it' }]
-                );
-              }
+            onPress={() => {
+              // BUG FIX: Show Alert directly since rewardly.app/privacy doesn't exist yet
+              Alert.alert(
+                'Privacy Details',
+                'Smart Wallet uses geofencing technology to detect when you enter a monitored store. Your exact location is never stored or transmitted. All processing happens on your device.\n\nYou control which stores are monitored. You can disable Smart Wallet or remove individual stores at any time.\n\nWe do not sell your data to third parties.',
+                [{ text: 'Got it' }]
+              );
             }}
           >
             <Text style={styles.privacyLinkText}>Learn more about privacy</Text>

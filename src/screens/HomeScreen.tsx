@@ -128,17 +128,17 @@ export default function HomeScreen() {
       setHasCards(portfolio.length > 0);
       setState((prev) => ({ ...prev, isLoading: false, loadError: null }));
       
-      // Load recommendations if user has cards
-      if (portfolio.length > 0) {
-        setRecommendationsLoading(true);
-        try {
-          const analysis = await analyzeAndRecommend();
-          setRecommendations(analysis.recommendations.slice(0, 3)); // Top 3
-        } catch (err) {
-          console.warn('Failed to load recommendations:', err);
-        } finally {
-          setRecommendationsLoading(false);
-        }
+      // Load recommendations for ALL users (not just those with cards)
+      setRecommendationsLoading(true);
+      try {
+        // analyzeAndRecommend works for both users with and without portfolios
+        // For users without a portfolio, it returns general top cards
+        const analysis = await analyzeAndRecommend();
+        setRecommendations(analysis.recommendations.slice(0, 3)); // Top 3
+      } catch (err) {
+        console.warn('Failed to load recommendations:', err);
+      } finally {
+        setRecommendationsLoading(false);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to load card data';
@@ -166,10 +166,11 @@ export default function HomeScreen() {
       setRecommendations([]);
       try {
         await refreshCards(); // Clears cache and fetches new country's cards
+        await loadData(); // BUG FIX: Await loadData to prevent race condition
       } catch (err) {
         console.warn('Failed to refresh cards for new country:', err);
+        setState((prev) => ({ ...prev, isLoading: false }));
       }
-      loadData();
     });
     return unsubscribe;
   }, [loadData]);
@@ -357,56 +358,6 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* Wallet Optimizer Hero Banner */}
-        <TouchableOpacity
-          style={styles.heroCard}
-          onPress={() => navigation.navigate('Insights', { screen: 'WalletOptimizer' } as never)}
-          activeOpacity={0.8}
-        >
-          <View style={styles.heroContent}>
-            <View style={styles.heroIcon}>
-              <Text style={styles.heroEmoji}>🎯</Text>
-            </View>
-            <View style={styles.heroText}>
-              <Text style={styles.heroTitle}>Find Your Perfect Wallet</Text>
-              <Text style={styles.heroSubtitle}>
-                Get personalized card recommendations based on your spending
-              </Text>
-            </View>
-          </View>
-          <View style={styles.heroArrow}>
-            <ChevronRight size={24} color={colors.primary.main} />
-          </View>
-        </TouchableOpacity>
-
-        {/* Quick Actions Row */}
-        <View style={styles.quickActionsRow}>
-          <TouchableOpacity
-            style={styles.quickActionButton}
-            onPress={() => navigation.navigate('Insights', { screen: 'CardCompare' } as never)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.quickActionEmoji}>⚖️</Text>
-            <Text style={styles.quickActionLabel}>Compare</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickActionButton}
-            onPress={() => navigation.navigate('Insights', { screen: 'ExploreCards' } as never)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.quickActionEmoji}>💳</Text>
-            <Text style={styles.quickActionLabel}>Apply</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickActionButton}
-            onPress={() => navigation.navigate('Sage' as never)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.quickActionEmoji}>✨</Text>
-            <Text style={styles.quickActionLabel}>Ask Sage</Text>
-          </TouchableOpacity>
-        </View>
-
         {/* Calculator Section */}
         {/* Store Selector */}
         <View style={styles.section}>
@@ -525,73 +476,81 @@ export default function HomeScreen() {
           />
         )}
 
-        {/* Recommended Cards Section */}
-        {hasCards && (
-          <View style={styles.recommendationsSection}>
-            <View style={styles.divider} />
-            <View style={styles.recommendationsHeader}>
-              <View style={styles.recommendationsTitle}>
-                <Sparkles size={18} color={colors.primary.main} />
-                <Text style={styles.resultsHeader}>
-                  {t('home.recommendedCards') || 'Recommended Cards'}
-                </Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.seeAllButton}
-                onPress={() => navigation.navigate('Insights', { screen: 'CardRecommendations' } as never)}
-              >
-                <Text style={styles.seeAllText}>{t('home.seeAll') || 'See All'}</Text>
-                <ChevronRight size={16} color={colors.primary.main} />
-              </TouchableOpacity>
+        {/* Recommended Cards Section - Show for ALL users */}
+        <View style={styles.recommendationsSection}>
+          <View style={styles.divider} />
+          <View style={styles.recommendationsHeader}>
+            <View style={styles.recommendationsTitle}>
+              <Sparkles size={18} color={colors.primary.main} />
+              <Text style={styles.resultsHeader}>
+                {hasCards 
+                  ? (t('home.recommendedCards') || 'Recommended Cards')
+                  : (t('home.topCards') || 'Top Cards to Consider')
+                }
+              </Text>
             </View>
-
-            {recommendationsLoading ? (
-              <View style={styles.recommendationsLoading}>
-                <ActivityIndicator size="small" color={colors.primary.main} />
-                <Text style={styles.loadingText}>Finding best cards for you...</Text>
-              </View>
-            ) : recommendations.length > 0 ? (
-              <View style={styles.recommendationsList}>
-                {recommendations.map((rec, index) => {
-                  const upToRate = formatUpToRate(rec.card);
-                  return (
-                    <TouchableOpacity 
-                      key={rec.card.id}
-                      style={styles.recommendationItem}
-                      onPress={() => navigation.navigate('CardDetail' as never, { cardId: rec.card.id } as never)}
-                    >
-                      <View style={styles.recommendationRank}>
-                        <Text style={styles.rankText}>{index + 1}</Text>
-                      </View>
-                      <View style={styles.recommendationContent}>
-                        <Text style={styles.recommendationCardName} numberOfLines={1}>
-                          {rec.card.name}
-                        </Text>
-                        <Text style={styles.recommendationCategoryRate} numberOfLines={1}>
-                          {upToRate}
-                        </Text>
-                        <Text style={styles.recommendationReason} numberOfLines={1}>
-                          {rec.reason}
-                        </Text>
-                      </View>
-                      <View style={styles.recommendationValue}>
-                        <Text style={styles.rewardValue}>
-                          ${rec.estimatedAnnualRewards.toFixed(0)}/yr
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            ) : (
-              <View style={styles.noRecommendations}>
-                <Text style={styles.noRecommendationsText}>
-                  {t('home.noRecommendations') || 'Add spending data to get personalized recommendations'}
-                </Text>
-              </View>
-            )}
+            <TouchableOpacity 
+              style={styles.seeAllButton}
+              onPress={() => navigation.navigate('Insights', { screen: 'CardRecommendations' } as never)}
+              accessibilityRole="button"
+              accessibilityLabel="See all card recommendations"
+            >
+              <Text style={styles.seeAllText}>{t('home.seeAll') || 'See All'}</Text>
+              <ChevronRight size={16} color={colors.primary.main} />
+            </TouchableOpacity>
           </View>
-        )}
+
+          {recommendationsLoading ? (
+            <View style={styles.recommendationsLoading}>
+              <ActivityIndicator size="small" color={colors.primary.main} />
+              <Text style={styles.loadingText}>Finding best cards for you...</Text>
+            </View>
+          ) : recommendations.length > 0 ? (
+            <View style={styles.recommendationsList}>
+              {recommendations.map((rec, index) => {
+                const upToRate = formatUpToRate(rec.card);
+                return (
+                  <TouchableOpacity 
+                    key={rec.card.id}
+                    style={styles.recommendationItem}
+                    onPress={() => navigation.navigate('CardDetail' as never, { cardId: rec.card.id } as never)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`View ${rec.card.name} details`}
+                  >
+                    <View style={styles.recommendationRank}>
+                      <Text style={styles.rankText}>{index + 1}</Text>
+                    </View>
+                    <View style={styles.recommendationContent}>
+                      <Text style={styles.recommendationCardName} numberOfLines={1}>
+                        {rec.card.name}
+                      </Text>
+                      <Text style={styles.recommendationCategoryRate} numberOfLines={1}>
+                        {upToRate}
+                      </Text>
+                      <Text style={styles.recommendationReason} numberOfLines={1}>
+                        {rec.reason}
+                      </Text>
+                    </View>
+                    <View style={styles.recommendationValue}>
+                      <Text style={styles.rewardValue}>
+                        ${rec.estimatedAnnualRewards.toFixed(0)}/yr
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          ) : (
+            <View style={styles.noRecommendations}>
+              <Text style={styles.noRecommendationsText}>
+                {hasCards 
+                  ? (t('home.noRecommendations') || 'Add spending data to get personalized recommendations')
+                  : (t('home.exploreCards') || 'Explore cards to find the best rewards for you')
+                }
+              </Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
