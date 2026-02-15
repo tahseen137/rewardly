@@ -1072,7 +1072,7 @@
         {
           "category": "dining",
           "rewardRate": {
-            "value": 6,
+            "value": 5,
             "type": "points",
             "unit": "multiplier"
           }
@@ -1080,7 +1080,7 @@
         {
           "category": "entertainment",
           "rewardRate": {
-            "value": 6,
+            "value": 5,
             "type": "points",
             "unit": "multiplier"
           }
