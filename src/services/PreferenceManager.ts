@@ -39,17 +39,20 @@ function detectCountryFromLocale(): Country {
     // Web defaults to CA since the app is marketed as "Canada's #1 Rewards Optimizer"
     // Most Canadian users have en-US browser locale, so locale detection is unreliable on web
     if (Platform.OS === 'web') {
-      // Check all browser locale hints for CA
+      // Web defaults to CA since the app is marketed as "Canada's #1 Rewards Optimizer"
+      // Most Canadian users have en-US browser locale, so locale detection is unreliable
+      // Only return US if we find an EXPLICIT US locale (not en-US which is the default everywhere)
       if (typeof navigator !== 'undefined') {
         const languages = navigator.languages || [navigator.language || 'en-US'];
         for (const lang of languages) {
           const parts = lang.replace('_', '-').split('-');
           const code = parts.length > 1 ? parts[1].toUpperCase() : '';
-          if (code === 'US') return 'US';
+          // Only detect CA explicitly — en-US is too common to be reliable
           if (code === 'CA') return 'CA';
         }
       }
       // Default to CA on web — our primary market
+      // Canadian users almost always have en-US as their browser locale
       return 'CA';
     }
 
