@@ -29,6 +29,7 @@ import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
 import { Card, SpendingCategory } from '../types';
 import { getCardByIdSync, getAllCardsSync } from '../services/CardDataService';
+import { getCards } from '../services/CardPortfolioManager';
 import { getBenefitsForCard } from '../services/BenefitsService';
 import { getSpendingProfileSync } from '../services/SpendingProfileService';
 import { calculateFeeBreakeven } from '../services/FeeBreakevenService';
@@ -123,6 +124,10 @@ export default function CardDetailScreen() {
 
   const card = useMemo(() => getCardByIdSync(cardId), [cardId]);
   const benefits = useMemo(() => getBenefitsForCard(cardId), [cardId]);
+  const isOwnedCard = useMemo(() => {
+    const portfolio = getCards();
+    return portfolio.some((uc) => uc.cardId === cardId);
+  }, [cardId]);
 
   // Track achievement on mount
   useEffect(() => {
@@ -358,15 +363,52 @@ export default function CardDetailScreen() {
           </View>
         )}
 
-        {/* Apply Now Button */}
-        <View style={styles.applySection}>
-          <ApplyNowButton
-            card={card}
-            sourceScreen="CardDetail"
-            variant="primary"
-            showDisclosure
-          />
-        </View>
+        {/* Apply Now Button - only for cards user doesn't own */}
+        {!isOwnedCard && (
+          <View style={styles.applySection}>
+            <ApplyNowButton
+              card={card}
+              sourceScreen="CardDetail"
+              variant="primary"
+              showDisclosure
+            />
+          </View>
+        )}
+
+        {/* My Card Rewards Summary - only for cards user owns */}
+        {isOwnedCard && card.categoryRewards && card.categoryRewards.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Your Rewards Summary</Text>
+            <View style={styles.infoCard}>
+              {card.categoryRewards.map((cr, index) => (
+                <View key={index} style={styles.infoRow}>
+                  <View style={styles.infoRowLeft}>
+                    <DollarSign size={18} color={colors.success.main} />
+                    <Text style={styles.infoLabel}>
+                      {cr.category.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                    </Text>
+                  </View>
+                  <Text style={[styles.infoValue, { color: colors.success.main }]}>
+                    {cr.rewardRate.unit === 'percent'
+                      ? `${cr.rewardRate.value}% cash back`
+                      : `${cr.rewardRate.value}x points`}
+                  </Text>
+                </View>
+              ))}
+              <View style={styles.infoRow}>
+                <View style={styles.infoRowLeft}>
+                  <DollarSign size={18} color={colors.text.tertiary} />
+                  <Text style={styles.infoLabel}>Everything Else</Text>
+                </View>
+                <Text style={styles.infoValue}>
+                  {card.baseRewardRate.unit === 'percent'
+                    ? `${card.baseRewardRate.value}% cash back`
+                    : `${card.baseRewardRate.value}x points`}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
 
         <View style={{ height: 40 }} />
       </ScrollView>

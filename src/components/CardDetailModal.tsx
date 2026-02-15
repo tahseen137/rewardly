@@ -31,6 +31,8 @@ interface CardDetailModalProps {
     onPress: () => void;
     variant?: 'primary' | 'secondary';
   };
+  /** Whether the user owns this card (hides Apply Now, shows reward details) */
+  isOwnedCard?: boolean;
 }
 
 export function CardDetailModal({
@@ -39,6 +41,7 @@ export function CardDetailModal({
   onClose,
   currentRewardRate,
   actionButton,
+  isOwnedCard = false,
 }: CardDetailModalProps) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -193,15 +196,17 @@ export function CardDetailModal({
             </View>
           )}
 
-          {/* Apply Now Button */}
-          <View style={styles.applyNowSection}>
-            <ApplyNowButton
-              card={card}
-              sourceScreen="CardDetailModal"
-              variant="primary"
-              showDisclosure
-            />
-          </View>
+          {/* Apply Now Button - only for cards user doesn't own */}
+          {!isOwnedCard && (
+            <View style={styles.applyNowSection}>
+              <ApplyNowButton
+                card={card}
+                sourceScreen="CardDetailModal"
+                variant="primary"
+                showDisclosure
+              />
+            </View>
+          )}
 
           {/* Spacer for action button */}
           {actionButton && <View style={{ height: 80 }} />}
