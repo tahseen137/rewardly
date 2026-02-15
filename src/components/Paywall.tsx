@@ -98,6 +98,7 @@ export default function Paywall({
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('annual');
   const [selectedTier, setSelectedTier] = useState<SubscriptionTier>(defaultTier);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [inlineMessage, setInlineMessage] = useState<{type: 'error' | 'info', text: string} | null>(null);
 
   // Show Pro, Max, and Lifetime tiers
   const tiers = [SUBSCRIPTION_TIERS.pro, SUBSCRIPTION_TIERS.max];
@@ -114,6 +115,7 @@ export default function Paywall({
 
   const handleSubscribe = useCallback(async () => {
     setIsProcessing(true);
+    setInlineMessage(null);
     
     try {
       // In development, allow quick testing by setting tier directly
@@ -132,9 +134,9 @@ export default function Paywall({
       
       if ('error' in result) {
         if (result.error === 'Not authenticated') {
-          showAlert('Sign In Required', 'Please create an account or sign in to subscribe.');
+          setInlineMessage({ type: 'info', text: '🔐 Please create an account or sign in to subscribe.' });
         } else {
-          showAlert('Subscription Error', result.error);
+          setInlineMessage({ type: 'error', text: result.error });
         }
         return;
       }
@@ -369,6 +371,19 @@ export default function Paywall({
 
         {/* CTA */}
         <View style={styles.footer}>
+          {inlineMessage && (
+            <View style={[
+              styles.inlineMessage,
+              inlineMessage.type === 'error' ? styles.inlineMessageError : styles.inlineMessageInfo,
+            ]}>
+              <Text style={[
+                styles.inlineMessageText,
+                inlineMessage.type === 'error' ? styles.inlineMessageTextError : styles.inlineMessageTextInfo,
+              ]}>
+                {inlineMessage.text}
+              </Text>
+            </View>
+          )}
           <TouchableOpacity
             onPress={handleSubscribe}
             disabled={isProcessing}
@@ -748,5 +763,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.text.tertiary,
     marginHorizontal: 8,
+  },
+  inlineMessage: {
+    borderRadius: borderRadius.md,
+    padding: 12,
+    marginBottom: 12,
+  },
+  inlineMessageError: {
+    backgroundColor: 'rgba(255, 77, 77, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 77, 77, 0.3)',
+  },
+  inlineMessageInfo: {
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+  },
+  inlineMessageText: {
+    fontSize: 14,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  inlineMessageTextError: {
+    color: '#FF6B6B',
+  },
+  inlineMessageTextInfo: {
+    color: '#60A5FA',
   },
 });
