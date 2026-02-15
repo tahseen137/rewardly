@@ -475,17 +475,13 @@ export default function AppNavigator() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // Initialize preferences
-        await initializePreferences();
+        // Initialize each service independently — one failure shouldn't block the app
+        await initializePreferences().catch(e => console.warn('Preferences init failed:', e));
+        await initializeSubscription().catch(e => console.warn('Subscription init failed:', e));
+        await initializeAutoPilot().catch(e => console.warn('AutoPilot init failed:', e));
 
-        // Initialize subscription service
-        await initializeSubscription();
-
-        // Initialize Smart Wallet service (uses AutoPilot service internally)
-        await initializeAutoPilot();
-
-        // Track app open for streak achievement
-        AchievementEventEmitter.track('app_opened', {});
+        // Track app open (non-blocking)
+        try { AchievementEventEmitter.track('app_opened', {}); } catch (_) {}
 
         // Check for existing user
         const currentUser = await getCurrentUser();
@@ -501,8 +497,8 @@ export default function AppNavigator() {
         }
       } catch (error) {
         console.error('Failed to initialize app:', error);
-        // Default to auth screen on error
-        setAppState('auth');
+        // Default to landing page on web, auth on mobile
+        setAppState(Platform.OS === 'web' ? 'landing' : 'auth');
       }
     };
 

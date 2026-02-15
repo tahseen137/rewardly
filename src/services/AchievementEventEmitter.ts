@@ -42,7 +42,9 @@ class AchievementEventEmitterClass {
     };
 
     // Emit asynchronously to not block caller
-    setImmediate(() => {
+    // Use setTimeout as setImmediate is not available on web
+    const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: () => void) => setTimeout(fn, 0);
+    defer(() => {
       // Call each callback and catch errors individually
       for (const callback of this.callbacks) {
         try {
