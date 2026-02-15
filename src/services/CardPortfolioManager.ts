@@ -61,6 +61,19 @@ async function isUserAuthenticated(): Promise<{ authenticated: boolean; userId: 
 }
 
 /**
+ * Database row type for user_cards table
+ */
+interface UserCardDbRow {
+  id: string;
+  user_id: string;
+  card_key: string;
+  nickname: string | null;
+  notes: string | null;
+  added_at: string;
+  updated_at: string;
+}
+
+/**
  * Load portfolio from Supabase for authenticated users
  */
 async function loadFromSupabase(userId: string): Promise<UserCard[] | null> {
@@ -80,7 +93,10 @@ async function loadFromSupabase(userId: string): Promise<UserCard[] | null> {
       return null;
     }
 
-    return data.map((row) => {
+    // Cast to our known type since Supabase generic types can cause TS issues
+    const rows = data as unknown as UserCardDbRow[];
+
+    return rows.map((row) => {
       const notesData = parseNotesData(row.notes);
       return {
         cardId: row.card_key,
@@ -138,15 +154,18 @@ async function saveCardToSupabase(userId: string, card: UserCard): Promise<boole
       balanceUpdatedAt: card.balanceUpdatedAt?.toISOString(),
     };
 
+    // Use explicit insert data to avoid complex type inference
+    const insertData = {
+      user_id: userId,
+      card_key: card.cardId,
+      nickname: card.nickname ?? null,
+      notes: serializeNotesData(notesData),
+      added_at: card.addedAt.toISOString(),
+    };
+
     const { error } = await supabase
       .from('user_cards')
-      .upsert({
-        user_id: userId,
-        card_key: card.cardId,
-        nickname: card.nickname ?? null,
-        notes: serializeNotesData(notesData),
-        added_at: card.addedAt.toISOString(),
-      }, {
+      .upsert(insertData as never, {
         onConflict: 'user_id,card_key',
       });
 

@@ -38,6 +38,16 @@ export interface Database {
         Insert: PointValuationInsert;
         Update: PointValuationUpdate;
       };
+      user_cards: {
+        Row: UserCardRow;
+        Insert: UserCardInsert;
+        Update: UserCardUpdate;
+      };
+      user_profiles: {
+        Row: UserProfileRow;
+        Insert: UserProfileInsert;
+        Update: UserProfileUpdate;
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -378,4 +388,74 @@ export interface CardWithProgramDetails extends CardRow {
  */
 export interface RewardProgramWithValuations extends RewardProgramRow {
   point_valuations: PointValuationRow[];
+}
+
+// ============================================================================
+// User Cards Table (synced portfolio)
+// ============================================================================
+
+export interface UserCardRow {
+  id: string;
+  user_id: string;
+  card_key: string;
+  nickname: string | null;
+  notes: string | null;
+  added_at: string;
+  updated_at: string;
+}
+
+export interface UserCardInsert {
+  id?: string;
+  user_id: string;
+  card_key: string;
+  nickname?: string | null;
+  notes?: string | null;
+  added_at?: string;
+  updated_at?: string;
+}
+
+export interface UserCardUpdate {
+  id?: string;
+  user_id?: string;
+  card_key?: string;
+  nickname?: string | null;
+  notes?: string | null;
+  added_at?: string;
+  updated_at?: string;
+}
+
+// ============================================================================
+// User Profiles Table
+// ============================================================================
+
+export interface UserProfileRow {
+  id: string;
+  country: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  preferred_language: string;
+  onboarding_complete: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserProfileInsert {
+  id: string;
+  country?: string;
+  display_name?: string | null;
+  avatar_url?: string | null;
+  preferred_language?: string;
+  onboarding_complete?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface UserProfileUpdate {
+  id?: string;
+  country?: string;
+  display_name?: string | null;
+  avatar_url?: string | null;
+  preferred_language?: string;
+  onboarding_complete?: boolean;
+  updated_at?: string;
 }
