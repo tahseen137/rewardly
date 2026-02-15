@@ -198,11 +198,23 @@ export function calculateRewards(
   // Sort by CAD value descending (best value first)
   results.sort((a, b) => b.cadValue - a.cadValue);
 
+  // Deduplicate cards with the same normalized name (keep highest value version)
+  // This prevents showing near-duplicate cards from database
+  const seenNames = new Set<string>();
+  const deduplicatedResults = results.filter((result) => {
+    const normalizedName = result.cardName.toLowerCase().replace(/\s+/g, ' ').trim();
+    if (seenNames.has(normalizedName)) {
+      return false;
+    }
+    seenNames.add(normalizedName);
+    return true;
+  });
+
   // Identify best card (first in sorted list)
-  const bestCard = results.length > 0 ? results[0] : null;
+  const bestCard = deduplicatedResults.length > 0 ? deduplicatedResults[0] : null;
 
   return {
-    results,
+    results: deduplicatedResults,
     bestCard,
     category,
     amount,

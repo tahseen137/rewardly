@@ -205,7 +205,20 @@ export function rankRecommendations(
   }
   
   // Sort by priority (descending)
-  return recommendations.sort((a, b) => b.priority - a.priority);
+  recommendations.sort((a, b) => b.priority - a.priority);
+  
+  // Deduplicate cards with the same normalized name (keep highest priority version)
+  const seenNames = new Set<string>();
+  const deduplicatedRecs = recommendations.filter((rec) => {
+    const normalizedName = rec.card.name.toLowerCase().replace(/\s+/g, ' ').trim();
+    if (seenNames.has(normalizedName)) {
+      return false;
+    }
+    seenNames.add(normalizedName);
+    return true;
+  });
+  
+  return deduplicatedRecs;
 }
 
 // ============================================================================

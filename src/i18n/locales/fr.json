@@ -56,7 +56,12 @@
     "cardsInPortfolio_one": "{{count}} carte dans votre portefeuille",
     "cardsInPortfolio_other": "{{count}} cartes dans votre portefeuille",
     "noResultsTitle": "Aucun Résultat",
-    "noResultsMessage": "Impossible de calculer les récompenses. Veuillez réessayer."
+    "noResultsMessage": "Impossible de calculer les récompenses. Veuillez réessayer.",
+    "recommendedCards": "Cartes Recommandées",
+    "seeAll": "Voir Tout",
+    "topCardsTitle": "Meilleures Cartes pour cette Catégorie",
+    "topCards": "Meilleures Cartes à Considérer",
+    "noRecommendations": "Ajoutez des données de dépenses pour obtenir des recommandations personnalisées"
   },
   "productSearch": {
     "title": "Recherche de Produit",
