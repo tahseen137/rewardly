@@ -386,7 +386,6 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         ),
         tabBarActiveTintColor: colors.primary.main,
         tabBarInactiveTintColor: colors.text.secondary,
-        unmountOnBlur: true, // BUG #5 FIX: Unmount inactive tabs to prevent overlap
         lazy: true, // Don't pre-render inactive tabs
         tabBarStyle: {
           height: 64, // h-16

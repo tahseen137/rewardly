@@ -405,9 +405,10 @@ const filterStyles = StyleSheet.create({
 interface CardItemProps {
   card: Card;
   onApply: (card: Card) => void;
+  onPress?: (card: Card) => void;
 }
 
-const CardItem: React.FC<CardItemProps> = ({ card, onApply }) => {
+const CardItem: React.FC<CardItemProps> = ({ card, onApply, onPress }) => {
   // Get best category rate
   const bestCategoryReward = useMemo(() => {
     if (!card.categoryRewards || card.categoryRewards.length === 0) return null;
@@ -421,7 +422,13 @@ const CardItem: React.FC<CardItemProps> = ({ card, onApply }) => {
   };
 
   return (
-    <View style={cardStyles.container}>
+    <TouchableOpacity
+      style={cardStyles.container}
+      onPress={() => onPress?.(card)}
+      activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={`View ${card.name} details`}
+    >
       <View style={cardStyles.header}>
         <View style={cardStyles.cardIcon}>
           <CreditCard size={24} color={colors.primary.main} />
@@ -460,7 +467,7 @@ const CardItem: React.FC<CardItemProps> = ({ card, onApply }) => {
                 bestCategoryReward.rewardRate.value,
                 bestCategoryReward.rewardRate.unit
               )}{' '}
-              on {bestCategoryReward.category}
+              on {bestCategoryReward.category.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
             </Text>
           </View>
         )}
@@ -472,7 +479,7 @@ const CardItem: React.FC<CardItemProps> = ({ card, onApply }) => {
             <Text style={cardStyles.signupText}>
               {card.signupBonus.amount.toLocaleString()}{' '}
               {card.signupBonus.currency === RewardType.CASHBACK ? 'cash back' : 'points'} after $
-              {card.signupBonus.spendRequirement} in {card.signupBonus.timeframeDays} days
+              {card.signupBonus.spendRequirement.toLocaleString()} in {Math.round(card.signupBonus.timeframeDays / 30)} months
             </Text>
           </View>
         )}
@@ -489,7 +496,7 @@ const CardItem: React.FC<CardItemProps> = ({ card, onApply }) => {
           <Text style={cardStyles.applyBtnText}>Coming Soon</Text>
         )}
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -708,6 +715,11 @@ export default function ExploreCardsScreen() {
     return result;
   }, [cards, searchQuery, filters]);
 
+  // Handle card press — navigate to detail
+  const handleCardPress = useCallback((card: Card) => {
+    navigation.navigate('CardDetail' as never, { cardId: card.id } as never);
+  }, [navigation]);
+
   // Handle apply button
   const handleApply = useCallback((card: Card) => {
     if (card.applicationUrl) {
@@ -812,7 +824,7 @@ export default function ExploreCardsScreen() {
         <FlatList
           data={filteredCards}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <CardItem card={item} onApply={handleApply} />}
+          renderItem={({ item }) => <CardItem card={item} onApply={handleApply} onPress={handleCardPress} />}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           refreshControl={

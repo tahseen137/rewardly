@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { CardRewardItem } from './CardRewardItem';
 import { RedemptionOptionsModal } from './RedemptionOptionsModal';
@@ -96,13 +96,13 @@ export function RewardsDisplay({
         {t('home.cardsInPortfolio', { count: results.length })}
       </Text>
 
-      <FlatList
-        data={results}
-        keyExtractor={(item) => item.cardId}
-        renderItem={({ item }) => {
+      {/* Use plain View + map instead of FlatList to avoid nested scroll issues on web */}
+      <View style={styles.listContent}>
+        {results.map((item) => {
           const card = cards.find((c) => c.id === item.cardId);
           return (
             <CardRewardItem
+              key={item.cardId}
               result={item}
               isBestValue={bestCard?.cardId === item.cardId}
               card={card}
@@ -111,10 +111,8 @@ export function RewardsDisplay({
               onViewOptions={() => handleViewOptions(item.cardId)}
             />
           );
-        }}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+        })}
+      </View>
 
       {/* Redemption Options Modal */}
       {selectedCard && (

@@ -491,9 +491,9 @@ export default function HomeScreen() {
             </View>
             <TouchableOpacity 
               style={styles.seeAllButton}
-              onPress={() => navigation.navigate('Insights', { screen: 'CardRecommendations' } as never)}
+              onPress={() => navigation.navigate('Insights', { screen: 'ExploreCards' } as never)}
               accessibilityRole="button"
-              accessibilityLabel="See all card recommendations"
+              accessibilityLabel="Explore all cards"
             >
               <Text style={styles.seeAllText}>{t('home.seeAll') || 'See All'}</Text>
               <ChevronRight size={16} color={colors.primary.main} />
@@ -532,9 +532,15 @@ export default function HomeScreen() {
                       </Text>
                     </View>
                     <View style={styles.recommendationValue}>
-                      <Text style={styles.rewardValue}>
-                        ${rec.estimatedAnnualRewards.toFixed(0)}/yr
-                      </Text>
+                      {rec.estimatedAnnualRewards > 0 ? (
+                        <Text style={styles.rewardValue}>
+                          ${rec.estimatedAnnualRewards.toFixed(0)}/yr
+                        </Text>
+                      ) : (
+                        <Text style={styles.rewardValue}>
+                          {upToRate}
+                        </Text>
+                      )}
                     </View>
                   </TouchableOpacity>
                 );
@@ -589,108 +595,7 @@ const createStyles = (theme: Theme) =>
       color: colors.text.secondary,
       textAlign: 'center',
     },
-    heroCard: {
-      backgroundColor: colors.primary.light,
-      borderRadius: 16,
-      padding: 20,
-      marginBottom: 24,
-      borderWidth: 2,
-      borderColor: colors.primary.main,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    heroContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      flex: 1,
-      gap: 16,
-    },
-    heroIcon: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      backgroundColor: colors.primary.main,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    heroEmoji: {
-      fontSize: 28,
-    },
-    heroText: {
-      flex: 1,
-    },
-    heroTitle: {
-      fontSize: 18,
-      fontWeight: '700',
-      color: colors.primary.dark,
-      marginBottom: 4,
-    },
-    heroSubtitle: {
-      fontSize: 13,
-      color: colors.primary.dark,
-      lineHeight: 18,
-    },
-    heroArrow: {
-      marginLeft: 8,
-    },
-    quickActionsRow: {
-      flexDirection: 'row',
-      gap: 12,
-      marginBottom: 24,
-    },
-    quickActionButton: {
-      flex: 1,
-      backgroundColor: colors.background.secondary,
-      borderRadius: 12,
-      padding: 16,
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: colors.border.light,
-    },
-    quickActionEmoji: {
-      fontSize: 24,
-      marginBottom: 8,
-    },
-    quickActionLabel: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: colors.text.primary,
-    },
-    uploadCard: {
-      backgroundColor: colors.background.secondary,
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 24,
-      borderWidth: 1,
-      borderColor: colors.border.light,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    uploadContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      flex: 1,
-      gap: 12,
-    },
-    uploadEmoji: {
-      fontSize: 32,
-    },
-    uploadText: {
-      flex: 1,
-    },
-    uploadTitle: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: colors.text.primary,
-      marginBottom: 2,
-    },
-    uploadSubtitle: {
-      fontSize: 13,
-      color: colors.text.secondary,
-      lineHeight: 18,
-    },
+    // Removed: heroCard, heroContent, heroIcon, heroEmoji, heroText, heroTitle, heroSubtitle, heroArrow, quickActionsRow, quickActionButton, quickActionEmoji, quickActionLabel, uploadCard, uploadContent, uploadEmoji, uploadText, uploadTitle, uploadSubtitle
     section: {
       marginBottom: 16, // space-y-4 (16px gap)
     },
@@ -821,53 +726,7 @@ const createStyles = (theme: Theme) =>
       color: colors.text.tertiary,
       textAlign: 'center',
     },
-    achievementsCard: {
-      backgroundColor: colors.primary.bg20,
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 24,
-      borderWidth: 2,
-      borderColor: colors.primary.main,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    achievementsContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      flex: 1,
-      gap: 12,
-    },
-    achievementsIconContainer: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      backgroundColor: colors.primary.main,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    achievementsText: {
-      flex: 1,
-    },
-    achievementsTitle: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: colors.primary.dark,
-      marginBottom: 2,
-    },
-    achievementsSubtitle: {
-      fontSize: 13,
-      color: colors.primary.dark,
-      lineHeight: 18,
-    },
-    streakBadge: {
-      marginTop: 4,
-    },
-    streakText: {
-      fontSize: 12,
-      fontWeight: '600',
-      color: colors.primary.dark,
-    },
+    // Removed: achievementsCard, achievementsContent, achievementsIconContainer, achievementsText, achievementsTitle, achievementsSubtitle, streakBadge, streakText
     // Personalization banner styles
     personalizationBanner: {
       flexDirection: 'row',
