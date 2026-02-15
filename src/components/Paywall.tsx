@@ -104,6 +104,14 @@ export default function Paywall({
 
   const isLifetimeSelected = selectedTier === 'lifetime';
 
+  const showAlert = useCallback((title: string, message: string) => {
+    if (Platform.OS === 'web') {
+      window.alert(`${title}\n\n${message}`);
+    } else {
+      Alert.alert(title, message, [{ text: 'OK' }]);
+    }
+  }, []);
+
   const handleSubscribe = useCallback(async () => {
     setIsProcessing(true);
     
@@ -123,37 +131,33 @@ export default function Paywall({
       );
       
       if ('error' in result) {
-        Alert.alert(
-          'Subscription Error',
-          result.error,
-          [{ text: 'OK' }]
-        );
+        if (result.error === 'Not authenticated') {
+          showAlert('Sign In Required', 'Please create an account or sign in to subscribe.');
+        } else {
+          showAlert('Subscription Error', result.error);
+        }
         return;
       }
       
       // Open Stripe Checkout in browser
-      const supported = await Linking.canOpenURL(result.url);
-      if (supported) {
-        await Linking.openURL(result.url);
-        // User will return to app after checkout
-        // Webhook will update subscription state automatically
+      if (Platform.OS === 'web') {
+        // On web, use window.open for reliable redirect (Linking.openURL can fail in modals)
+        window.open(result.url, '_blank');
         onClose();
-        
-        // Optionally notify parent component
         onSubscribe?.(selectedTier, billingPeriod);
       } else {
-        Alert.alert(
-          'Error',
-          'Unable to open checkout page. Please try again.',
-          [{ text: 'OK' }]
-        );
+        const supported = await Linking.canOpenURL(result.url);
+        if (supported) {
+          await Linking.openURL(result.url);
+          onClose();
+          onSubscribe?.(selectedTier, billingPeriod);
+        } else {
+          showAlert('Error', 'Unable to open checkout page. Please try again.');
+        }
       }
     } catch (error) {
       console.error('Subscription error:', error);
-      Alert.alert(
-        'Subscription Error',
-        'Unable to start subscription. Please try again.',
-        [{ text: 'OK' }]
+      showAlert('Subscription Error', 'Unable to start subscription. Please try again.'
       );
     } finally {
       setIsProcessing(false);
@@ -404,8 +408,7 @@ export default function Paywall({
             </TouchableOpacity>
             <Text style={styles.legalSeparator}>•</Text>
             <TouchableOpacity onPress={() => {
-              // TODO: Restore purchases via Stripe
-              Alert.alert('Restore Purchases', 'Contact support@rewardly.app to restore your subscription.');
+              showAlert('Restore Purchases', 'Contact support@rewardly.app to restore your subscription.');
             }}>
               <Text style={styles.legalLink}>Restore Purchases</Text>
             </TouchableOpacity>

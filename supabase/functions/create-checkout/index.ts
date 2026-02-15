@@ -4,7 +4,7 @@
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
 import Stripe from 'https://esm.sh/stripe@14.5.0?target=deno';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -35,14 +35,19 @@ serve(async (req) => {
       throw new Error('Missing authorization header');
     }
 
-    const supabase = createClient(
+    // Extract JWT token from Bearer header
+    const token = authHeader.replace('Bearer ', '');
+
+    // Use service role client for database operations
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    // Verify user via auth API with explicit token
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
     if (userError || !user) {
+      console.error('Auth error:', userError?.message);
       throw new Error('Unauthorized');
     }
 
@@ -54,7 +59,7 @@ serve(async (req) => {
     }
 
     // Get or create Stripe customer
-    const { data: profile } = await supabase
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('stripe_customer_id')
       .eq('user_id', user.id)
@@ -72,7 +77,7 @@ serve(async (req) => {
       customerId = customer.id;
 
       // Save customer ID to profile
-      await supabase
+      await supabaseAdmin
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('user_id', user.id);

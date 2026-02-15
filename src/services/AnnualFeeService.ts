@@ -132,7 +132,10 @@ async function estimateAnnualRewards(cardId: string): Promise<number> {
       .eq('card_used', cardId)
       .gte('transaction_date', new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString());
     
-    if (error) throw error;
+    if (error) {
+      // Table may not exist yet — fall through to estimation
+      console.warn('spending_log not available:', error.message);
+    }
     
     if (data && data.length > 0) {
       return (data as any[]).reduce((sum, entry: any) => sum + (parseFloat(entry.rewards_earned) || 0), 0);

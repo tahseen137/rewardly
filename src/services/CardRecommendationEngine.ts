@@ -53,7 +53,11 @@ export async function getTopSpendingCategories(
       .eq('user_id', user.data.user.id)
       .gte('transaction_date', thirtyDaysAgo.toISOString());
     
-    if (error) throw error;
+    if (error) {
+      // Table may not exist yet — gracefully return empty
+      console.warn('Failed to get top spending categories:', error);
+      return [];
+    }
     
     // Aggregate by category
     const categoryTotals: Record<string, number> = {};

@@ -57,7 +57,11 @@ export async function generateMonthlyReport(month: Date): Promise<SavingsReport 
       .gte('transaction_date', startDate.toISOString())
       .lt('transaction_date', endDate.toISOString());
     
-    if (spendingError) throw spendingError;
+    if (spendingError) {
+      // Table may not exist yet — return null gracefully
+      console.warn('spending_log not available:', spendingError.message);
+      return null;
+    }
     
     if (!spendingData || spendingData.length === 0) {
       return null; // No spending data for this month
