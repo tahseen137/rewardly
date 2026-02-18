@@ -34,6 +34,138 @@ export interface SavingsReport {
 }
 
 // ============================================================================
+// Private Helpers
+// ============================================================================
+
+/** Map a raw Supabase row to a typed SavingsReport */
+function rowToReport(row: Record<string, unknown>): SavingsReport {
+  return {
+    id: row.id as string,
+    userId: row.user_id as string,
+    reportMonth: new Date(row.report_month as string),
+    totalSpend: parseFloat(row.total_spend as string),
+    totalRewardsEarned: parseFloat(row.total_rewards_earned as string),
+    totalRewardsMissed: parseFloat(row.total_rewards_missed as string),
+    bestCard: row.best_card as string | null,
+    bestCardEarnings: parseFloat((row.best_card_earnings as string) || '0'),
+    worstCard: row.worst_card as string | null,
+    worstCardEarnings: parseFloat((row.worst_card_earnings as string) || '0'),
+    categoryBreakdown: row.category_breakdown as CategoryBreakdown[],
+    optimizationScore: row.optimization_score as number,
+    generatedAt: new Date(row.generated_at as string),
+  };
+}
+
+interface SpendingEntry {
+  amount: string;
+  rewards_earned?: string;
+  rewards_missed?: string;
+  card_used: string;
+  category: SpendingCategory;
+}
+
+interface AggregatedSpending {
+  totalSpend: number;
+  totalEarned: number;
+  totalMissed: number;
+  cardEarnings: Record<string, number>;
+  categoryData: Record<string, CategoryBreakdown>;
+}
+
+/** Aggregate raw spending log entries into summary totals */
+function aggregateSpendingEntries(entries: SpendingEntry[]): AggregatedSpending {
+  let totalSpend = 0;
+  let totalEarned = 0;
+  let totalMissed = 0;
+  const cardEarnings: Record<string, number> = {};
+  const categoryData: Record<string, CategoryBreakdown> = {};
+
+  for (const entry of entries) {
+    const amount = parseFloat(entry.amount);
+    const earned = parseFloat(entry.rewards_earned || '0');
+    const missed = parseFloat(entry.rewards_missed || '0');
+
+    totalSpend += amount;
+    totalEarned += earned;
+    totalMissed += missed;
+
+    // Track per card
+    cardEarnings[entry.card_used] = (cardEarnings[entry.card_used] || 0) + earned;
+
+    // Track per category
+    const cat = entry.category;
+    if (!categoryData[cat]) {
+      categoryData[cat] = { category: cat, spend: 0, earned: 0, missed: 0 };
+    }
+    categoryData[cat].spend += amount;
+    categoryData[cat].earned += earned;
+    categoryData[cat].missed += missed;
+  }
+
+  return { totalSpend, totalEarned, totalMissed, cardEarnings, categoryData };
+}
+
+interface BestWorstCards {
+  bestCard: string | null;
+  bestCardEarnings: number;
+  worstCard: string | null;
+  worstCardEarnings: number;
+}
+
+/** Identify the best and worst-earning cards from per-card totals */
+function findBestAndWorstCards(cardEarnings: Record<string, number>): BestWorstCards {
+  let bestCard: string | null = null;
+  let bestCardEarnings = 0;
+  let worstCard: string | null = null;
+  let worstCardEarnings = Infinity;
+
+  for (const [card, earnings] of Object.entries(cardEarnings)) {
+    if (earnings > bestCardEarnings) {
+      bestCard = card;
+      bestCardEarnings = earnings;
+    }
+    if (earnings < worstCardEarnings) {
+      worstCard = card;
+      worstCardEarnings = earnings;
+    }
+  }
+
+  return {
+    bestCard,
+    bestCardEarnings,
+    worstCard,
+    // Normalize Infinity (no cards found) to 0
+    worstCardEarnings: worstCardEarnings === Infinity ? 0 : worstCardEarnings,
+  };
+}
+
+/** Build the Supabase payload for inserting/updating a savings report */
+function buildReportPayload(
+  userId: string,
+  reportMonth: Date,
+  totalSpend: number,
+  totalEarned: number,
+  totalMissed: number,
+  cards: BestWorstCards,
+  categoryBreakdown: CategoryBreakdown[],
+  optimizationScore: number,
+) {
+  return {
+    user_id: userId,
+    report_month: reportMonth.toISOString(),
+    total_spend: totalSpend,
+    total_rewards_earned: totalEarned,
+    total_rewards_missed: totalMissed,
+    best_card: cards.bestCard,
+    best_card_earnings: cards.bestCardEarnings,
+    worst_card: cards.worstCard,
+    worst_card_earnings: cards.worstCardEarnings,
+    category_breakdown: categoryBreakdown,
+    optimization_score: optimizationScore,
+  };
+}
+
+// ============================================================================
 // Report Generation
 // ============================================================================
 
@@ -42,160 +174,72 @@ export async function generateMonthlyReport(month: Date): Promise<SavingsReport 
     if (!supabase) return null;
     const user = await supabase.auth.getUser();
     if (!user.data.user) return null;
-    
+
+    const userId = user.data.user.id;
+
     // Normalize to first day of month
     const reportMonth = new Date(month.getFullYear(), month.getMonth(), 1);
-    
-    // Get spending log for the month
-    const startDate = reportMonth;
     const endDate = new Date(reportMonth.getFullYear(), reportMonth.getMonth() + 1, 1);
-    
+
+    // Fetch spending log for the month
     const { data: spendingData, error: spendingError } = await (supabase
       .from('spending_log') as any)
       .select('*')
-      .eq('user_id', user.data.user.id)
-      .gte('transaction_date', startDate.toISOString())
+      .eq('user_id', userId)
+      .gte('transaction_date', reportMonth.toISOString())
       .lt('transaction_date', endDate.toISOString());
-    
+
     if (spendingError) {
       // Table may not exist yet — return null gracefully
       console.warn('spending_log not available:', spendingError.message);
       return null;
     }
-    
-    if (!spendingData || spendingData.length === 0) {
-      return null; // No spending data for this month
-    }
-    
-    // Aggregate data
-    let totalSpend = 0;
-    let totalEarned = 0;
-    let totalMissed = 0;
-    
-    const cardEarnings: Record<string, number> = {};
-    const categoryData: Record<string, CategoryBreakdown> = {};
-    
-    (spendingData as any[]).forEach((entry: any) => {
-      const amount = parseFloat(entry.amount);
-      const earned = parseFloat(entry.rewards_earned || '0');
-      const missed = parseFloat(entry.rewards_missed || '0');
-      
-      totalSpend += amount;
-      totalEarned += earned;
-      totalMissed += missed;
-      
-      // Track per card
-      const card = entry.card_used;
-      cardEarnings[card] = (cardEarnings[card] || 0) + earned;
-      
-      // Track per category
-      const category = entry.category;
-      if (!categoryData[category]) {
-        categoryData[category] = {
-          category,
-          spend: 0,
-          earned: 0,
-          missed: 0,
-        };
-      }
-      categoryData[category].spend += amount;
-      categoryData[category].earned += earned;
-      categoryData[category].missed += missed;
-    });
-    
-    // Find best and worst cards
-    const cardEntries = Object.entries(cardEarnings);
-    let bestCard: string | null = null;
-    let bestCardEarnings = 0;
-    let worstCard: string | null = null;
-    let worstCardEarnings = Infinity;
-    
-    cardEntries.forEach(([card, earnings]) => {
-      if (earnings > bestCardEarnings) {
-        bestCard = card;
-        bestCardEarnings = earnings;
-      }
-      if (earnings < worstCardEarnings) {
-        worstCard = card;
-        worstCardEarnings = earnings;
-      }
-    });
-    
-    // Calculate optimization score (0-100)
-    // Score = (earned / (earned + missed)) * 100
-    const optimizationScore = totalEarned + totalMissed > 0
-      ? Math.round((totalEarned / (totalEarned + totalMissed)) * 100)
-      : 100;
-    
-    // Category breakdown
+
+    if (!spendingData || spendingData.length === 0) return null;
+
+    // Aggregate spending data
+    const { totalSpend, totalEarned, totalMissed, cardEarnings, categoryData } =
+      aggregateSpendingEntries(spendingData as SpendingEntry[]);
+
+    // Derived stats
+    const cards = findBestAndWorstCards(cardEarnings);
+    const optimizationScore =
+      totalEarned + totalMissed > 0
+        ? Math.round((totalEarned / (totalEarned + totalMissed)) * 100)
+        : 100;
     const categoryBreakdown = Object.values(categoryData);
-    
-    // Insert into database
+    const payload = buildReportPayload(
+      userId, reportMonth, totalSpend, totalEarned, totalMissed,
+      cards, categoryBreakdown, optimizationScore,
+    );
+
+    // Upsert: try insert, fall back to update on duplicate month
     let { data: reportData, error: reportError } = await (supabase
       .from('savings_reports') as any)
-      .insert({
-        user_id: user.data.user.id,
-        report_month: reportMonth.toISOString(),
-        total_spend: totalSpend,
-        total_rewards_earned: totalEarned,
-        total_rewards_missed: totalMissed,
-        best_card: bestCard,
-        best_card_earnings: bestCardEarnings,
-        worst_card: worstCard,
-        worst_card_earnings: worstCardEarnings === Infinity ? 0 : worstCardEarnings,
-        category_breakdown: categoryBreakdown,
-        optimization_score: optimizationScore,
-      })
+      .insert(payload)
       .select()
       .single();
-    
+
     if (reportError) {
-      // Check if report already exists
       if (reportError.code === '23505') {
-        // Unique constraint violation - update existing
+        // Unique constraint violation — update existing record
         const { data: existingData } = await (supabase
           .from('savings_reports') as any)
-          .update({
-            total_spend: totalSpend,
-            total_rewards_earned: totalEarned,
-            total_rewards_missed: totalMissed,
-            best_card: bestCard,
-            best_card_earnings: bestCardEarnings,
-            worst_card: worstCard,
-            worst_card_earnings: worstCardEarnings === Infinity ? 0 : worstCardEarnings,
-            category_breakdown: categoryBreakdown,
-            optimization_score: optimizationScore,
-            generated_at: new Date().toISOString(),
-          })
-          .eq('user_id', user.data.user.id)
+          .update({ ...payload, generated_at: new Date().toISOString() })
+          .eq('user_id', userId)
           .eq('report_month', reportMonth.toISOString())
           .select()
           .single();
-        
+
         if (!existingData) throw new Error('Failed to update existing report');
         reportData = existingData;
       } else {
         throw reportError;
       }
     }
-    
-    const rd = reportData as any;
-    return {
-      id: rd.id,
-      userId: rd.user_id,
-      reportMonth: new Date(rd.report_month),
-      totalSpend: parseFloat(rd.total_spend),
-      totalRewardsEarned: parseFloat(rd.total_rewards_earned),
-      totalRewardsMissed: parseFloat(rd.total_rewards_missed),
-      bestCard: rd.best_card,
-      bestCardEarnings: parseFloat(rd.best_card_earnings || '0'),
-      worstCard: rd.worst_card,
-      worstCardEarnings: parseFloat(rd.worst_card_earnings || '0'),
-      categoryBreakdown: rd.category_breakdown,
-      optimizationScore: rd.optimization_score,
-      generatedAt: new Date(rd.generated_at),
-    };
-    
+
+    return rowToReport(reportData as Record<string, unknown>);
+
   } catch (error) {
     console.error('Failed to generate monthly report:', error);
     return null;
@@ -211,32 +255,17 @@ export async function getReport(reportId: string): Promise<SavingsReport | null>
     if (!supabase) return null;
     const user = await supabase.auth.getUser();
     if (!user.data.user) return null;
-    
+
     const { data, error } = await (supabase
       .from('savings_reports') as any)
       .select('*')
       .eq('id', reportId)
       .eq('user_id', user.data.user.id)
       .single();
-    
+
     if (error) throw error;
-    
-    const d = data as any;
-    return {
-      id: d.id,
-      userId: d.user_id,
-      reportMonth: new Date(d.report_month),
-      totalSpend: parseFloat(d.total_spend),
-      totalRewardsEarned: parseFloat(d.total_rewards_earned),
-      totalRewardsMissed: parseFloat(d.total_rewards_missed),
-      bestCard: d.best_card,
-      bestCardEarnings: parseFloat(d.best_card_earnings || '0'),
-      worstCard: d.worst_card,
-      worstCardEarnings: parseFloat(d.worst_card_earnings || '0'),
-      categoryBreakdown: d.category_breakdown,
-      optimizationScore: d.optimization_score,
-      generatedAt: new Date(d.generated_at),
-    };
+
+    return rowToReport(data as Record<string, unknown>);
   } catch (error) {
     console.error('Failed to get report:', error);
     return null;
@@ -248,31 +277,17 @@ export async function getRecentReports(limit: number = 6): Promise<SavingsReport
     if (!supabase) return [];
     const user = await supabase.auth.getUser();
     if (!user.data.user) return [];
-    
+
     const { data, error } = await (supabase
       .from('savings_reports') as any)
       .select('*')
       .eq('user_id', user.data.user.id)
       .order('report_month', { ascending: false })
       .limit(limit);
-    
+
     if (error) throw error;
-    
-    return ((data || []) as any[]).map((row: any) => ({
-      id: row.id,
-      userId: row.user_id,
-      reportMonth: new Date(row.report_month),
-      totalSpend: parseFloat(row.total_spend),
-      totalRewardsEarned: parseFloat(row.total_rewards_earned),
-      totalRewardsMissed: parseFloat(row.total_rewards_missed),
-      bestCard: row.best_card,
-      bestCardEarnings: parseFloat(row.best_card_earnings || '0'),
-      worstCard: row.worst_card,
-      worstCardEarnings: parseFloat(row.worst_card_earnings || '0'),
-      categoryBreakdown: row.category_breakdown,
-      optimizationScore: row.optimization_score,
-      generatedAt: new Date(row.generated_at),
-    }));
+
+    return ((data || []) as Record<string, unknown>[]).map(rowToReport);
   } catch (error) {
     console.error('Failed to get recent reports:', error);
     return [];
@@ -292,18 +307,19 @@ export interface ShareableReportData {
 }
 
 export function formatReportForSharing(report: SavingsReport): ShareableReportData {
-  const month = report.reportMonth.toLocaleDateString('en-US', { 
-    month: 'long', 
-    year: 'numeric' 
+  const month = report.reportMonth.toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
   });
-  
+
   // Find top category by spend
-  const topCategory = report.categoryBreakdown.length > 0
-    ? report.categoryBreakdown.reduce((max, cat) => 
-        cat.spend > max.spend ? cat : max
-      ).category
-    : 'none';
-  
+  const topCategory =
+    report.categoryBreakdown.length > 0
+      ? report.categoryBreakdown.reduce((max, cat) =>
+          cat.spend > max.spend ? cat : max
+        ).category
+      : 'none';
+
   return {
     month,
     totalEarned: `$${report.totalRewardsEarned.toFixed(2)}`,
