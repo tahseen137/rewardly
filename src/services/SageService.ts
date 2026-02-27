@@ -204,11 +204,12 @@ class SageServiceClass {
         throw new Error('No response body received');
       }
 
-      // Manual SSE Parsing (Option 2)
+      // Manual SSE Parsing
       // @ts-ignore - ReadableStream/getReader depends on RN version/polyfills
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      let rawBody = ''; // Capture full body for JSON fallback detection
       let accumulatedText = '';
       let remoteConversationId = convId;
 
@@ -216,7 +217,9 @@ class SageServiceClass {
         const { done, value } = await reader.read();
         if (done) break;
 
-        buffer += decoder.decode(value, { stream: true });
+        const chunk = decoder.decode(value, { stream: true });
+        rawBody += chunk;
+        buffer += chunk;
         const lines = buffer.split('\n\n');
         buffer = lines.pop() || ''; // Keep incomplete chunk
 
@@ -255,6 +258,22 @@ class SageServiceClass {
           if (event === 'error') {
              throw new Error(dataStr);
           }
+        }
+      }
+
+      // Handle JSON fallback: edge function returned JSON instead of SSE
+      // (e.g., when Gemini API key is misconfigured or returns an error)
+      if (!accumulatedText && rawBody.trim()) {
+        try {
+          const fallback = JSON.parse(rawBody.trim());
+          if (fallback.text) {
+            accumulatedText = fallback.text;
+            onToken(fallback.text);
+          } else if (fallback.error) {
+            throw new Error(fallback.error);
+          }
+        } catch (parseErr) {
+          // Not JSON — ignore, will return empty reply
         }
       }
 

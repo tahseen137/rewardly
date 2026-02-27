@@ -460,42 +460,61 @@ serve(async (req) => {
     // ========================================================================
     if (googleApiKey) {
       const geminiBody = toGeminiMessages(systemPrompt, messages, message);
-      const geminiModel = "gemini-2.0-flash";
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?key=${googleApiKey}&alt=sse`;
+      // Try gemini-2.0-flash first, fall back to gemini-1.5-flash if unavailable
+      const geminiModels = ["gemini-2.0-flash", "gemini-1.5-flash"];
+      let response: Response | null = null;
+      let lastGeminiErr = "";
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      for (const geminiModel of geminiModels) {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?key=${googleApiKey}&alt=sse`;
 
-      let response: Response;
-      try {
-        response = await fetch(geminiUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(geminiBody),
-          signal: controller.signal,
-        });
-      } catch (err) {
-        clearTimeout(timeoutId);
-        if (err.name === "AbortError") {
-          console.error("[Sage] Gemini timeout");
-          return new Response(JSON.stringify({ text: getFallbackResponse(userContext), fallback: true }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+        let candidate: Response;
+        try {
+          candidate = await fetch(geminiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(geminiBody),
+            signal: controller.signal,
           });
+        } catch (err) {
+          clearTimeout(timeoutId);
+          if (err.name === "AbortError") {
+            console.error(`[Sage] Gemini ${geminiModel} timeout`);
+            lastGeminiErr = "timeout";
+            continue;
+          }
+          throw err;
         }
-        throw err;
+        clearTimeout(timeoutId);
+
+        if (candidate.ok) {
+          response = candidate;
+          console.log(`[Sage] Using Gemini model: ${geminiModel}`);
+          break;
+        }
+
+        const errText = await candidate.text();
+        lastGeminiErr = `${candidate.status}: ${errText.substring(0, 100)}`;
+        console.warn(`[Sage] Gemini ${geminiModel} failed (${candidate.status}), trying next model`);
       }
 
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const err = await response.text();
-        console.error("[Sage] Gemini error:", response.status, err);
-        return new Response(JSON.stringify({ 
-          text: `Sage is temporarily unavailable. (API ${response.status})`, 
-          fallback: true,
-          debug: { status: response.status, error: err.substring(0, 200) }
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+      if (!response) {
+        console.error("[Sage] All Gemini models failed:", lastGeminiErr);
+        // Return SSE-formatted error so client handles it properly
+        const encoder = new TextEncoder();
+        const errorStream = new ReadableStream({
+          start(ctrl) {
+            const fallbackText = getFallbackResponse(userContext);
+            ctrl.enqueue(encoder.encode(`event: text\ndata: ${JSON.stringify({ text: fallbackText })}\n\n`));
+            ctrl.enqueue(encoder.encode(`event: done\ndata: ${JSON.stringify({ conversationId: conversationId || `conv_${Date.now()}`, status: "fallback" })}\n\n`));
+            ctrl.close();
+          }
+        });
+        return new Response(errorStream, {
+          headers: { ...corsHeaders, "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
         });
       }
 

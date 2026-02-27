@@ -144,7 +144,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.americanexpress.com/en-ca/credit-cards/platinum-card/",
+      "applicationUrl": "https://www.americanexpress.com/ca/en/credit-cards/the-platinum-card/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -250,7 +250,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.americanexpress.com/en-ca/credit-cards/aeroplan-card/",
+      "applicationUrl": "https://www.americanexpress.com/ca/en/credit-cards/aeroplan-cards/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -324,7 +324,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.americanexpress.com/en-ca/credit-cards/marriott-bonvoy/",
+      "applicationUrl": "https://www.americanexpress.com/ca/en/credit-cards/marriott-bonvoy-credit-card/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -684,7 +684,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/travel/rbc-westjet-world-elite-mastercard.html",
+      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/travel/westjet-rbc-world-elite-mastercard.html",
       "lastVerified": "2026-02-14"
     },
     {
@@ -725,7 +725,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/cash-back/cashback-preferred-world-elite-mastercard.html",
+      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -798,7 +798,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/rewards/rbc-rewards-plus-visa.html",
+      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -847,7 +847,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-cards/aeroplan-visa-infinite-card.html",
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aeroplan-visa-infinite-card.html",
       "lastVerified": "2026-02-14"
     },
     {
@@ -880,7 +880,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-cards/aventura-visa-infinite-card.html",
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aventura-visa-infinite-card.html",
       "lastVerified": "2026-02-14"
     },
     {
@@ -929,7 +929,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-cards/dividend-visa-infinite-card.html",
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/dividend-visa-infinite-card.html",
       "lastVerified": "2026-02-14"
     },
     {
@@ -972,7 +972,7 @@
       ],
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-cards/costco-mastercard.html",
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/costco-mastercard.html",
       "lastVerified": "2026-02-14"
     },
     {
@@ -996,7 +996,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-cards/select-visa-card.html",
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/select-visa-card.html",
       "lastVerified": "2026-02-14"
     },
     {
@@ -1308,7 +1308,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.bmo.com/en-ca/main/personal/credit-cards/bmo-air-miles-world-elite-mastercard/",
+      "applicationUrl": "https://www.bmo.com/main/personal/credit-cards/bmo-air-miles-world-elite-mastercard/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -1422,7 +1422,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.bmo.com/en-ca/main/personal/credit-cards/bmo-eclipse-visa-infinite/",
+      "applicationUrl": "https://www.bmo.com/main/personal/credit-cards/bmo-eclipse-visa-infinite/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -1455,7 +1455,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.bmo.com/en-ca/main/personal/credit-cards/bmo-cashback-mastercard/",
+      "applicationUrl": "https://www.bmo.com/main/personal/credit-cards/bmo-cashback-mastercard/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -1473,7 +1473,7 @@
       "categoryRewards": [],
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.bmo.com/en-ca/main/personal/credit-cards/bmo-preferred-rate-mastercard/",
+      "applicationUrl": "https://www.bmo.com/main/personal/credit-cards/bmo-preferred-rate-mastercard/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -1676,7 +1676,7 @@
       ],
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.pcfinancial.ca/en/credit-cards/pc-money-account/world-elite/",
+      "applicationUrl": "https://www.pcfinancial.ca/en/credit-cards/world-elite-mastercard/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -1711,7 +1711,7 @@
       ],
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.pcfinancial.ca/en/credit-cards/pc-money-account/no-fee/",
+      "applicationUrl": "https://www.pcfinancial.ca/en/credit-cards/no-fee-mastercard/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -1760,7 +1760,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.simplii.com/en/credit-cards/cash-back-visa-card.html",
+      "applicationUrl": "https://www.simplii.com/en/credit-cards/cash-back-visa.html",
       "lastVerified": "2026-02-14"
     },
     {
@@ -1987,7 +1987,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0,
-      "applicationUrl": "https://www.nbc.ca/personal/credit-cards/world-elite-mastercard.html",
+      "applicationUrl": "https://www.nbc.ca/en/personal/credit-cards/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -2011,7 +2011,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.nbc.ca/personal/credit-cards/syncro-mastercard.html",
+      "applicationUrl": "https://www.nbc.ca/en/personal/credit-cards/",
       "lastVerified": "2026-02-14"
     },
     {
@@ -2087,7 +2087,7 @@
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
-      "applicationUrl": "https://www.capitalone.ca/credit-cards/aspire-travel-world/",
+      "applicationUrl": "https://www.capitalone.ca/",
       "lastVerified": "2026-02-14"
     },
     {
