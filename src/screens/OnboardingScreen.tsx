@@ -3,6 +3,12 @@
  * Step 1: Select your country (🇺🇸 / 🇨🇦)
  * Step 2: Add your credit cards
  * Step 3: Meet Sage, your AI assistant
+ * 
+ * Feb 27, 2026: Implemented onboarding fixes from ONBOARDING_AUDIT.md
+ * - Added back button (P0)
+ * - Added Popular/All/Search tabs for cards (P0)
+ * - Added value prop callouts (P1)
+ * - Added skip confirmation (P1)
  */
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
@@ -25,7 +31,7 @@ import Animated, {
   useSharedValue,
   interpolate,
 } from 'react-native-reanimated';
-import { CreditCard, MessageCircle, MapPin, ChevronRight, Check, Search } from 'lucide-react-native';
+import { CreditCard, MessageCircle, MapPin, ChevronRight, ChevronLeft, Check, Search, Sparkles } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -48,6 +54,36 @@ interface OnboardingScreenProps {
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const TOTAL_STEPS = 3;
 
+// Popular Canadian cards (most common rewards cards)
+const POPULAR_CARDS_CA = [
+  'tangerine-cashback-mastercard',
+  'scotiabank-momentum-infinite-visa',
+  'td-cash-back-infinite-visa',
+  'pc-financial-world-elite-mastercard',
+  'american-express-cobalt-card',
+  'cibc-dividend-visa-infinite',
+  'bmo-eclipse-visa-infinite',
+  'rbc-avion-visa-infinite',
+  'td-aeroplan-visa-infinite',
+  'amex-gold-rewards-card',
+];
+
+// Popular US cards
+const POPULAR_CARDS_US = [
+  'chase-sapphire-preferred',
+  'chase-sapphire-reserve',
+  'american-express-platinum',
+  'capital-one-venture-x',
+  'chase-freedom-unlimited',
+  'amex-gold-card',
+  'citi-double-cash',
+  'discover-it-cash-back',
+  'wells-fargo-active-cash',
+  'capital-one-quicksilver',
+];
+
+type CardViewMode = 'popular' | 'all' | 'search';
+
 export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const { t } = useTranslation();
   
@@ -57,6 +93,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
   const [availableCards, setAvailableCards] = useState<Card[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [cardViewMode, setCardViewMode] = useState<CardViewMode>('popular');
   
   const animatedStep = useSharedValue(0);
 
@@ -65,27 +102,41 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     const loadCards = async () => {
       try {
         const cards = await getAllCards();
-        setAvailableCards(cards); // Show all cards (will be filtered by search)
+        setAvailableCards(cards);
       } catch (err) {
-        // Use empty array if cards fail to load
         setAvailableCards([]);
       }
     };
     loadCards();
   }, [selectedCountry]);
 
-  // Filter cards based on search query
-  const filteredCards = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return availableCards;
+  // Get popular cards based on country
+  const popularCardIds = useMemo(() => {
+    return selectedCountry === 'CA' ? POPULAR_CARDS_CA : POPULAR_CARDS_US;
+  }, [selectedCountry]);
+
+  // Filter cards based on view mode and search query
+  const displayedCards = useMemo(() => {
+    let cards = availableCards;
+
+    // Apply view mode filter
+    if (cardViewMode === 'popular') {
+      cards = cards.filter(card => 
+        popularCardIds.some(popId => 
+          card.id.toLowerCase().includes(popId.toLowerCase()) ||
+          card.cardId?.toLowerCase().includes(popId.toLowerCase())
+        )
+      );
+    } else if (cardViewMode === 'search' || searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      cards = cards.filter(card => 
+        card.name.toLowerCase().includes(query) ||
+        card.issuer.toLowerCase().includes(query)
+      );
     }
-    
-    const query = searchQuery.toLowerCase();
-    return availableCards.filter(card => 
-      card.name.toLowerCase().includes(query) ||
-      card.issuer.toLowerCase().includes(query)
-    );
-  }, [availableCards, searchQuery]);
+
+    return cards;
+  }, [availableCards, cardViewMode, searchQuery, popularCardIds]);
 
   // Load existing portfolio
   useEffect(() => {
@@ -109,7 +160,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     // Reload cards for new country
     try {
       const cards = await getAllCards();
-      setAvailableCards(cards.slice(0, 20));
+      setAvailableCards(cards);
     } catch (err) {
       setAvailableCards([]);
     }
@@ -123,6 +174,13 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       return [...prev, cardId];
     });
   }, []);
+
+  // P0: Back button handler
+  const handleBack = useCallback(() => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  }, [currentStep]);
 
   const handleNext = useCallback(async () => {
     if (currentStep === 1) {
@@ -152,10 +210,33 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     }
   }, [currentStep, selectedCards, onComplete]);
 
-  const handleSkip = useCallback(async () => {
-    await setOnboardingComplete(true);
-    onComplete();
-  }, [onComplete]);
+  // P1: Skip confirmation (especially important on card step)
+  const handleSkip = useCallback(() => {
+    if (currentStep === 1 && selectedCards.length === 0) {
+      // Show confirmation dialog on card step if no cards selected
+      Alert.alert(
+        t('onboarding.skipCardTitle'),
+        t('onboarding.skipCardMessage'),
+        [
+          { 
+            text: t('onboarding.skipCardAddNow'), 
+            style: 'cancel' 
+          },
+          { 
+            text: t('onboarding.skipCardConfirm'), 
+            onPress: async () => {
+              await setOnboardingComplete(true);
+              onComplete();
+            },
+            style: 'destructive' 
+          }
+        ]
+      );
+    } else {
+      // Skip without confirmation on other steps
+      setOnboardingComplete(true).then(onComplete);
+    }
+  }, [currentStep, selectedCards, onComplete, t]);
 
   const renderProgressDots = () => (
     <View style={styles.progressContainer}>
@@ -172,6 +253,16 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     </View>
   );
 
+  // P1: Value prop callout component
+  const renderValueCallout = (messageKey: string) => (
+    <View style={styles.valueCallout}>
+      <Sparkles size={16} color={colors.primary.main} />
+      <Text style={styles.valueCalloutText}>
+        {t(messageKey)}
+      </Text>
+    </View>
+  );
+
   const renderCountryStep = () => (
     <View style={styles.stepContent}>
       <View style={styles.iconContainer}>
@@ -179,6 +270,9 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       </View>
       <Text style={styles.stepTitle}>{t('onboarding.countryTitle')}</Text>
       <Text style={styles.stepDescription}>{t('onboarding.countryDescription')}</Text>
+
+      {/* P1: Value callout */}
+      {renderValueCallout('onboarding.countryValue')}
 
       <View style={styles.countryOptions}>
         {(['US', 'CA'] as Country[]).map(country => (
@@ -217,25 +311,81 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       <Text style={styles.stepTitle}>{t('onboarding.cardsTitle')}</Text>
       <Text style={styles.stepDescription}>{t('onboarding.cardsDescription')}</Text>
 
-      {/* Search Input */}
-      <View style={styles.searchContainer}>
-        <Search size={20} color={colors.text.secondary} style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder={t('onboarding.searchCards')}
-          placeholderTextColor={colors.text.tertiary}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
+      {/* P1: Value callout */}
+      {renderValueCallout('onboarding.cardsValue')}
+
+      {/* P1: Guidance text */}
+      <Text style={styles.cardGuidance}>
+        {t('onboarding.cardsGuidance')}
+      </Text>
+
+      {/* P0: Card View Mode Tabs */}
+      <View style={styles.cardTabs}>
+        <TouchableOpacity
+          style={[styles.cardTab, cardViewMode === 'popular' && styles.cardTabActive]}
+          onPress={() => {
+            setCardViewMode('popular');
+            setSearchQuery('');
+          }}
+        >
+          <Text style={[
+            styles.cardTabText,
+            cardViewMode === 'popular' && styles.cardTabTextActive
+          ]}>
+            {t('onboarding.popularTab')}
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.cardTab, cardViewMode === 'all' && styles.cardTabActive]}
+          onPress={() => {
+            setCardViewMode('all');
+            setSearchQuery('');
+          }}
+        >
+          <Text style={[
+            styles.cardTabText,
+            cardViewMode === 'all' && styles.cardTabTextActive
+          ]}>
+            {t('onboarding.allTab')}
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.cardTab, cardViewMode === 'search' && styles.cardTabActive]}
+          onPress={() => setCardViewMode('search')}
+        >
+          <Text style={[
+            styles.cardTabText,
+            cardViewMode === 'search' && styles.cardTabTextActive
+          ]}>
+            {t('onboarding.searchTab')}
+          </Text>
+        </TouchableOpacity>
       </View>
 
+      {/* Search Input (only show in search mode) */}
+      {cardViewMode === 'search' && (
+        <View style={styles.searchContainer}>
+          <Search size={20} color={colors.text.secondary} style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder={t('onboarding.searchCards')}
+            placeholderTextColor={colors.text.tertiary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoFocus
+          />
+        </View>
+      )}
+
       {/* Result Count */}
-      {searchQuery.trim() && (
+      {(cardViewMode === 'search' && searchQuery.trim()) && (
         <Text style={styles.resultCount}>
           {t('onboarding.showingCards', { 
-            count: filteredCards.length, 
+            count: displayedCards.length, 
             total: availableCards.length 
           })}
         </Text>
@@ -250,12 +400,17 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
           <View style={styles.emptyCards}>
             <Text style={styles.emptyCardsText}>{t('onboarding.loadingCards')}</Text>
           </View>
-        ) : filteredCards.length === 0 ? (
+        ) : displayedCards.length === 0 ? (
           <View style={styles.emptyCards}>
-            <Text style={styles.emptyCardsText}>{t('onboarding.noCardsFound')}</Text>
+            <Text style={styles.emptyCardsText}>
+              {cardViewMode === 'search' 
+                ? t('onboarding.noCardsFound')
+                : t('onboarding.noPopularCards')
+              }
+            </Text>
           </View>
         ) : (
-          filteredCards.map(card => (
+          displayedCards.map(card => (
             <TouchableOpacity
               key={card.id}
               style={[
@@ -295,6 +450,9 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       </View>
       <Text style={styles.stepTitle}>{t('onboarding.sageTitle')}</Text>
       <Text style={styles.stepDescription}>{t('onboarding.sageDescription')}</Text>
+
+      {/* P1: Value callout */}
+      {renderValueCallout('onboarding.sageValue')}
 
       <View style={styles.sageFeatures}>
         <View style={styles.sageFeature}>
@@ -347,11 +505,30 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     <View style={styles.container}>
       {/* Header with skip and progress */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-          <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
-        </TouchableOpacity>
+        {/* P0: Back button (show on steps 2 and 3) */}
+        {currentStep > 0 ? (
+          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+            <ChevronLeft size={20} color={colors.text.secondary} />
+            <Text style={styles.backButtonText}>{t('onboarding.back')}</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.backButton} />
+        )}
+        
         {renderProgressDots()}
-        <View style={styles.skipButton} /> {/* Spacer for alignment */}
+        
+        {/* P1: Make skip less prominent on card step */}
+        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
+          <Text style={[
+            styles.skipText,
+            currentStep === 1 && styles.skipTextSubtle
+          ]}>
+            {currentStep === 1 
+              ? t('onboarding.skipLater') 
+              : t('onboarding.skip')
+            }
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Step Content */}
@@ -396,14 +573,33 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 16,
   },
-  skipButton: {
-    width: 60,
+  // P0: Back button styles
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingVertical: 8,
+    minWidth: 60,
+  },
+  backButtonText: {
+    color: colors.text.secondary,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  skipButton: {
+    paddingVertical: 8,
+    minWidth: 60,
+    alignItems: 'flex-end',
   },
   skipText: {
     color: colors.text.secondary,
     fontSize: 14,
     fontWeight: '500',
+  },
+  // P1: Subtle skip text on card step
+  skipTextSubtle: {
+    color: colors.text.tertiary,
+    fontSize: 13,
   },
   progressContainer: {
     flexDirection: 'row',
@@ -450,7 +646,24 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: 32,
+    marginBottom: 16,
+  },
+  // P1: Value callout styles
+  valueCallout: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.primary.bg10,
+    borderRadius: borderRadius.md,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginBottom: 24,
+  },
+  valueCalloutText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.primary.main,
   },
   // Country Step
   countryOptions: {
@@ -491,6 +704,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   // Card Step
+  cardGuidance: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  // P0: Card tabs
+  cardTabs: {
+    flexDirection: 'row',
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.md,
+    padding: 4,
+    marginBottom: 16,
+    gap: 4,
+  },
+  cardTab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: borderRadius.sm,
+  },
+  cardTabActive: {
+    backgroundColor: colors.primary.main,
+  },
+  cardTabText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.text.secondary,
+  },
+  cardTabTextActive: {
+    color: colors.background.primary,
+  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
