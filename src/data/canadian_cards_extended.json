@@ -58,7 +58,10 @@
         "amount": 15000,
         "currency": "points",
         "spendRequirement": 9000,
-        "timeframeDays": 365
+        "timeframeDays": 365,
+        "description": "15,000 MR points",
+        "value": 315,
+        "timeframeMonths": 12
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -107,7 +110,10 @@
         "amount": 40000,
         "currency": "points",
         "spendRequirement": 3000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "40,000 MR points",
+        "value": 840,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -140,7 +146,10 @@
         "amount": 80000,
         "currency": "points",
         "spendRequirement": 6000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "80,000 MR points",
+        "value": 1680,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -181,7 +190,10 @@
         "amount": 250,
         "currency": "cashback",
         "spendRequirement": 3000,
-        "timeframeDays": 120
+        "timeframeDays": 120,
+        "description": "$250 cash back",
+        "value": 250,
+        "timeframeMonths": 4
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -205,7 +217,10 @@
         "amount": 100,
         "currency": "cashback",
         "spendRequirement": 1000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$100 cash back",
+        "value": 100,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -246,7 +261,10 @@
         "amount": 30000,
         "currency": "airline_miles",
         "spendRequirement": 3000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "30,000 Aeroplan points",
+        "value": 600,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -287,7 +305,10 @@
         "amount": 75000,
         "currency": "airline_miles",
         "spendRequirement": 6000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "75,000 Aeroplan points",
+        "value": 1500,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -320,7 +341,10 @@
         "amount": 80000,
         "currency": "hotel_points",
         "spendRequirement": 3000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "80,000 Marriott Bonvoy points",
+        "value": 592,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -369,7 +393,10 @@
         "amount": 40000,
         "currency": "airline_miles",
         "spendRequirement": 7500,
-        "timeframeDays": 365
+        "timeframeDays": 365,
+        "description": "40,000 Aeroplan points",
+        "value": 800,
+        "timeframeMonths": 12
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -426,7 +453,10 @@
         "amount": 50000,
         "currency": "airline_miles",
         "spendRequirement": 3000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "50,000 Aeroplan points",
+        "value": 1000,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -499,7 +529,10 @@
         "amount": 165000,
         "currency": "points",
         "spendRequirement": 7500,
-        "timeframeDays": 180
+        "timeframeDays": 180,
+        "description": "165,000 TD Rewards points",
+        "value": 825,
+        "timeframeMonths": 6
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -548,7 +581,10 @@
         "amount": 350,
         "currency": "cashback",
         "spendRequirement": 3500,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$350 cash back",
+        "value": 350,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -581,7 +617,10 @@
         "amount": 15000,
         "currency": "points",
         "spendRequirement": 1000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "15,000 TD Rewards points",
+        "value": 75,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -614,7 +653,10 @@
         "amount": 35000,
         "currency": "points",
         "spendRequirement": 5000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "35,000 points",
+        "value": 350,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -647,7 +689,10 @@
         "amount": 55000,
         "currency": "points",
         "spendRequirement": 5000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "55,000 points",
+        "value": 627,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -680,7 +725,10 @@
         "amount": 350,
         "currency": "cashback",
         "spendRequirement": 3000,
-        "timeframeDays": 120
+        "timeframeDays": 120,
+        "description": "$350 WestJet dollars",
+        "value": 350,
+        "timeframeMonths": 4
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -721,7 +769,10 @@
         "amount": 100,
         "currency": "cashback",
         "spendRequirement": 1000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$100 cash back",
+        "value": 100,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -770,7 +821,10 @@
         "amount": 80,
         "currency": "cashback",
         "spendRequirement": 1000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$80 cash back",
+        "value": 80,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -794,7 +848,10 @@
         "amount": 5000,
         "currency": "points",
         "spendRequirement": 1000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "5,000 points",
+        "value": 50,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -843,7 +900,10 @@
         "amount": 25000,
         "currency": "airline_miles",
         "spendRequirement": 1500,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "25,000 Aeroplan points",
+        "value": 500,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -876,7 +936,10 @@
         "amount": 35000,
         "currency": "points",
         "spendRequirement": 3000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "35,000 Aventura points",
+        "value": 350,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -925,7 +988,10 @@
         "amount": 250,
         "currency": "cashback",
         "spendRequirement": 2500,
-        "timeframeDays": 120
+        "timeframeDays": 120,
+        "description": "$250 cash back",
+        "value": 250,
+        "timeframeMonths": 4
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -992,7 +1058,10 @@
         "amount": 10000,
         "currency": "points",
         "spendRequirement": 1000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "10,000 Aventura points",
+        "value": 100,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -1049,7 +1118,10 @@
         "amount": 50000,
         "currency": "points",
         "spendRequirement": 10000,
-        "timeframeDays": 180
+        "timeframeDays": 180,
+        "description": "50,000 Scene+ points",
+        "value": 500,
+        "timeframeMonths": 6
       },
       "country": "CA",
       "foreignTransactionFee": 0,
@@ -1106,7 +1178,10 @@
         "amount": 45000,
         "currency": "points",
         "spendRequirement": 7500,
-        "timeframeDays": 365
+        "timeframeDays": 365,
+        "description": "45,000 Scene+ points",
+        "value": 450,
+        "timeframeMonths": 12
       },
       "country": "CA",
       "foreignTransactionFee": 0,
@@ -1163,7 +1238,10 @@
         "amount": 100,
         "currency": "cashback",
         "spendRequirement": 2500,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$100 cash back",
+        "value": 100,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -1212,7 +1290,10 @@
         "amount": 10000,
         "currency": "points",
         "spendRequirement": 500,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "10,000 Scene+ points",
+        "value": 100,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -1304,7 +1385,10 @@
         "amount": 3000,
         "currency": "airline_miles",
         "spendRequirement": 3000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "3,000 AIR MILES rewards",
+        "value": 315,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -1361,7 +1445,10 @@
         "amount": 100,
         "currency": "cashback",
         "spendRequirement": 1000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$100 cash back",
+        "value": 100,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -1418,7 +1505,10 @@
         "amount": 60000,
         "currency": "points",
         "spendRequirement": 3000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "60,000 BMO Rewards points",
+        "value": 402,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -1451,7 +1541,10 @@
         "amount": 100,
         "currency": "cashback",
         "spendRequirement": 1000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$100 cash back",
+        "value": 100,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -1632,7 +1725,10 @@
         "amount": 100,
         "currency": "cashback",
         "spendRequirement": 500,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$100 cash back",
+        "value": 100,
+        "timeframeMonths": 3
       },
       "country": "CA"
     },
@@ -1756,7 +1852,10 @@
         "amount": 100,
         "currency": "cashback",
         "spendRequirement": 1000,
-        "timeframeDays": 120
+        "timeframeDays": 120,
+        "description": "$100 cash back",
+        "value": 100,
+        "timeframeMonths": 4
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -1861,7 +1960,10 @@
         "amount": 150,
         "currency": "cashback",
         "spendRequirement": 1500,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$150 cash back",
+        "value": 150,
+        "timeframeMonths": 3
       },
       "country": "CA"
     },
@@ -1899,7 +2001,10 @@
         "amount": 40000,
         "currency": "points",
         "spendRequirement": 2000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "40,000 points",
+        "value": 400,
+        "timeframeMonths": 3
       },
       "country": "CA"
     },
@@ -1937,7 +2042,10 @@
         "amount": 60000,
         "currency": "points",
         "spendRequirement": 4000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "60,000 points",
+        "value": 300,
+        "timeframeMonths": 3
       },
       "country": "CA"
     },
@@ -1983,7 +2091,10 @@
         "amount": 200,
         "currency": "cashback",
         "spendRequirement": 2000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$200 cash back",
+        "value": 200,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0,
@@ -2007,7 +2118,10 @@
         "amount": 50,
         "currency": "cashback",
         "spendRequirement": 500,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$50 cash back",
+        "value": 50,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -2083,7 +2197,10 @@
         "amount": 30000,
         "currency": "points",
         "spendRequirement": 3000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "30,000 points",
+        "value": 300,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -2124,7 +2241,10 @@
         "amount": 50000,
         "currency": "points",
         "spendRequirement": 3000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "50,000 points",
+        "value": 500,
+        "timeframeMonths": 3
       },
       "country": "CA"
     },
@@ -2194,7 +2314,10 @@
         "amount": 30000,
         "currency": "points",
         "spendRequirement": 2000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "30,000 points",
+        "value": 150,
+        "timeframeMonths": 3
       },
       "country": "CA"
     },
@@ -2271,7 +2394,10 @@
         "amount": 10000,
         "currency": "points",
         "spendRequirement": 1500,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "10,000 points",
+        "value": 100,
+        "timeframeMonths": 3
       },
       "country": "CA"
     },
@@ -2340,7 +2466,10 @@
         "amount": 20000,
         "currency": "points",
         "spendRequirement": 1500,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "20,000 Aventura points",
+        "value": 200,
+        "timeframeMonths": 3
       },
       "country": "CA"
     },
@@ -2393,7 +2522,10 @@
         "amount": 200,
         "currency": "cashback",
         "spendRequirement": 2000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "$200 cash back",
+        "value": 200,
+        "timeframeMonths": 3
       },
       "country": "CA"
     },
@@ -2447,7 +2579,10 @@
         "amount": 100000,
         "currency": "airline_miles",
         "spendRequirement": 6000,
-        "timeframeDays": 180
+        "timeframeDays": 180,
+        "description": "100,000 Aeroplan points",
+        "value": 2000,
+        "timeframeMonths": 6
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -2496,7 +2631,10 @@
         "amount": 10000,
         "currency": "airline_miles",
         "spendRequirement": 1000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "10,000 Aeroplan points",
+        "value": 200,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -2553,7 +2691,10 @@
         "amount": 50000,
         "currency": "points",
         "spendRequirement": 5000,
-        "timeframeDays": 180
+        "timeframeDays": 180,
+        "description": "50,000 Aventura points",
+        "value": 500,
+        "timeframeMonths": 6
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -2596,7 +2737,10 @@
         "amount": 5000,
         "currency": "points",
         "spendRequirement": 750,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "5,000 CIBC points",
+        "value": 50,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -2670,7 +2814,10 @@
         "amount": 200,
         "currency": "cashback",
         "spendRequirement": 2000,
-        "timeframeDays": 120
+        "timeframeDays": 120,
+        "description": "$200 cash back",
+        "value": 200,
+        "timeframeMonths": 4
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -2780,7 +2927,10 @@
         "amount": 15000,
         "currency": "airline_miles",
         "spendRequirement": 1000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "15,000 Aeroplan points",
+        "value": 300,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -2891,7 +3041,10 @@
         "amount": 15152,
         "currency": "points",
         "spendRequirement": 500,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "15,152 TD Rewards points",
+        "value": 61,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -2925,7 +3078,10 @@
         "amount": 80000,
         "currency": "points",
         "spendRequirement": 3000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "80,000 Scene+ points",
+        "value": 1000,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0,
@@ -2984,7 +3140,10 @@
         "amount": 100000,
         "currency": "points",
         "spendRequirement": 2000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "100,000 Scene+ points",
+        "value": 1250,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0,
@@ -3037,7 +3196,10 @@
         "amount": 20000,
         "currency": "points",
         "spendRequirement": 0,
-        "timeframeDays": 0
+        "timeframeDays": 0,
+        "description": "20,000 BMO Rewards points",
+        "value": 134,
+        "timeframeMonths": 0
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -3089,7 +3251,10 @@
         "amount": 200000,
         "currency": "points",
         "spendRequirement": 6000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "200,000 BMO Rewards points",
+        "value": 1340,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -3150,7 +3315,10 @@
         "amount": 60000,
         "currency": "points",
         "spendRequirement": 3000,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "60,000 BMO Rewards points",
+        "value": 402,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,
@@ -3201,7 +3369,10 @@
         "amount": 11000,
         "currency": "points",
         "spendRequirement": 500,
-        "timeframeDays": 90
+        "timeframeDays": 90,
+        "description": "11,000 Avion points",
+        "value": 110,
+        "timeframeMonths": 3
       },
       "country": "CA",
       "foreignTransactionFee": 0.025,

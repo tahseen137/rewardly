@@ -167,9 +167,10 @@
     "bonusCategories": "BONUS CATEGORIES",
     "annualFee": "Annual Fee",
     "noFee": "No annual fee",
-    "signupBonus": "SIGNUP BONUS",
-    "signupBonusDetails": "Spend {{spendRequirement}} in {{timeframeDays}} days",
-    "signupBonusAmount": "{{amount}} {{currency}}"
+    "signupBonus": "WELCOME BONUS",
+    "signupBonusDetails": "Spend {{spendRequirement}} in {{timeframeDays}}",
+    "signupBonusAmount": "{{amount}} {{currency}}",
+    "bonusValueLabel": "in value"
   },
   "languages": {
     "en": "English",
