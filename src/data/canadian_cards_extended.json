@@ -2897,6 +2897,99 @@
       "foreignTransactionFee": 0.025,
       "applicationUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/travel-rewards/rewards-visa-card",
       "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "scotia-platinum-amex",
+      "name": "Scotiabank Platinum American Express Card",
+      "issuer": "Scotiabank",
+      "rewardProgram": "Scene+",
+      "annualFee": 399,
+      "pointValuation": 1.25,
+      "baseRewardRate": {
+        "value": 2,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "all",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Flat 2x Scene+ on all eligible purchases \u2014 no categories"
+        }
+      ],
+      "signupBonus": {
+        "amount": 80000,
+        "currency": "points",
+        "spendRequirement": 3000,
+        "timeframeDays": 90
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0,
+      "applicationUrl": "https://www.scotiabank.com/ca/en/personal/credit-cards/american-express/platinum-card.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "scotia-passport-visa-infinite-privilege",
+      "name": "Scotiabank Passport Visa Infinite Privilege Card",
+      "issuer": "Scotiabank",
+      "rewardProgram": "Scene+",
+      "annualFee": 599,
+      "pointValuation": 1.25,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 6,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Hotels, car rentals, and activities booked through Scene+ Travel (Expedia)"
+        },
+        {
+          "category": "travel_direct",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "All other eligible travel purchases"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "entertainment",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 100000,
+        "currency": "points",
+        "spendRequirement": 2000,
+        "timeframeDays": 90
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0,
+      "applicationUrl": "https://www.scotiabank.com/ca/en/personal/credit-cards/visa/passport-infinite-privilege-card.html",
+      "lastVerified": "2026-02-27"
     }
   ]
 }
