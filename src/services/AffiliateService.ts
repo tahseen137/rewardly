@@ -27,7 +27,7 @@ export const ISSUER_APPLICATION_URLS: Record<string, string> = {
   'BMO': 'https://www.bmo.com/main/personal/credit-cards/',
   'Capital One': 'https://www.capitalone.ca/credit-cards/',
   'MBNA': 'https://www.mbna.ca/credit-cards/',
-  'National Bank': 'https://www.nbc.ca/personal/credit-cards.html',
+  'National Bank': 'https://www.nbc.ca/en/personal/credit-cards/',
   'Desjardins': 'https://www.desjardins.com/ca/personal/loans-credit/credit-cards/',
   'HSBC': 'https://www.hsbc.ca/credit-cards/',
   'Tangerine': 'https://www.tangerine.ca/en/products/spending/creditcard',

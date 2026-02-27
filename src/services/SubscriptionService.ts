@@ -260,7 +260,7 @@ function getDefaultSageUsage(): SageUsage {
     month: getCurrentMonth(),
     chatCount: 0,
     limit: SAGE_LIMITS.free,
-    remaining: 0,
+    remaining: SAGE_LIMITS.free, // Fix: was 0, should be full limit for new users
   };
 }
 
