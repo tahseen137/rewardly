@@ -52,7 +52,7 @@ import LandingPage from '../screens/LandingPage';
 import { ErrorBoundary } from '../components';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
-import { getCurrentUser, onAuthStateChange, AuthUser } from '../services/AuthService';
+import { getCurrentUser, onAuthStateChange, continueAsGuest, AuthUser } from '../services/AuthService';
 import { isOnboardingComplete, setOnboardingComplete, initializePreferences } from '../services/PreferenceManager';
 import { supabase, isSupabaseConfigured } from '../services/supabase';
 import { initializeSubscription, refreshSubscription, canAccessFeatureSync, getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
@@ -483,6 +483,20 @@ export default function AppNavigator() {
 
         // Track app open (non-blocking)
         try { AchievementEventEmitter.track('app_opened', {}); } catch (_) {}
+
+        // ── Demo mode: ?demo=true or ?demo=1 bypasses auth (web only) ──────
+        if (Platform.OS === 'web' && typeof window !== 'undefined') {
+          const urlParams = new URLSearchParams(window.location.search);
+          const isDemoMode = urlParams.get('demo') === 'true' || urlParams.get('demo') === '1';
+          if (isDemoMode) {
+            const demoResult = await continueAsGuest();
+            if (demoResult.user) {
+              setUser(demoResult.user);
+              setAppState('main');
+              return;
+            }
+          }
+        }
 
         // Check for existing user
         const currentUser = await getCurrentUser();
