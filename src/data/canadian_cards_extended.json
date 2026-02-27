@@ -2735,6 +2735,168 @@
       "foreignTransactionFee": 0.025,
       "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/dividend-visa-card.html",
       "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "td-aeroplan-visa-platinum",
+      "name": "TD Aeroplan Visa Platinum Credit Card",
+      "issuer": "TD",
+      "rewardProgram": "Aeroplan",
+      "annualFee": 89,
+      "pointValuation": 2.0,
+      "baseRewardRate": {
+        "value": 0.67,
+        "type": "airline_miles",
+        "unit": "multiplier",
+        "note": "1 point per $1.50 on other purchases"
+      },
+      "categoryRewards": [
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 1,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 1,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 1,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          },
+          "note": "Direct Air Canada and Air Canada Vacations purchases"
+        }
+      ],
+      "signupBonus": {
+        "amount": 15000,
+        "currency": "airline_miles",
+        "spendRequirement": 1000,
+        "timeframeDays": 90
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/aeroplan/aeroplan-visa-platinum-card",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "td-cash-back-visa",
+      "name": "TD Cash Back Visa Card",
+      "issuer": "TD",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 0.5,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 1,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 1,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "transit",
+          "rewardRate": {
+            "value": 1,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "recurring",
+          "rewardRate": {
+            "value": 1,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "note": "Recurring bill payments, streaming, digital gaming & media"
+        }
+      ],
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/cash-back/cash-back-visa-card",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "td-rewards-visa",
+      "name": "TD Rewards Visa Card",
+      "issuer": "TD",
+      "rewardProgram": "TD Rewards",
+      "annualFee": 0,
+      "pointValuation": 0.4,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 4,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Travel booked through Expedia for TD"
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "recurring",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Recurring bills, streaming, gaming, transit"
+        }
+      ],
+      "signupBonus": {
+        "amount": 15152,
+        "currency": "points",
+        "spendRequirement": 500,
+        "timeframeDays": 90
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/travel-rewards/rewards-visa-card",
+      "lastVerified": "2026-02-27"
     }
   ]
 }
