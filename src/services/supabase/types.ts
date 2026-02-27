@@ -48,9 +48,29 @@ export interface Database {
         Insert: UserProfileInsert;
         Update: UserProfileUpdate;
       };
+      referral_codes: {
+        Row: ReferralCodeRow;
+        Insert: ReferralCodeInsert;
+        Update: ReferralCodeUpdate;
+      };
+      referral_signups: {
+        Row: ReferralSignupRow;
+        Insert: ReferralSignupInsert;
+        Update: ReferralSignupUpdate;
+      };
+      referral_clicks: {
+        Row: ReferralClickRow;
+        Insert: ReferralClickInsert;
+        Update: ReferralClickUpdate;
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      increment_referral_usage: {
+        Args: { code_id: string };
+        Returns: void;
+      };
+    };
     Enums: Record<string, never>;
   };
 }
@@ -458,4 +478,100 @@ export interface UserProfileUpdate {
   preferred_language?: string;
   onboarding_complete?: boolean;
   updated_at?: string;
+}
+
+// ============================================================================
+// Referral Tables
+// ============================================================================
+
+export interface ReferralCodeRow {
+  id: string;
+  user_id: string;
+  code: string;
+  created_at: string;
+  expires_at: string;
+  is_active: boolean;
+  usage_count: number;
+  max_uses: number | null;
+}
+
+export interface ReferralCodeInsert {
+  id?: string;
+  user_id: string;
+  code: string;
+  created_at?: string;
+  expires_at?: string;
+  is_active?: boolean;
+  usage_count?: number;
+  max_uses?: number | null;
+}
+
+export interface ReferralCodeUpdate {
+  id?: string;
+  user_id?: string;
+  code?: string;
+  expires_at?: string;
+  is_active?: boolean;
+  usage_count?: number;
+  max_uses?: number | null;
+}
+
+export interface ReferralSignupRow {
+  id: string;
+  referral_code_id: string;
+  referrer_user_id: string;
+  referee_user_id: string;
+  referrer_reward: string | null;
+  referee_reward: string | null;
+  signed_up_at: string;
+  reward_claimed_at: string | null;
+  status: 'pending' | 'claimed' | 'expired';
+}
+
+export interface ReferralSignupInsert {
+  id?: string;
+  referral_code_id: string;
+  referrer_user_id: string;
+  referee_user_id: string;
+  referrer_reward?: string | null;
+  referee_reward?: string | null;
+  signed_up_at?: string;
+  reward_claimed_at?: string | null;
+  status?: 'pending' | 'claimed' | 'expired';
+}
+
+export interface ReferralSignupUpdate {
+  referral_code_id?: string;
+  referrer_user_id?: string;
+  referee_user_id?: string;
+  referrer_reward?: string | null;
+  referee_reward?: string | null;
+  reward_claimed_at?: string | null;
+  status?: 'pending' | 'claimed' | 'expired';
+}
+
+export interface ReferralClickRow {
+  id: string;
+  referral_code_id: string;
+  clicked_at: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  converted: boolean;
+}
+
+export interface ReferralClickInsert {
+  id?: string;
+  referral_code_id: string;
+  clicked_at?: string;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  converted?: boolean;
+}
+
+export interface ReferralClickUpdate {
+  referral_code_id?: string;
+  clicked_at?: string;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  converted?: boolean;
 }

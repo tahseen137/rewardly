@@ -138,6 +138,21 @@ function HeroSection({ onGetStarted }: { onGetStarted: () => void }) {
             </LinearGradient>
           </TouchableOpacity>
 
+          {/* Demo mode link — for screenshots & Product Hunt */}
+          <TouchableOpacity
+            onPress={() => {
+              if (typeof window !== 'undefined') {
+                const url = new URL(window.location.href);
+                url.searchParams.set('demo', 'true');
+                window.location.href = url.toString();
+              }
+            }}
+            activeOpacity={0.7}
+            style={styles.demoLink}
+          >
+            <Text style={styles.demoLinkText}>Try Demo (no signup)</Text>
+          </TouchableOpacity>
+
           <Text style={styles.heroFinePrint}>
             No credit card required · Free forever plan available
           </Text>
@@ -775,6 +790,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.text.tertiary,
     marginTop: 16,
+  },
+  demoLink: {
+    marginTop: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+  },
+  demoLinkText: {
+    fontSize: 14,
+    color: colors.primary.light ?? colors.primary.main,
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+    opacity: 0.85,
   },
 
   // ---- Features ----
