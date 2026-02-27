@@ -2990,6 +2990,223 @@
       "foreignTransactionFee": 0,
       "applicationUrl": "https://www.scotiabank.com/ca/en/personal/credit-cards/visa/passport-infinite-privilege-card.html",
       "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "bmo-eclipse-rise-visa",
+      "name": "BMO Eclipse Rise Visa Card",
+      "issuer": "BMO",
+      "rewardProgram": "BMO Rewards",
+      "annualFee": 0,
+      "pointValuation": 0.67,
+      "baseRewardRate": {
+        "value": 0.5,
+        "type": "points",
+        "unit": "multiplier",
+        "note": "1 point per $2 on other purchases"
+      },
+      "categoryRewards": [
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 2.5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "5 points per $2 spent"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2.5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "5 points per $2 spent"
+        },
+        {
+          "category": "recurring",
+          "rewardRate": {
+            "value": 2.5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "5 points per $2 spent on recurring bill payments (streaming, gym, phone)"
+        }
+      ],
+      "signupBonus": {
+        "amount": 20000,
+        "currency": "points",
+        "spendRequirement": 0,
+        "timeframeDays": 0
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.bmo.com/en-ca/main/personal/credit-cards/bmo-eclipse-rise-visa/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "bmo-eclipse-visa-infinite-privilege",
+      "name": "BMO eclipse Visa Infinite Privilege Card",
+      "issuer": "BMO",
+      "rewardProgram": "BMO Rewards",
+      "annualFee": 599,
+      "pointValuation": 0.67,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Up to $25,000/year"
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Airfare, hotels, car rentals up to $25,000/year"
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 4,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Up to $20,000/year"
+        }
+      ],
+      "signupBonus": {
+        "amount": 200000,
+        "currency": "points",
+        "spendRequirement": 6000,
+        "timeframeDays": 90
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.bmo.com/main/personal/credit-cards/bmo-eclipse-visa-infinite-privilege/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "bmo-ascend-world-elite",
+      "name": "BMO Ascend World Elite Mastercard",
+      "issuer": "BMO",
+      "rewardProgram": "BMO Rewards",
+      "annualFee": 150,
+      "pointValuation": 0.67,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Up to $15,000/year"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Up to $10,000/year"
+        },
+        {
+          "category": "entertainment",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Up to $10,000/year"
+        },
+        {
+          "category": "recurring",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Recurring bill payments up to $10,000/year"
+        }
+      ],
+      "signupBonus": {
+        "amount": 60000,
+        "currency": "points",
+        "spendRequirement": 3000,
+        "timeframeDays": 90
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.bmo.com/en-ca/main/personal/credit-cards/bmo-ascend-world-elite-mastercard/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "rbc-ion-visa",
+      "name": "RBC ION Visa Card",
+      "issuer": "RBC",
+      "rewardProgram": "Avion Rewards",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 1.5,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 1.5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Gas, EV charging, transit, and rideshare"
+        },
+        {
+          "category": "entertainment",
+          "rewardRate": {
+            "value": 1.5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Streaming, gaming, and digital subscriptions"
+        }
+      ],
+      "signupBonus": {
+        "amount": 11000,
+        "currency": "points",
+        "spendRequirement": 500,
+        "timeframeDays": 90
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.rbcroyalbank.com/credit-cards/rewards/rbc-ion-visa.html",
+      "lastVerified": "2026-02-27"
     }
   ]
 }
