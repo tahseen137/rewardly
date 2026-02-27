@@ -97,6 +97,15 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onViewHistory,
   hasHistory,
 }) => {
+  // Suggested conversational prompts
+  const suggestedPrompts = [
+    { id: '1', text: 'How can I fly to London for free?', icon: '✈️' },
+    { id: '2', text: "What's the best card for Costco?", icon: '🛒' },
+    { id: '3', text: 'Should I get the Cobalt or Gold card?', icon: '💳' },
+    { id: '4', text: 'How do I maximize my grocery rewards?', icon: '🥗' },
+    { id: '5', text: 'What cards have welcome bonuses right now?', icon: '🎁' },
+  ];
+
   return (
     <Animated.View 
       entering={FadeIn.duration(500)}
@@ -112,6 +121,24 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           Your AI credit card rewards advisor. Ask me anything about maximizing 
           your rewards, comparing cards, or planning trips with points.
         </Text>
+      </View>
+      
+      {/* Suggested conversational prompts - NEW */}
+      <View style={styles.welcomeActions}>
+        <Text style={styles.sectionTitle}>Try Asking...</Text>
+        <View style={styles.suggestedPromptsContainer}>
+          {suggestedPrompts.map((prompt) => (
+            <TouchableOpacity
+              key={prompt.id}
+              style={styles.suggestedPrompt}
+              onPress={() => onQuickAction(prompt.text)}
+              accessibilityLabel={prompt.text}
+            >
+              <Text style={styles.suggestedPromptIcon}>{prompt.icon}</Text>
+              <Text style={styles.suggestedPromptText}>{prompt.text}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
       
       {/* Category quick actions */}
@@ -130,19 +157,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             </TouchableOpacity>
           ))}
         </View>
-      </View>
-      
-      {/* Quick actions */}
-      <View style={styles.welcomeActions}>
-        <Text style={styles.sectionTitle}>Quick Questions</Text>
-        <QuickActions
-          actions={QUICK_ACTIONS.slice(0, 4).map(a => ({
-            ...a,
-            icon: undefined // Let QuickActions use default icons
-          }))}
-          onActionPress={onQuickAction}
-          variant="grid"
-        />
       </View>
       
       {/* History button */}
@@ -776,6 +790,35 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 14,
+  },
+  suggestedPromptsContainer: {
+    gap: 10,
+  },
+  suggestedPrompt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background.elevated,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: colors.primary.main + '30',
+    gap: 12,
+    shadowColor: colors.primary.main,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  suggestedPromptIcon: {
+    fontSize: 20,
+  },
+  suggestedPromptText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.text.primary,
+    lineHeight: 20,
   },
   historyButton: {
     flexDirection: 'row',
