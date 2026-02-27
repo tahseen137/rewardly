@@ -1,6 +1,6 @@
 # Rewardly QA Report - Run 2
 **Date:** February 15, 2026  
-**URL:** https://rewardly-cyan.vercel.app  
+**URL:** https://rewardly.ca  
 **Test Account:** tahseen137@gmail.com (Admin Access)  
 **Tester:** QA Automation (OpenClaw)
 
