@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "generated": "2026-02-12T21:43:52.559553Z",
+    "generated": "2026-02-27T13:06:24.238201Z",
     "version": "1.2",
-    "total_cards": 203,
-    "canadian_cards": 86,
+    "total_cards": 233,
+    "canadian_cards": 116,
     "us_cards": 117,
     "countries": [
       "CA",
@@ -1659,7 +1659,7 @@
       }
     },
     {
-      "name": "National Bank à la carte Mastercard",
+      "name": "National Bank \u00e0 la carte Mastercard",
       "issuer": "National Bank",
       "country": "CA",
       "currency": "CAD",
@@ -4303,6 +4303,712 @@
         "base": 1.0,
         "choice_category": 1.5
       }
+    },
+    {
+      "name": "BMO eclipse Visa Infinite Privilege Card",
+      "issuer": "BMO",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "rewards",
+      "reward_program": "BMO Rewards",
+      "point_value_cad": 0.67,
+      "point_value_usd": 0.496,
+      "annual_fee": 399.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 4.0,
+        "dining": 5.0,
+        "groceries": 5.0,
+        "gas": 5.0,
+        "transit": 5.0,
+        "travel": 4.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 6000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.bmo.com/en-ca/main/personal/credit-cards/bmo-eclipse-visa-infinite-privilege/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "BMO AIR MILES World Elite Mastercard",
+      "issuer": "BMO",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "AIR MILES",
+      "point_value_cad": 0.1,
+      "point_value_usd": 0.074,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 2.0,
+        "groceries": 3.0,
+        "drugstores": 3.0,
+        "gas": 3.0
+      },
+      "signup_bonus": {
+        "points": 3000,
+        "spend_requirement": 3000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.bmo.com/en-ca/main/personal/credit-cards/bmo-airmiles-world-elite-mastercard/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "TD Aeroplan Visa Platinum Card",
+      "issuer": "TD Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Aeroplan",
+      "point_value_cad": 1.5,
+      "point_value_usd": 1.11,
+      "annual_fee": 89.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 1.5,
+        "gas": 1.5,
+        "travel": 1.0
+      },
+      "signup_bonus": {
+        "points": 10000,
+        "spend_requirement": 1000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/aeroplan/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "TD Emerald Flex Rate Visa Card",
+      "issuer": "TD Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "low-interest",
+      "reward_program": "None",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 25.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/low-rate/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "RBC WestJet Mastercard",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "WestJet Rewards",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 39.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 1.5
+      },
+      "signup_bonus": {
+        "points": 25,
+        "spend_requirement": 0,
+        "months": 0
+      },
+      "applicationUrl": "https://www.rbc.com/en/westjet-mastercard",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "RBC Avion Visa Platinum Card",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "RBC Rewards",
+      "point_value_cad": 0.5,
+      "point_value_usd": 0.37,
+      "annual_fee": 110.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      },
+      "signup_bonus": {
+        "points": 15000,
+        "spend_requirement": 1500,
+        "months": 3
+      },
+      "applicationUrl": "https://www.rbc.com/en/credit-cards/avion-visa-platinum.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "RBC Avion Visa Classic Card",
+      "issuer": "RBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "RBC Rewards",
+      "point_value_cad": 0.5,
+      "point_value_usd": 0.37,
+      "annual_fee": 39.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      },
+      "signup_bonus": {
+        "points": 7500,
+        "spend_requirement": 1000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.rbc.com/en/credit-cards/avion-visa-classic.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Scotiabank Passport Visa Infinite Privilege Card",
+      "issuer": "Scotiabank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Scene+",
+      "point_value_cad": 0.85,
+      "point_value_usd": 0.63,
+      "annual_fee": 599.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5,
+        "dining": 3.0,
+        "groceries": 3.0,
+        "entertainment": 3.0,
+        "travel": 2.0,
+        "gas": 2.0
+      },
+      "signup_bonus": {
+        "points": 40000,
+        "spend_requirement": 5000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.scotiabank.com/ca/en/personal/credit-cards/visa/passport-visa-infinite-privilege-card.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Scotiabank Passport for Business Visa Infinite Card",
+      "issuer": "Scotiabank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Scene+",
+      "point_value_cad": 0.85,
+      "point_value_usd": 0.63,
+      "annual_fee": 199.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.5,
+        "travel": 3.0,
+        "dining": 3.0
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.scotiabank.com/ca/en/business/credit-cards/visa/passport-visa-infinite.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "CIBC Aeroplan Visa Platinum Card",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "Aeroplan",
+      "point_value_cad": 1.5,
+      "point_value_usd": 1.11,
+      "annual_fee": 89.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 1.5,
+        "gas": 1.5
+      },
+      "signup_bonus": {
+        "points": 10000,
+        "spend_requirement": 1000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/aeroplan.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "CIBC Aventura Visa Gold Card",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "travel",
+      "reward_program": "CIBC Aventura",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "travel": 2.0,
+        "groceries": 1.5
+      },
+      "signup_bonus": {
+        "points": 10000,
+        "spend_requirement": 1000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/aventura.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "National Bank Platinum Mastercard",
+      "issuer": "National Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "rewards",
+      "reward_program": "\u00c0 la carte Rewards",
+      "point_value_cad": 0.45,
+      "point_value_usd": 0.33,
+      "annual_fee": 70.5,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "dining": 2.0,
+        "entertainment": 2.0,
+        "online_shopping": 2.0
+      },
+      "signup_bonus": {
+        "points": 5000,
+        "spend_requirement": 1500,
+        "months": 3
+      },
+      "applicationUrl": "https://www.nbc.ca/en/personal/credit-cards/alacarte-rewards.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Desjardins Odyssey Visa Infinite Card",
+      "issuer": "Desjardins",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Desjardins Bonusdollars",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 130.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.5,
+        "groceries": 3.5,
+        "dining": 3.5,
+        "entertainment": 2.0,
+        "gas": 2.0
+      },
+      "signup_bonus": {
+        "points": 150,
+        "spend_requirement": 3000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.desjardins.com/en/personal/accounts-cards/credit-cards/odyssey-gold/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Desjardins No-Fee Cash Back Visa Card",
+      "issuer": "Desjardins",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Desjardins Bonusdollars",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.5,
+        "groceries": 1.0,
+        "dining": 1.0
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.desjardins.com/en/personal/accounts-cards/credit-cards/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Brim World Elite Mastercard",
+      "issuer": "Brim Financial",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Brim Rewards",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 199.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 2.0,
+        "dining": 3.0,
+        "groceries": 2.0,
+        "travel": 2.0
+      },
+      "signup_bonus": {
+        "points": 100,
+        "spend_requirement": 2000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.brimfinancial.com/world-elite-mastercard",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "KOHO Everything Mastercard",
+      "issuer": "KOHO Financial",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "KOHO Cash Back",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.0,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 2.0,
+        "dining": 2.0,
+        "gas": 2.0
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.koho.ca/credit-card/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Fido Mastercard",
+      "issuer": "Rogers Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Fido Cash Back",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "dining": 1.5,
+        "groceries": 1.5,
+        "gas": 1.5
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.fido.ca/en/fido-mastercard",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Home Trust Secured Visa Card",
+      "issuer": "Home Trust",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "secured",
+      "reward_program": "None",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 59.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.hometrust.ca/credit-cards/secured-visa/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Plastk Secured Visa Card",
+      "issuer": "Plastk",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "secured",
+      "reward_program": "Plastk Rewards",
+      "point_value_cad": 0.1,
+      "point_value_usd": 0.074,
+      "annual_fee": 48.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.plastk.ca/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Capital One Guaranteed Secured Mastercard",
+      "issuer": "Capital One",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "secured",
+      "reward_program": "None",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 59.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.0
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.capitalone.ca/credit-cards/secured/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Capital One Aspire Cash World Elite Mastercard",
+      "issuer": "Capital One",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "Capital One Cashback",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.5,
+        "dining": 2.0,
+        "groceries": 2.0,
+        "gas": 2.0
+      },
+      "signup_bonus": {
+        "points": 100,
+        "spend_requirement": 500,
+        "months": 3
+      },
+      "applicationUrl": "https://www.capitalone.ca/credit-cards/aspire-cash-world-elite/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Hudson's Bay Mastercard",
+      "issuer": "Duo Bank of Canada",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "store",
+      "reward_program": "Hudson's Bay Rewards",
+      "point_value_cad": 0.1,
+      "point_value_usd": 0.074,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "online_shopping": 5.0
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.thebay.com/credit-card",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Canadian Tire Options Mastercard",
+      "issuer": "Canadian Tire Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "store",
+      "reward_program": "Canadian Tire Money",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 0.5,
+        "gas": 3.0,
+        "online_shopping": 4.0
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.canadiantire.ca/en/credit-cards/options-mastercard.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "ATB World Elite Mastercard",
+      "issuer": "ATB Financial",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "ATB Rewards",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 120.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.25,
+        "groceries": 3.0,
+        "dining": 3.0,
+        "gas": 3.0,
+        "travel": 2.0
+      },
+      "signup_bonus": {
+        "points": 200,
+        "spend_requirement": 2500,
+        "months": 3
+      },
+      "applicationUrl": "https://www.atb.com/personal/credit-cards/world-elite-mastercard/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "ATB No-Fee Mastercard",
+      "issuer": "ATB Financial",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "cashback",
+      "reward_program": "ATB Rewards",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 1.5
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.atb.com/personal/credit-cards/no-fee-mastercard/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "Manulife Vitality Visa Infinite Card",
+      "issuer": "Manulife Bank",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "rewards",
+      "reward_program": "Vitality Rewards",
+      "point_value_cad": 0.5,
+      "point_value_usd": 0.37,
+      "annual_fee": 139.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.0,
+        "groceries": 3.0,
+        "drugstores": 3.0,
+        "travel": 1.5
+      },
+      "signup_bonus": {
+        "points": 20000,
+        "spend_requirement": 2000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.manulifebank.ca/personal-banking/credit-cards/vitality-visa/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "American Express Aeroplan Business Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Aeroplan",
+      "point_value_cad": 1.5,
+      "point_value_usd": 1.11,
+      "annual_fee": 180.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.25,
+        "travel": 3.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 5000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.americanexpress.com/en-ca/business/credit-cards/aeroplan/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "American Express Marriott Bonvoy Business Card",
+      "issuer": "American Express",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "Marriott Bonvoy",
+      "point_value_cad": 0.9,
+      "point_value_usd": 0.67,
+      "annual_fee": 150.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 3.0,
+        "travel": 5.0,
+        "dining": 3.0,
+        "gas": 3.0
+      },
+      "signup_bonus": {
+        "points": 60000,
+        "spend_requirement": 3000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.americanexpress.com/en-ca/business/credit-cards/marriott-bonvoy/",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "CIBC Business Visa Infinite Privilege Card",
+      "issuer": "CIBC",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "business",
+      "category": "travel",
+      "reward_program": "CIBC Aventura",
+      "point_value_cad": 1.0,
+      "point_value_usd": 0.74,
+      "annual_fee": 450.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 1.5,
+        "travel": 3.0,
+        "dining": 2.0
+      },
+      "signup_bonus": {
+        "points": 30000,
+        "spend_requirement": 3000,
+        "months": 3
+      },
+      "applicationUrl": "https://www.cibc.com/en/business-banking/credit-cards/visa-infinite-privilege.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "name": "PC Financial World Elite Mastercard",
+      "issuer": "PC Financial",
+      "country": "CA",
+      "currency": "CAD",
+      "card_type": "personal",
+      "category": "rewards",
+      "reward_program": "PC Optimum",
+      "point_value_cad": 0.001,
+      "point_value_usd": 0.00074,
+      "annual_fee": 0.0,
+      "foreign_transaction_fee": 0.025,
+      "earning_rates": {
+        "base": 30.0,
+        "groceries": 45.0,
+        "gas": 30.0
+      },
+      "signup_bonus": null,
+      "applicationUrl": "https://www.pcfinancial.ca/en/credit-cards/world-elite/",
+      "lastVerified": "2026-02-27"
     }
   ]
 }

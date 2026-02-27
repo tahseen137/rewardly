@@ -1,7 +1,7 @@
 # Rewardly Final QA Report
 **Date:** February 15, 2026  
 **Tester:** Claude (Automated QA)  
-**App URL:** https://rewardly-cyan.vercel.app  
+**App URL:** https://rewardly.ca  
 **Test Account:** tahseen137@gmail.com (CEO Admin)
 
 ---

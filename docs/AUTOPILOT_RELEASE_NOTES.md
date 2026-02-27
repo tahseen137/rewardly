@@ -128,7 +128,7 @@ See `docs/AUTOPILOT_TESTING.md` for detailed instructions.
 ## Deployment
 
 ### Web (Vercel)
-- **URL:** https://rewardly-cyan.vercel.app
+- **URL:** https://rewardly.ca
 - **Status:** ✅ Live
 
 ### iOS (TestFlight)
