@@ -2,7 +2,7 @@
 
 **Date:** February 15, 2026  
 **Tester:** QA Subagent  
-**URL:** https://rewardly-cyan.vercel.app  
+**URL:** https://rewardly.ca  
 **Environment:** Browser (openclaw profile)
 
 ---

@@ -160,7 +160,7 @@ If a bad deploy goes out:
 
 3. **Verify the site loads**
    ```bash
-   curl -s https://rewardly-cyan.vercel.app | grep -q "index-" && echo "✅ Site loads"
+   curl -s https://rewardly.ca | grep -q "index-" && echo "✅ Site loads"
    ```
 
 ---
