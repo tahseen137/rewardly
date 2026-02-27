@@ -2396,6 +2396,345 @@
         "timeframeDays": 90
       },
       "country": "CA"
+    },
+    {
+      "id": "cibc-aeroplan-visa-infinite-privilege",
+      "name": "CIBC Aeroplan Visa Infinite Privilege Card",
+      "issuer": "CIBC",
+      "rewardProgram": "Aeroplan",
+      "annualFee": 599,
+      "pointValuation": 2.0,
+      "baseRewardRate": {
+        "value": 1.5,
+        "type": "airline_miles",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 1.5,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 1.5,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 1.5,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 100000,
+        "currency": "airline_miles",
+        "spendRequirement": 6000,
+        "timeframeDays": 180
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aeroplan-visa-infinite-privilege-card.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "cibc-aeroplan-visa",
+      "name": "CIBC Aeroplan Visa Card",
+      "issuer": "CIBC",
+      "rewardProgram": "Aeroplan",
+      "annualFee": 0,
+      "pointValuation": 2.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "airline_miles",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 1,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 1,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 1,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 10000,
+        "currency": "airline_miles",
+        "spendRequirement": 1000,
+        "timeframeDays": 90
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aeroplan-visa-card.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "cibc-aventura-visa-infinite-privilege",
+      "name": "CIBC Aventura Visa Infinite Privilege Card",
+      "issuer": "CIBC",
+      "rewardProgram": "CIBC Aventura",
+      "annualFee": 499,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 2,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 50000,
+        "currency": "points",
+        "spendRequirement": 5000,
+        "timeframeDays": 180
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aventura-visa-infinite-privilege-card.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "cibc-adapta-mastercard",
+      "name": "CIBC Adapta Mastercard",
+      "issuer": "CIBC",
+      "rewardProgram": "CIBC Adapta",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "top3",
+          "rewardRate": {
+            "value": 1.5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Auto-rewards 1.5x in your top 3 spend categories each month"
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "note": "Travel purchases through CIBC by Expedia"
+        }
+      ],
+      "signupBonus": {
+        "amount": 5000,
+        "currency": "points",
+        "spendRequirement": 750,
+        "timeframeDays": 90
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/adapta-mastercard.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "cibc-dividend-platinum-visa",
+      "name": "CIBC Dividend Platinum Visa Card",
+      "issuer": "CIBC",
+      "rewardProgram": "Cash Back",
+      "annualFee": 99,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "transit",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "recurring",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "note": "Travel purchases through CIBC by Expedia"
+        }
+      ],
+      "signupBonus": {
+        "amount": 200,
+        "currency": "cashback",
+        "spendRequirement": 2000,
+        "timeframeDays": 120
+      },
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/dividend-visa-platinum-card.html",
+      "lastVerified": "2026-02-27"
+    },
+    {
+      "id": "cibc-dividend-visa",
+      "name": "CIBC Dividend Visa Card",
+      "issuer": "CIBC",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 1,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 1,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "transit",
+          "rewardRate": {
+            "value": 1,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "recurring",
+          "rewardRate": {
+            "value": 1,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        }
+      ],
+      "country": "CA",
+      "foreignTransactionFee": 0.025,
+      "applicationUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/dividend-visa-card.html",
+      "lastVerified": "2026-02-27"
     }
   ]
 }
