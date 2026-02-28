@@ -4,7 +4,12 @@
     <meta charset="utf-8" />
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Rewardly</title>
+    <title>Rewardly — Canada's Credit Card Rewards Optimizer</title>
+
+    <!-- Preconnect to external services for faster resolution -->
+    <link rel="preconnect" href="https://tvvhdzbmrv.supabase.co" crossorigin />
+    <link rel="dns-prefetch" href="https://tvvhdzbmrv.supabase.co" />
+
     <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
     <style id="expo-reset">
       /* These styles make the body full-height */
@@ -23,6 +28,70 @@
         flex: 1;
       }
     </style>
+
+    <!-- Critical CSS: loading splash screen shown before JS renders -->
+    <style id="loading-splash">
+      #app-loading {
+        position: fixed;
+        inset: 0;
+        background: #0a0a0a;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.3s ease;
+      }
+      #app-loading.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .splash-logo {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, #1DDB82, #0fa860);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        box-shadow: 0 0 40px rgba(29, 219, 130, 0.25);
+      }
+      .splash-logo svg {
+        width: 40px;
+        height: 40px;
+      }
+      .splash-title {
+        color: #ffffff;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin-bottom: 8px;
+      }
+      .splash-subtitle {
+        color: rgba(255,255,255,0.45);
+        font-size: 14px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin-bottom: 40px;
+      }
+      .splash-spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid rgba(29, 219, 130, 0.15);
+        border-top-color: #1DDB82;
+        border-radius: 50%;
+        animation: spin 0.75s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+
+    <meta name="theme-color" content="#1DDB82">
+    <meta name="description" content="Canada's #1 credit card rewards optimizer — find the best card for every purchase and never leave money on the table">
+    <link rel="icon" href="/favicon.ico" />
+
     <!-- Umami Analytics -->
     <script
       defer
@@ -32,11 +101,43 @@
   </head>
 
   <body>
+    <!-- Loading splash: shown immediately, hidden once React mounts -->
+    <div id="app-loading" aria-hidden="true">
+      <div class="splash-logo">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 20C8 13.373 13.373 8 20 8s12 5.373 12 12-5.373 12-12 12S8 26.627 8 20z" fill="rgba(255,255,255,0.1)"/>
+          <path d="M14 20l4 4 8-8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="splash-title">Rewardly</div>
+      <div class="splash-subtitle">Canada's Credit Card Rewards Optimizer</div>
+      <div class="splash-spinner"></div>
+    </div>
+
     <!-- Use static rendering with Expo Router to support running without JavaScript. -->
     <noscript>
       You need to enable JavaScript to run this app.
     </noscript>
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
+
+    <!-- Hide splash once React app mounts -->
+    <script>
+      // Hide loading splash after React renders
+      (function() {
+        var observer = new MutationObserver(function() {
+          var root = document.getElementById('root');
+          if (root && root.children.length > 0) {
+            var splash = document.getElementById('app-loading');
+            if (splash) {
+              splash.classList.add('hidden');
+              setTimeout(function() { splash.remove(); }, 350);
+            }
+            observer.disconnect();
+          }
+        });
+        observer.observe(document.getElementById('root'), { childList: true, subtree: false });
+      })();
+    </script>
   </body>
 </html>

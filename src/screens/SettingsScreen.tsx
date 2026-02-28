@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
   },
   contentContainer: {
-    paddingBottom: 100, // Extra padding for tab bar
+    paddingBottom: 120, // Extra padding for tab bar (64px tab bar + 56px buffer)
   },
   loadingContainer: {
     flex: 1,
