@@ -112,6 +112,93 @@ const navStyles = StyleSheet.create({
   },
 });
 
+
+// ============================================================================
+// Recent Wins Ticker (Social Proof)
+// ============================================================================
+
+const RECENT_WINS = [
+  '🎉 Sarah in Toronto saved $312/yr switching to Amex Cobalt for groceries',
+  '💳 Mike in Vancouver found he was missing 3x points on gas — fixed in 2 min',
+  '🏆 Priya earns 5x on dining — just picked up the Cobalt Card',
+  '💰 James in Calgary saves $180/yr by using Scene+ for grocery runs',
+  '✈️ Emma in Ottawa redeemed 45,000 Aeroplan pts — flights to Europe for free',
+  '🚗 David switched to TD Aeroplan for gas — earning 1.5x he never knew about',
+  '📊 Anita discovered her cash back card was earning 1% when she could get 4%',
+  '🎯 Ryan in Montreal earns $420/yr more since switching his everyday card',
+  '💡 Chloe pairs Scotiabank Gold Amex + cashback portal for 8% back on groceries',
+  '🛒 Kevin in Winnipeg: "Never realized I had $600 in unused points sitting there"',
+];
+
+function WinsTicker() {
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const tickerWidth = 3200; // approximate total content width
+
+  useEffect(() => {
+    const runAnimation = () => {
+      scrollX.setValue(0);
+      Animated.timing(scrollX, {
+        toValue: -tickerWidth / 2,
+        duration: 40000,
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) runAnimation();
+      });
+    };
+    runAnimation();
+    return () => scrollX.stopAnimation();
+  }, []);
+
+  const doubled = [...RECENT_WINS, ...RECENT_WINS];
+
+  return (
+    <View style={tickerStyles.wrapper}>
+      <Animated.View
+        style={[tickerStyles.track, { transform: [{ translateX: scrollX }] }]}
+      >
+        {doubled.map((win, i) => (
+          <View key={i} style={tickerStyles.item}>
+            <Text style={tickerStyles.text}>{win}</Text>
+            <Text style={tickerStyles.sep}>·</Text>
+          </View>
+        ))}
+      </Animated.View>
+    </View>
+  );
+}
+
+const tickerStyles = StyleSheet.create({
+  wrapper: {
+    width: '100%',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(99, 102, 241, 0.08)',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.18)',
+    paddingVertical: 9,
+  },
+  track: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  text: {
+    color: 'rgba(255,255,255,0.82)',
+    fontSize: 13,
+    fontWeight: '500',
+    whiteSpace: 'nowrap' as any,
+  },
+  sep: {
+    color: 'rgba(99, 102, 241, 0.6)',
+    fontSize: 14,
+    marginLeft: 12,
+  },
+});
+
 // ============================================================================
 // Hero Section
 // ============================================================================
@@ -700,6 +787,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
       stickyHeaderIndices={[0]}
     >
       <NavHeader onGetStarted={onGetStarted} />
+      <WinsTicker />
       <HeroSection onGetStarted={onGetStarted} />
       <FeaturesSection />
       <HowItWorksSection />
