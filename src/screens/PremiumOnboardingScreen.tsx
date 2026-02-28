@@ -265,6 +265,15 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
         contentContainerStyle={styles.cardsListContent}
         showsVerticalScrollIndicator={false}
       >
+        {isLoading ? (
+          <View style={styles.loadingCards}>
+            <Text style={styles.loadingCardsText}>Loading cards...</Text>
+          </View>
+        ) : filteredCards.length === 0 && searchQuery.trim() ? (
+          <View style={styles.loadingCards}>
+            <Text style={styles.loadingCardsText}>No cards found for "{searchQuery}"</Text>
+          </View>
+        ) : null}
         {filteredCards.map((card, index) => (
           <Animated.View
             key={card.id}
@@ -284,7 +293,7 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
               activeOpacity={0.7}
             >
               <View style={styles.cardItemInfo}>
-                <Text style={styles.cardItemName} numberOfLines={1}>{card.name}</Text>
+                <Text style={styles.cardItemName} numberOfLines={2}>{card.name}</Text>
                 <Text style={styles.cardItemIssuer}>{card.issuer}</Text>
               </View>
               <View style={[
@@ -484,8 +493,8 @@ function SmartWalletStep({ onEnable, onSkip, onBack }: SmartWalletStepProps) {
     <View style={styles.stepContainer}>
       <Animated.View entering={FadeInDown.duration(400)}>
         <View style={styles.stepHeader}>
-          <View style={styles.iconCircleAccent}>
-            <Navigation size={28} color={colors.accent.main} />
+          <View style={styles.iconCircle}>
+            <Navigation size={28} color={colors.primary.main} />
           </View>
           <Text style={styles.stepTitle}>Enable Smart Wallet</Text>
           <Text style={styles.stepSubtitle}>
@@ -535,7 +544,7 @@ function SmartWalletStep({ onEnable, onSkip, onBack }: SmartWalletStepProps) {
           disabled={isEnabling}
         >
           <LinearGradient
-            colors={[colors.accent.main, colors.accent.dark]}
+            colors={[colors.primary.main, colors.primary.dark]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.enableButton}
@@ -611,12 +620,11 @@ function RewardsIQStep({ score, onComplete }: RewardsIQStepProps) {
   
   return (
     <View style={styles.stepContainer}>
-      <Animated.View style={[styles.confettiContainer, celebrationStyle]}>
-        <Text style={styles.confetti}>🎉</Text>
-      </Animated.View>
-      
       <Animated.View entering={FadeInDown.duration(400)}>
         <View style={styles.stepHeader}>
+          <Animated.View style={[styles.confettiContainer, celebrationStyle]}>
+            <Text style={styles.confetti}>🎉</Text>
+          </Animated.View>
           <Text style={styles.congratsTitle}>You're All Set!</Text>
           <Text style={styles.stepSubtitle}>
             Here's your initial Rewards IQ score
@@ -920,6 +928,7 @@ const styles = StyleSheet.create({
   stepContainer: {
     flex: 1,
     paddingHorizontal: 24,
+    paddingBottom: 8,
   },
   
   // Step Header
@@ -1098,6 +1107,15 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     gap: 8,
   },
+  loadingCards: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 32,
+  },
+  loadingCardsText: {
+    fontSize: 14,
+    color: colors.text.secondary,
+  },
   cardItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1232,23 +1250,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.background.primary,
     borderRadius: borderRadius.md,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     height: 40,
-    minWidth: 100,
+    width: 110,
     borderWidth: 1,
     borderColor: colors.border.light,
   },
   amountPrefix: {
-    fontSize: 16,
+    fontSize: 15,
     color: colors.text.secondary,
-    marginRight: 4,
+    marginRight: 2,
   },
   amountInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: colors.text.primary,
     textAlign: 'right',
+    minWidth: 60,
   },
   presetRow: {
     flexDirection: 'row',
@@ -1325,9 +1344,8 @@ const styles = StyleSheet.create({
   
   // Rewards IQ Step
   confettiContainer: {
-    position: 'absolute',
-    top: 40,
-    alignSelf: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   confetti: {
     fontSize: 48,

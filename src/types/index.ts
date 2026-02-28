@@ -60,6 +60,10 @@ export interface SignupBonus {
   currency: RewardType;
   spendRequirement: number; // In CAD
   timeframeDays: number;
+  // Enhanced display fields
+  description?: string;    // Human-readable (e.g., "15,000 MR points")
+  value?: number;          // Dollar value of bonus in CAD
+  timeframeMonths?: number; // Timeframe in months (e.g., 3 for 3 months)
 }
 
 /**

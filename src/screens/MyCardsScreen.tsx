@@ -687,7 +687,7 @@ export default function MyCardsScreen() {
           <View style={styles.subtitleRow}>
             <Text style={styles.subtitle}>
               {showLimit 
-                ? `${portfolio.length}/${limit} cards`
+                ? `${portfolio.length} of ${limit} slots used`
                 : `${portfolio.length} card${portfolio.length !== 1 ? 's' : ''}`
               }
             </Text>

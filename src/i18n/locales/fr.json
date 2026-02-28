@@ -159,9 +159,10 @@
     "bonusCategories": "CATÉGORIES BONUS",
     "annualFee": "Frais Annuels",
     "noFee": "Pas de frais annuels",
-    "signupBonus": "BONUS D'INSCRIPTION",
-    "signupBonusDetails": "Dépensez {{spendRequirement}} en {{timeframeDays}} jours",
-    "signupBonusAmount": "{{amount}} {{currency}}"
+    "signupBonus": "BONUS DE BIENVENUE",
+    "signupBonusDetails": "Dépensez {{spendRequirement}} en {{timeframeDays}}",
+    "signupBonusAmount": "{{amount}} {{currency}}",
+    "bonusValueLabel": "en valeur"
   },
   "languages": {
     "en": "English",

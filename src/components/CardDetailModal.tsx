@@ -181,15 +181,22 @@ export function CardDetailModal({
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>{t('cardDetail.signupBonus')}</Text>
               <View style={styles.bonusBox}>
+                {/* Dollar value prominently if available */}
+                {card.signupBonus.value !== undefined && (
+                  <Text style={styles.bonusValue}>
+                    ${card.signupBonus.value.toLocaleString()} {t('cardDetail.bonusValueLabel')}
+                  </Text>
+                )}
                 <Text style={styles.bonusAmount}>
-                  {card.signupBonus.currency === 'cashback' ? '$' : ''}
-                  {card.signupBonus.amount.toLocaleString()}
-                  {card.signupBonus.currency !== 'cashback' ? ` ${card.signupBonus.currency}` : ''}
+                  {card.signupBonus.description ||
+                    `${card.signupBonus.currency === 'cashback' ? '$' : ''}${card.signupBonus.amount.toLocaleString()}${card.signupBonus.currency !== 'cashback' ? ` ${card.signupBonus.currency}` : ''}`}
                 </Text>
                 <Text style={styles.bonusRequirement}>
                   {t('cardDetail.signupBonusDetails', {
                     spendRequirement: `$${card.signupBonus.spendRequirement.toLocaleString()}`,
-                    timeframeDays: card.signupBonus.timeframeDays,
+                    timeframeDays: card.signupBonus.timeframeMonths
+                      ? `${card.signupBonus.timeframeMonths} months`
+                      : `${card.signupBonus.timeframeDays} days`,
                   })}
                 </Text>
               </View>
@@ -427,11 +434,18 @@ const createStyles = (theme: Theme) =>
       padding: theme.spacing.lg,
       alignItems: 'center',
     },
-    bonusAmount: {
-      fontSize: 28,
+    bonusValue: {
+      fontSize: 22,
       fontWeight: '700',
       color: theme.colors.success.dark,
+      marginBottom: theme.spacing.xs,
+    },
+    bonusAmount: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.success.dark,
       marginBottom: theme.spacing.sm,
+      opacity: 0.85,
     },
     bonusRequirement: {
       ...theme.textStyles.bodySmall,

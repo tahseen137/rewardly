@@ -591,7 +591,7 @@ const createStyles = (theme: Theme) =>
     scrollContent: {
       paddingHorizontal: 16, // px-4
       paddingVertical: 24, // py-6
-      paddingBottom: 100, // Extra padding for tab bar
+      paddingBottom: 120, // Extra padding for tab bar (64px tab bar + 56px buffer)
     },
     header: {
       marginBottom: 24,

@@ -49,6 +49,70 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const isWide = SCREEN_WIDTH > 768;
 
 // ============================================================================
+// Nav Header (sticky, mobile-first)
+// ============================================================================
+
+function NavHeader({ onGetStarted }: { onGetStarted: () => void }) {
+  return (
+    <View style={navStyles.header}>
+      <View style={navStyles.inner}>
+        <Text style={navStyles.logo}>💳 Rewardly</Text>
+        <TouchableOpacity
+          style={navStyles.ctaBtn}
+          onPress={onGetStarted}
+          activeOpacity={0.8}
+        >
+          <Text style={navStyles.ctaBtnText}>Get Started</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const navStyles = StyleSheet.create({
+  header: {
+    width: '100%',
+    backgroundColor: 'rgba(10, 14, 31, 0.97)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.08)',
+    position: Platform.OS === 'web' ? 'sticky' as any : 'relative',
+    top: 0,
+    zIndex: 100,
+  },
+  inner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    maxWidth: 1100,
+    alignSelf: 'center',
+    width: '100%',
+  },
+  logo: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: -0.3,
+  },
+  ctaBtn: {
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 22,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ctaBtnText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+});
+
+// ============================================================================
 // Hero Section
 // ============================================================================
 
@@ -633,7 +697,9 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
+      stickyHeaderIndices={[0]}
     >
+      <NavHeader onGetStarted={onGetStarted} />
       <HeroSection onGetStarted={onGetStarted} />
       <FeaturesSection />
       <HowItWorksSection />
@@ -667,8 +733,8 @@ const styles = StyleSheet.create({
   heroGradient: {
     width: '100%',
     alignItems: 'center',
-    paddingTop: 80,
-    paddingBottom: 80,
+    paddingTop: SCREEN_WIDTH > 768 ? 80 : 48,
+    paddingBottom: SCREEN_WIDTH > 768 ? 80 : 56,
     paddingHorizontal: 24,
     overflow: 'hidden',
   },
