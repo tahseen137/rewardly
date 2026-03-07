@@ -1,0 +1,136 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-07",
+  "merchants": [
+    {
+      "id": "amazon-ca",
+      "name": "Amazon.ca",
+      "domain": "amazon.ca",
+      "urlPatterns": ["amazon.ca"],
+      "category": "General",
+      "rates": [
+        { "program": "Rakuten", "rate": 2.0, "url": "https://www.rakuten.ca/click/amazon" },
+        { "program": "GCR", "rate": 1.5, "url": "https://www.greatcanadianrebates.ca/store/amazon" },
+        { "program": "TopCashback", "rate": 2.5, "url": "https://www.topcashback.ca/amazon" },
+        { "program": "Honey", "rate": 1.0, "url": "https://www.joinhoney.com/shop/amazon" }
+      ]
+    },
+    {
+      "id": "walmart-ca",
+      "name": "Walmart.ca",
+      "domain": "walmart.ca",
+      "urlPatterns": ["walmart.ca"],
+      "category": "General",
+      "rates": [
+        { "program": "Rakuten", "rate": 1.0, "url": "https://www.rakuten.ca/click/walmart" },
+        { "program": "GCR", "rate": 1.5, "url": "https://www.greatcanadianrebates.ca/store/walmart" },
+        { "program": "TopCashback", "rate": 2.0, "url": "https://www.topcashback.ca/walmart" },
+        { "program": "Honey", "rate": 0.5, "url": "https://www.joinhoney.com/shop/walmart" }
+      ]
+    },
+    {
+      "id": "bestbuy-ca",
+      "name": "Best Buy Canada",
+      "domain": "bestbuy.ca",
+      "urlPatterns": ["bestbuy.ca"],
+      "category": "Electronics",
+      "rates": [
+        { "program": "Rakuten", "rate": 3.0, "url": "https://www.rakuten.ca/click/bestbuy" },
+        { "program": "GCR", "rate": 2.5, "url": "https://www.greatcanadianrebates.ca/store/bestbuy" },
+        { "program": "TopCashback", "rate": 3.5, "url": "https://www.topcashback.ca/bestbuy" },
+        { "program": "Honey", "rate": 2.0, "url": "https://www.joinhoney.com/shop/bestbuy" }
+      ]
+    },
+    {
+      "id": "sephora-ca",
+      "name": "Sephora Canada",
+      "domain": "sephora.com",
+      "urlPatterns": ["sephora.com"],
+      "category": "Beauty",
+      "rates": [
+        { "program": "Rakuten", "rate": 5.0, "url": "https://www.rakuten.ca/click/sephora" },
+        { "program": "GCR", "rate": 4.0, "url": "https://www.greatcanadianrebates.ca/store/sephora" },
+        { "program": "TopCashback", "rate": 6.0, "url": "https://www.topcashback.ca/sephora" },
+        { "program": "Honey", "rate": 4.5, "url": "https://www.joinhoney.com/shop/sephora" }
+      ]
+    },
+    {
+      "id": "chapters-ca",
+      "name": "Indigo / Chapters",
+      "domain": "indigo.ca",
+      "urlPatterns": ["indigo.ca", "chapters.ca"],
+      "category": "Books",
+      "rates": [
+        { "program": "Rakuten", "rate": 3.0, "url": "https://www.rakuten.ca/click/indigo" },
+        { "program": "GCR", "rate": 2.5, "url": "https://www.greatcanadianrebates.ca/store/indigo" },
+        { "program": "TopCashback", "rate": 3.5, "url": "https://www.topcashback.ca/indigo" },
+        { "program": "Honey", "rate": 2.0, "url": "https://www.joinhoney.com/shop/indigo" }
+      ]
+    },
+    {
+      "id": "sport-chek",
+      "name": "Sport Chek",
+      "domain": "sportchek.ca",
+      "urlPatterns": ["sportchek.ca"],
+      "category": "Sports",
+      "rates": [
+        { "program": "Rakuten", "rate": 4.0, "url": "https://www.rakuten.ca/click/sportchek" },
+        { "program": "GCR", "rate": 3.0, "url": "https://www.greatcanadianrebates.ca/store/sportchek" },
+        { "program": "TopCashback", "rate": 4.5, "url": "https://www.topcashback.ca/sportchek" },
+        { "program": "Honey", "rate": 3.5, "url": "https://www.joinhoney.com/shop/sportchek" }
+      ]
+    },
+    {
+      "id": "loblaws",
+      "name": "Loblaws",
+      "domain": "loblaws.ca",
+      "urlPatterns": ["loblaws.ca"],
+      "category": "Grocery",
+      "rates": [
+        { "program": "Rakuten", "rate": 1.0, "url": "https://www.rakuten.ca/click/loblaws" },
+        { "program": "GCR", "rate": 1.5, "url": "https://www.greatcanadianrebates.ca/store/loblaws" },
+        { "program": "TopCashback", "rate": 2.0, "url": "https://www.topcashback.ca/loblaws" },
+        { "program": "Honey", "rate": 0.5, "url": "https://www.joinhoney.com/shop/loblaws" }
+      ]
+    },
+    {
+      "id": "nike-ca",
+      "name": "Nike Canada",
+      "domain": "nike.com",
+      "urlPatterns": ["nike.com"],
+      "category": "Fashion",
+      "rates": [
+        { "program": "Rakuten", "rate": 7.0, "url": "https://www.rakuten.ca/click/nike" },
+        { "program": "GCR", "rate": 5.0, "url": "https://www.greatcanadianrebates.ca/store/nike" },
+        { "program": "TopCashback", "rate": 8.0, "url": "https://www.topcashback.ca/nike" },
+        { "program": "Honey", "rate": 6.0, "url": "https://www.joinhoney.com/shop/nike" }
+      ]
+    },
+    {
+      "id": "winners",
+      "name": "Winners / HomeSense",
+      "domain": "winners.ca",
+      "urlPatterns": ["winners.ca", "homesense.ca"],
+      "category": "Fashion",
+      "rates": [
+        { "program": "Rakuten", "rate": 2.0, "url": "https://www.rakuten.ca/click/winners" },
+        { "program": "GCR", "rate": 1.5, "url": "https://www.greatcanadianrebates.ca/store/winners" },
+        { "program": "TopCashback", "rate": 2.5, "url": "https://www.topcashback.ca/winners" },
+        { "program": "Honey", "rate": 1.0, "url": "https://www.joinhoney.com/shop/winners" }
+      ]
+    },
+    {
+      "id": "the-bay",
+      "name": "Hudson's Bay",
+      "domain": "thebay.com",
+      "urlPatterns": ["thebay.com", "hudsonsbay.com"],
+      "category": "Department Store",
+      "rates": [
+        { "program": "Rakuten", "rate": 5.0, "url": "https://www.rakuten.ca/click/thebay" },
+        { "program": "GCR", "rate": 4.0, "url": "https://www.greatcanadianrebates.ca/store/thebay" },
+        { "program": "TopCashback", "rate": 6.0, "url": "https://www.topcashback.ca/thebay" },
+        { "program": "Honey", "rate": 4.5, "url": "https://www.joinhoney.com/shop/thebay" }
+      ]
+    }
+  ]
+}

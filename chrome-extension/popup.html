@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rewardly</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="logo">
+        <span class="logo-icon">💳</span>
+        <span class="logo-text">Rewardly</span>
+      </div>
+      <button class="settings-btn" id="openSettings" title="Settings">⚙️</button>
+    </header>
+
+    <!-- Loading state -->
+    <div class="state-container" id="loadingState">
+      <div class="spinner"></div>
+      <p class="state-text">Checking for cashback...</p>
+    </div>
+
+    <!-- Not found state -->
+    <div class="state-container hidden" id="notFoundState">
+      <div class="state-icon">🔍</div>
+      <p class="state-title">No cashback found</p>
+      <p class="state-text">This store isn't in our database yet.</p>
+      <a href="https://rewardly.ca" target="_blank" class="cta-link">Browse all stores →</a>
+    </div>
+
+    <!-- Results state -->
+    <div class="hidden" id="resultsState">
+      <!-- Merchant info -->
+      <div class="merchant-section">
+        <div class="merchant-info">
+          <span class="merchant-icon" id="merchantIcon">🛍️</span>
+          <div>
+            <p class="merchant-name" id="merchantName">Loading...</p>
+            <p class="merchant-category" id="merchantCategory">General</p>
+          </div>
+        </div>
+        <div class="savings-badge" id="savingsBadge">
+          <span class="savings-label">Up to</span>
+          <span class="savings-amount" id="bestRate">0%</span>
+          <span class="savings-label">cashback</span>
+        </div>
+      </div>
+
+      <!-- Estimated savings -->
+      <div class="estimate-bar" id="estimateBar">
+        <span class="estimate-label">💰 On a $100 purchase, save up to</span>
+        <span class="estimate-amount" id="estimateAmount">$0.00</span>
+      </div>
+
+      <!-- Rates list -->
+      <div class="rates-section">
+        <p class="rates-header">Cashback rates — sorted best first</p>
+        <div class="rates-list" id="ratesList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Footer CTA -->
+      <div class="popup-footer">
+        <a href="https://rewardly.ca" target="_blank" class="footer-link">
+          Track all your rewards at rewardly.ca →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="data/merchants.json" type="application/json" id="merchantData"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Rewardly – Cashback Comparison",
+  "version": "1.0.0",
+  "description": "Instantly compare cashback rates across Rakuten, GCR, TopCashback and more — for every Canadian retailer you visit.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "notifications"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Rewardly – Compare Cashback Rates"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "options_page": "settings.html"
+}
