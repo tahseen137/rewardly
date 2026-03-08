@@ -7,6 +7,7 @@ import { supabase, isSupabaseConfigured } from './supabase';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { User, Session, AuthChangeEvent, AuthError } from '@supabase/supabase-js';
+import { ReferralService } from './ReferralService';
 
 // ============================================================================
 // Types
@@ -133,6 +134,13 @@ export async function signUp(email: string, password: string): Promise<AuthResul
 
     // Clear any guest user
     await clearGuestUser();
+
+    // Complete referral signup if user came via referral link
+    if (data.user?.id) {
+      await ReferralService.completeReferralSignup(data.user.id).catch(err => {
+        console.warn('[AuthService] Failed to complete referral signup:', err);
+      });
+    }
 
     // Check if email confirmation is required
     const needsConfirmation = data.user && !data.session;

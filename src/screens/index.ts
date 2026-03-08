@@ -52,3 +52,4 @@ export { default as LandingPage } from './LandingPage';
 
 // Root-level screens (accessible from anywhere)
 export { default as CardDetailScreen } from './CardDetailScreen';
+export { default as ReferralDashboardScreen } from './ReferralDashboardScreen';

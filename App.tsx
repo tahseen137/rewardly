@@ -21,6 +21,7 @@ import { ErrorBoundary, AppErrorBoundary } from './src/components';
 import { initializePortfolio } from './src/services/CardPortfolioManager';
 import { initializePreferences, getLanguage } from './src/services/PreferenceManager';
 import { getAllCards } from './src/services/CardDataService';
+import { ReferralService } from './src/services/ReferralService';
 import { ThemeProvider, useTheme } from './src/theme';
 import { isWeb, platformLog } from './src/utils/platform';
 
@@ -45,6 +46,11 @@ function AppContent() {
     async function initialize() {
       try {
         platformLog('Initializing app services...');
+        
+        // Track referral from URL (if present)
+        await ReferralService.trackReferralFromUrl().catch(err => {
+          console.warn('[Rewardly] Failed to track referral:', err);
+        });
         
         // Initialize services and preload cards
         await Promise.all([

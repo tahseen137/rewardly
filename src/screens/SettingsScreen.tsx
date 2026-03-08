@@ -18,7 +18,10 @@ import {
   Linking,
   Platform,
 } from 'react-native';
-import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, LogIn, User, Crown, Navigation, ChevronRight } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, LogIn, User, Crown, Navigation, ChevronRight, Gift } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -134,6 +137,7 @@ interface SettingsScreenProps {
 
 export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenProps) {
   const { t, i18n } = useTranslation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [newCardSuggestions, setNewCardSuggestions] = useState(true);
   const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
   const [currentCountry, setCurrentCountry] = useState<Country>('US');
@@ -431,7 +435,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
                   icon={<Crown size={20} color={colors.primary.main} />}
                   title="Sage AI Usage"
                   description={`${sageUsage.chatCount} of ${sageUsage.limit} chats used this month`}
-                  isLast={true}
+                  isLast={false}
                 >
                   <Text style={[
                     styles.usageText,
@@ -442,6 +446,17 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
                   </Text>
                 </SettingsRow>
               )}
+
+              {/* Referral Program */}
+              <SettingsRow
+                icon={<Gift size={20} color="#10b981" />}
+                title="Invite & Earn Rewards"
+                description="Share Rewardly and unlock free Pro features"
+                isLast={true}
+                onPress={() => navigation.navigate('ReferralDashboard')}
+              >
+                <ChevronRight size={20} color={colors.text.secondary} />
+              </SettingsRow>
             </View>
           </>
         )}

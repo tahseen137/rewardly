@@ -43,6 +43,7 @@ import {
   ApplicationTrackerScreen,
   ExploreCardsScreen,
   CardDetailScreen,
+  ReferralDashboardScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
@@ -104,6 +105,7 @@ export type RootStackParamList = {
   CardDetail: {
     cardId: string;
   };
+  ReferralDashboard: undefined;
 };
 
 type AppState = 'loading' | 'landing' | 'auth' | 'onboarding' | 'main';
@@ -391,7 +393,7 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         tabBarStyle: {
           height: 64, // h-16
           backgroundColor: Platform.OS === 'web'
-            ? 'rgba(15, 21, 40, 0.8)' // Glass effect fallback for web
+            ? 'rgba(15, 21, 40, 0.97)' // Opaque for web — prevents card text bleed-through
             : colors.background.secondary,
           borderTopWidth: 1,
           borderTopColor: colors.border.light,
@@ -691,6 +693,20 @@ function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignI
         options={{
           presentation: 'modal',
           animation: 'slide_from_bottom',
+        }}
+      />
+      <RootStack.Screen
+        name="ReferralDashboard"
+        component={ReferralDashboardScreen}
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+          headerShown: true,
+          headerTitle: 'Referral Program',
+          headerStyle: {
+            backgroundColor: '#7c3aed',
+          },
+          headerTintColor: '#fff',
         }}
       />
     </RootStack.Navigator>
