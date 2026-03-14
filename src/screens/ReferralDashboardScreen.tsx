@@ -21,7 +21,7 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
-import { useAuth } from '@clerk/clerk-expo';
+import { getCurrentUser } from '../services/AuthService';
 import { ReferralService, ReferralStats } from '../services/ReferralService';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -34,11 +34,18 @@ const REWARD_TIERS = [
 ];
 
 export function ReferralDashboardScreen() {
-  const { userId } = useAuth();
+  const [userId, setUserId] = useState<string | null>(null);
   const [stats, setStats] = useState<ReferralStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [copiedTooltip, setCopiedTooltip] = useState(false);
+
+  // Load user ID on mount
+  useEffect(() => {
+    getCurrentUser().then(user => {
+      setUserId(user?.id ?? null);
+    });
+  }, []);
 
   const loadStats = useCallback(async () => {
     if (!userId) return;
