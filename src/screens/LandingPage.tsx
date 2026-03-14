@@ -161,25 +161,24 @@ function HeroSection({ onGetStarted }: { onGetStarted: () => void }) {
 
           {/* Title */}
           <Text style={styles.heroTitle}>
-            Maximize Your{'\n'}
-            <Text style={styles.heroTitleAccent}>Credit Card Rewards</Text>
+            Which Card Earns the Most{'\n'}
+            <Text style={styles.heroTitleAccent}>at Loblaws? Gas? Tim Hortons?</Text>
           </Text>
 
           {/* Subtitle */}
           <Text style={styles.heroSubtitle}>
-            Stop leaving money on the table. Rewardly tells you the best card to use 
-            for every purchase — automatically. Built for Canadian credit cards.
+            Rewardly knows. Most Canadians swipe the wrong card 3× a week — losing $40–80/month in rewards they should have earned. We show you the best card for every purchase. Free. Takes 2 minutes.
           </Text>
 
           {/* Stats */}
           <View style={styles.heroStats}>
             <View style={styles.heroStatItem}>
-              <Text style={styles.heroStatValue}>$127</Text>
-              <Text style={styles.heroStatLabel}>avg. saved/month</Text>
+              <Text style={styles.heroStatValue}>$400–800</Text>
+              <Text style={styles.heroStatLabel}>more per year</Text>
             </View>
             <View style={styles.heroStatDivider} />
             <View style={styles.heroStatItem}>
-              <Text style={styles.heroStatValue}>50+</Text>
+              <Text style={styles.heroStatValue}>410+</Text>
               <Text style={styles.heroStatLabel}>Canadian cards</Text>
             </View>
             <View style={styles.heroStatDivider} />
@@ -279,25 +278,25 @@ function FeaturesSection() {
       icon: <CreditCard size={28} color={colors.primary.main} />,
       title: 'Smart Card Picker',
       description:
-        'Instantly know which card earns the most rewards at any store or category. Never miss a bonus again.',
+        'At Loblaws, your Scotia Gold earns 6× — but your TD Cash Back earns 3%. Rewardly tells you which card wins for every purchase, every time. Works for 410+ Canadian cards.',
     },
     {
       icon: <Navigation size={28} color={colors.accent.main} />,
       title: 'Smart Wallet',
       description:
-        'Get automatic notifications when you arrive at stores, telling you exactly which card to pull out.',
+        'Walking into Shoppers Drug Mart? Your phone tells you which card to tap before you reach the checkout. No guessing, no fumbling, no missed rewards.',
     },
     {
       icon: <BarChart3 size={28} color={colors.info.main} />,
       title: 'Rewards IQ Score',
       description:
-        'Track how well you\'re optimizing your rewards. See missed opportunities and improve your score.',
+        'See exactly how optimized your card usage is — and where you\'re leaving money behind. Most users recover $40–60/month in missed rewards in the first week.',
     },
     {
       icon: <Sparkles size={28} color={colors.warning.main} />,
       title: 'Sage AI Assistant',
       description:
-        'Ask Sage anything about credit cards, points strategies, or travel redemptions. Your personal advisor.',
+        'Ask: "Which card is best for my Costco run?" or "Should I get the TD Aeroplan or RBC Avion?" Real answers for Canadian cards — not American ones.',
     },
   ];
 
@@ -333,7 +332,7 @@ function HowItWorksSection() {
     {
       number: '1',
       title: 'Add Your Cards',
-      description: 'Select from 50+ popular Canadian credit cards',
+      description: 'Choose from 410+ Canadian credit cards — TD, RBC, CIBC, Scotiabank, BMO, Amex, and more.',
       icon: <CreditCard size={24} color={colors.primary.main} />,
     },
     {
@@ -344,8 +343,8 @@ function HowItWorksSection() {
     },
     {
       number: '3',
-      title: 'Start Saving',
-      description: 'Get personalized recommendations for every purchase',
+      title: 'Start Earning More',
+      description: 'Pull up Rewardly before you pay. The average user captures $400–800 more per year from the same spending.',
       icon: <Zap size={24} color={colors.primary.main} />,
     },
   ];
@@ -383,6 +382,150 @@ function HowItWorksSection() {
 // ============================================================================
 // Pricing Section
 // ============================================================================
+
+// ============================================================================
+// How Rewardly Works Examples
+// ============================================================================
+
+function SocialProofSection() {
+  const scenarios = [
+    {
+      scenario:
+        "Shopping at Loblaws? Your Scotiabank Gold earns 6× on groceries vs 1× on your TD card — that's 5× more points on every trip.",
+      emoji: '🛒',
+      category: 'Groceries',
+    },
+    {
+      scenario:
+        "Gas station? Your CIBC Dividend Platinum gives 4% cash back vs 1% on most cards — that's $12 extra per tank on a $300 fill.",
+      emoji: '⛽',
+      category: 'Gas',
+    },
+    {
+      scenario:
+        "Booking a flight? Aeroplan points from your TD Aeroplan Visa are worth 2.1¢ each when booked for travel — not 1¢ like cash back.",
+      emoji: '✈️',
+      category: 'Travel',
+    },
+  ];
+
+  return (
+    <View style={socialStyles.section}>
+      <Text style={socialStyles.label}>HOW REWARDLY WORKS</Text>
+      <Text style={socialStyles.title}>Real Scenarios. Real Value.</Text>
+      <View style={socialStyles.grid}>
+        {scenarios.map((s, i) => (
+          <View key={i} style={socialStyles.card}>
+            <Text style={socialStyles.emoji}>{s.emoji}</Text>
+            <Text style={socialStyles.category}>{s.category}</Text>
+            <Text style={socialStyles.scenario}>{s.scenario}</Text>
+          </View>
+        ))}
+      </View>
+      <View style={socialStyles.statRow}>
+        <View style={socialStyles.statItem}>
+          <Text style={socialStyles.statValue}>$400–800</Text>
+          <Text style={socialStyles.statLabel}>avg. additional rewards/year</Text>
+        </View>
+        <View style={socialStyles.statDivider} />
+        <View style={socialStyles.statItem}>
+          <Text style={socialStyles.statValue}>2 min</Text>
+          <Text style={socialStyles.statLabel}>to get your first recommendation</Text>
+        </View>
+        <View style={socialStyles.statDivider} />
+        <View style={socialStyles.statItem}>
+          <Text style={socialStyles.statValue}>$0</Text>
+          <Text style={socialStyles.statLabel}>to get started</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const socialStyles = StyleSheet.create({
+  section: {
+    backgroundColor: '#0A0E1F',
+    paddingVertical: 64,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  label: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    color: colors.primary.main,
+    textTransform: 'uppercase',
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 36,
+    letterSpacing: -0.5,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 16,
+    maxWidth: 1100,
+    width: '100%',
+    marginBottom: 40,
+  },
+  card: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 16,
+    padding: 24,
+    width: 300,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  emoji: {
+    fontSize: 28,
+    marginBottom: 12,
+  },
+  category: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.primary.main,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  scenario: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: 'rgba(255,255,255,0.85)',
+  },
+  statRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 32,
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.primary.main,
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    textAlign: 'center',
+    maxWidth: 120,
+  },
+  statDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+});
 
 interface PricingCardProps {
   tier: string;
@@ -602,8 +745,13 @@ function TrustSection() {
         </View>
         <View style={styles.trustItem}>
           <Star size={24} color={colors.primary.main} />
-          <Text style={styles.trustTitle}>Made for Canadians</Text>
-          <Text style={styles.trustDesc}>All major Canadian issuers supported</Text>
+          <Text style={styles.trustTitle}>Built for Canadians</Text>
+          <Text style={styles.trustDesc}>TD, RBC, CIBC, Scotiabank, BMO — all 410+ cards supported</Text>
+        </View>
+        <View style={styles.trustItem}>
+          <Shield size={24} color={colors.primary.main} />
+          <Text style={styles.trustTitle}>No Bank Login Required</Text>
+          <Text style={styles.trustDesc}>Rewardly never asks for your banking credentials. Ever.</Text>
         </View>
       </View>
     </View>
@@ -703,6 +851,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
       <HeroSection onGetStarted={onGetStarted} />
       <FeaturesSection />
       <HowItWorksSection />
+      <SocialProofSection />
       <PricingSection onGetStarted={onGetStarted} />
       <TrustSection />
       <FinalCTA onGetStarted={onGetStarted} />

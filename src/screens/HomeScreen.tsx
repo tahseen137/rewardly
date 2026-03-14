@@ -660,6 +660,9 @@ const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: 4,
+      minHeight: 44, // Accessibility: minimum touch target 44px
+      paddingVertical: 12,
+      paddingHorizontal: 8,
     },
     seeAllText: {
       fontSize: 13,

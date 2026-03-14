@@ -95,7 +95,8 @@ export default function Paywall({
 }: PaywallProps) {
   const { t } = useTranslation();
   
-  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('annual');
+  // Default to monthly — annual price IDs not yet configured in Stripe
+  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly');
   const [selectedTier, setSelectedTier] = useState<SubscriptionTier>(defaultTier);
   const [isProcessing, setIsProcessing] = useState(false);
   const [inlineMessage, setInlineMessage] = useState<{type: 'error' | 'info', text: string} | null>(null);
