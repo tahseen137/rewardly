@@ -205,6 +205,7 @@
     "cardsTitle": "Ajoutez Vos Cartes",
     "cardsDescription": "Sélectionnez les cartes de crédit que vous possédez actuellement. Vous pouvez en ajouter d'autres plus tard.",
     "cardsHint": "{{count}} cartes sélectionnées",
+    "selectedCards": "Sélectionnées ({{count}})",
     "loadingCards": "Chargement des cartes disponibles...",
     "sageTitle": "Rencontrez Sage",
     "sageDescription": "Votre assistant de récompenses alimenté par l'IA est prêt à vous aider à maximiser chaque achat.",

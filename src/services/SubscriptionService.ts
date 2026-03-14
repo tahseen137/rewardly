@@ -369,7 +369,7 @@ async function loadSageUsage(): Promise<SageUsage> {
           .select('*')
           .eq('user_id', user.id)
           .eq('month', currentMonth)
-          .single();
+          .maybeSingle();
         
         if (usage) {
           const usageData = usage as any;

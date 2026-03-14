@@ -275,11 +275,13 @@ export async function initializePortfolio(): Promise<void> {
     if (authenticated && userId) {
       // Try to load from Supabase first
       const supabaseCards = await loadFromSupabase(userId);
-      if (supabaseCards !== null) {
+      // Only use Supabase data if it's not empty
+      // If empty, fall back to AsyncStorage to catch cards saved during race conditions
+      if (supabaseCards !== null && supabaseCards.length > 0) {
         portfolioCache = supabaseCards;
         return;
       }
-      // Fall back to AsyncStorage if Supabase fails
+      // Fall back to AsyncStorage if Supabase fails or is empty
     }
 
     // Load from AsyncStorage for guests or as fallback
@@ -362,10 +364,9 @@ export async function addCard(cardId: string): Promise<Result<UserCard, Portfoli
   // Sync to appropriate storage
   const { authenticated, userId } = await isUserAuthenticated();
   if (authenticated && userId) {
-    // Save to Supabase (async, don't block on it)
-    saveCardToSupabase(userId, userCard).catch(err => {
-      console.error('Failed to sync card to Supabase:', err);
-    });
+    // Save to Supabase and wait for completion to ensure data is synced
+    // before onboarding completes
+    await saveCardToSupabase(userId, userCard);
   }
   
   // Always persist to AsyncStorage as backup
@@ -395,10 +396,8 @@ export async function removeCard(cardId: string): Promise<Result<void, Portfolio
   // Sync to appropriate storage
   const { authenticated, userId } = await isUserAuthenticated();
   if (authenticated && userId) {
-    // Delete from Supabase (async, don't block on it)
-    deleteCardFromSupabase(userId, cardId).catch(err => {
-      console.error('Failed to delete card from Supabase:', err);
-    });
+    // Delete from Supabase and wait for completion
+    await deleteCardFromSupabase(userId, cardId);
   }
 
   // Always persist to AsyncStorage as backup
@@ -486,9 +485,7 @@ export async function updatePointBalance(
   // Sync to Supabase if authenticated
   const { authenticated, userId } = await isUserAuthenticated();
   if (authenticated && userId) {
-    saveCardToSupabase(userId, portfolioCache![cardIndex]).catch(err => {
-      console.error('Failed to sync point balance to Supabase:', err);
-    });
+    await saveCardToSupabase(userId, portfolioCache![cardIndex]);
   }
 
   await persistPortfolio();
@@ -522,9 +519,7 @@ export async function updateCardNickname(
   // Sync to Supabase if authenticated
   const { authenticated, userId } = await isUserAuthenticated();
   if (authenticated && userId) {
-    saveCardToSupabase(userId, portfolioCache![cardIndex]).catch(err => {
-      console.error('Failed to sync nickname to Supabase:', err);
-    });
+    await saveCardToSupabase(userId, portfolioCache![cardIndex]);
   }
 
   await persistPortfolio();

@@ -227,6 +227,7 @@
     "noCardsFound": "No cards found. Try a different search.",
     "noPopularCards": "No popular cards available. Try the 'All' tab.",
     "cardsHint": "{{count}} cards selected",
+    "selectedCards": "Selected ({{count}})",
     "loadingCards": "Loading available cards...",
     "popularTab": "Popular",
     "allTab": "All Cards",

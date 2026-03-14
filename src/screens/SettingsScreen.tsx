@@ -401,7 +401,10 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
                     <Text style={styles.adminBadgeText}>ADMIN</Text>
                   </View>
                 )}
-                {(subscriptionTier === 'pro' || subscriptionTier === 'max') && !subscriptionState?.isAdmin && (
+                {/* TODO: Re-enable when manage-subscription edge function is deployed to Supabase
+                     The function exists in supabase/functions/manage-subscription/ but needs deployment:
+                     cd ~/Projects/rewardly && supabase functions deploy manage-subscription */}
+                {false && (subscriptionTier === 'pro' || subscriptionTier === 'max') && !subscriptionState?.isAdmin && (
                   <TouchableOpacity 
                     style={styles.manageButton}
                     onPress={async () => {

@@ -135,8 +135,15 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       );
     }
 
-    return cards;
-  }, [availableCards, cardViewMode, searchQuery, popularCardIds]);
+    // Sort selected cards to the top so users can see all their selections
+    return cards.sort((a, b) => {
+      const aSelected = selectedCards.includes(a.id);
+      const bSelected = selectedCards.includes(b.id);
+      if (aSelected && !bSelected) return -1;
+      if (!aSelected && bSelected) return 1;
+      return 0;
+    });
+  }, [availableCards, cardViewMode, searchQuery, popularCardIds, selectedCards]);
 
   // Load existing portfolio
   useEffect(() => {
@@ -389,6 +396,40 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
             total: availableCards.length 
           })}
         </Text>
+      )}
+
+      {/* Selected Cards Preview */}
+      {selectedCards.length > 0 && (
+        <View style={styles.selectedCardsContainer}>
+          <Text style={styles.selectedCardsTitle}>
+            {t('onboarding.selectedCards', { count: selectedCards.length })}
+          </Text>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.selectedCardsList}
+          >
+            {selectedCards.map(cardId => {
+              const card = availableCards.find(c => c.id === cardId);
+              if (!card) return null;
+              return (
+                <TouchableOpacity
+                  key={cardId}
+                  style={styles.selectedCardChip}
+                  onPress={() => handleCardToggle(cardId)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.selectedCardChipText} numberOfLines={1}>
+                    {card.name}
+                  </Text>
+                  <View style={styles.selectedCardChipRemove}>
+                    <Text style={styles.selectedCardChipRemoveIcon}>×</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
       )}
 
       <ScrollView 
@@ -759,6 +800,56 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.text.secondary,
     marginBottom: 8,
+  },
+  // Selected Cards Preview
+  selectedCardsContainer: {
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
+  },
+  selectedCardsTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text.secondary,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  selectedCardsList: {
+    gap: 8,
+    paddingRight: 24,
+  },
+  selectedCardChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary.main,
+    borderRadius: borderRadius.full,
+    paddingLeft: 14,
+    paddingRight: 8,
+    paddingVertical: 8,
+    gap: 8,
+    maxWidth: 200,
+  },
+  selectedCardChipText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.background.primary,
+    flex: 1,
+  },
+  selectedCardChipRemove: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectedCardChipRemoveIcon: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.background.primary,
+    lineHeight: 16,
   },
   cardList: {
     flex: 1,

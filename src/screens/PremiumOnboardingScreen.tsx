@@ -620,17 +620,21 @@ function RewardsIQStep({ score, onComplete }: RewardsIQStepProps) {
   
   return (
     <View style={styles.stepContainer}>
-      <Animated.View entering={FadeInDown.duration(400)}>
-        <View style={styles.stepHeader}>
-          <Animated.View style={[styles.confettiContainer, celebrationStyle]}>
-            <Text style={styles.confetti}>🎉</Text>
-          </Animated.View>
-          <Text style={styles.congratsTitle}>You're All Set!</Text>
-          <Text style={styles.stepSubtitle}>
-            Here's your initial Rewards IQ score
-          </Text>
-        </View>
-      </Animated.View>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.stepContainerContent}
+      >
+        <Animated.View entering={FadeInDown.duration(400)}>
+          <View style={styles.stepHeader}>
+            <Animated.View style={[styles.confettiContainer, celebrationStyle]}>
+              <Text style={styles.confetti}>🎉</Text>
+            </Animated.View>
+            <Text style={styles.congratsTitle}>You're All Set!</Text>
+            <Text style={styles.stepSubtitle}>
+              Here's your initial Rewards IQ score
+            </Text>
+          </View>
+        </Animated.View>
       
       {/* Score Display */}
       <Animated.View style={[styles.iqScoreContainer, scoreStyle]}>
@@ -686,20 +690,21 @@ function RewardsIQStep({ score, onComplete }: RewardsIQStepProps) {
         </View>
       </Animated.View>
       
-      {/* Complete Button */}
-      <Animated.View entering={FadeInUp.delay(700).duration(500)} style={styles.ctaContainer}>
-        <TouchableOpacity onPress={onComplete} activeOpacity={0.9}>
-          <LinearGradient
-            colors={[colors.primary.main, colors.primary.dark]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.primaryButton}
-          >
-            <Text style={styles.primaryButtonText}>Start Optimizing</Text>
-            <ChevronRight size={24} color={colors.background.primary} />
-          </LinearGradient>
-        </TouchableOpacity>
-      </Animated.View>
+        {/* Complete Button */}
+        <Animated.View entering={FadeInUp.delay(700).duration(500)} style={styles.ctaContainer}>
+          <TouchableOpacity onPress={onComplete} activeOpacity={0.9}>
+            <LinearGradient
+              colors={[colors.primary.main, colors.primary.dark]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.primaryButton}
+            >
+              <Text style={styles.primaryButtonText}>Start Optimizing</Text>
+              <ChevronRight size={24} color={colors.background.primary} />
+            </LinearGradient>
+          </TouchableOpacity>
+        </Animated.View>
+      </ScrollView>
     </View>
   );
 }
@@ -929,6 +934,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingBottom: 8,
+  },
+  stepContainerContent: {
+    paddingBottom: 24,
   },
   
   // Step Header
