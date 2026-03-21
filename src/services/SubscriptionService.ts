@@ -552,6 +552,15 @@ export async function getSageUsage(): Promise<SageUsage> {
  * Check if user can use Sage AI
  */
 export async function canUseSage(): Promise<{allowed: boolean; remaining: number | null; reason?: string}> {
+  // Demo mode: unlimited access
+  if (typeof window !== 'undefined' && typeof window.location !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDemoMode = urlParams.get('demo') === 'true' || urlParams.get('demo') === '1';
+    if (isDemoMode) {
+      return { allowed: true, remaining: null };
+    }
+  }
+  
   const tier = await getCurrentTier();
   
   // Free users get limited access (3 chats/month)

@@ -551,12 +551,23 @@ serve(async (req) => {
                 if (eventData) {
                   try {
                     const parsed = JSON.parse(eventData);
+                    console.log('[Sage] Gemini event FULL:', JSON.stringify(parsed));
                     
                     // Gemini response format: candidates[0].content.parts[0].text
                     const text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (text) {
+                      console.log('[Sage] Streaming text chunk:', text);
                       const chunk = JSON.stringify({ text });
                       controller.enqueue(encoder.encode(`event: text\ndata: ${chunk}\n\n`));
+                    } else {
+                      console.error('[Sage] No text found. Parsed structure:', {
+                        hasCandidates: !!parsed?.candidates,
+                        candidatesLength: parsed?.candidates?.length,
+                        hasContent: !!parsed?.candidates?.[0]?.content,
+                        hasParts: !!parsed?.candidates?.[0]?.content?.parts,
+                        partsLength: parsed?.candidates?.[0]?.content?.parts?.length,
+                        fullParsed: JSON.stringify(parsed).substring(0, 500)
+                      });
                     }
 
                     // Check for finish
@@ -626,7 +637,7 @@ serve(async (req) => {
             "content-type": "application/json",
           },
           body: JSON.stringify({
-            model: "claude-3-5-haiku-20241022",
+            model: "claude-haiku-4-5",
             max_tokens: 1024,
             system: systemPrompt,
             messages,
