@@ -33,7 +33,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
     "validate": "npm run lint && npm run typecheck && npm run test:web",
-    "build:web": "expo export -p web",
+    "build:web": "expo export -p web && cp -r public/api dist/api",
     "build:preview": "eas build --profile preview --platform all",
     "build:production": "eas build --profile production --platform all",
     "build:android-apk": "eas build --profile preview --platform android",
