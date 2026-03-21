@@ -14,7 +14,7 @@
       "destination": "/ceo-queue.html"
     },
     {
-      "source": "/((?!admin|ceo-queue).*)",
+      "source": "/((?!admin|ceo-queue|api/).*)",
       "destination": "/index.html"
     }
   ],
