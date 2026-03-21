@@ -1,0 +1,200 @@
+{
+  "version": "1.0.0",
+  "programs": {
+    "pc-optimum": {
+      "id": "pc-optimum",
+      "name": "PC Optimum",
+      "description": "Loyalty program for Loblaws, Shoppers Drug Mart, and other Loblaw banners",
+      "pointValue": 0.001,
+      "pointValueOptimized": 0.0015,
+      "merchants": {
+        "loblaws.ca": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base, 15-20x with offers"
+        },
+        "shoppersdrugmart.ca": {
+          "baseRate": 15,
+          "promoRate": 20,
+          "description": "15 pts/$1 base, 20-25x with offers"
+        },
+        "nofrills.ca": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base, 15x with offers"
+        },
+        "rexall.ca": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base, 15x with offers"
+        },
+        "fortinos.ca": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base"
+        },
+        "valumart.ca": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base"
+        },
+        "zehrs.ca": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base"
+        },
+        "esso.ca": {
+          "baseRate": 10,
+          "promoRate": 20,
+          "description": "10 pts/$1 base, up to 20x with offers"
+        },
+        "mobil.ca": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base"
+        }
+      }
+    },
+    "scene-plus": {
+      "id": "scene-plus",
+      "name": "Scene+",
+      "description": "Loyalty program for Scotiabank, Sobeys, Cineplex, and Empire",
+      "pointValue": 0.01,
+      "pointValueOptimized": 0.01,
+      "merchants": {
+        "sobeys.com": {
+          "baseRate": 5,
+          "promoRate": 10,
+          "description": "5 pts/$1 base, 10x with offers"
+        },
+        "safeway.ca": {
+          "baseRate": 5,
+          "promoRate": 10,
+          "description": "5 pts/$1 base"
+        },
+        "foodland.ca": {
+          "baseRate": 5,
+          "promoRate": 10,
+          "description": "5 pts/$1 base"
+        },
+        "farmboy.ca": {
+          "baseRate": 5,
+          "promoRate": 10,
+          "description": "5 pts/$1 base"
+        },
+        "freshco.com": {
+          "baseRate": 5,
+          "promoRate": 10,
+          "description": "5 pts/$1 base"
+        },
+        "cineplex.com": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base"
+        },
+        "shell.ca": {
+          "baseRate": 5,
+          "promoRate": 10,
+          "description": "5 pts/$1 at Shell"
+        },
+        "recipes.ca": {
+          "baseRate": 5,
+          "promoRate": 10,
+          "description": "5 pts/$1 base"
+        }
+      }
+    },
+    "triangle-rewards": {
+      "id": "triangle-rewards",
+      "name": "Triangle Rewards",
+      "description": "Loyalty program for Canadian Tire, Sport Chek, Mark's, and Atmosphere",
+      "pointValue": 0.004,
+      "pointValueOptimized": 0.004,
+      "merchants": {
+        "canadiantire.ca": {
+          "baseRate": 10,
+          "promoRate": 20,
+          "description": "10 pts/$1 base, up to 40x with offers"
+        },
+        "sportchek.ca": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base"
+        },
+        "marks.com": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base"
+        },
+        "atmosphere.ca": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base"
+        },
+        "partyc ity.ca": {
+          "baseRate": 10,
+          "promoRate": 15,
+          "description": "10 pts/$1 base"
+        }
+      }
+    },
+    "aeroplan": {
+      "id": "aeroplan",
+      "name": "Aeroplan",
+      "description": "Air Canada's loyalty program — earn miles on flights, shopping, and everyday purchases",
+      "pointValue": 0.02,
+      "pointValueOptimized": 0.02,
+      "merchants": {
+        "aircanada.com": {
+          "baseRate": 5,
+          "promoRate": 10,
+          "description": "5 miles/$1 base, varies by fare class"
+        },
+        "esso.ca": {
+          "baseRate": 1,
+          "promoRate": 2,
+          "description": "1 mile/$1 base"
+        },
+        "staralliance.com": {
+          "baseRate": 5,
+          "promoRate": 10,
+          "description": "Varies by airline partner"
+        }
+      }
+    },
+    "air-miles": {
+      "id": "air-miles",
+      "name": "Air Miles",
+      "description": "Canada-wide coalition loyalty program — earn miles at groceries, gas, and retail",
+      "pointValue": 0.10,
+      "pointValueOptimized": 0.10,
+      "merchants": {
+        "shell.ca": {
+          "baseRate": 1,
+          "promoRate": 5,
+          "description": "1 mile per $20 spent, up to 5x with offers"
+        },
+        "sobeys.com": {
+          "baseRate": 1,
+          "promoRate": 5,
+          "description": "1 mile per $20 spent (select locations)"
+        },
+        "safeway.ca": {
+          "baseRate": 1,
+          "promoRate": 5,
+          "description": "1 mile per $20 spent (select locations)"
+        },
+        "staples.ca": {
+          "baseRate": 1,
+          "promoRate": 3,
+          "description": "1 mile per $10 spent"
+        },
+        "rona.ca": {
+          "baseRate": 1,
+          "promoRate": 3,
+          "description": "1 mile per $20 spent"
+        }
+      }
+    }
+  }
+}
