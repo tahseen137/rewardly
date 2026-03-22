@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Rewardly</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #1f2937;
+    }
+    
+    .last-updated {
+      color: #6b7280;
+      margin-bottom: 32px;
+      font-size: 14px;
+    }
+    
+    h2 {
+      font-size: 24px;
+      margin-top: 32px;
+      margin-bottom: 16px;
+      color: #1f2937;
+    }
+    
+    p {
+      margin-bottom: 16px;
+      color: #4b5563;
+    }
+    
+    ul {
+      margin-bottom: 16px;
+      padding-left: 24px;
+    }
+    
+    li {
+      margin-bottom: 8px;
+      color: #4b5563;
+    }
+    
+    strong {
+      color: #1f2937;
+    }
+    
+    .highlight-box {
+      background: #f0f4ff;
+      border-left: 4px solid #667eea;
+      padding: 16px;
+      margin: 24px 0;
+      border-radius: 4px;
+    }
+    
+    .highlight-box p {
+      margin: 0;
+    }
+    
+    a {
+      color: #667eea;
+      text-decoration: none;
+    }
+    
+    a:hover {
+      text-decoration: underline;
+    }
+    
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Privacy Policy</h1>
+  <p class="last-updated">Last updated: March 22, 2026</p>
+  
+  <div class="highlight-box">
+    <p><strong>TL;DR:</strong> Rewardly stores all your data locally on your device. We don't collect, sell, or share your personal information. We never see your bank credentials or purchase history. Your privacy is non-negotiable.</p>
+  </div>
+  
+  <h2>What Data We Collect</h2>
+  <p>Rewardly collects minimal data to provide its core service:</p>
+  <ul>
+    <li><strong>Credit cards you add:</strong> Card names and IDs (e.g., "Amex Cobalt") — stored locally in Chrome's sync storage</li>
+    <li><strong>Loyalty programs you select:</strong> Program IDs (e.g., "PC Optimum") — stored locally</li>
+    <li><strong>Shopping activity:</strong> Merchant names, categories, and estimated savings (e.g., "Loblaws, groceries, $4.20 saved") — stored locally</li>
+    <li><strong>Extension settings:</strong> Your preferences (e.g., blacklisted sites, popup settings) — stored locally</li>
+  </ul>
+  
+  <h2>What We DON'T Collect</h2>
+  <ul>
+    <li>❌ Bank account credentials or passwords</li>
+    <li>❌ Credit card numbers or CVVs</li>
+    <li>❌ Purchase amounts or transaction details</li>
+    <li>❌ Personal identifying information (name, email, address)</li>
+    <li>❌ Browsing history outside of merchant detection</li>
+    <li>❌ Any data that leaves your device</li>
+  </ul>
+  
+  <h2>Where Your Data is Stored</h2>
+  <p>All data is stored locally on your device using Chrome's built-in storage APIs:</p>
+  <ul>
+    <li><strong>chrome.storage.sync:</strong> Selected cards and loyalty programs (syncs across your Chrome browsers if you're signed in)</li>
+    <li><strong>chrome.storage.local:</strong> Savings log, analytics events, affiliate state (stays on this device only)</li>
+  </ul>
+  <p>We do NOT have servers that collect or store your data. Everything stays on your computer.</p>
+  
+  <h2>What We Do With Your Data</h2>
+  <p>Your data is used solely to provide Rewardly's core features:</p>
+  <ul>
+    <li>Show you the best credit card recommendation at checkout</li>
+    <li>Calculate your estimated savings over time</li>
+    <li>Suggest high-value credit card upgrades based on your shopping patterns</li>
+    <li>Respect your blacklist and settings preferences</li>
+  </ul>
+  <p>We do NOT:</p>
+  <ul>
+    <li>Sell your data to third parties</li>
+    <li>Share your data with advertisers</li>
+    <li>Track you across the web</li>
+    <li>Build user profiles for marketing</li>
+  </ul>
+  
+  <h2>Third-Party Services</h2>
+  <p>Rewardly fetches publicly available credit card earn rates and merchant data from our API (<code>rewardly.ca/api/*</code>) to keep card data up-to-date. These API requests do NOT include any personal data — only version checks.</p>
+  <p>If you click an affiliate link to apply for a recommended card, you'll be redirected to the card issuer's website (e.g., American Express, RBC). Those sites have their own privacy policies — we recommend reading them before applying.</p>
+  
+  <h2>Cookies and Tracking</h2>
+  <p>Rewardly does NOT use cookies or any tracking technologies. We don't integrate with Google Analytics, Facebook Pixel, or any third-party analytics services.</p>
+  
+  <h2>Data Retention</h2>
+  <p>Your data is stored locally until you:</p>
+  <ul>
+    <li>Uninstall the extension (all data is deleted automatically)</li>
+    <li>Manually clear your Chrome storage</li>
+    <li>Remove specific cards or loyalty programs through the settings</li>
+  </ul>
+  <p>We do NOT have backups of your data because we never receive it in the first place.</p>
+  
+  <h2>Your Rights</h2>
+  <p>You have full control over your data:</p>
+  <ul>
+    <li><strong>Access:</strong> View all your data by opening the extension popup → Settings</li>
+    <li><strong>Delete:</strong> Remove individual cards/programs or uninstall the extension entirely</li>
+    <li><strong>Export:</strong> Chrome's sync storage can be accessed via Developer Tools (for power users)</li>
+  </ul>
+  
+  <h2>Security</h2>
+  <p>Because all data is stored locally on your device, security is managed by Chrome's built-in protections. We recommend:</p>
+  <ul>
+    <li>Keeping Chrome up-to-date</li>
+    <li>Using a strong device password</li>
+    <li>Enabling two-factor authentication on your Google account (if using Chrome sync)</li>
+  </ul>
+  
+  <h2>Children's Privacy</h2>
+  <p>Rewardly is not intended for children under 18. We do not knowingly collect data from minors. If you're under 18, please do not use this extension.</p>
+  
+  <h2>Changes to This Policy</h2>
+  <p>We may update this privacy policy from time to time. Changes will be posted at <a href="https://rewardly.ca/privacy">rewardly.ca/privacy</a> with an updated "Last updated" date. Continued use of the extension after changes means you accept the new policy.</p>
+  
+  <h2>Contact Us</h2>
+  <p>Questions or concerns? Email us:</p>
+  <p><strong>Email:</strong> <a href="mailto:support@rewardly.ca">support@rewardly.ca</a></p>
+  <p><strong>Website:</strong> <a href="https://rewardly.ca">rewardly.ca</a></p>
+  
+  <footer>
+    <p>&copy; 2026 Rewardly. Built in Canada, for Canadians.</p>
+  </footer>
+</body>
+</html>
