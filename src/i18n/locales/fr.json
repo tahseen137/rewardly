@@ -139,7 +139,7 @@
     "refreshError": "Erreur",
     "refreshErrorMessage": "Échec de l'actualisation des cartes. Vérifiez votre connexion.",
     "supabaseNotConfigured": "Connexion à la base de données non configurée. Utilisation des données locales.",
-    "footerText": "Fait avec 💳 pour les dépenseurs intelligents"
+    "footerText": "Fait pour maximiser chaque achat"
   },
   "rewardTypes": {
     "cashback": "Remise en Argent",
@@ -170,7 +170,7 @@
   },
   "auth": {
     "title": "Rewardly",
-    "subtitle": "Maximisez vos récompenses de carte de crédit",
+    "subtitle": "Trouvez la meilleure carte pour chaque achat",
     "emailPlaceholder": "Adresse e-mail",
     "passwordPlaceholder": "Mot de passe",
     "confirmPasswordPlaceholder": "Confirmer le mot de passe",
@@ -208,7 +208,7 @@
     "selectedCards": "Sélectionnées ({{count}})",
     "loadingCards": "Chargement des cartes disponibles...",
     "sageTitle": "Rencontrez Sage",
-    "sageDescription": "Votre assistant de récompenses alimenté par l'IA est prêt à vous aider à maximiser chaque achat.",
+    "sageDescription": "Sage, votre assistant de récompenses IA, est prêt à vous aider à tirer le meilleur de chaque achat.",
     "sageFeature1Title": "Recommandations Intelligentes",
     "sageFeature1Desc": "Obtenez la meilleure carte pour tout achat, instantanément.",
     "sageFeature2Title": "Planification de Voyage",
@@ -217,8 +217,8 @@
     "sageFeature3Desc": "Posez des questions sur les récompenses, les cartes et les stratégies."
   },
   "paywall": {
-    "title": "Libérez Votre Plein Potentiel",
-    "subtitle": "Obtenez un accès illimité à toutes les fonctionnalités et maximisez vos récompenses",
+    "title": "Découvrez les récompenses que vous manquez",
+    "subtitle": "Recommandations illimitées, assistance IA et analyse de portefeuille",
     "monthly": "Mensuel",
     "annual": "Annuel",
     "month": "mois",

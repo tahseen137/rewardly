@@ -868,6 +868,28 @@ export async function createCheckoutSession(
 }
 
 /**
+ * Get the number of lifetime deal spots remaining (server-side enforced).
+ * Returns null if the count cannot be fetched.
+ */
+export async function getLifetimeSpotsRemaining(): Promise<number | null> {
+  try {
+    if (!isSupabaseConfigured() || !supabase) return null;
+
+    const { count, error } = await supabase
+      .from('subscriptions')
+      .select('*', { count: 'exact', head: true })
+      .eq('tier', 'lifetime');
+
+    if (error || count === null) return null;
+
+    const LIFETIME_LIMIT = 100;
+    return Math.max(0, LIFETIME_LIMIT - count);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Open Stripe Customer Portal for subscription management
  */
 export async function openCustomerPortal(): Promise<{ url: string } | { error: string }> {

@@ -1,14 +1,14 @@
 /* Rewardly Chrome Extension — Popup Styles */
-/* Brand colors: #7C3AED (purple-600), #5B21B6 (purple-800) */
+/* Brand colors: #1DDB82 (green), #0fa860 (green-dark) */
 
 :root {
-  --brand: #7C3AED;
-  --brand-light: #A78BFA;
-  --brand-dark: #5B21B6;
-  --bg: #0F0A1E;
-  --surface: #1A1130;
-  --surface-2: #241848;
-  --border: #2D2060;
+  --brand: #1DDB82;
+  --brand-light: #4AE99E;
+  --brand-dark: #0fa860;
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface-2: #1E1E1E;
+  --border: #2A2A2A;
   --text: #F5F3FF;
   --text-muted: #9CA3AF;
   --text-faint: #6B7280;
@@ -193,7 +193,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 9px 16px;
-  background: linear-gradient(90deg, rgba(124,58,237,0.12) 0%, rgba(124,58,237,0.05) 100%);
+  background: linear-gradient(90deg, rgba(29,219,130,0.12) 0%, rgba(29,219,130,0.05) 100%);
   border-bottom: 1px solid var(--border);
 }
 
@@ -244,12 +244,12 @@ body {
 }
 
 .rate-row.best {
-  background: linear-gradient(90deg, rgba(124,58,237,0.18) 0%, rgba(124,58,237,0.06) 100%);
+  background: linear-gradient(90deg, rgba(29,219,130,0.18) 0%, rgba(29,219,130,0.06) 100%);
   border-left: 3px solid var(--brand);
 }
 
 .rate-row.best:hover {
-  background: linear-gradient(90deg, rgba(124,58,237,0.25) 0%, rgba(124,58,237,0.10) 100%);
+  background: linear-gradient(90deg, rgba(29,219,130,0.25) 0%, rgba(29,219,130,0.10) 100%);
 }
 
 .rate-rank {

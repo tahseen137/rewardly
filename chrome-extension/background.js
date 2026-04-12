@@ -52,7 +52,7 @@ async function updateBadge(tabId, url) {
     const bestRate = getBestRate(merchant);
     if (bestRate) {
       chrome.action.setBadgeText({ text: `${bestRate}%`, tabId });
-      chrome.action.setBadgeBackgroundColor({ color: "#7C3AED", tabId });
+      chrome.action.setBadgeBackgroundColor({ color: "#1DDB82", tabId });
     }
   } catch (e) {
     // Silent fail

@@ -141,7 +141,7 @@
     "refreshError": "Error",
     "refreshErrorMessage": "Failed to refresh cards. Please check your connection.",
     "supabaseNotConfigured": "Database connection not configured. Using local data.",
-    "footerText": "Made with 💳 for smart spenders",
+    "footerText": "Made for the Canadian rewards community",
     "smartWallet": "SMART WALLET",
     "smartWalletEnabled": "Smart Wallet",
     "smartWalletDescription": "Get notified with the best card to use when you arrive at a store",
@@ -178,7 +178,7 @@
   },
   "auth": {
     "title": "Rewardly",
-    "subtitle": "Maximize your credit card rewards",
+    "subtitle": "Find the best card for every purchase",
     "emailPlaceholder": "Email address",
     "passwordPlaceholder": "Password",
     "confirmPasswordPlaceholder": "Confirm password",
@@ -233,7 +233,7 @@
     "allTab": "All Cards",
     "searchTab": "Search",
     "sageTitle": "Meet Sage",
-    "sageDescription": "Your AI-powered rewards assistant is ready to help you maximize every purchase.",
+    "sageDescription": "Sage, your AI rewards assistant, is ready to help you get the most from every purchase.",
     "sageValue": "Get instant answers to any rewards question",
     "sageFeature1Title": "Smart Recommendations",
     "sageFeature1Desc": "Get the best card for any purchase, instantly.",
@@ -243,8 +243,8 @@
     "sageFeature3Desc": "Ask questions about rewards, cards, and strategies."
   },
   "paywall": {
-    "title": "Unlock Your Full Potential",
-    "subtitle": "Get unlimited access to all features and maximize your rewards",
+    "title": "See Every Reward You're Missing",
+    "subtitle": "Unlimited recommendations, AI assistance, and wallet analysis",
     "monthly": "Monthly",
     "annual": "Annual",
     "month": "mo",

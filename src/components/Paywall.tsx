@@ -4,7 +4,7 @@
  * Monthly/Annual toggle with savings display
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -31,6 +31,7 @@ import {
   getAnnualSavings,
   setTier,
   createCheckoutSession,
+  getLifetimeSpotsRemaining,
 } from '../services/SubscriptionService';
 
 interface PaywallProps {
@@ -101,6 +102,12 @@ export default function Paywall({
     type: 'error' | 'info';
     text: string;
   } | null>(null);
+  const [lifetimeSpotsRemaining, setLifetimeSpotsRemaining] = useState<number | null>(null);
+
+  // Fetch live lifetime spots count
+  useEffect(() => {
+    getLifetimeSpotsRemaining().then(setLifetimeSpotsRemaining).catch(() => {});
+  }, []);
 
   // Show Pro, Max, and Lifetime tiers
   const tiers = [SUBSCRIPTION_TIERS.pro, SUBSCRIPTION_TIERS.max];
@@ -256,9 +263,9 @@ export default function Paywall({
           <View style={styles.heroIconContainer}>
             <Sparkles size={32} color={colors.primary.main} />
           </View>
-          <Text style={styles.heroTitle}>Unlock Premium</Text>
+          <Text style={styles.heroTitle}>See Every Reward You're Missing</Text>
           <Text style={styles.heroSubtitle}>
-            Get unlimited access to all features and maximize your rewards
+            Unlimited recommendations, AI assistance, and wallet analysis
           </Text>
         </View>
 
@@ -317,7 +324,7 @@ export default function Paywall({
             >
               <View style={styles.lifetimeBadgeRow}>
                 <View style={styles.lifetimeFireBadge}>
-                  <Text style={styles.lifetimeFireBadgeText}>🔥 EARLY ADOPTER SPECIAL</Text>
+                  <Text style={styles.lifetimeFireBadgeText}>EARLY ADOPTER PRICING</Text>
                 </View>
                 {isLifetimeSelected && (
                   <View style={styles.selectedIndicator}>
@@ -338,7 +345,7 @@ export default function Paywall({
 
               <View style={styles.lifetimeSavings}>
                 <Text style={styles.lifetimeSavingsText}>
-                  💰 Saves $155+/year vs Premium monthly
+                  Saves $105.89 in year one vs Max monthly ($12.99/mo x 12 = $155.88)
                 </Text>
               </View>
 
@@ -361,11 +368,13 @@ export default function Paywall({
                 </View>
               </View>
 
-              <View style={styles.lifetimeUrgency}>
-                <Text style={styles.lifetimeUrgencyText}>
-                  ⏳ Only available for first 100 users
-                </Text>
-              </View>
+              {lifetimeSpotsRemaining !== null && lifetimeSpotsRemaining > 0 && (
+                <View style={styles.lifetimeUrgency}>
+                  <Text style={styles.lifetimeUrgencyText}>
+                    {lifetimeSpotsRemaining} of 100 spots remaining
+                  </Text>
+                </View>
+              )}
             </LinearGradient>
           </TouchableOpacity>
 

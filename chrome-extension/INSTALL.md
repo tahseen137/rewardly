@@ -45,4 +45,4 @@ Replace placeholder icons in `icons/` with:
 - `icon48.png` (48×48)
 - `icon128.png` (128×128)
 
-Use the Rewardly brand color #7C3AED (purple).
+Use the Rewardly brand color #1DDB82 (green).
