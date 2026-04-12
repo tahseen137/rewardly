@@ -760,7 +760,10 @@ function Footer() {
           </View>
           <View style={styles.footerLinkColumn}>
             <Text style={styles.footerLinkHeader}>Legal</Text>
-            <TouchableOpacity onPress={() => Linking.openURL('/privacy-policy')} activeOpacity={0.7}>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('/privacy-policy')}
+              activeOpacity={0.7}
+            >
               <Text style={[styles.footerLink, styles.footerLinkClickable]}>Privacy Policy</Text>
             </TouchableOpacity>
             <Text style={styles.footerLink}>Terms of Service</Text>
