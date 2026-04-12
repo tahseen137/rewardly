@@ -1,6 +1,6 @@
 /**
  * StatementStorageService - Local + Cloud Storage for Statements
- * 
+ *
  * Features:
  * - AsyncStorage for local-only users
  * - Optional Supabase sync for authenticated users
@@ -14,7 +14,6 @@ import {
   StatementUpload,
   StatementWithTransactions,
   ParsedTransaction,
-  SupportedBank,
   TransactionFilter,
   Result,
   success,
@@ -155,12 +154,10 @@ export async function getStatementById(
 ): Promise<StatementWithTransactions | null> {
   if (!isInitialized) await initializeStatementStorage();
 
-  const statement = statementsCache.find(s => s.id === statementId);
+  const statement = statementsCache.find((s) => s.id === statementId);
   if (!statement) return null;
 
-  const transactions = transactionsCache.filter(
-    t => t.id.startsWith(statementId)
-  );
+  const transactions = transactionsCache.filter((t) => t.id.startsWith(statementId));
 
   return {
     ...statement,
@@ -171,16 +168,12 @@ export async function getStatementById(
 /**
  * Delete a statement and its transactions
  */
-export async function deleteStatement(
-  statementId: string
-): Promise<void> {
+export async function deleteStatement(statementId: string): Promise<void> {
   if (!isInitialized) await initializeStatementStorage();
 
   // Remove from cache
-  statementsCache = statementsCache.filter(s => s.id !== statementId);
-  transactionsCache = transactionsCache.filter(
-    t => !t.id.startsWith(statementId)
-  );
+  statementsCache = statementsCache.filter((s) => s.id !== statementId);
+  transactionsCache = transactionsCache.filter((t) => !t.id.startsWith(statementId));
 
   // Persist locally
   await persistToStorage();
@@ -189,10 +182,7 @@ export async function deleteStatement(
   if (isSupabaseConfigured()) {
     const user = await getCurrentUser();
     if (user && supabase) {
-      await supabase
-        .from('statement_uploads')
-        .delete()
-        .eq('id', statementId);
+      await supabase.from('statement_uploads').delete().eq('id', statementId);
     }
   }
 }
@@ -204,9 +194,7 @@ export async function deleteStatement(
 /**
  * Get all transactions with optional filtering
  */
-export async function getTransactions(
-  filter?: TransactionFilter
-): Promise<ParsedTransaction[]> {
+export async function getTransactions(filter?: TransactionFilter): Promise<ParsedTransaction[]> {
   if (!isInitialized) await initializeStatementStorage();
 
   let filtered = [...transactionsCache];
@@ -215,39 +203,33 @@ export async function getTransactions(
     // Date range filter
     if (filter.dateRange) {
       filtered = filtered.filter(
-        t =>
-          t.date >= filter.dateRange!.start &&
-          t.date <= filter.dateRange!.end
+        (t) => t.date >= filter.dateRange!.start && t.date <= filter.dateRange!.end
       );
     }
 
     // Category filter
     if (filter.categories && filter.categories.length > 0) {
-      filtered = filtered.filter(t =>
-        filter.categories!.includes(t.category)
-      );
+      filtered = filtered.filter((t) => filter.categories!.includes(t.category));
     }
 
     // Bank filter
     if (filter.banks && filter.banks.length > 0) {
-      filtered = filtered.filter(t =>
-        filter.banks!.includes(t.sourceBank)
-      );
+      filtered = filtered.filter((t) => filter.banks!.includes(t.sourceBank));
     }
 
     // Amount range filter
     if (filter.minAmount !== undefined) {
-      filtered = filtered.filter(t => t.amount >= filter.minAmount!);
+      filtered = filtered.filter((t) => t.amount >= filter.minAmount!);
     }
     if (filter.maxAmount !== undefined) {
-      filtered = filtered.filter(t => t.amount <= filter.maxAmount!);
+      filtered = filtered.filter((t) => t.amount <= filter.maxAmount!);
     }
 
     // Search term filter
     if (filter.searchTerm) {
       const term = filter.searchTerm.toLowerCase();
       filtered = filtered.filter(
-        t =>
+        (t) =>
           t.description.toLowerCase().includes(term) ||
           t.normalizedMerchant.toLowerCase().includes(term)
       );
@@ -255,7 +237,7 @@ export async function getTransactions(
 
     // Exclude credits filter
     if (filter.excludeCredits) {
-      filtered = filtered.filter(t => !t.isCredit);
+      filtered = filtered.filter((t) => !t.isCredit);
     }
   }
 
@@ -271,7 +253,7 @@ export async function updateTransactionCategory(
 ): Promise<void> {
   if (!isInitialized) await initializeStatementStorage();
 
-  const tx = transactionsCache.find(t => t.id === transactionId);
+  const tx = transactionsCache.find((t) => t.id === transactionId);
   if (!tx) return;
 
   tx.category = newCategory;
@@ -297,10 +279,7 @@ export async function updateTransactionCategory(
 /**
  * Get total spend for a date range
  */
-export async function getTotalSpend(
-  startDate: Date,
-  endDate: Date
-): Promise<number> {
+export async function getTotalSpend(startDate: Date, endDate: Date): Promise<number> {
   const transactions = await getTransactions({
     dateRange: { start: startDate, end: endDate },
     excludeCredits: true,
@@ -315,7 +294,7 @@ export async function getTotalSpend(
 
 async function persistToStorage(): Promise<void> {
   const statementsJson = JSON.stringify(
-    statementsCache.map(s => ({
+    statementsCache.map((s) => ({
       ...s,
       uploadDate: s.uploadDate.toISOString(),
       periodStart: s.periodStart.toISOString(),
@@ -324,7 +303,7 @@ async function persistToStorage(): Promise<void> {
   );
 
   const transactionsJson = JSON.stringify(
-    transactionsCache.map(t => ({
+    transactionsCache.map((t) => ({
       ...t,
       date: t.date.toISOString(),
     }))
@@ -409,7 +388,7 @@ async function syncToSupabase(
   } as any);
 
   // Save transactions
-  const txRows = transactions.map(t => ({
+  const txRows = transactions.map((t) => ({
     id: t.id,
     user_id: user.id,
     statement_id: statement.id,

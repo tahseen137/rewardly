@@ -148,7 +148,7 @@ function buildReportPayload(
   totalMissed: number,
   cards: BestWorstCards,
   categoryBreakdown: CategoryBreakdown[],
-  optimizationScore: number,
+  optimizationScore: number
 ) {
   return {
     user_id: userId,
@@ -182,8 +182,9 @@ export async function generateMonthlyReport(month: Date): Promise<SavingsReport 
     const endDate = new Date(reportMonth.getFullYear(), reportMonth.getMonth() + 1, 1);
 
     // Fetch spending log for the month
-    const { data: spendingData, error: spendingError } = await (supabase
-      .from('spending_log') as any)
+    const { data: spendingData, error: spendingError } = await (
+      supabase.from('spending_log') as any
+    )
       .select('*')
       .eq('user_id', userId)
       .gte('transaction_date', reportMonth.toISOString())
@@ -209,13 +210,19 @@ export async function generateMonthlyReport(month: Date): Promise<SavingsReport 
         : 100;
     const categoryBreakdown = Object.values(categoryData);
     const payload = buildReportPayload(
-      userId, reportMonth, totalSpend, totalEarned, totalMissed,
-      cards, categoryBreakdown, optimizationScore,
+      userId,
+      reportMonth,
+      totalSpend,
+      totalEarned,
+      totalMissed,
+      cards,
+      categoryBreakdown,
+      optimizationScore
     );
 
     // Upsert: try insert, fall back to update on duplicate month
-    let { data: reportData, error: reportError } = await (supabase
-      .from('savings_reports') as any)
+    // eslint-disable-next-line prefer-const
+    let { data: reportData, error: reportError } = await (supabase.from('savings_reports') as any)
       .insert(payload)
       .select()
       .single();
@@ -223,8 +230,7 @@ export async function generateMonthlyReport(month: Date): Promise<SavingsReport 
     if (reportError) {
       if (reportError.code === '23505') {
         // Unique constraint violation — update existing record
-        const { data: existingData } = await (supabase
-          .from('savings_reports') as any)
+        const { data: existingData } = await (supabase.from('savings_reports') as any)
           .update({ ...payload, generated_at: new Date().toISOString() })
           .eq('user_id', userId)
           .eq('report_month', reportMonth.toISOString())
@@ -239,7 +245,6 @@ export async function generateMonthlyReport(month: Date): Promise<SavingsReport 
     }
 
     return rowToReport(reportData as Record<string, unknown>);
-
   } catch (error) {
     console.error('Failed to generate monthly report:', error);
     return null;
@@ -256,8 +261,7 @@ export async function getReport(reportId: string): Promise<SavingsReport | null>
     const user = await supabase.auth.getUser();
     if (!user.data.user) return null;
 
-    const { data, error } = await (supabase
-      .from('savings_reports') as any)
+    const { data, error } = await (supabase.from('savings_reports') as any)
       .select('*')
       .eq('id', reportId)
       .eq('user_id', user.data.user.id)
@@ -278,8 +282,7 @@ export async function getRecentReports(limit: number = 6): Promise<SavingsReport
     const user = await supabase.auth.getUser();
     if (!user.data.user) return [];
 
-    const { data, error } = await (supabase
-      .from('savings_reports') as any)
+    const { data, error } = await (supabase.from('savings_reports') as any)
       .select('*')
       .eq('user_id', user.data.user.id)
       .order('report_month', { ascending: false })
@@ -315,9 +318,7 @@ export function formatReportForSharing(report: SavingsReport): ShareableReportDa
   // Find top category by spend
   const topCategory =
     report.categoryBreakdown.length > 0
-      ? report.categoryBreakdown.reduce((max, cat) =>
-          cat.spend > max.spend ? cat : max
-        ).category
+      ? report.categoryBreakdown.reduce((max, cat) => (cat.spend > max.spend ? cat : max)).category
       : 'none';
 
   return {

@@ -4,7 +4,7 @@
  * Built for viral sharing potential
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -20,15 +20,30 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-  withSpring,
   withDelay,
-  interpolate,
   Easing,
   FadeInDown,
   FadeInUp,
 } from 'react-native-reanimated';
-import Svg, { Circle, Defs, LinearGradient as SvgGradient, Stop, G, Text as SvgText } from 'react-native-svg';
-import { Share2, TrendingUp, TrendingDown, Minus, Zap, Target, Navigation, ChevronRight, Award, Trophy } from 'lucide-react-native';
+import Svg, {
+  Circle,
+  Defs,
+  LinearGradient as SvgGradient,
+  Stop,
+  Text as _SvgText,
+} from 'react-native-svg';
+import {
+  Share2,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Zap,
+  Target,
+  Navigation,
+  ChevronRight,
+  Award,
+  Trophy,
+} from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 
 import { colors } from '../theme/colors';
@@ -52,11 +67,11 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 function ScoreGauge({ score, size = 220 }: ScoreGaugeProps) {
   const progress = useSharedValue(0);
   const displayScore = useSharedValue(0);
-  
+
   const strokeWidth = 12;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  
+
   useEffect(() => {
     progress.value = withDelay(
       300,
@@ -65,33 +80,33 @@ function ScoreGauge({ score, size = 220 }: ScoreGaugeProps) {
         easing: Easing.out(Easing.cubic),
       })
     );
-    
+
     // Animate the display score number
     const interval = setInterval(() => {
       displayScore.value = Math.min(displayScore.value + 1, score);
     }, 20);
-    
+
     setTimeout(() => clearInterval(interval), 2000);
-    
+
     return () => clearInterval(interval);
   }, [score]);
-  
+
   const animatedStrokeStyle = useAnimatedStyle(() => {
     const strokeDashoffset = circumference * (1 - progress.value);
     return {
       strokeDashoffset,
-    };
+    } as any;
   });
-  
+
   // Determine color based on score
-  const getScoreColor = () => {
+  const _getScoreColor = () => {
     if (score >= 80) return colors.primary.main;
     if (score >= 60) return colors.warning.main;
     return colors.error.main;
   };
-  
+
   const [displayValue, setDisplayValue] = useState(0);
-  
+
   useEffect(() => {
     let current = 0;
     const interval = setInterval(() => {
@@ -106,10 +121,10 @@ function ScoreGauge({ score, size = 220 }: ScoreGaugeProps) {
         setDisplayValue(current);
       }
     }, 20);
-    
+
     return () => clearInterval(interval);
   }, [score]);
-  
+
   return (
     <View style={[styles.gaugeContainer, { width: size, height: size }]}>
       <Svg width={size} height={size} style={styles.gaugeSvg}>
@@ -119,7 +134,7 @@ function ScoreGauge({ score, size = 220 }: ScoreGaugeProps) {
             <Stop offset="100%" stopColor={colors.accent.main} />
           </SvgGradient>
         </Defs>
-        
+
         {/* Background Circle */}
         <Circle
           cx={size / 2}
@@ -129,7 +144,7 @@ function ScoreGauge({ score, size = 220 }: ScoreGaugeProps) {
           strokeWidth={strokeWidth}
           fill="transparent"
         />
-        
+
         {/* Progress Circle */}
         <AnimatedCircle
           cx={size / 2}
@@ -141,10 +156,10 @@ function ScoreGauge({ score, size = 220 }: ScoreGaugeProps) {
           strokeDasharray={circumference}
           strokeLinecap="round"
           transform={`rotate(-90, ${size / 2}, ${size / 2})`}
-          style={animatedStrokeStyle}
+          {...({ style: animatedStrokeStyle } as any)}
         />
       </Svg>
-      
+
       {/* Center Content */}
       <View style={styles.gaugeCenter}>
         <Text style={styles.gaugeScore}>{displayValue}</Text>
@@ -172,16 +187,14 @@ function ScoreComponent({ label, score, icon, weight, index }: ScoreComponentPro
     if (score >= 60) return colors.warning.main;
     return colors.error.main;
   };
-  
+
   return (
     <Animated.View
       entering={FadeInDown.delay(400 + index * 100).duration(400)}
       style={styles.componentCard}
     >
       <View style={styles.componentLeft}>
-        <View style={[styles.componentIcon, { backgroundColor: getColor() + '20' }]}>
-          {icon}
-        </View>
+        <View style={[styles.componentIcon, { backgroundColor: getColor() + '20' }]}>{icon}</View>
         <View>
           <Text style={styles.componentLabel}>{label}</Text>
           <Text style={styles.componentWeight}>{weight}</Text>
@@ -191,10 +204,7 @@ function ScoreComponent({ label, score, icon, weight, index }: ScoreComponentPro
         <Text style={[styles.componentScore, { color: getColor() }]}>{score}</Text>
         <View style={styles.componentBar}>
           <View
-            style={[
-              styles.componentBarFill,
-              { width: `${score}%`, backgroundColor: getColor() },
-            ]}
+            style={[styles.componentBarFill, { width: `${score}%`, backgroundColor: getColor() }]}
           />
         </View>
       </View>
@@ -210,13 +220,10 @@ export default function RewardsIQScreen() {
   const [scoreData, setScoreData] = useState<RewardsIQScore | null>(null);
   const [shareStats, setShareStats] = useState<ShareableStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const loadData = useCallback(async () => {
     try {
-      const [score, stats] = await Promise.all([
-        calculateRewardsIQ(),
-        getShareableStats(),
-      ]);
+      const [score, stats] = await Promise.all([calculateRewardsIQ(), getShareableStats()]);
       setScoreData(score);
       setShareStats(stats);
     } catch (e) {
@@ -225,18 +232,18 @@ export default function RewardsIQScreen() {
       setIsLoading(false);
     }
   }, []);
-  
+
   useEffect(() => {
     loadData();
   }, [loadData]);
-  
+
   const handleShare = async () => {
     if (!shareStats) return;
-    
+
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-    
+
     try {
       await Share.share({
         message: shareStats.shareText,
@@ -246,7 +253,7 @@ export default function RewardsIQScreen() {
       console.error('Share failed:', e);
     }
   };
-  
+
   if (isLoading || !scoreData) {
     return (
       <View style={styles.loadingContainer}>
@@ -256,50 +263,35 @@ export default function RewardsIQScreen() {
       </View>
     );
   }
-  
-  const TrendIcon = scoreData.trend === 'up' 
-    ? TrendingUp 
-    : scoreData.trend === 'down' 
-      ? TrendingDown 
-      : Minus;
-  
-  const trendColor = scoreData.trend === 'up'
-    ? colors.primary.main
-    : scoreData.trend === 'down'
-      ? colors.error.main
-      : colors.text.tertiary;
-  
+
+  const TrendIcon =
+    scoreData.trend === 'up' ? TrendingUp : scoreData.trend === 'down' ? TrendingDown : Minus;
+
+  const trendColor =
+    scoreData.trend === 'up'
+      ? colors.primary.main
+      : scoreData.trend === 'down'
+        ? colors.error.main
+        : colors.text.tertiary;
+
   return (
-    <ScrollView 
-      style={styles.container}
-      contentContainerStyle={styles.content}
-    >
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Header */}
-      <Animated.View 
-        entering={FadeInDown.duration(500)}
-        style={styles.header}
-      >
+      <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
         <Text style={styles.headerTitle}>Your Rewards IQ</Text>
-        <Text style={styles.headerSubtitle}>
-          See how well you're optimizing your rewards
-        </Text>
+        <Text style={styles.headerSubtitle}>See how well you're optimizing your rewards</Text>
       </Animated.View>
-      
+
       {/* Score Gauge */}
-      <Animated.View 
-        entering={FadeInDown.delay(100).duration(600)}
-        style={styles.gaugeSection}
-      >
+      <Animated.View entering={FadeInDown.delay(100).duration(600)} style={styles.gaugeSection}>
         <ScoreGauge score={scoreData.overallScore} />
-        
+
         {/* Percentile Badge */}
         <View style={styles.percentileBadge}>
           <Trophy size={14} color={colors.warning.main} />
-          <Text style={styles.percentileText}>
-            Top {100 - scoreData.percentile}% of users
-          </Text>
+          <Text style={styles.percentileText}>Top {100 - scoreData.percentile}% of users</Text>
         </View>
-        
+
         {/* Trend Indicator */}
         {scoreData.previousScore !== undefined && (
           <View style={styles.trendContainer}>
@@ -311,11 +303,11 @@ export default function RewardsIQScreen() {
           </View>
         )}
       </Animated.View>
-      
+
       {/* Score Breakdown */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Score Breakdown</Text>
-        
+
         <ScoreComponent
           label="Card Usage"
           score={scoreData.optimalCardUsageScore}
@@ -323,7 +315,7 @@ export default function RewardsIQScreen() {
           weight="60% weight"
           index={0}
         />
-        
+
         <ScoreComponent
           label="Portfolio"
           score={scoreData.portfolioOptimizationScore}
@@ -331,7 +323,7 @@ export default function RewardsIQScreen() {
           weight="25% weight"
           index={1}
         />
-        
+
         <ScoreComponent
           label="Smart Wallet"
           score={scoreData.autoPilotScore}
@@ -340,14 +332,11 @@ export default function RewardsIQScreen() {
           index={2}
         />
       </View>
-      
+
       {/* Tips to Improve */}
-      <Animated.View 
-        entering={FadeInUp.delay(700).duration(400)}
-        style={styles.tipsSection}
-      >
+      <Animated.View entering={FadeInUp.delay(700).duration(400)} style={styles.tipsSection}>
         <Text style={styles.sectionTitle}>Boost Your Score</Text>
-        
+
         {scoreData.optimalCardUsageScore < 80 && (
           <View style={styles.tipCard}>
             <View style={styles.tipIcon}>
@@ -362,7 +351,7 @@ export default function RewardsIQScreen() {
             <ChevronRight size={20} color={colors.text.tertiary} />
           </View>
         )}
-        
+
         {scoreData.portfolioOptimizationScore < 80 && (
           <View style={styles.tipCard}>
             <View style={styles.tipIcon}>
@@ -370,14 +359,12 @@ export default function RewardsIQScreen() {
             </View>
             <View style={styles.tipContent}>
               <Text style={styles.tipTitle}>Optimize your card portfolio</Text>
-              <Text style={styles.tipText}>
-                See which cards could earn you more
-              </Text>
+              <Text style={styles.tipText}>See which cards could earn you more</Text>
             </View>
             <ChevronRight size={20} color={colors.text.tertiary} />
           </View>
         )}
-        
+
         {scoreData.autoPilotScore === 0 && (
           <View style={styles.tipCard}>
             <View style={styles.tipIcon}>
@@ -393,12 +380,9 @@ export default function RewardsIQScreen() {
           </View>
         )}
       </Animated.View>
-      
+
       {/* Share Button */}
-      <Animated.View 
-        entering={FadeInUp.delay(800).duration(400)}
-        style={styles.shareSection}
-      >
+      <Animated.View entering={FadeInUp.delay(800).duration(400)} style={styles.shareSection}>
         <TouchableOpacity onPress={handleShare} activeOpacity={0.9}>
           <LinearGradient
             colors={[colors.accent.main, colors.accent.dark]}
@@ -410,12 +394,10 @@ export default function RewardsIQScreen() {
             <Text style={styles.shareButtonText}>Share My Score</Text>
           </LinearGradient>
         </TouchableOpacity>
-        
-        <Text style={styles.shareHint}>
-          Show off your rewards optimization skills 🎯
-        </Text>
+
+        <Text style={styles.shareHint}>Show off your rewards optimization skills 🎯</Text>
       </Animated.View>
-      
+
       {/* Bottom padding */}
       <View style={{ height: 100 }} />
     </ScrollView>
@@ -453,7 +435,7 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     fontSize: 16,
   },
-  
+
   // Header
   header: {
     alignItems: 'center',
@@ -469,7 +451,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text.secondary,
   },
-  
+
   // Gauge
   gaugeSection: {
     alignItems: 'center',
@@ -521,7 +503,7 @@ const styles = StyleSheet.create({
   trendText: {
     fontSize: 13,
   },
-  
+
   // Section
   section: {
     marginBottom: 24,
@@ -532,7 +514,7 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     marginBottom: 16,
   },
-  
+
   // Score Components
   componentCard: {
     flexDirection: 'row',
@@ -586,7 +568,7 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 2,
   },
-  
+
   // Tips
   tipsSection: {
     marginBottom: 24,
@@ -624,7 +606,7 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     lineHeight: 16,
   },
-  
+
   // Share
   shareSection: {
     alignItems: 'center',

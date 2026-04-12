@@ -7,6 +7,7 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { isUuid, requireEnv, sanitizeFilterInput } from '../_shared/helpers.ts';
 
 // ============================================================================
 // Types
@@ -71,8 +72,14 @@ interface CardRecommendation {
 const AI_PROVIDER = Deno.env.get('AI_PROVIDER') || 'anthropic'; // 'anthropic' or 'openai'
 const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const SUPABASE_URL = requireEnv('SUPABASE_URL');
+const SUPABASE_SERVICE_ROLE_KEY = requireEnv('SUPABASE_SERVICE_ROLE_KEY');
+
+// At least one AI provider key is required — verified at request time so
+// tests/local tooling can still import this module without both keys set.
+if (!ANTHROPIC_API_KEY && !OPENAI_API_KEY) {
+  console.warn('[sage-chat] Neither ANTHROPIC_API_KEY nor OPENAI_API_KEY is set — function will fail at request time.');
+}
 
 // Models
 const ANTHROPIC_MODEL = 'claude-sonnet-4-5-20241022';
@@ -224,14 +231,18 @@ async function executeTool(
     switch (toolName) {
       case 'lookup_card': {
         const { cardName } = toolInput as { cardName: string };
+        const safeName = sanitizeFilterInput(cardName || '');
+        if (!safeName) {
+          return `Invalid card name. Please provide a specific card name.`;
+        }
         const { data: cards, error } = await supabase
           .from('cards')
           .select('*, category_rewards(*)')
-          .ilike('name', `%${cardName}%`)
+          .ilike('name', `%${safeName}%`)
           .limit(3);
-        
+
         if (error || !cards?.length) {
-          return `Could not find card matching "${cardName}". Try a more specific name.`;
+          return `Could not find card matching "${safeName}". Try a more specific name.`;
         }
         
         return cards.map(c => 
@@ -245,10 +256,15 @@ async function executeTool(
 
       case 'compare_cards': {
         const { card1, card2, category } = toolInput as { card1: string; card2: string; category?: string };
+        const safe1 = sanitizeFilterInput(card1 || '');
+        const safe2 = sanitizeFilterInput(card2 || '');
+        if (!safe1 || !safe2) {
+          return 'Invalid card names for comparison.';
+        }
         const { data: cards } = await supabase
           .from('cards')
           .select('*, category_rewards(*)')
-          .or(`name.ilike.%${card1}%,name.ilike.%${card2}%`)
+          .or(`name.ilike.%${safe1}%,name.ilike.%${safe2}%`)
           .limit(2);
         
         if (!cards || cards.length < 2) {
@@ -303,15 +319,19 @@ async function executeTool(
           redemptionType?: string 
         };
         
+        const safeProgram = sanitizeFilterInput(program || '');
+        if (!safeProgram) {
+          return 'Invalid program name.';
+        }
         // Get program valuations from database
         const { data: programData } = await supabase
           .from('reward_programs')
           .select('*, point_valuations(*)')
-          .ilike('program_name', `%${program}%`)
+          .ilike('program_name', `%${safeProgram}%`)
           .single();
-        
+
         if (!programData) {
-          return `Could not find valuation data for ${program}.`;
+          return `Could not find valuation data for ${safeProgram}.`;
         }
         
         const directValue = (programData.direct_rate_cents || 1) * points / 100;
@@ -510,32 +530,102 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { 
-      message, 
-      userId, 
+    // Verify the caller via Supabase auth. The service-role client is used
+    // downstream for writes, so the user identity MUST come from a verified
+    // JWT — never from the request body.
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Missing Authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const token = authHeader.replace('Bearer ', '');
+
+    // Initialize Supabase client with service role for DB writes. Auth
+    // verification happens via the admin client's auth API using the JWT.
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const userId = user.id;
+
+    const {
+      message,
       conversationId: existingConversationId,
       portfolio = [],
       preferences = { rewardType: 'points', newCardSuggestionsEnabled: true },
       pointBalances = {}
     }: ChatRequest = await req.json();
 
-    // Validate input
+    // Validate message
     if (!message?.trim()) {
       return new Response(
         JSON.stringify({ error: 'Message is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    if (!userId) {
+    if (message.length > 4000) {
       return new Response(
-        JSON.stringify({ error: 'User ID is required' }),
+        JSON.stringify({ error: 'Message too long (max 4000 characters)' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Initialize Supabase client
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    // Validate conversationId shape if provided — prevents garbage UUIDs
+    // from being passed into Postgres queries.
+    if (existingConversationId && !isUuid(existingConversationId)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid conversationId' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate portfolio shape — must be an array with well-formed entries.
+    if (!Array.isArray(portfolio)) {
+      return new Response(
+        JSON.stringify({ error: 'portfolio must be an array' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const portfolioValid = portfolio.every(
+      (card) =>
+        card &&
+        typeof card === 'object' &&
+        typeof card.id === 'string' &&
+        typeof card.name === 'string' &&
+        typeof card.issuer === 'string'
+    );
+    if (!portfolioValid) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid portfolio entry' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate pointBalances — must be a plain object of finite non-negative numbers.
+    if (pointBalances && typeof pointBalances === 'object') {
+      for (const [prog, bal] of Object.entries(pointBalances)) {
+        if (typeof bal !== 'number' || !Number.isFinite(bal) || bal < 0) {
+          return new Response(
+            JSON.stringify({ error: `Invalid point balance for ${prog}` }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+    }
+
+    // Validate preferences — must be a plain object.
+    if (preferences && typeof preferences !== 'object') {
+      return new Response(
+        JSON.stringify({ error: 'preferences must be an object' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Get or create conversation
     let conversationId = existingConversationId;

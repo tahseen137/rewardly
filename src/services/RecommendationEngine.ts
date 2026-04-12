@@ -18,11 +18,10 @@ import {
   success,
   failure,
   RecommendationError,
-  Store,
 } from '../types';
 import { getAllCardsSync, getCardByIdSync } from './CardDataService';
 import { findStore } from './StoreDataService';
-import { searchProduct, ProductSearchResult } from './ProductService';
+import { searchProduct } from './ProductService';
 
 /**
  * Get the reward rate for a card in a specific category

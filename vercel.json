@@ -14,6 +14,10 @@
       "destination": "/ceo-queue.html"
     },
     {
+      "source": "/privacy-policy",
+      "destination": "/privacy-policy.html"
+    },
+    {
       "source": "/((?!admin|ceo-queue|api/).*)",
       "destination": "/index.html"
     }

@@ -11,7 +11,6 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  Linking,
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -22,14 +21,12 @@ import Animated, {
   useSharedValue,
   withSpring,
   withDelay,
-  withTiming,
 } from 'react-native-reanimated';
 import {
   ArrowRight,
   TrendingUp,
   CreditCard,
   ChevronRight,
-  CheckCircle,
   PlusCircle,
   MinusCircle,
   DollarSign,
@@ -39,7 +36,7 @@ import * as Haptics from 'expo-haptics';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
-import { Card, SpendingCategory } from '../types';
+import { Card } from '../types';
 import { PortfolioOptimization, CategoryOptimization } from '../types/rewards-iq';
 import { getPortfolioOptimization } from '../services/RewardsIQService';
 import { CATEGORY_INFO } from '../services/MockTransactionData';
@@ -56,7 +53,7 @@ interface MoneyCounterProps {
 
 function MoneyCounter({ value, style, duration = 1500 }: MoneyCounterProps) {
   const [displayValue, setDisplayValue] = useState(0);
-  
+
   useEffect(() => {
     const startTime = Date.now();
     const interval = setInterval(() => {
@@ -64,16 +61,16 @@ function MoneyCounter({ value, style, duration = 1500 }: MoneyCounterProps) {
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setDisplayValue(Math.round(value * eased));
-      
+
       if (progress >= 1) {
         clearInterval(interval);
         setDisplayValue(value);
       }
     }, 16);
-    
+
     return () => clearInterval(interval);
   }, [value, duration]);
-  
+
   return <Text style={style}>${displayValue.toLocaleString()}</Text>;
 }
 
@@ -93,10 +90,7 @@ function ComparisonCard({ label, amount, isCurrent, cards, delay }: ComparisonCa
   return (
     <Animated.View
       entering={FadeInDown.delay(delay).duration(400)}
-      style={[
-        styles.comparisonCard,
-        !isCurrent && styles.comparisonCardRecommended,
-      ]}
+      style={[styles.comparisonCard, !isCurrent && styles.comparisonCardRecommended]}
     >
       {!isCurrent && (
         <View style={styles.recommendedBadge}>
@@ -104,21 +98,18 @@ function ComparisonCard({ label, amount, isCurrent, cards, delay }: ComparisonCa
           <Text style={styles.recommendedText}>Recommended</Text>
         </View>
       )}
-      
+
       <Text style={styles.comparisonLabel}>{label}</Text>
-      
+
       <MoneyCounter
         value={amount}
-        style={[
-          styles.comparisonAmount,
-          !isCurrent && styles.comparisonAmountRecommended,
-        ]}
+        style={[styles.comparisonAmount, !isCurrent && styles.comparisonAmountRecommended]}
       />
-      
+
       <Text style={styles.comparisonPeriod}>/year</Text>
-      
+
       <View style={styles.cardsList}>
-        {cards.slice(0, 3).map((card, index) => (
+        {cards.slice(0, 3).map((card, _index) => (
           <View key={card.id} style={styles.cardChip}>
             <CreditCard size={12} color={colors.text.secondary} />
             <Text style={styles.cardChipText} numberOfLines={1}>
@@ -143,7 +134,7 @@ interface CategoryRowProps {
 function CategoryRow({ opt, index }: CategoryRowProps) {
   const info = CATEGORY_INFO[opt.category];
   const hasGain = opt.annualGain > 0;
-  
+
   return (
     <Animated.View
       entering={FadeInDown.delay(400 + index * 80).duration(300)}
@@ -155,30 +146,19 @@ function CategoryRow({ opt, index }: CategoryRowProps) {
         </View>
         <View style={styles.categoryInfo}>
           <Text style={styles.categoryLabel}>{info.label}</Text>
-          <Text style={styles.categorySpend}>
-            ${opt.monthlySpend.toLocaleString()}/mo
-          </Text>
+          <Text style={styles.categorySpend}>${opt.monthlySpend.toLocaleString()}/mo</Text>
         </View>
       </View>
-      
+
       <View style={styles.categoryRight}>
         <View style={styles.rewardsComparison}>
-          <Text style={styles.currentReward}>
-            ${opt.currentMonthlyRewards.toFixed(2)}
-          </Text>
+          <Text style={styles.currentReward}>${opt.currentMonthlyRewards.toFixed(2)}</Text>
           <ArrowRight size={12} color={colors.text.tertiary} />
-          <Text style={[
-            styles.recommendedReward,
-            hasGain && styles.gainText,
-          ]}>
+          <Text style={[styles.recommendedReward, hasGain && styles.gainText]}>
             ${opt.recommendedMonthlyRewards.toFixed(2)}
           </Text>
         </View>
-        {hasGain && (
-          <Text style={styles.annualGain}>
-            +${opt.annualGain.toFixed(0)}/yr
-          </Text>
-        )}
+        {hasGain && <Text style={styles.annualGain}>+${opt.annualGain.toFixed(0)}/yr</Text>}
       </View>
     </Animated.View>
   );
@@ -198,7 +178,7 @@ function CardChangeItem({ card, type, index }: CardChangeProps) {
   const isAdd = type === 'add';
   const Icon = isAdd ? PlusCircle : MinusCircle;
   const color = isAdd ? colors.primary.main : colors.error.main;
-  
+
   return (
     <Animated.View
       entering={FadeInUp.delay(500 + index * 100).duration(300)}
@@ -226,14 +206,14 @@ export default function PortfolioOptimizerScreen() {
   const [optimization, setOptimization] = useState<PortfolioOptimization | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+
   const gainScale = useSharedValue(1);
-  
+
   const loadData = useCallback(async () => {
     try {
       const data = await getPortfolioOptimization();
       setOptimization(data);
-      
+
       // Pulse animation for the gain
       gainScale.value = withDelay(
         1500,
@@ -241,7 +221,7 @@ export default function PortfolioOptimizerScreen() {
           gainScale.value = withSpring(1);
         })
       );
-      
+
       if (Platform.OS !== 'web' && data.annualGain > 0) {
         setTimeout(() => {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -254,20 +234,20 @@ export default function PortfolioOptimizerScreen() {
       setIsRefreshing(false);
     }
   }, []);
-  
+
   useEffect(() => {
     loadData();
   }, [loadData]);
-  
+
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
     loadData();
   }, [loadData]);
-  
+
   const gainStyle = useAnimatedStyle(() => ({
     transform: [{ scale: gainScale.value }],
   }));
-  
+
   if (isLoading || !optimization) {
     return (
       <View style={styles.loadingContainer}>
@@ -275,9 +255,9 @@ export default function PortfolioOptimizerScreen() {
       </View>
     );
   }
-  
+
   const hasGain = optimization.annualGain > 0;
-  
+
   return (
     <ScrollView
       style={styles.container}
@@ -291,16 +271,11 @@ export default function PortfolioOptimizerScreen() {
       }
     >
       {/* Header */}
-      <Animated.View
-        entering={FadeInDown.duration(400)}
-        style={styles.header}
-      >
+      <Animated.View entering={FadeInDown.duration(400)} style={styles.header}>
         <Text style={styles.headerTitle}>Portfolio Optimizer</Text>
-        <Text style={styles.headerSubtitle}>
-          See how much more you could be earning
-        </Text>
+        <Text style={styles.headerSubtitle}>See how much more you could be earning</Text>
       </Animated.View>
-      
+
       {/* Comparison Section */}
       <View style={styles.comparisonSection}>
         <ComparisonCard
@@ -310,18 +285,15 @@ export default function PortfolioOptimizerScreen() {
           cards={optimization.currentSetup.cards}
           delay={100}
         />
-        
-        <Animated.View
-          entering={FadeInDown.delay(200).duration(400)}
-          style={styles.arrowContainer}
-        >
+
+        <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.arrowContainer}>
           <View style={styles.arrowLine} />
           <View style={styles.arrowCircle}>
             <TrendingUp size={20} color={colors.primary.main} />
           </View>
           <View style={styles.arrowLine} />
         </Animated.View>
-        
+
         <ComparisonCard
           label="Recommended Setup"
           amount={optimization.recommendedSetup.annualRewards}
@@ -330,13 +302,10 @@ export default function PortfolioOptimizerScreen() {
           delay={300}
         />
       </View>
-      
+
       {/* Annual Gain Highlight */}
       {hasGain && (
-        <Animated.View
-          entering={FadeInDown.delay(400).duration(500)}
-          style={[gainStyle]}
-        >
+        <Animated.View entering={FadeInDown.delay(400).duration(500)} style={[gainStyle]}>
           <LinearGradient
             colors={[colors.primary.main + '20', colors.primary.main + '05']}
             style={styles.gainCard}
@@ -353,72 +322,54 @@ export default function PortfolioOptimizerScreen() {
               />
             </View>
             <View style={styles.gainPercent}>
-              <Text style={styles.gainPercentText}>
-                +{optimization.gainPercentage.toFixed(0)}%
-              </Text>
+              <Text style={styles.gainPercentText}>+{optimization.gainPercentage.toFixed(0)}%</Text>
             </View>
           </LinearGradient>
         </Animated.View>
       )}
-      
+
       {/* Category Breakdown */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>By Category</Text>
-        <Text style={styles.sectionSubtitle}>
-          Monthly rewards current → recommended
-        </Text>
-        
+        <Text style={styles.sectionSubtitle}>Monthly rewards current → recommended</Text>
+
         <View style={styles.categoryList}>
           {optimization.breakdown
-            .filter(opt => opt.monthlySpend > 0)
+            .filter((opt) => opt.monthlySpend > 0)
             .slice(0, 6)
             .map((opt, index) => (
               <CategoryRow key={opt.category} opt={opt} index={index} />
-            ))
-          }
+            ))}
         </View>
       </View>
-      
+
       {/* Cards to Add/Remove */}
       {(optimization.cardsToAdd.length > 0 || optimization.cardsToRemove.length > 0) && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recommended Changes</Text>
-          
+
           {optimization.cardsToAdd.length > 0 && (
             <View style={styles.changeSection}>
               <Text style={styles.changeLabel}>Cards to Consider</Text>
               {optimization.cardsToAdd.slice(0, 3).map((card, index) => (
-                <CardChangeItem
-                  key={card.id}
-                  card={card}
-                  type="add"
-                  index={index}
-                />
+                <CardChangeItem key={card.id} card={card} type="add" index={index} />
               ))}
             </View>
           )}
-          
+
           {optimization.cardsToRemove.length > 0 && (
             <View style={styles.changeSection}>
               <Text style={styles.changeLabel}>Less Optimal Cards</Text>
               {optimization.cardsToRemove.slice(0, 2).map((card, index) => (
-                <CardChangeItem
-                  key={card.id}
-                  card={card}
-                  type="remove"
-                  index={index}
-                />
+                <CardChangeItem key={card.id} card={card} type="remove" index={index} />
               ))}
             </View>
           )}
         </View>
       )}
-      
+
       {/* CTA */}
-      <Animated.View
-        entering={FadeInUp.delay(600).duration(400)}
-        style={styles.ctaSection}
-      >
+      <Animated.View entering={FadeInUp.delay(600).duration(400)} style={styles.ctaSection}>
         <TouchableOpacity activeOpacity={0.9}>
           <LinearGradient
             colors={[colors.primary.main, colors.primary.dark]}
@@ -430,18 +381,16 @@ export default function PortfolioOptimizerScreen() {
             <ChevronRight size={24} color={colors.background.primary} />
           </LinearGradient>
         </TouchableOpacity>
-        
-        <Text style={styles.ctaHint}>
-          Enable Smart Wallet to always use the best card
-        </Text>
+
+        <Text style={styles.ctaHint}>Enable Smart Wallet to always use the best card</Text>
       </Animated.View>
-      
+
       {/* Disclaimer */}
       <Text style={styles.disclaimer}>
-        * Estimates based on your spending profile. Actual rewards may vary.
-        Annual fee differences not included in calculations.
+        * Estimates based on your spending profile. Actual rewards may vary. Annual fee differences
+        not included in calculations.
       </Text>
-      
+
       {/* Bottom padding */}
       <View style={{ height: 100 }} />
     </ScrollView>
@@ -471,7 +420,7 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     fontSize: 16,
   },
-  
+
   // Header
   header: {
     alignItems: 'center',
@@ -487,7 +436,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text.secondary,
   },
-  
+
   // Comparison
   comparisonSection: {
     marginBottom: 16,
@@ -578,7 +527,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 8,
   },
-  
+
   // Gain Card
   gainCard: {
     flexDirection: 'row',
@@ -623,7 +572,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.background.primary,
   },
-  
+
   // Section
   section: {
     marginBottom: 24,
@@ -639,7 +588,7 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     marginBottom: 16,
   },
-  
+
   // Category List
   categoryList: {
     backgroundColor: colors.background.secondary,
@@ -707,7 +656,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 2,
   },
-  
+
   // Card Changes
   changeSection: {
     marginTop: 12,
@@ -752,7 +701,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.primary.main,
   },
-  
+
   // CTA
   ctaSection: {
     alignItems: 'center',
@@ -778,7 +727,7 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     marginTop: 12,
   },
-  
+
   // Disclaimer
   disclaimer: {
     fontSize: 11,

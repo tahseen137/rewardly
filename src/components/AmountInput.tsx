@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { DollarSign } from 'lucide-react-native';
-import { validateAmount, formatCurrency } from '../utils/amountUtils';
+import { validateAmount } from '../utils/amountUtils';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -27,7 +27,7 @@ export function AmountInput({
   label = 'Purchase Amount',
   placeholder = 'Enter amount',
 }: AmountInputProps) {
-  const theme = useTheme();
+  const _theme = useTheme();
   const [inputValue, setInputValue] = useState<string>('');
   const [internalError, setInternalError] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -84,7 +84,7 @@ export function AmountInput({
       // Set new timer for debounced validation
       debounceTimerRef.current = setTimeout(() => {
         const validation = validateAmount(cleanText);
-        
+
         if (validation.isValid && validation.value !== null) {
           setInternalError(null);
           onChange(validation.value);
@@ -114,20 +114,9 @@ export function AmountInput({
 
   return (
     <View style={styles.container}>
-      {label && (
-        <Text style={styles.label}>
-          {label}
-        </Text>
-      )}
-      <View style={[
-        styles.inputContainer,
-        displayError && styles.inputContainerError
-      ]}>
-        <DollarSign
-          size={20}
-          color={colors.text.secondary}
-          style={styles.dollarIcon}
-        />
+      {label && <Text style={styles.label}>{label}</Text>}
+      <View style={[styles.inputContainer, displayError && styles.inputContainerError]}>
+        <DollarSign size={20} color={colors.text.secondary} style={styles.dollarIcon} />
         <TextInput
           value={inputValue}
           onChangeText={handleChangeText}
@@ -141,11 +130,7 @@ export function AmountInput({
           accessibilityHint="Enter the purchase amount"
         />
       </View>
-      {displayError && (
-        <Text style={styles.errorText}>
-          {displayError}
-        </Text>
-      )}
+      {displayError && <Text style={styles.errorText}>{displayError}</Text>}
     </View>
   );
 }

@@ -1,6 +1,6 @@
 /**
  * LandingPage - Marketing/landing page shown on web before authentication
- * 
+ *
  * Features:
  * - Hero with value proposition
  * - Feature highlights
@@ -35,18 +35,16 @@ import {
   ChevronRight,
   Star,
   MapPin,
-  Bell,
 } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
-import { borderRadius } from '../theme/borders';
 
 interface LandingPageProps {
   onGetStarted: () => void;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const isWide = SCREEN_WIDTH > 768;
+const _isWide = SCREEN_WIDTH > 768;
 
 // ============================================================================
 // Nav Header (sticky, mobile-first)
@@ -57,11 +55,7 @@ function NavHeader({ onGetStarted }: { onGetStarted: () => void }) {
     <View style={navStyles.header}>
       <View style={navStyles.inner}>
         <Text style={navStyles.logo}>💳 Rewardly</Text>
-        <TouchableOpacity
-          style={navStyles.ctaBtn}
-          onPress={onGetStarted}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity style={navStyles.ctaBtn} onPress={onGetStarted} activeOpacity={0.8}>
           <Text style={navStyles.ctaBtnText}>Get Started</Text>
         </TouchableOpacity>
       </View>
@@ -75,7 +69,7 @@ const navStyles = StyleSheet.create({
     backgroundColor: 'rgba(10, 14, 31, 0.97)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.08)',
-    position: Platform.OS === 'web' ? 'sticky' as any : 'relative',
+    position: Platform.OS === 'web' ? ('sticky' as any) : 'relative',
     top: 0,
     zIndex: 100,
   },
@@ -137,10 +131,7 @@ function HeroSection({ onGetStarted }: { onGetStarted: () => void }) {
 
   return (
     <View style={styles.heroSection}>
-      <LinearGradient
-        colors={['#0A0E1F', '#0F1528', '#0A0E1F']}
-        style={styles.heroGradient}
-      >
+      <LinearGradient colors={['#0A0E1F', '#0F1528', '#0A0E1F']} style={styles.heroGradient}>
         {/* Decorative elements */}
         <View style={styles.heroDecorative}>
           <View style={[styles.decorCircle, styles.decorCircle1]} />
@@ -167,7 +158,9 @@ function HeroSection({ onGetStarted }: { onGetStarted: () => void }) {
 
           {/* Subtitle */}
           <Text style={styles.heroSubtitle}>
-            Rewardly knows. Most Canadians swipe the wrong card 3× a week — losing $40–80/month in rewards they should have earned. We show you the best card for every purchase. Free. Takes 2 minutes.
+            Rewardly knows. Most Canadians swipe the wrong card 3× a week — losing $40–80/month in
+            rewards they should have earned. We show you the best card for every purchase. Free.
+            Takes 2 minutes.
           </Text>
 
           {/* Stats */}
@@ -260,10 +253,7 @@ function FeatureCard({ icon, title, description, delay = 0 }: FeatureCardProps) 
 
   return (
     <Animated.View
-      style={[
-        styles.featureCard,
-        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
-      ]}
+      style={[styles.featureCard, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
     >
       <View style={styles.featureIconContainer}>{icon}</View>
       <Text style={styles.featureTitle}>{title}</Text>
@@ -290,7 +280,7 @@ function FeaturesSection() {
       icon: <BarChart3 size={28} color={colors.info.main} />,
       title: 'Rewards IQ Score',
       description:
-        'See exactly how optimized your card usage is — and where you\'re leaving money behind. Most users recover $40–60/month in missed rewards in the first week.',
+        "See exactly how optimized your card usage is — and where you're leaving money behind. Most users recover $40–60/month in missed rewards in the first week.",
     },
     {
       icon: <Sparkles size={28} color={colors.warning.main} />,
@@ -332,7 +322,8 @@ function HowItWorksSection() {
     {
       number: '1',
       title: 'Add Your Cards',
-      description: 'Choose from 410+ Canadian credit cards — TD, RBC, CIBC, Scotiabank, BMO, Amex, and more.',
+      description:
+        'Choose from 410+ Canadian credit cards — TD, RBC, CIBC, Scotiabank, BMO, Amex, and more.',
       icon: <CreditCard size={24} color={colors.primary.main} />,
     },
     {
@@ -344,7 +335,8 @@ function HowItWorksSection() {
     {
       number: '3',
       title: 'Start Earning More',
-      description: 'Pull up Rewardly before you pay. The average user captures $400–800 more per year from the same spending.',
+      description:
+        'Pull up Rewardly before you pay. The average user captures $400–800 more per year from the same spending.',
       icon: <Zap size={24} color={colors.primary.main} />,
     },
   ];
@@ -403,7 +395,7 @@ function SocialProofSection() {
     },
     {
       scenario:
-        "Booking a flight? Aeroplan points from your TD Aeroplan Visa are worth 2.1¢ each when booked for travel — not 1¢ like cash back.",
+        'Booking a flight? Aeroplan points from your TD Aeroplan Visa are worth 2.1¢ each when booked for travel — not 1¢ like cash back.',
       emoji: '✈️',
       category: 'Travel',
     },
@@ -547,12 +539,7 @@ function PricingCard({
   onSelect,
 }: PricingCardProps) {
   return (
-    <View
-      style={[
-        styles.pricingCard,
-        highlighted && styles.pricingCardHighlighted,
-      ]}
-    >
+    <View style={[styles.pricingCard, highlighted && styles.pricingCardHighlighted]}>
       {badge && (
         <View style={styles.pricingBadge}>
           <Text style={styles.pricingBadgeText}>{badge}</Text>
@@ -572,10 +559,7 @@ function PricingCard({
       <View style={styles.pricingFeatures}>
         {features.map((feature, index) => (
           <View key={index} style={styles.pricingFeatureRow}>
-            <Check
-              size={16}
-              color={highlighted ? colors.primary.main : colors.text.secondary}
-            />
+            <Check size={16} color={highlighted ? colors.primary.main : colors.text.secondary} />
             <Text style={styles.pricingFeatureText}>{feature}</Text>
           </View>
         ))}
@@ -602,10 +586,7 @@ function PricingCard({
 function LifetimeBanner({ onGetStarted }: { onGetStarted: () => void }) {
   return (
     <View style={styles.lifetimeBanner}>
-      <LinearGradient
-        colors={['#FFD70015', '#FF8C0008']}
-        style={styles.lifetimeBannerGradient}
-      >
+      <LinearGradient colors={['#FFD70015', '#FF8C0008']} style={styles.lifetimeBannerGradient}>
         <View style={styles.lifetimeBannerBadge}>
           <Text style={styles.lifetimeBannerBadgeText}>🔥 EARLY ADOPTER SPECIAL</Text>
         </View>
@@ -637,10 +618,7 @@ function LifetimeBanner({ onGetStarted }: { onGetStarted: () => void }) {
         </View>
         <Text style={styles.lifetimeBannerUrgency}>⏳ Only available for first 100 users</Text>
         <TouchableOpacity onPress={onGetStarted} activeOpacity={0.9}>
-          <LinearGradient
-            colors={['#FFD700', '#FF8C00']}
-            style={styles.pricingButton}
-          >
+          <LinearGradient colors={['#FFD700', '#FF8C00']} style={styles.pricingButton}>
             <Text style={styles.pricingButtonTextHighlighted}>Claim Lifetime Access</Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -700,9 +678,7 @@ function PricingSection({ onGetStarted }: { onGetStarted: () => void }) {
       <Text style={styles.sectionTitle}>
         Simple, <Text style={styles.sectionTitleAccent}>Transparent</Text> Pricing
       </Text>
-      <Text style={styles.pricingSublabel}>
-        Start free. Upgrade when you're ready.
-      </Text>
+      <Text style={styles.pricingSublabel}>Start free. Upgrade when you're ready.</Text>
 
       {/* Lifetime Deal Banner — above the pricing grid */}
       <LifetimeBanner onGetStarted={onGetStarted} />
@@ -746,12 +722,16 @@ function TrustSection() {
         <View style={styles.trustItem}>
           <Star size={24} color={colors.primary.main} />
           <Text style={styles.trustTitle}>Built for Canadians</Text>
-          <Text style={styles.trustDesc}>TD, RBC, CIBC, Scotiabank, BMO — all 410+ cards supported</Text>
+          <Text style={styles.trustDesc}>
+            TD, RBC, CIBC, Scotiabank, BMO — all 410+ cards supported
+          </Text>
         </View>
         <View style={styles.trustItem}>
           <Shield size={24} color={colors.primary.main} />
           <Text style={styles.trustTitle}>No Bank Login Required</Text>
-          <Text style={styles.trustDesc}>Rewardly never asks for your banking credentials. Ever.</Text>
+          <Text style={styles.trustDesc}>
+            Rewardly never asks for your banking credentials. Ever.
+          </Text>
         </View>
       </View>
     </View>
@@ -768,9 +748,7 @@ function Footer() {
       <View style={styles.footerContent}>
         <View style={styles.footerBrand}>
           <Text style={styles.footerLogo}>💳 Rewardly</Text>
-          <Text style={styles.footerTagline}>
-            Maximize every swipe.
-          </Text>
+          <Text style={styles.footerTagline}>Maximize every swipe.</Text>
         </View>
 
         <View style={styles.footerLinks}>
@@ -782,7 +760,12 @@ function Footer() {
           </View>
           <View style={styles.footerLinkColumn}>
             <Text style={styles.footerLinkHeader}>Legal</Text>
-            <Text style={styles.footerLink}>Privacy Policy</Text>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('/privacy-policy')}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.footerLink, styles.footerLinkClickable]}>Privacy Policy</Text>
+            </TouchableOpacity>
             <Text style={styles.footerLink}>Terms of Service</Text>
           </View>
           <View style={styles.footerLinkColumn}>
@@ -812,9 +795,7 @@ function FinalCTA({ onGetStarted }: { onGetStarted: () => void }) {
         colors={[colors.primary.main + '15', colors.primary.dark + '08']}
         style={styles.finalCTAGradient}
       >
-        <Text style={styles.finalCTATitle}>
-          Ready to Stop Leaving{'\n'}Money on the Table?
-        </Text>
+        <Text style={styles.finalCTATitle}>Ready to Stop Leaving{'\n'}Money on the Table?</Text>
         <Text style={styles.finalCTASubtitle}>
           Join thousands of Canadians who are maximizing their credit card rewards.
         </Text>
@@ -1244,9 +1225,7 @@ const styles = StyleSheet.create({
   pricingCardHighlighted: {
     borderColor: colors.primary.main,
     borderWidth: 2,
-    ...(Platform.OS === 'web'
-      ? { boxShadow: '0 0 40px rgba(29, 219, 130, 0.15)' }
-      : {}),
+    ...(Platform.OS === 'web' ? { boxShadow: '0 0 40px rgba(29, 219, 130, 0.15)' } : {}),
   },
   pricingBadge: {
     position: 'absolute',
@@ -1456,6 +1435,9 @@ const styles = StyleSheet.create({
   footerLink: {
     fontSize: 14,
     color: colors.text.secondary,
+  },
+  footerLinkClickable: {
+    textDecorationLine: 'underline',
   },
   footerDivider: {
     height: 1,

@@ -4,18 +4,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Modal,
-  Pressable,
-} from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { SearchInput } from './SearchInput';
 import { Card } from './Card';
-import { Button } from './Button';
 import { useTheme } from '../theme';
 import { Store, SpendingCategory } from '../types';
 import { searchStores } from '../services/StoreDataService';
@@ -31,9 +22,9 @@ interface StoreSelectorProps {
 
 export function StoreSelector({
   onStoreSelect,
-  onCategorySelect,
+  onCategorySelect: _onCategorySelect,
   selectedStore,
-  selectedCategory,
+  selectedCategory: _selectedCategory,
   label = 'Select Store',
   placeholder = 'Search for a store...',
 }: StoreSelectorProps) {
@@ -51,7 +42,7 @@ export function StoreSelector({
     } else {
       const results = searchStores(searchQuery);
       setSuggestions(results.slice(0, 10)); // Limit to 10 suggestions
-      
+
       // Show "no results" if user has typed enough and no matches
       setShowNoResults(searchQuery.length >= 3 && results.length === 0);
     }
@@ -100,9 +91,7 @@ export function StoreSelector({
 
   return (
     <View style={styles.container}>
-      {label && (
-        <Text style={[styles.label, { color: theme.colors.text.secondary }]}>{label}</Text>
-      )}
+      {label && <Text style={[styles.label, { color: theme.colors.text.secondary }]}>{label}</Text>}
 
       {/* Selected Store Display */}
       {selectedStore ? (
@@ -148,10 +137,7 @@ export function StoreSelector({
               animationType="fade"
               onRequestClose={() => setIsDropdownVisible(false)}
             >
-              <Pressable
-                style={styles.modalOverlay}
-                onPress={() => setIsDropdownVisible(false)}
-              >
+              <Pressable style={styles.modalOverlay} onPress={() => setIsDropdownVisible(false)}>
                 <View
                   style={[
                     styles.dropdownContainer,
@@ -181,8 +167,15 @@ export function StoreSelector({
                               {item.name}
                             </Text>
                             <View style={styles.categoryBadge}>
-                              <Text style={styles.categoryIcon}>{getCategoryIcon(item.category)}</Text>
-                              <Text style={[styles.categoryText, { color: theme.colors.text.secondary }]}>
+                              <Text style={styles.categoryIcon}>
+                                {getCategoryIcon(item.category)}
+                              </Text>
+                              <Text
+                                style={[
+                                  styles.categoryText,
+                                  { color: theme.colors.text.secondary },
+                                ]}
+                              >
                                 {getCategoryLabel(item.category)}
                               </Text>
                             </View>
@@ -197,7 +190,9 @@ export function StoreSelector({
                       <Text style={[styles.noResultsText, { color: theme.colors.text.secondary }]}>
                         Store not found
                       </Text>
-                      <Text style={[styles.noResultsSubtext, { color: theme.colors.text.tertiary }]}>
+                      <Text
+                        style={[styles.noResultsSubtext, { color: theme.colors.text.tertiary }]}
+                      >
                         Try selecting a category manually instead
                       </Text>
                     </View>

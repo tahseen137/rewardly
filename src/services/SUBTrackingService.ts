@@ -1,6 +1,6 @@
 /**
  * SUBTrackingService - Manages Sign-Up Bonus tracking
- * 
+ *
  * Free feature (hook to get users to add cards)
  * Syncs with Supabase when available, falls back to AsyncStorage
  */
@@ -73,7 +73,7 @@ export async function getAllSUBs(): Promise<SUBTracking[]> {
  */
 export async function getActiveSUBs(): Promise<SUBTracking[]> {
   const all = await getAllSUBs();
-  return all.filter(sub => sub.status === 'active');
+  return all.filter((sub) => sub.status === 'active');
 }
 
 /**
@@ -82,7 +82,7 @@ export async function getActiveSUBs(): Promise<SUBTracking[]> {
 export async function getSUBById(id: string): Promise<SUBTracking | null> {
   if (!isInitialized) await initializeSUBTracking();
   if (!subCache) return null;
-  return subCache.find(sub => sub.id === id) || null;
+  return subCache.find((sub) => sub.id === id) || null;
 }
 
 // ============================================================================
@@ -128,7 +128,7 @@ export async function updateSUB(
   if (!isInitialized) await initializeSUBTracking();
   if (!subCache) throw new Error('SUB cache not initialized');
 
-  const index = subCache.findIndex(sub => sub.id === id);
+  const index = subCache.findIndex((sub) => sub.id === id);
   if (index === -1) throw new Error(`SUB ${id} not found`);
 
   subCache[index] = {
@@ -153,7 +153,7 @@ export async function deleteSUB(id: string): Promise<void> {
   if (!isInitialized) await initializeSUBTracking();
   if (!subCache) return;
 
-  const index = subCache.findIndex(sub => sub.id === id);
+  const index = subCache.findIndex((sub) => sub.id === id);
   if (index === -1) return;
 
   subCache.splice(index, 1);
@@ -198,14 +198,13 @@ export async function addSpendingToSUB(id: string, amount: number): Promise<SUBT
 export function calculateProgress(sub: SUBTracking): SUBProgress {
   const percentComplete = Math.min((sub.currentAmount / sub.targetAmount) * 100, 100);
   const amountRemaining = Math.max(sub.targetAmount - sub.currentAmount, 0);
-  
+
   const now = new Date();
   const deadline = new Date(sub.deadlineDate);
   const daysRemaining = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  
-  const dailyTargetNeeded = amountRemaining > 0 && daysRemaining > 0 
-    ? amountRemaining / daysRemaining 
-    : 0;
+
+  const dailyTargetNeeded =
+    amountRemaining > 0 && daysRemaining > 0 ? amountRemaining / daysRemaining : 0;
 
   // On track if spending is proportional to time passed
   const start = new Date(sub.startDate);
@@ -232,9 +231,7 @@ export function calculateProgress(sub: SUBTracking): SUBProgress {
  */
 export async function getUrgentSUBs(): Promise<SUBProgress[]> {
   const active = await getActiveSUBs();
-  return active
-    .map(calculateProgress)
-    .filter(progress => progress.isUrgent);
+  return active.map(calculateProgress).filter((progress) => progress.isUrgent);
 }
 
 // ============================================================================
@@ -243,9 +240,9 @@ export async function getUrgentSUBs(): Promise<SUBProgress[]> {
 
 async function persistToStorage(): Promise<void> {
   if (!subCache) return;
-  
+
   const serialized = JSON.stringify(
-    subCache.map(sub => ({
+    subCache.map((sub) => ({
       ...sub,
       startDate: sub.startDate.toISOString(),
       deadlineDate: sub.deadlineDate.toISOString(),
@@ -277,10 +274,7 @@ async function syncFromSupabase(): Promise<void> {
   const user = await getCurrentUser();
   if (!user || !supabase) return;
 
-  const { data, error } = await supabase
-    .from('sub_tracking')
-    .select('*')
-    .eq('user_id', user.id);
+  const { data, error } = await supabase.from('sub_tracking').select('*').eq('user_id', user.id);
 
   if (error) {
     console.error('[SUBTrackingService] Sync from Supabase error:', error);
@@ -328,9 +322,7 @@ async function syncToSupabase(sub: SUBTracking): Promise<void> {
     completed_at: sub.completedAt?.toISOString(),
   };
 
-  const { error } = await supabase
-    .from('sub_tracking')
-    .upsert(row as any);
+  const { error } = await supabase.from('sub_tracking').upsert(row as any);
 
   if (error) {
     console.error('[SUBTrackingService] Sync to Supabase error:', error);

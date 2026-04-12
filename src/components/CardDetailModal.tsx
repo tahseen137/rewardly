@@ -79,16 +79,16 @@ export function CardDetailModal({
             <View style={styles.upToRateContainer}>
               <Text style={styles.upToRateText}>{formatUpToRate(card)}</Text>
             </View>
-            {card.categoryRewards.length > 0 && card.baseRewardRate.value < (card.categoryRewards.reduce(
-              (max, cr) => Math.max(max, cr.rewardRate.value), 0
-            )) && (
-              <Text style={styles.baseRateSecondary}>
-                {card.baseRewardRate.unit === 'percent'
-                  ? `${card.baseRewardRate.value}%`
-                  : `${card.baseRewardRate.value}x`}{' '}
-                on everything else
-              </Text>
-            )}
+            {card.categoryRewards.length > 0 &&
+              card.baseRewardRate.value <
+                card.categoryRewards.reduce((max, cr) => Math.max(max, cr.rewardRate.value), 0) && (
+                <Text style={styles.baseRateSecondary}>
+                  {card.baseRewardRate.unit === 'percent'
+                    ? `${card.baseRewardRate.value}%`
+                    : `${card.baseRewardRate.value}x`}{' '}
+                  on everything else
+                </Text>
+              )}
             <View style={styles.feeContainer}>
               <Text style={styles.feeLabel}>{t('cardDetail.annualFee')}</Text>
               <Text style={styles.feeValue}>
@@ -112,18 +112,20 @@ export function CardDetailModal({
                 <View style={styles.valuationExample}>
                   <DollarSign size={14} color={theme.colors.text.secondary} />
                   <Text style={styles.valuationExampleText}>
-                    10,000 pts ≈ ${(10000 * card.pointValuation / 100).toFixed(0)} value
+                    10,000 pts ≈ ${((10000 * card.pointValuation) / 100).toFixed(0)} value
                   </Text>
                 </View>
               </View>
-              {card.programDetails?.optimalRateCents && card.programDetails.optimalRateCents > card.pointValuation && (
-                <View style={styles.optimalTip}>
-                  <Info size={12} color={theme.colors.success.main} />
-                  <Text style={styles.optimalTipText}>
-                    Up to {card.programDetails.optimalRateCents.toFixed(2)}¢ with optimal redemption
-                  </Text>
-                </View>
-              )}
+              {card.programDetails?.optimalRateCents &&
+                card.programDetails.optimalRateCents > card.pointValuation && (
+                  <View style={styles.optimalTip}>
+                    <Info size={12} color={theme.colors.success.main} />
+                    <Text style={styles.optimalTipText}>
+                      Up to {card.programDetails.optimalRateCents.toFixed(2)}¢ with optimal
+                      redemption
+                    </Text>
+                  </View>
+                )}
             </View>
           )}
 

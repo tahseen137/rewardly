@@ -18,15 +18,9 @@ import {
   getApplications,
   getTrackerState,
   deleteApplication,
-  resetTracker,
   resetTrackerCache,
-  initializeApplicationTracker,
 } from '../ApplicationTrackerService';
-import {
-  CardApplication,
-  CardApplicationInput,
-  WantedCard,
-} from '../../types';
+import { CardApplication, CardApplicationInput, WantedCard } from '../../types';
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -78,14 +72,14 @@ describe('ApplicationTrackerService', () => {
     });
 
     it('should have Amex 90-day rule', () => {
-      const amex = ISSUER_RULES.find(r => r.issuer === 'American Express');
+      const amex = ISSUER_RULES.find((r) => r.issuer === 'American Express');
       expect(amex).toBeDefined();
       expect(amex?.cooldownDays).toBe(90);
       expect(amex?.isStrict).toBe(true);
     });
 
     it('should have Chase 5/24 rule', () => {
-      const chase = ISSUER_RULES.find(r => r.issuer === 'Chase');
+      const chase = ISSUER_RULES.find((r) => r.issuer === 'Chase');
       expect(chase).toBeDefined();
       expect(chase?.maxAppsPerPeriod).toBe(5);
       expect(chase?.periodMonths).toBe(24);
@@ -93,16 +87,16 @@ describe('ApplicationTrackerService', () => {
     });
 
     it('should have TD soft 90-day rule', () => {
-      const td = ISSUER_RULES.find(r => r.issuer === 'TD');
+      const td = ISSUER_RULES.find((r) => r.issuer === 'TD');
       expect(td).toBeDefined();
       expect(td?.cooldownDays).toBe(90);
       expect(td?.isStrict).toBe(false);
     });
 
     it('should have flexible CIBC and RBC rules', () => {
-      const cibc = ISSUER_RULES.find(r => r.issuer === 'CIBC');
-      const rbc = ISSUER_RULES.find(r => r.issuer === 'RBC');
-      
+      const cibc = ISSUER_RULES.find((r) => r.issuer === 'CIBC');
+      const rbc = ISSUER_RULES.find((r) => r.issuer === 'RBC');
+
       expect(cibc?.cooldownDays).toBe(0);
       expect(rbc?.cooldownDays).toBe(0);
     });
@@ -234,7 +228,7 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const cooldown = calculateIssuerCooldown(apps, 'American Express', refDate);
-      
+
       expect(cooldown.isEligible).toBe(false);
       expect(cooldown.daysUntilEligible).toBeGreaterThan(0);
       expect(cooldown.daysUntilEligible).toBeLessThanOrEqual(90);
@@ -277,7 +271,7 @@ describe('ApplicationTrackerService', () => {
     it('should handle unknown issuers gracefully', () => {
       const apps: CardApplication[] = [];
       const cooldown = calculateIssuerCooldown(apps, 'Unknown Bank', refDate);
-      
+
       expect(cooldown.isEligible).toBe(true);
       expect(cooldown.rule.cooldownDays).toBe(0);
       expect(cooldown.rule.description).toContain('No known restrictions');
@@ -293,7 +287,7 @@ describe('ApplicationTrackerService', () => {
 
     it('should check eligibility for card with no applications', () => {
       const eligibility = checkCardEligibility('card1', [], refDate);
-      
+
       expect(eligibility.isEligible).toBe(true);
       expect(eligibility.cardName).toBe('Amex Gold');
       expect(eligibility.issuer).toBe('American Express');
@@ -306,7 +300,7 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const eligibility = checkCardEligibility('card1', apps, refDate);
-      
+
       expect(eligibility.isEligible).toBe(false);
       expect(eligibility.reasons.length).toBeGreaterThan(0);
       expect(eligibility.daysUntilEligible).toBeGreaterThan(0);
@@ -322,9 +316,9 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const eligibility = checkCardEligibility('card2', apps, refDate);
-      
+
       expect(eligibility.isEligible).toBe(false);
-      expect(eligibility.reasons.some(r => r.includes('5/24'))).toBe(true);
+      expect(eligibility.reasons.some((r) => r.includes('5/24'))).toBe(true);
     });
 
     it('should note previous applications for welcome bonus', () => {
@@ -333,7 +327,7 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const eligibility = checkCardEligibility('card1', apps, refDate);
-      
+
       expect(eligibility.previousApplications).toHaveLength(1);
       expect(eligibility.welcomeBonusEligible).toBe(true); // >2 years ago
     });
@@ -362,10 +356,10 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const timeline = generateTimeline(apps, refDate);
-      
+
       expect(timeline.length).toBeGreaterThanOrEqual(4); // 2 apps + 2 falloffs
-      expect(timeline.some(e => e.type === 'application')).toBe(true);
-      expect(timeline.some(e => e.type === 'falloff')).toBe(true);
+      expect(timeline.some((e) => e.type === 'application')).toBe(true);
+      expect(timeline.some((e) => e.type === 'falloff')).toBe(true);
     });
 
     it('should sort timeline events by date', () => {
@@ -375,24 +369,20 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const timeline = generateTimeline(apps, refDate);
-      
+
       for (let i = 1; i < timeline.length; i++) {
-        expect(timeline[i].date.getTime()).toBeGreaterThanOrEqual(
-          timeline[i - 1].date.getTime()
-        );
+        expect(timeline[i].date.getTime()).toBeGreaterThanOrEqual(timeline[i - 1].date.getTime());
       }
     });
 
     it('should mark future events correctly', () => {
-      const apps: CardApplication[] = [
-        createTestApp('app1', new Date('2024-03-01')),
-      ];
+      const apps: CardApplication[] = [createTestApp('app1', new Date('2024-03-01'))];
 
       const timeline = generateTimeline(apps, refDate);
-      
-      const pastEvents = timeline.filter(e => !e.isInFuture);
-      const futureEvents = timeline.filter(e => e.isInFuture);
-      
+
+      const pastEvents = timeline.filter((e) => !e.isInFuture);
+      const futureEvents = timeline.filter((e) => e.isInFuture);
+
       expect(pastEvents.length).toBeGreaterThan(0);
       expect(futureEvents.length).toBeGreaterThan(0);
     });
@@ -403,8 +393,8 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const timeline = generateTimeline(apps, refDate);
-      
-      const eligibleEvent = timeline.find(e => e.type === 'eligible');
+
+      const eligibleEvent = timeline.find((e) => e.type === 'eligible');
       expect(eligibleEvent).toBeDefined();
       expect(eligibleEvent?.description).toContain('American Express');
     });
@@ -429,7 +419,7 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const strategy = generateStrategy(wantedCards, [], refDate);
-      
+
       expect(strategy.advice).toHaveLength(1);
       expect(strategy.advice[0].recommendation).toBe('apply_now');
       expect(strategy.summary).toContain('0/24');
@@ -451,7 +441,7 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const strategy = generateStrategy(wantedCards, apps, refDate);
-      
+
       expect(strategy.advice[0].recommendation).toBe('wait');
       expect(strategy.advice[0].suggestedDate).toBeDefined();
     });
@@ -465,8 +455,8 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const strategy = generateStrategy([], apps, refDate);
-      
-      expect(strategy.warnings.some(w => w.includes('5/24'))).toBe(true);
+
+      expect(strategy.warnings.some((w) => w.includes('5/24'))).toBe(true);
     });
 
     it('should prioritize high priority cards', () => {
@@ -488,7 +478,7 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const strategy = generateStrategy(wantedCards, [], refDate);
-      
+
       expect(strategy.advice[0].cardId).toBe('card2'); // High priority first
     });
 
@@ -504,7 +494,7 @@ describe('ApplicationTrackerService', () => {
       ];
 
       const strategy = generateStrategy(wantedCards, [], refDate);
-      
+
       expect(strategy.advice[0].impact.will524Increase).toBe(true);
       expect(strategy.advice[0].impact.new524Count).toBe(1);
     });
@@ -525,7 +515,7 @@ describe('ApplicationTrackerService', () => {
       };
 
       const result = await addApplication(input);
-      
+
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.value.cardId).toBe('card1');
@@ -543,7 +533,7 @@ describe('ApplicationTrackerService', () => {
       };
 
       const result = await addApplication(input);
-      
+
       if (result.success) {
         const fallOffDate = result.value.fallOffDate;
         const expectedDate = new Date('2026-02-14');
@@ -563,7 +553,7 @@ describe('ApplicationTrackerService', () => {
 
       await addApplication(input);
       const result2 = await addApplication(input);
-      
+
       expect(result2.success).toBe(false);
       if (!result2.success) {
         expect(result2.error.type).toBe('DUPLICATE_APPLICATION');
@@ -580,7 +570,7 @@ describe('ApplicationTrackerService', () => {
       };
 
       const result = await addApplication(input);
-      
+
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.type).toBe('INVALID_APPLICATION');
@@ -620,7 +610,7 @@ describe('ApplicationTrackerService', () => {
       });
 
       const state = await getTrackerState();
-      
+
       expect(state.countLast24Months).toBeGreaterThanOrEqual(0);
       expect(state.countLast12Months).toBeGreaterThanOrEqual(0);
       expect(state.applications).toHaveLength(1);
@@ -636,10 +626,10 @@ describe('ApplicationTrackerService', () => {
       });
 
       const state = await getTrackerState();
-      
+
       expect(state.issuerCooldowns.length).toBeGreaterThan(0);
       const amexCooldown = state.issuerCooldowns.find(
-        c => normalizeIssuer(c.issuer) === 'american express'
+        (c) => normalizeIssuer(c.issuer) === 'american express'
       );
       expect(amexCooldown).toBeDefined();
     });
@@ -649,8 +639,8 @@ describe('ApplicationTrackerService', () => {
       const now = new Date();
       for (let i = 0; i < 4; i++) {
         const appDate = new Date(now);
-        appDate.setMonth(appDate.getMonth() - (i * 5)); // Spread over last 20 months
-        
+        appDate.setMonth(appDate.getMonth() - i * 5); // Spread over last 20 months
+
         await addApplication({
           cardId: `card${i}`,
           cardName: `Card ${i}`,
@@ -661,8 +651,8 @@ describe('ApplicationTrackerService', () => {
       }
 
       const state = await getTrackerState();
-      
-      const approaching524 = state.alerts.find(a => a.type === 'approaching_limit');
+
+      const approaching524 = state.alerts.find((a) => a.type === 'approaching_limit');
       expect(approaching524).toBeDefined();
     });
   });
@@ -688,7 +678,7 @@ describe('ApplicationTrackerService', () => {
 
     it('should return error for non-existent application', async () => {
       const result = await deleteApplication('non-existent');
-      
+
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.type).toBe('APPLICATION_NOT_FOUND');

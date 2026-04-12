@@ -9,13 +9,12 @@ import {
   matchesDateFormat,
   parseDate,
   parseAmount,
-  parseRow,
   parseCSV,
   parseStatement,
   getBankDisplayName,
   getSupportedBanks,
 } from '../StatementParserService';
-import { SupportedBank, SpendingCategory } from '../../types';
+import { SpendingCategory } from '../../types';
 
 // Mock MerchantPatternService
 jest.mock('../MerchantPatternService', () => ({
@@ -37,7 +36,7 @@ describe('StatementParserService', () => {
     it('should parse simple CSV', () => {
       const csv = 'a,b,c\n1,2,3';
       const rows = parseCSVToRows(csv);
-      
+
       expect(rows).toEqual([
         ['a', 'b', 'c'],
         ['1', '2', '3'],
@@ -47,21 +46,21 @@ describe('StatementParserService', () => {
     it('should handle quoted fields', () => {
       const csv = '"a","b,c","d"';
       const rows = parseCSVToRows(csv);
-      
+
       expect(rows).toEqual([['a', 'b,c', 'd']]);
     });
 
     it('should handle escaped quotes', () => {
       const csv = '"a","b""c","d"';
       const rows = parseCSVToRows(csv);
-      
+
       expect(rows).toEqual([['a', 'b"c', 'd']]);
     });
 
     it('should skip empty lines', () => {
       const csv = 'a,b\n\n\nc,d';
       const rows = parseCSVToRows(csv);
-      
+
       expect(rows).toEqual([
         ['a', 'b'],
         ['c', 'd'],
@@ -71,7 +70,7 @@ describe('StatementParserService', () => {
     it('should handle CR LF line endings', () => {
       const csv = 'a,b\r\nc,d';
       const rows = parseCSVToRows(csv);
-      
+
       expect(rows).toEqual([
         ['a', 'b'],
         ['c', 'd'],
@@ -189,7 +188,7 @@ describe('StatementParserService', () => {
     it('should detect TD from header', () => {
       const csv = `Date,Description,Debit Amount,Credit Amount,Balance
 01/15/2024,LOBLAWS,85.23,,1234.56`;
-      
+
       const result = detectBank(csv);
       expect(result.bank).toBe('td');
       expect(result.confidence).toBeGreaterThanOrEqual(80);
@@ -198,7 +197,7 @@ describe('StatementParserService', () => {
     it('should detect RBC from header', () => {
       const csv = `Account Type,Account Number,Transaction Date,Cheque Number,Description 1,Description 2,CAD$,USD$
 Visa,1234567890,01/15/2024,,LOBLAWS,,85.23,`;
-      
+
       const result = detectBank(csv);
       expect(result.bank).toBe('rbc');
       expect(result.confidence).toBeGreaterThanOrEqual(80);
@@ -207,7 +206,7 @@ Visa,1234567890,01/15/2024,,LOBLAWS,,85.23,`;
     it('should detect CIBC from pattern (no header)', () => {
       const csv = `01/15/2024,LOBLAWS,85.23,
 01/16/2024,PAYMENT,,500.00`;
-      
+
       const result = detectBank(csv);
       expect(result.suggestedBank).toBe('cibc');
       expect(result.confidence).toBeGreaterThan(50);
@@ -216,7 +215,7 @@ Visa,1234567890,01/15/2024,,LOBLAWS,,85.23,`;
     it('should detect Scotiabank from column count', () => {
       const csv = `1/15/2024,LOBLAWS,-85.23
 1/16/2024,PAYMENT,500.00`;
-      
+
       const result = detectBank(csv);
       expect(result.suggestedBank).toBe('scotiabank');
       expect(result.confidence).toBeGreaterThan(40);
@@ -225,7 +224,7 @@ Visa,1234567890,01/15/2024,,LOBLAWS,,85.23,`;
     it('should detect BMO from header and date format', () => {
       const csv = `Item #,Card #,Transaction Date,Posting Date,Transaction Amount,Description
 1,1234********5678,20240115,20240116,85.23,LOBLAWS`;
-      
+
       const result = detectBank(csv);
       expect(result.bank).toBe('bmo');
     });
@@ -233,7 +232,7 @@ Visa,1234567890,01/15/2024,,LOBLAWS,,85.23,`;
     it('should detect Tangerine from header and Unicode minus', () => {
       const csv = `Date,Transaction,Name,Memo,Amount
 1/15/2024,DEBIT,LOBLAWS,,−85.23`;
-      
+
       const result = detectBank(csv);
       expect(result.bank).toBe('tangerine');
     });
@@ -241,7 +240,7 @@ Visa,1234567890,01/15/2024,,LOBLAWS,,85.23,`;
     it('should detect PC Financial from header', () => {
       const csv = `Date,Description,Amount
 01/15/2024,LOBLAWS,-85.23`;
-      
+
       const result = detectBank(csv);
       expect(result.bank).toBe('pc_financial');
     });
@@ -249,7 +248,7 @@ Visa,1234567890,01/15/2024,,LOBLAWS,,85.23,`;
     it('should detect Amex from column count and pattern', () => {
       const csv = `01/15/2024,REF123,LOBLAWS #1234,85.23,USD
 01/16/2024,REF124,TIM HORTONS,5.50,USD`;
-      
+
       const result = detectBank(csv);
       // Amex detection can overlap with other formats, but should suggest something
       expect(result.suggestedBank).toBeTruthy();
@@ -259,7 +258,7 @@ Visa,1234567890,01/15/2024,,LOBLAWS,,85.23,`;
     it('should return null for unsupported format', () => {
       const csv = `This,Is,Not,A,Bank,Statement
 1,2,3,4,5,6`;
-      
+
       const result = detectBank(csv);
       expect(result.bank).toBeNull();
       expect(result.confidence).toBeLessThan(80);
@@ -284,7 +283,7 @@ Visa,1234567890,01/15/2024,,LOBLAWS,,85.23,`;
 
     it('should parse TD CSV successfully', () => {
       const result = parseCSV(tdCSV, 'td');
-      
+
       expect(result.success).toBe(true);
       expect(result.transactions.length).toBe(3);
       expect(result.bank).toBe('td');
@@ -293,7 +292,7 @@ Visa,1234567890,01/15/2024,,LOBLAWS,,85.23,`;
     it('should parse TD transactions correctly', () => {
       const result = parseCSV(tdCSV, 'td');
       const tx = result.transactions[0];
-      
+
       expect(tx.description).toBe('LOBLAWS #1234 TORONTO ON');
       expect(tx.amount).toBe(85.23);
       expect(tx.isCredit).toBe(false);
@@ -303,14 +302,14 @@ Visa,1234567890,01/15/2024,,LOBLAWS,,85.23,`;
     it('should identify credits in TD CSV', () => {
       const result = parseCSV(tdCSV, 'td');
       const payment = result.transactions[2];
-      
+
       expect(payment.amount).toBe(500);
       expect(payment.isCredit).toBe(true);
     });
 
     it('should calculate TD totals', () => {
       const result = parseCSV(tdCSV, 'td');
-      
+
       expect(result.totalSpend).toBe(90.73); // 85.23 + 5.50
       expect(result.totalCredits).toBe(500);
     });
@@ -328,7 +327,7 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
 
     it('should parse RBC CSV successfully', () => {
       const result = parseCSV(rbcCSV, 'rbc');
-      
+
       expect(result.success).toBe(true);
       expect(result.transactions.length).toBe(3);
     });
@@ -336,14 +335,14 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
     it('should combine description columns', () => {
       const result = parseCSV(rbcCSV, 'rbc');
       const tx = result.transactions[0];
-      
+
       expect(tx.description).toBe('LOBLAWS #1234');
     });
 
     it('should extract card number', () => {
       const result = parseCSV(rbcCSV, 'rbc');
       const tx = result.transactions[0];
-      
+
       expect(tx.cardLast4).toBe('7890');
     });
   });
@@ -359,14 +358,14 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
 
     it('should parse CIBC CSV successfully (no header)', () => {
       const result = parseCSV(cibcCSV, 'cibc');
-      
+
       expect(result.success).toBe(true);
       expect(result.transactions.length).toBe(3);
     });
 
     it('should parse CIBC debits and credits', () => {
       const result = parseCSV(cibcCSV, 'cibc');
-      
+
       expect(result.transactions[0].isCredit).toBe(false);
       expect(result.transactions[0].amount).toBe(85.23);
       expect(result.transactions[2].isCredit).toBe(true);
@@ -385,18 +384,18 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
 
     it('should parse Scotiabank CSV successfully', () => {
       const result = parseCSV(scotiabankCSV, 'scotiabank');
-      
+
       expect(result.success).toBe(true);
       expect(result.transactions.length).toBe(3);
     });
 
     it('should handle Scotiabank sign convention (negative = debit)', () => {
       const result = parseCSV(scotiabankCSV, 'scotiabank');
-      
+
       // Negative amount = purchase
       expect(result.transactions[0].amount).toBe(85.23);
       expect(result.transactions[0].isCredit).toBe(false);
-      
+
       // Positive amount = payment
       expect(result.transactions[2].amount).toBe(500);
       expect(result.transactions[2].isCredit).toBe(true);
@@ -414,7 +413,7 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
 
     it('should parse BMO CSV successfully', () => {
       const result = parseCSV(bmoCSV, 'bmo');
-      
+
       expect(result.success).toBe(true);
       expect(result.transactions.length).toBe(2);
     });
@@ -422,14 +421,14 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
     it('should parse BMO date format (YYYYMMDD)', () => {
       const result = parseCSV(bmoCSV, 'bmo');
       const tx = result.transactions[0];
-      
+
       expect(tx.date).toEqual(new Date(2024, 0, 15));
     });
 
     it('should extract BMO card last 4', () => {
       const result = parseCSV(bmoCSV, 'bmo');
       const tx = result.transactions[0];
-      
+
       expect(tx.cardLast4).toBe('5678');
     });
   });
@@ -446,14 +445,14 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
 
     it('should parse Tangerine CSV successfully', () => {
       const result = parseCSV(tangerineCSV, 'tangerine');
-      
+
       expect(result.success).toBe(true);
       expect(result.transactions.length).toBe(3);
     });
 
     it('should handle Tangerine Unicode minus', () => {
       const result = parseCSV(tangerineCSV, 'tangerine');
-      
+
       expect(result.transactions[0].amount).toBe(85.23);
       expect(result.transactions[0].isCredit).toBe(false);
     });
@@ -471,7 +470,7 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
 
     it('should parse PC Financial CSV successfully', () => {
       const result = parseCSV(pcCSV, 'pc_financial');
-      
+
       expect(result.success).toBe(true);
       expect(result.transactions.length).toBe(3);
     });
@@ -488,7 +487,7 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
 
     it('should parse Amex CSV successfully', () => {
       const result = parseCSV(amexCSV, 'amex_canada');
-      
+
       expect(result.success).toBe(true);
       expect(result.transactions.length).toBe(3);
     });
@@ -504,7 +503,7 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
 
     it('should auto-detect and parse statement', () => {
       const result = parseStatement(validCSV);
-      
+
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.value.bank).toBe('td');
@@ -514,7 +513,7 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
 
     it('should use forced bank when provided', () => {
       const result = parseStatement(validCSV, 'td');
-      
+
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.value.bank).toBe('td');
@@ -523,7 +522,7 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
 
     it('should return error for empty file', () => {
       const result = parseStatement('');
-      
+
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.type).toBe('EMPTY_FILE');
@@ -533,7 +532,7 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
     it('should return error for unsupported bank', () => {
       const invalidCSV = 'This,Is,Invalid\n1,2,3';
       const result = parseStatement(invalidCSV);
-      
+
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.type).toBe('UNSUPPORTED_BANK');
@@ -543,7 +542,7 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
     it('should return error for no transactions', () => {
       const emptyCSV = `Date,Description,Debit Amount,Credit Amount,Balance`;
       const result = parseStatement(emptyCSV, 'td');
-      
+
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.type).toBe('NO_TRANSACTIONS');
@@ -571,9 +570,9 @@ Visa,1234567890,01/17/2024,,PAYMENT,,−500.00,`;
   describe('getSupportedBanks', () => {
     it('should return all 8 supported banks', () => {
       const banks = getSupportedBanks();
-      
+
       expect(banks).toHaveLength(8);
-      expect(banks.map(b => b.bank)).toEqual([
+      expect(banks.map((b) => b.bank)).toEqual([
         'td',
         'rbc',
         'cibc',

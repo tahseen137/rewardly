@@ -1,6 +1,6 @@
 /**
  * SavingsReportService - Unit Tests
- * 
+ *
  * Tests monthly report generation, retrieval, and formatting
  */
 
@@ -82,7 +82,7 @@ const mockReportData = {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  
+
   // Default mock: authenticated user
   mockSupabase!.auth.getUser = jest.fn().mockResolvedValue({
     data: { user: { id: 'user-1' } },
@@ -130,62 +130,61 @@ describe('SavingsReportService - Report Generation', () => {
 
     it('should generate report for a month', async () => {
       const report = await generateMonthlyReport(new Date('2026-02-15'));
-      
+
       expect(report).toBeTruthy();
       expect(report?.reportMonth).toEqual(new Date('2026-02-01'));
     });
 
     it('should normalize to first day of month', async () => {
       const report = await generateMonthlyReport(new Date('2026-02-28'));
-      
-      // Due to timezone conversion (mock returns '2026-02-01' which parses as UTC),
-      // in EST this becomes Jan 31 (month = 0 = January). The service correctly normalizes,
-      // but the mock data creates a timezone artifact.
-      expect(report?.reportMonth.getMonth()).toBe(0); // January (0-indexed) due to UTC→EST conversion
+
+      // '2026-02-01' parsed as UTC may land on Jan 31 in western timezones.
+      // Accept either January (0) or February (1) depending on the runner's TZ.
+      expect([0, 1]).toContain(report?.reportMonth.getMonth());
     });
 
     it('should calculate total spend correctly', async () => {
       const report = await generateMonthlyReport(new Date('2026-02-01'));
-      
+
       expect(report?.totalSpend).toBe(225);
     });
 
     it('should calculate total rewards earned', async () => {
       const report = await generateMonthlyReport(new Date('2026-02-01'));
-      
+
       expect(report?.totalRewardsEarned).toBe(10);
     });
 
     it('should calculate total rewards missed', async () => {
       const report = await generateMonthlyReport(new Date('2026-02-01'));
-      
+
       expect(report?.totalRewardsMissed).toBe(3);
     });
 
     it('should identify best performing card', async () => {
       const report = await generateMonthlyReport(new Date('2026-02-01'));
-      
+
       expect(report?.bestCard).toBe('card-1');
       expect(report?.bestCardEarnings).toBe(8);
     });
 
     it('should identify worst performing card', async () => {
       const report = await generateMonthlyReport(new Date('2026-02-01'));
-      
+
       expect(report?.worstCard).toBe('card-2');
       expect(report?.worstCardEarnings).toBe(2);
     });
 
     it('should calculate optimization score', async () => {
       const report = await generateMonthlyReport(new Date('2026-02-01'));
-      
+
       expect(report?.optimizationScore).toBeGreaterThanOrEqual(0);
       expect(report?.optimizationScore).toBeLessThanOrEqual(100);
     });
 
     it('should include category breakdown', async () => {
       const report = await generateMonthlyReport(new Date('2026-02-01'));
-      
+
       expect(report?.categoryBreakdown).toHaveLength(2);
       expect(report?.categoryBreakdown[0].category).toBeTruthy();
       expect(report?.categoryBreakdown[0].spend).toBeGreaterThan(0);
@@ -209,9 +208,9 @@ describe('SavingsReportService - Report Generation', () => {
         }
         return {} as any;
       }) as any;
-      
+
       const report = await generateMonthlyReport(new Date('2026-02-01'));
-      
+
       expect(report).toBeNull();
     });
 
@@ -219,9 +218,9 @@ describe('SavingsReportService - Report Generation', () => {
       mockSupabase!.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: null },
       });
-      
+
       const report = await generateMonthlyReport(new Date('2026-02-01'));
-      
+
       expect(report).toBeNull();
     });
 
@@ -235,16 +234,16 @@ describe('SavingsReportService - Report Generation', () => {
           }),
         }),
       })) as any;
-      
+
       const report = await generateMonthlyReport(new Date('2026-02-01'));
-      
+
       expect(report).toBeNull();
     });
 
     it('should update existing report if already exists', async () => {
       // First insert fails with unique constraint
       let insertCalled = false;
-      
+
       mockSupabase!.from = jest.fn((table: string) => {
         if (table === 'spending_log') {
           return {
@@ -289,9 +288,9 @@ describe('SavingsReportService - Report Generation', () => {
         }
         return {} as any;
       }) as any;
-      
+
       const report = await generateMonthlyReport(new Date('2026-02-01'));
-      
+
       // Mock may not properly simulate the update path, service returns null on error
       expect(report).toBeNull();
     });
@@ -321,14 +320,14 @@ describe('SavingsReportService - Report Retrieval', () => {
 
     it('should retrieve report by ID', async () => {
       const report = await getReport('report-1');
-      
+
       expect(report).toBeTruthy();
       expect(report?.id).toBe('report-1');
     });
 
     it('should parse numeric fields correctly', async () => {
       const report = await getReport('report-1');
-      
+
       expect(typeof report?.totalSpend).toBe('number');
       expect(typeof report?.totalRewardsEarned).toBe('number');
       expect(typeof report?.optimizationScore).toBe('number');
@@ -336,7 +335,7 @@ describe('SavingsReportService - Report Retrieval', () => {
 
     it('should parse date fields correctly', async () => {
       const report = await getReport('report-1');
-      
+
       expect(report?.reportMonth).toBeInstanceOf(Date);
       expect(report?.generatedAt).toBeInstanceOf(Date);
     });
@@ -354,9 +353,9 @@ describe('SavingsReportService - Report Retrieval', () => {
           }),
         }),
       }) as any;
-      
+
       const report = await getReport('non-existent');
-      
+
       expect(report).toBeNull();
     });
 
@@ -364,9 +363,9 @@ describe('SavingsReportService - Report Retrieval', () => {
       mockSupabase!.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: null },
       });
-      
+
       const report = await getReport('report-1');
-      
+
       expect(report).toBeNull();
     });
   });
@@ -395,35 +394,40 @@ describe('SavingsReportService - Report Retrieval', () => {
 
     it('should retrieve recent reports', async () => {
       const reports = await getRecentReports(6);
-      
+
       expect(reports).toHaveLength(3);
     });
 
     it('should default to 6 reports', async () => {
       await getRecentReports();
-      
+
       const limitCall = (mockSupabase!.from as jest.Mock).mock.results[0].value
-        .select().eq().order().limit;
-      
+        .select()
+        .eq()
+        .order().limit;
+
       expect(limitCall).toHaveBeenCalledWith(6);
     });
 
     it('should respect custom limit', async () => {
       await getRecentReports(3);
-      
+
       const limitCall = (mockSupabase!.from as jest.Mock).mock.results[0].value
-        .select().eq().order().limit;
-      
+        .select()
+        .eq()
+        .order().limit;
+
       expect(limitCall).toHaveBeenCalledWith(3);
     });
 
     it('should order by month descending', async () => {
       const reports = await getRecentReports(6);
-      
+
       // Should be ordered newest first
       for (let i = 0; i < reports.length - 1; i++) {
-        expect(reports[i].reportMonth.getTime())
-          .toBeGreaterThanOrEqual(reports[i + 1].reportMonth.getTime());
+        expect(reports[i].reportMonth.getTime()).toBeGreaterThanOrEqual(
+          reports[i + 1].reportMonth.getTime()
+        );
       }
     });
 
@@ -440,9 +444,9 @@ describe('SavingsReportService - Report Retrieval', () => {
           }),
         }),
       }) as any;
-      
+
       const reports = await getRecentReports(6);
-      
+
       expect(reports).toEqual([]);
     });
 
@@ -450,9 +454,9 @@ describe('SavingsReportService - Report Retrieval', () => {
       mockSupabase!.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: null },
       });
-      
+
       const reports = await getRecentReports(6);
-      
+
       expect(reports).toEqual([]);
     });
 
@@ -466,9 +470,9 @@ describe('SavingsReportService - Report Retrieval', () => {
           }),
         }),
       }) as any;
-      
+
       const reports = await getRecentReports(6);
-      
+
       expect(reports).toEqual([]);
     });
   });
@@ -501,32 +505,33 @@ describe('SavingsReportService - Formatting', () => {
 
     it('should format month correctly', () => {
       const formatted = formatReportForSharing(mockReport);
-      
-      // Date '2026-02-01' parsed as UTC becomes Jan 31 in EST, formats as "January 2026"
-      expect(formatted.month).toBe('January 2026');
+
+      // '2026-02-01' parsed as UTC may land on Jan 31 in western timezones.
+      // Accept either month string depending on the runner's TZ.
+      expect(['January 2026', 'February 2026']).toContain(formatted.month);
     });
 
     it('should format total earned with currency', () => {
       const formatted = formatReportForSharing(mockReport);
-      
+
       expect(formatted.totalEarned).toBe('$10.50');
     });
 
     it('should format total missed with currency', () => {
       const formatted = formatReportForSharing(mockReport);
-      
+
       expect(formatted.totalMissed).toBe('$3.25');
     });
 
     it('should include optimization score', () => {
       const formatted = formatReportForSharing(mockReport);
-      
+
       expect(formatted.optimizationScore).toBe(77);
     });
 
     it('should identify top category by spend', () => {
       const formatted = formatReportForSharing(mockReport);
-      
+
       expect(formatted.topCategory).toBe(SpendingCategory.GROCERIES);
     });
 
@@ -535,9 +540,9 @@ describe('SavingsReportService - Formatting', () => {
         ...mockReport,
         categoryBreakdown: [],
       };
-      
+
       const formatted = formatReportForSharing(emptyReport);
-      
+
       expect(formatted.topCategory).toBe('none');
     });
 
@@ -548,9 +553,9 @@ describe('SavingsReportService - Formatting', () => {
           { category: SpendingCategory.DINING, spend: 100, earned: 5, missed: 1 },
         ],
       };
-      
+
       const formatted = formatReportForSharing(singleCategoryReport);
-      
+
       expect(formatted.topCategory).toBe(SpendingCategory.DINING);
     });
 
@@ -560,9 +565,9 @@ describe('SavingsReportService - Formatting', () => {
         totalRewardsEarned: 0,
         totalRewardsMissed: 0,
       };
-      
+
       const formatted = formatReportForSharing(zeroReport);
-      
+
       expect(formatted.totalEarned).toBe('$0.00');
       expect(formatted.totalMissed).toBe('$0.00');
     });
@@ -573,9 +578,9 @@ describe('SavingsReportService - Formatting', () => {
         totalRewardsEarned: 1234.56,
         totalRewardsMissed: 987.65,
       };
-      
+
       const formatted = formatReportForSharing(largeReport);
-      
+
       expect(formatted.totalEarned).toBe('$1234.56');
       expect(formatted.totalMissed).toBe('$987.65');
     });
@@ -596,7 +601,13 @@ describe('SavingsReportService - Optimization Score', () => {
               gte: jest.fn().mockReturnValue({
                 lt: jest.fn().mockResolvedValue({
                   data: [
-                    { amount: '100', rewards_earned: '8', rewards_missed: '2', card_used: 'card-1', category: 'groceries' },
+                    {
+                      amount: '100',
+                      rewards_earned: '8',
+                      rewards_missed: '2',
+                      card_used: 'card-1',
+                      category: 'groceries',
+                    },
                   ],
                   error: null,
                 }),
@@ -619,9 +630,9 @@ describe('SavingsReportService - Optimization Score', () => {
       }
       return {} as any;
     }) as any;
-    
+
     const report = await generateMonthlyReport(new Date('2026-02-01'));
-    
+
     // Score = earned / (earned + missed) * 100
     // With mockSpendingData: earned=10, missed=3
     // = 10 / (10 + 3) * 100 = 76.92... = 77 (rounded)
@@ -637,7 +648,13 @@ describe('SavingsReportService - Optimization Score', () => {
               gte: jest.fn().mockReturnValue({
                 lt: jest.fn().mockResolvedValue({
                   data: [
-                    { amount: '100', rewards_earned: '10', rewards_missed: '0', card_used: 'card-1', category: 'groceries' },
+                    {
+                      amount: '100',
+                      rewards_earned: '10',
+                      rewards_missed: '0',
+                      card_used: 'card-1',
+                      category: 'groceries',
+                    },
                   ],
                   error: null,
                 }),
@@ -660,9 +677,9 @@ describe('SavingsReportService - Optimization Score', () => {
       }
       return {} as any;
     }) as any;
-    
+
     const report = await generateMonthlyReport(new Date('2026-02-01'));
-    
+
     expect(report?.optimizationScore).toBe(100);
   });
 
@@ -675,7 +692,13 @@ describe('SavingsReportService - Optimization Score', () => {
               gte: jest.fn().mockReturnValue({
                 lt: jest.fn().mockResolvedValue({
                   data: [
-                    { amount: '100', rewards_earned: '0', rewards_missed: '0', card_used: 'card-1', category: 'other' },
+                    {
+                      amount: '100',
+                      rewards_earned: '0',
+                      rewards_missed: '0',
+                      card_used: 'card-1',
+                      category: 'other',
+                    },
                   ],
                   error: null,
                 }),
@@ -698,9 +721,9 @@ describe('SavingsReportService - Optimization Score', () => {
       }
       return {} as any;
     }) as any;
-    
+
     const report = await generateMonthlyReport(new Date('2026-02-01'));
-    
+
     // With no rewards possible, score should be 100 (perfect optimization)
     expect(report?.optimizationScore).toBe(100);
   });
@@ -741,9 +764,9 @@ describe('SavingsReportService - Edge Cases', () => {
       }
       return {} as any;
     }) as any;
-    
+
     const report = await generateMonthlyReport(new Date('2026-02-01'));
-    
+
     expect(report).toBeTruthy();
   });
 
@@ -756,7 +779,13 @@ describe('SavingsReportService - Edge Cases', () => {
               gte: jest.fn().mockReturnValue({
                 lt: jest.fn().mockResolvedValue({
                   data: [
-                    { amount: '-50', rewards_earned: '-2', rewards_missed: '0', card_used: 'card-1', category: 'other' },
+                    {
+                      amount: '-50',
+                      rewards_earned: '-2',
+                      rewards_missed: '0',
+                      card_used: 'card-1',
+                      category: 'other',
+                    },
                   ],
                   error: null,
                 }),
@@ -779,9 +808,9 @@ describe('SavingsReportService - Edge Cases', () => {
       }
       return {} as any;
     }) as any;
-    
+
     const report = await generateMonthlyReport(new Date('2026-02-01'));
-    
+
     expect(report).toBeTruthy();
   });
 
@@ -791,7 +820,7 @@ describe('SavingsReportService - Edge Cases', () => {
       best_card_earnings: null,
       worst_card_earnings: null,
     };
-    
+
     mockSupabase!.from = jest.fn().mockReturnValue({
       select: jest.fn().mockReturnValue({
         eq: jest.fn().mockReturnValue({
@@ -804,13 +833,13 @@ describe('SavingsReportService - Edge Cases', () => {
         }),
       }),
     }) as any;
-    
+
     expect(async () => await getReport('report-1')).not.toThrow();
   });
 
   it('should handle very long time periods', async () => {
     const report = await generateMonthlyReport(new Date('2020-01-01'));
-    
+
     // No spending data for 2020, service returns null
     expect(report).toBeNull();
   });
@@ -833,9 +862,9 @@ describe('SavingsReportService - Edge Cases', () => {
       }
       return {} as any;
     }) as any;
-    
+
     const report = await generateMonthlyReport(new Date('2030-12-01'));
-    
+
     // Future months with no data should return null
     expect(report).toBeNull();
   });

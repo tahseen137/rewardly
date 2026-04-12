@@ -24,6 +24,10 @@ import { getAllCards } from './src/services/CardDataService';
 import { ReferralService } from './src/services/ReferralService';
 import { ThemeProvider, useTheme } from './src/theme';
 import { isWeb, platformLog } from './src/utils/platform';
+import { initErrorReporting, reportError } from './src/utils/errorReporting';
+
+// Initialize error reporting as early as possible so startup errors are captured.
+initErrorReporting();
 
 // Debug: Log app startup
 if (__DEV__ || isWeb) {
@@ -174,9 +178,12 @@ export default function App() {
         // Log to console in all environments
         console.error('[Rewardly] Fatal error caught by AppErrorBoundary:', error);
         console.error('[Rewardly] Component stack:', errorInfo.componentStack);
-        
-        // TODO: Send to error tracking service
-        // Sentry.captureException(error, { extra: { componentStack: errorInfo.componentStack } });
+
+        // Route to the configured error reporter (Sentry/Bugsnag/noop).
+        reportError(error, {
+          source: 'AppErrorBoundary',
+          componentStack: errorInfo.componentStack,
+        });
       }}
     >
       <GestureHandlerRootView style={{ flex: 1 }}>

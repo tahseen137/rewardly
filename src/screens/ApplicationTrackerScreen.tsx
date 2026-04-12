@@ -1,6 +1,6 @@
 /**
  * ApplicationTrackerScreen - F16: 5/24 Tracker UI
- * 
+ *
  * Features:
  * - Hero section: X/24 cards with visual gauge
  * - Issuer cooldown status cards
@@ -10,7 +10,7 @@
  * - Tier gating: Free = basic count, Pro = cooldowns + timeline, Max = strategy advisor
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -19,31 +19,21 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
-  TextInput,
   Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { ArrowLeft, Plus, Calendar, AlertCircle, TrendingUp, Clock } from 'lucide-react-native';
+import { ArrowLeft, Plus, AlertCircle, TrendingUp } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { useTheme, Theme } from '../theme';
 import {
   initializeApplicationTracker,
-  getApplications,
   getTrackerState,
   addApplication,
   deleteApplication,
-  ISSUER_RULES,
 } from '../services/ApplicationTrackerService';
 import { getAllCardsSync } from '../services/CardDataService';
-import { canAccessFeatureSync, getCurrentTierSync } from '../services/SubscriptionService';
-import {
-  ApplicationTracker,
-  CardApplication,
-  ApplicationStatus,
-  IssuerCooldownStatus,
-  ApplicationTimelineEvent,
-  SubscriptionTier,
-} from '../types';
+import { getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
+import { ApplicationTracker, ApplicationStatus } from '../types';
 
 type ViewMode = 'overview' | 'add';
 
@@ -88,7 +78,7 @@ export default function ApplicationTrackerScreen() {
       return;
     }
 
-    const card = allCards.find(c => c.id === selectedCardId);
+    const card = allCards.find((c) => c.id === selectedCardId);
     if (!card) return;
 
     setSaving(true);
@@ -110,7 +100,7 @@ export default function ApplicationTrackerScreen() {
       } else {
         Alert.alert('Error', 'Failed to add application');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to save application');
     } finally {
       setSaving(false);
@@ -118,21 +108,17 @@ export default function ApplicationTrackerScreen() {
   };
 
   const handleDeleteApplication = async (appId: string) => {
-    Alert.alert(
-      'Delete Application',
-      'Are you sure you want to delete this application?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteApplication(appId);
-            await loadData();
-          },
+    Alert.alert('Delete Application', 'Are you sure you want to delete this application?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          await deleteApplication(appId);
+          await loadData();
         },
-      ]
-    );
+      },
+    ]);
   };
 
   if (loading) {
@@ -184,8 +170,12 @@ export default function ApplicationTrackerScreen() {
           {/* Card Selection */}
           <View style={styles.formSection}>
             <Text style={styles.formLabel}>Select Card</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.cardScrollView}>
-              {allCards.map(card => (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.cardScrollView}
+            >
+              {allCards.map((card) => (
                 <TouchableOpacity
                   key={card.id}
                   style={[
@@ -194,10 +184,12 @@ export default function ApplicationTrackerScreen() {
                   ]}
                   onPress={() => setSelectedCardId(card.id)}
                 >
-                  <Text style={[
-                    styles.cardOptionName,
-                    selectedCardId === card.id && styles.cardOptionNameSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.cardOptionName,
+                      selectedCardId === card.id && styles.cardOptionNameSelected,
+                    ]}
+                  >
                     {card.name}
                   </Text>
                   <Text style={styles.cardOptionIssuer}>{card.issuer}</Text>
@@ -209,9 +201,7 @@ export default function ApplicationTrackerScreen() {
           {/* Application Date */}
           <View style={styles.formSection}>
             <Text style={styles.formLabel}>Application Date</Text>
-            <Text style={styles.dateDisplay}>
-              {applicationDate.toLocaleDateString()}
-            </Text>
+            <Text style={styles.dateDisplay}>{applicationDate.toLocaleDateString()}</Text>
             <Text style={styles.formHint}>Tap to change date (future feature)</Text>
           </View>
 
@@ -220,44 +210,41 @@ export default function ApplicationTrackerScreen() {
             <Text style={styles.formLabel}>Status</Text>
             <View style={styles.statusButtons}>
               <TouchableOpacity
-                style={[
-                  styles.statusButton,
-                  status === 'approved' && styles.statusButtonActive,
-                ]}
+                style={[styles.statusButton, status === 'approved' && styles.statusButtonActive]}
                 onPress={() => setStatus('approved')}
               >
-                <Text style={[
-                  styles.statusButtonText,
-                  status === 'approved' && styles.statusButtonTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.statusButtonText,
+                    status === 'approved' && styles.statusButtonTextActive,
+                  ]}
+                >
                   Approved
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[
-                  styles.statusButton,
-                  status === 'pending' && styles.statusButtonActive,
-                ]}
+                style={[styles.statusButton, status === 'pending' && styles.statusButtonActive]}
                 onPress={() => setStatus('pending')}
               >
-                <Text style={[
-                  styles.statusButtonText,
-                  status === 'pending' && styles.statusButtonTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.statusButtonText,
+                    status === 'pending' && styles.statusButtonTextActive,
+                  ]}
+                >
                   Pending
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[
-                  styles.statusButton,
-                  status === 'denied' && styles.statusButtonActive,
-                ]}
+                style={[styles.statusButton, status === 'denied' && styles.statusButtonActive]}
                 onPress={() => setStatus('denied')}
               >
-                <Text style={[
-                  styles.statusButtonText,
-                  status === 'denied' && styles.statusButtonTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.statusButtonText,
+                    status === 'denied' && styles.statusButtonTextActive,
+                  ]}
+                >
                   Denied
                 </Text>
               </TouchableOpacity>
@@ -309,10 +296,10 @@ export default function ApplicationTrackerScreen() {
               {tracker.countLast24Months === 0
                 ? 'You have no applications in the last 24 months'
                 : tracker.countLast24Months >= 5
-                ? 'You are over 5/24 - Chase cards will be difficult'
-                : `${5 - tracker.countLast24Months} more card${5 - tracker.countLast24Months === 1 ? '' : 's'} until 5/24`}
+                  ? 'You are over 5/24 - Chase cards will be difficult'
+                  : `${5 - tracker.countLast24Months} more card${5 - tracker.countLast24Months === 1 ? '' : 's'} until 5/24`}
             </Text>
-            
+
             {/* Visual gauge bar */}
             <View style={styles.gaugeBar}>
               {[...Array(5)].map((_, i) => (
@@ -341,9 +328,11 @@ export default function ApplicationTrackerScreen() {
                 Track issuer cooldowns, application timeline, and get eligibility alerts
               </Text>
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.tierGateButton}
-              onPress={() => navigation.navigate('Upgrade' as never, { feature: 'application_tracker' } as never)}
+              onPress={() =>
+                (navigation as any).navigate('Upgrade', { feature: 'application_tracker' })
+              }
             >
               <Text style={styles.tierGateButtonText}>Upgrade</Text>
             </TouchableOpacity>
@@ -359,12 +348,14 @@ export default function ApplicationTrackerScreen() {
                 </View>
               ) : (
                 <View style={styles.cooldownGrid}>
-                  {tracker.issuerCooldowns.map(cooldown => (
+                  {tracker.issuerCooldowns.map((cooldown) => (
                     <View
                       key={cooldown.issuer}
                       style={[
                         styles.cooldownCard,
-                        cooldown.isEligible ? styles.cooldownCardEligible : styles.cooldownCardWaiting,
+                        cooldown.isEligible
+                          ? styles.cooldownCardEligible
+                          : styles.cooldownCardWaiting,
                       ]}
                     >
                       <View style={styles.cooldownHeader}>
@@ -379,9 +370,7 @@ export default function ApplicationTrackerScreen() {
                           : `Wait ${cooldown.daysUntilEligible} day${cooldown.daysUntilEligible === 1 ? '' : 's'}`}
                       </Text>
                       {cooldown.rule.cooldownDays > 0 && (
-                        <Text style={styles.cooldownRule}>
-                          {cooldown.rule.description}
-                        </Text>
+                        <Text style={styles.cooldownRule}>{cooldown.rule.description}</Text>
                       )}
                     </View>
                   ))}
@@ -446,9 +435,11 @@ export default function ApplicationTrackerScreen() {
                 Get AI-powered strategy advice on when to apply for cards
               </Text>
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.tierGateButton}
-              onPress={() => navigation.navigate('Upgrade' as never, { feature: 'strategy_advisor' } as never)}
+              onPress={() =>
+                (navigation as any).navigate('Upgrade', { feature: 'strategy_advisor' })
+              }
             >
               <Text style={styles.tierGateButtonText}>Upgrade</Text>
             </TouchableOpacity>
@@ -460,7 +451,7 @@ export default function ApplicationTrackerScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Alerts</Text>
             <View style={styles.alertsList}>
-              {tracker.alerts.map(alert => (
+              {tracker.alerts.map((alert) => (
                 <View key={alert.id} style={styles.alertCard}>
                   <AlertCircle size={20} color={colors.warning.main} />
                   <View style={styles.alertContent}>
@@ -477,7 +468,7 @@ export default function ApplicationTrackerScreen() {
   );
 }
 
-const createStyles = (theme: Theme) =>
+const createStyles = (_theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -607,7 +598,7 @@ const createStyles = (theme: Theme) =>
       gap: 12,
     },
     cooldownCard: {
-      width: Platform.OS === 'web' ? 'calc(50% - 6px)' : '48%',
+      width: Platform.OS === 'web' ? ('calc(50% - 6px)' as any) : '48%',
       backgroundColor: colors.background.secondary,
       borderRadius: 12,
       padding: 16,
@@ -703,7 +694,7 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: 12,
       paddingVertical: 4,
       borderRadius: 8,
-      backgroundColor: colors.error.bg20,
+      backgroundColor: colors.error.background,
     },
     deleteButtonText: {
       fontSize: 12,
@@ -767,7 +758,7 @@ const createStyles = (theme: Theme) =>
       gap: 12,
     },
     alertCard: {
-      backgroundColor: colors.warning.bg20,
+      backgroundColor: colors.warning.background,
       borderRadius: 12,
       padding: 16,
       flexDirection: 'row',

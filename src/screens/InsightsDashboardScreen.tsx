@@ -1,6 +1,6 @@
 /**
  * InsightsDashboardScreen - F25: Spending Insights Dashboard
- * 
+ *
  * Features:
  * - Optimization score gauge (simple View-based, no chart libs)
  * - Category breakdown list
@@ -19,14 +19,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { 
-  ArrowLeft, 
-  TrendingUp, 
-  TrendingDown, 
-  Minus, 
-  AlertCircle,
-  CheckCircle,
-} from 'lucide-react-native';
+import { ArrowLeft, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { getTransactions } from '../services/StatementStorageService';
 import { getCards } from '../services/CardPortfolioManager';
@@ -65,35 +58,39 @@ export default function InsightsDashboardScreen() {
   const loadInsights = async () => {
     try {
       setLoading(true);
-      
+
       // Get transactions
       const transactions = await getTransactions();
-      
+
       if (transactions.length === 0) {
         setError('No transactions found. Upload a statement to see insights.');
         setLoading(false);
         return;
       }
-      
+
       // Get user cards
       const userCards = await getCards();
       const allCards = getAllCardsSync();
       const cardObjects = userCards
-        .map(uc => allCards.find(c => c.id === uc.cardId))
+        .map((uc) => allCards.find((c) => c.id === uc.cardId))
         .filter((c): c is NonNullable<typeof c> => c !== null);
-      
+
       // Generate insights
       const result = generateSpendingInsights(transactions, cardObjects);
-      
+
       if (!result.success) {
-        setError(result.error.message);
+        setError(
+          'message' in result.error
+            ? result.error.message
+            : `Insufficient data: ${result.error.transactionCount} transactions (need ${result.error.minimumRequired})`
+        );
         setLoading(false);
         return;
       }
-      
+
       setInsights(result.value);
       setLoading(false);
-    } catch (err) {
+    } catch {
       setError('Failed to load insights');
       setLoading(false);
     }
@@ -105,14 +102,14 @@ export default function InsightsDashboardScreen() {
 
   const renderOptimizationGauge = () => {
     if (!insights) return null;
-    
+
     const { score, label, emoji } = insights.optimizationScore;
     const percentage = Math.min(100, Math.max(0, score));
-    
+
     return (
       <View style={styles.gaugeCard}>
         <Text style={styles.gaugeTitle}>Optimization Score</Text>
-        
+
         {/* Simple circular gauge */}
         <View style={styles.gaugeContainer}>
           <View style={styles.gaugeCircle}>
@@ -121,12 +118,12 @@ export default function InsightsDashboardScreen() {
             <Text style={styles.gaugeLabel}>{label}</Text>
           </View>
         </View>
-        
+
         {/* Progress bar */}
         <View style={styles.progressBar}>
           <View style={[styles.progressFill, { width: `${percentage}%` }]} />
         </View>
-        
+
         <Text style={styles.improvementText}>
           {insights.optimizationScore.improvementPotential}
         </Text>
@@ -136,7 +133,7 @@ export default function InsightsDashboardScreen() {
 
   const renderMoneyLeftOnTable = () => {
     if (!insights) return null;
-    
+
     return (
       <View style={styles.heroCard}>
         <Text style={styles.heroLabel}>Money Left on Table</Text>
@@ -148,31 +145,31 @@ export default function InsightsDashboardScreen() {
 
   const renderCategoryBreakdown = () => {
     if (!insights) return null;
-    
+
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Category Breakdown</Text>
-        
-        {insights.categoryBreakdown.map((cat, index) => (
+
+        {insights.categoryBreakdown.map((cat, _index) => (
           <View key={cat.category} style={styles.categoryCard}>
             <View style={styles.categoryHeader}>
               <Text style={styles.categoryName}>{CATEGORY_LABELS[cat.category]}</Text>
               <Text style={styles.categoryAmount}>${cat.totalSpend.toFixed(2)}</Text>
             </View>
-            
+
             <View style={styles.categoryMeta}>
               <Text style={styles.categoryMeta}>
                 {cat.transactionCount} transactions • {cat.percentOfTotal.toFixed(1)}%
               </Text>
             </View>
-            
+
             {cat.optimalCard && (
               <View style={styles.categoryOptimal}>
                 <Text style={styles.optimalLabel}>Best card:</Text>
                 <Text style={styles.optimalCard}>{cat.optimalCard.name}</Text>
               </View>
             )}
-            
+
             {cat.rewardsGap > 0 && (
               <View style={styles.rewardsGap}>
                 <Text style={styles.rewardsGapText}>
@@ -188,18 +185,18 @@ export default function InsightsDashboardScreen() {
 
   const renderTrends = () => {
     if (!insights || insights.trends.length === 0) return null;
-    
+
     const significantTrends = insights.trends.filter(
-      t => t.direction !== 'stable' && Math.abs(t.changePercent) > 0
+      (t) => t.direction !== 'stable' && Math.abs(t.changePercent) > 0
     );
-    
+
     if (significantTrends.length === 0) return null;
-    
+
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Spending Trends</Text>
-        
-        {significantTrends.map(trend => (
+
+        {significantTrends.map((trend) => (
           <View key={trend.category} style={styles.trendCard}>
             <View style={styles.trendHeader}>
               {trend.direction === 'up' ? (
@@ -209,15 +206,17 @@ export default function InsightsDashboardScreen() {
               )}
               <Text style={styles.trendCategory}>{CATEGORY_LABELS[trend.category]}</Text>
             </View>
-            
-            <Text style={[
-              styles.trendPercent,
-              trend.direction === 'up' ? styles.trendUp : styles.trendDown,
-            ]}>
+
+            <Text
+              style={[
+                styles.trendPercent,
+                trend.direction === 'up' ? styles.trendUp : styles.trendDown,
+              ]}
+            >
               {trend.direction === 'up' ? '+' : ''}
               {trend.changePercent.toFixed(1)}%
             </Text>
-            
+
             <Text style={styles.trendAmount}>
               ${trend.previousMonth.toFixed(0)} → ${trend.currentMonth.toFixed(0)}
             </Text>
@@ -229,18 +228,15 @@ export default function InsightsDashboardScreen() {
 
   const renderAlerts = () => {
     if (!insights || insights.alerts.length === 0) return null;
-    
+
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Smart Alerts</Text>
-        
-        {insights.alerts.slice(0, 5).map(alert => (
+
+        {insights.alerts.slice(0, 5).map((alert) => (
           <View
             key={alert.id}
-            style={[
-              styles.alertCard,
-              alert.priority === 'high' && styles.alertHigh,
-            ]}
+            style={[styles.alertCard, alert.priority === 'high' && styles.alertHigh]}
           >
             <View style={styles.alertHeader}>
               <AlertCircle
@@ -249,9 +245,9 @@ export default function InsightsDashboardScreen() {
               />
               <Text style={styles.alertTitle}>{alert.title}</Text>
             </View>
-            
+
             <Text style={styles.alertMessage}>{alert.message}</Text>
-            
+
             {alert.potentialSavings && (
               <Text style={styles.alertSavings}>
                 💰 Save ${alert.potentialSavings.toFixed(2)}/year
@@ -265,11 +261,11 @@ export default function InsightsDashboardScreen() {
 
   const renderTopMerchants = () => {
     if (!insights || insights.topMerchants.length === 0) return null;
-    
+
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Top Merchants</Text>
-        
+
         {insights.topMerchants.slice(0, 5).map((merchant, index) => (
           <View key={merchant.name} style={styles.merchantRow}>
             <View style={styles.merchantRank}>

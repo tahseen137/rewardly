@@ -5,9 +5,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Calculator, TrendingUp, FileText } from 'lucide-react-native';
+import { TrendingUp, FileText } from 'lucide-react-native';
 import { SpendingProfileInput, SpendingCategory } from '../types';
-import { getFromSpendingLog, getDefaultSpendingProfile, calculateTotalMonthlySpend } from '../services/SpendingProfileService';
+import {
+  getFromSpendingLog,
+  getDefaultSpendingProfile,
+  calculateTotalMonthlySpend,
+} from '../services/SpendingProfileService';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
 
@@ -29,10 +33,30 @@ const CATEGORIES: CategoryConfig[] = [
   { key: 'dining', label: 'Dining & Restaurants', icon: '🍽️', category: SpendingCategory.DINING },
   { key: 'gas', label: 'Gas & Fuel', icon: '⛽', category: SpendingCategory.GAS },
   { key: 'travel', label: 'Travel', icon: '✈️', category: SpendingCategory.TRAVEL },
-  { key: 'onlineShopping', label: 'Online Shopping', icon: '📦', category: SpendingCategory.ONLINE_SHOPPING },
-  { key: 'entertainment', label: 'Entertainment', icon: '🎬', category: SpendingCategory.ENTERTAINMENT },
-  { key: 'drugstores', label: 'Drugstores & Pharmacy', icon: '💊', category: SpendingCategory.DRUGSTORES },
-  { key: 'homeImprovement', label: 'Home Improvement', icon: '🔨', category: SpendingCategory.HOME_IMPROVEMENT },
+  {
+    key: 'onlineShopping',
+    label: 'Online Shopping',
+    icon: '📦',
+    category: SpendingCategory.ONLINE_SHOPPING,
+  },
+  {
+    key: 'entertainment',
+    label: 'Entertainment',
+    icon: '🎬',
+    category: SpendingCategory.ENTERTAINMENT,
+  },
+  {
+    key: 'drugstores',
+    label: 'Drugstores & Pharmacy',
+    icon: '💊',
+    category: SpendingCategory.DRUGSTORES,
+  },
+  {
+    key: 'homeImprovement',
+    label: 'Home Improvement',
+    icon: '🔨',
+    category: SpendingCategory.HOME_IMPROVEMENT,
+  },
   { key: 'transit', label: 'Public Transit', icon: '🚇' },
   { key: 'other', label: 'Other Spending', icon: '🛍️', category: SpendingCategory.OTHER },
 ];
@@ -95,18 +119,12 @@ export function SpendingProfileForm({
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <Text style={styles.title}>Monthly Spending by Category</Text>
-        <Text style={styles.subtitle}>
-          Enter your average monthly spending in each category
-        </Text>
+        <Text style={styles.subtitle}>Enter your average monthly spending in each category</Text>
       </View>
 
       {showAutoFill && (
         <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={handleAutoFill}
-            disabled={loading}
-          >
+          <TouchableOpacity style={styles.actionButton} onPress={handleAutoFill} disabled={loading}>
             <TrendingUp size={16} color={colors.primary.main} />
             <Text style={styles.actionButtonText}>
               {loading ? 'Loading...' : 'Auto-fill from Spending Log'}

@@ -4,8 +4,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Target, Plus } from 'lucide-react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { Target } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
 import { getActiveSUBs, calculateProgress } from '../services/SUBTrackingService';
@@ -34,9 +34,7 @@ export default function SUBTrackerScreen() {
       <View style={styles.emptyState}>
         <Target size={48} color={colors.text.tertiary} />
         <Text style={styles.emptyTitle}>No Bonuses Being Tracked</Text>
-        <Text style={styles.emptyDescription}>
-          Add a sign-up bonus to track your progress
-        </Text>
+        <Text style={styles.emptyDescription}>Add a sign-up bonus to track your progress</Text>
       </View>
     );
   }
@@ -46,7 +44,7 @@ export default function SUBTrackerScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Sign-Up Bonus Tracker</Text>
       </View>
-      {subs.map((progress, index) => (
+      {subs.map((progress, _index) => (
         <View key={progress.sub.id} style={styles.subCard}>
           <Text style={styles.subCardName}>Tracking Bonus</Text>
           <View style={styles.progressBar}>
@@ -55,9 +53,7 @@ export default function SUBTrackerScreen() {
           <Text style={styles.progressText}>
             ${progress.sub.currentAmount} / ${progress.sub.targetAmount}
           </Text>
-          <Text style={styles.daysText}>
-            {progress.daysRemaining} days remaining
-          </Text>
+          <Text style={styles.daysText}>{progress.daysRemaining} days remaining</Text>
         </View>
       ))}
     </ScrollView>
@@ -87,6 +83,12 @@ const styles = StyleSheet.create({
   progressText: { fontSize: 14, color: colors.text.secondary, marginBottom: 4 },
   daysText: { fontSize: 12, color: colors.text.tertiary },
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-  emptyTitle: { fontSize: 20, fontWeight: '600', color: colors.text.primary, marginTop: 16, marginBottom: 8 },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: colors.text.primary,
+    marginTop: 16,
+    marginBottom: 8,
+  },
   emptyDescription: { fontSize: 14, color: colors.text.secondary, textAlign: 'center' },
 });

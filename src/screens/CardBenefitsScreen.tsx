@@ -1,19 +1,11 @@
 /**
  * CardBenefitsScreen - Display all card benefits grouped by category
- * 
+ *
  * Tier: Pro+ (Free sees first 2 benefits + locked overlay)
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Dimensions,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { Plane, ShieldCheck, Umbrella, Star, DollarSign, TrendingUp } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -38,9 +30,12 @@ import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { LockedFeature, FeeBreakevenCard, SignupBonusCard, ApplyNowButton } from '../components';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
-type RouteParams = RouteProp<InsightsStackParamList & { CardBenefits: { cardId: string } }, 'CardBenefits'>;
+type RouteParams = RouteProp<
+  InsightsStackParamList & { CardBenefits: { cardId: string } },
+  'CardBenefits'
+>;
 
 // ============================================================================
 // Benefit Card Component
@@ -60,9 +55,7 @@ function BenefitCard({ benefit, isLocked, index }: BenefitCardProps) {
     >
       <View style={styles.benefitHeader}>
         <Text style={styles.benefitName}>{benefit.name}</Text>
-        {benefit.value && (
-          <Text style={styles.benefitValue}>{benefit.value}</Text>
-        )}
+        {benefit.value && <Text style={styles.benefitValue}>{benefit.value}</Text>}
       </View>
       <Text style={[styles.benefitDescription, isLocked && styles.benefitDescriptionBlurred]}>
         {benefit.description}
@@ -104,11 +97,7 @@ function BenefitsSection({ category, benefits, startIndex }: BenefitsSectionProp
         <Text style={styles.sectionTitle}>{getBenefitCategoryName(category)}</Text>
       </View>
       {benefits.map((benefit, index) => (
-        <BenefitCard
-          key={`${category}-${index}`}
-          benefit={benefit}
-          index={startIndex + index}
-        />
+        <BenefitCard key={`${category}-${index}`} benefit={benefit} index={startIndex + index} />
       ))}
     </View>
   );
@@ -142,7 +131,7 @@ export default function CardBenefitsScreen() {
     const allBenefits = getBenefitsForCard(cardId);
     const tier = getCurrentTierSync();
     const visible = getVisibleBenefits(allBenefits, tier);
-    
+
     setBenefits(visible);
     setHasAccess(canViewAllBenefits(tier));
     setLockedCount(getLockedBenefitsCount(allBenefits.length, tier));
@@ -153,10 +142,10 @@ export default function CardBenefitsScreen() {
     const loadAnalysis = async () => {
       setLoadingAnalysis(true);
       const profile = getSpendingProfileSync();
-      
+
       if (profile) {
         setHasSpendingProfile(true);
-        
+
         // Calculate fee breakeven if card has annual fee
         if (card?.annualFee && card.annualFee > 0) {
           const feeResult = calculateFeeBreakeven(cardId, profile);
@@ -164,7 +153,7 @@ export default function CardBenefitsScreen() {
             setFeeBreakevenResult(feeResult.value);
           }
         }
-        
+
         // Calculate signup bonus ROI if card has signup bonus
         if (card?.signupBonus) {
           const bonusResult = calculateSignupBonusROI(cardId, profile);
@@ -175,10 +164,10 @@ export default function CardBenefitsScreen() {
       } else {
         setHasSpendingProfile(false);
       }
-      
+
       setLoadingAnalysis(false);
     };
-    
+
     if (card) {
       loadAnalysis();
     }
@@ -219,7 +208,7 @@ export default function CardBenefitsScreen() {
             startIndex={benefitIndex}
           />
         )}
-        {(benefitIndex += groupedBenefits.travel.length, null)}
+        {((benefitIndex += groupedBenefits.travel.length), null)}
 
         {/* Insurance Benefits */}
         {groupedBenefits.insurance.length > 0 && (
@@ -229,7 +218,7 @@ export default function CardBenefitsScreen() {
             startIndex={benefitIndex}
           />
         )}
-        {(benefitIndex += groupedBenefits.insurance.length, null)}
+        {((benefitIndex += groupedBenefits.insurance.length), null)}
 
         {/* Purchase Benefits */}
         {groupedBenefits.purchase.length > 0 && (
@@ -239,7 +228,7 @@ export default function CardBenefitsScreen() {
             startIndex={benefitIndex}
           />
         )}
-        {(benefitIndex += groupedBenefits.purchase.length, null)}
+        {((benefitIndex += groupedBenefits.purchase.length), null)}
 
         {/* Lifestyle Benefits */}
         {groupedBenefits.lifestyle.length > 0 && (
@@ -278,7 +267,13 @@ export default function CardBenefitsScreen() {
             <View style={styles.ctaCard}>
               <Text style={styles.ctaTitle}>Get Personalized Insights</Text>
               <Text style={styles.ctaDescription}>
-                Set up your spending profile to see if this card's {card?.annualFee && card?.signupBonus ? 'fee and signup bonus are' : card?.annualFee ? 'fee is' : 'signup bonus is'} worth it for you.
+                Set up your spending profile to see if this card's{' '}
+                {card?.annualFee && card?.signupBonus
+                  ? 'fee and signup bonus are'
+                  : card?.annualFee
+                    ? 'fee is'
+                    : 'signup bonus is'}{' '}
+                worth it for you.
               </Text>
               <TouchableOpacity
                 style={styles.ctaButton}

@@ -92,30 +92,24 @@ describe('amountUtils - Property Tests', () => {
 
     it('should accept very small positive amounts', () => {
       fc.assert(
-        fc.property(
-          fc.double({ min: 0.000001, max: 0.01, noNaN: true }),
-          (amount: number) => {
-            const result = validateAmount(amount);
+        fc.property(fc.double({ min: 0.000001, max: 0.01, noNaN: true }), (amount: number) => {
+          const result = validateAmount(amount);
 
-            expect(result.isValid).toBe(true);
-            expect(result.error).toBeNull();
-          }
-        ),
+          expect(result.isValid).toBe(true);
+          expect(result.error).toBeNull();
+        }),
         { numRuns: 100 }
       );
     });
 
     it('should accept very large positive amounts', () => {
       fc.assert(
-        fc.property(
-          fc.double({ min: 1000000, max: 10000000, noNaN: true }),
-          (amount: number) => {
-            const result = validateAmount(amount);
+        fc.property(fc.double({ min: 1000000, max: 10000000, noNaN: true }), (amount: number) => {
+          const result = validateAmount(amount);
 
-            expect(result.isValid).toBe(true);
-            expect(result.error).toBeNull();
-          }
-        ),
+          expect(result.isValid).toBe(true);
+          expect(result.error).toBeNull();
+        }),
         { numRuns: 100 }
       );
     });
@@ -189,15 +183,12 @@ describe('amountUtils - Property Tests', () => {
 
     it('should specifically reject negative amounts with appropriate message', () => {
       fc.assert(
-        fc.property(
-          fc.double({ min: -1000000, max: -0.01, noNaN: true }),
-          (amount: number) => {
-            const result = validateAmount(amount);
+        fc.property(fc.double({ min: -1000000, max: -0.01, noNaN: true }), (amount: number) => {
+          const result = validateAmount(amount);
 
-            expect(result.isValid).toBe(false);
-            expect(result.error).toContain('positive');
-          }
-        ),
+          expect(result.isValid).toBe(false);
+          expect(result.error).toContain('positive');
+        }),
         { numRuns: 100 }
       );
     });
@@ -233,15 +224,12 @@ describe('amountUtils - Property Tests', () => {
 
     it('should round to two decimal places', () => {
       fc.assert(
-        fc.property(
-          fc.double({ min: 0.001, max: 1000, noNaN: true }),
-          (amount: number) => {
-            const formatted = formatCurrency(amount);
-            const expectedValue = amount.toFixed(2);
+        fc.property(fc.double({ min: 0.001, max: 1000, noNaN: true }), (amount: number) => {
+          const formatted = formatCurrency(amount);
+          const expectedValue = amount.toFixed(2);
 
-            expect(formatted).toBe(`$${expectedValue}`);
-          }
-        ),
+          expect(formatted).toBe(`$${expectedValue}`);
+        }),
         { numRuns: 100 }
       );
     });
@@ -259,19 +247,16 @@ describe('amountUtils - Property Tests', () => {
 
     it('should format large amounts correctly', () => {
       fc.assert(
-        fc.property(
-          fc.double({ min: 1000000, max: 10000000, noNaN: true }),
-          (amount: number) => {
-            const formatted = formatCurrency(amount);
+        fc.property(fc.double({ min: 1000000, max: 10000000, noNaN: true }), (amount: number) => {
+          const formatted = formatCurrency(amount);
 
-            // Should still have exactly two decimal places
-            expect(formatted).toMatch(/^\$\d+\.\d{2}$/);
+          // Should still have exactly two decimal places
+          expect(formatted).toMatch(/^\$\d+\.\d{2}$/);
 
-            // Should preserve the value
-            const numericPart = formatted.substring(1);
-            expect(parseFloat(numericPart)).toBeCloseTo(amount, 2);
-          }
-        ),
+          // Should preserve the value
+          const numericPart = formatted.substring(1);
+          expect(parseFloat(numericPart)).toBeCloseTo(amount, 2);
+        }),
         { numRuns: 100 }
       );
     });
@@ -307,15 +292,12 @@ describe('amountUtils - Property Tests', () => {
 
     it('should round CAD values to two decimal places', () => {
       fc.assert(
-        fc.property(
-          fc.double({ min: 0.001, max: 1000, noNaN: true }),
-          (amount: number) => {
-            const formatted = formatCadValue(amount);
-            const expectedValue = amount.toFixed(2);
+        fc.property(fc.double({ min: 0.001, max: 1000, noNaN: true }), (amount: number) => {
+          const formatted = formatCadValue(amount);
+          const expectedValue = amount.toFixed(2);
 
-            expect(formatted).toBe(`$${expectedValue} CAD`);
-          }
-        ),
+          expect(formatted).toBe(`$${expectedValue} CAD`);
+        }),
         { numRuns: 100 }
       );
     });
@@ -333,19 +315,16 @@ describe('amountUtils - Property Tests', () => {
 
     it('should format large CAD amounts correctly', () => {
       fc.assert(
-        fc.property(
-          fc.double({ min: 1000000, max: 10000000, noNaN: true }),
-          (amount: number) => {
-            const formatted = formatCadValue(amount);
+        fc.property(fc.double({ min: 1000000, max: 10000000, noNaN: true }), (amount: number) => {
+          const formatted = formatCadValue(amount);
 
-            // Should still have exactly two decimal places and CAD suffix
-            expect(formatted).toMatch(/^\$\d+\.\d{2} CAD$/);
+          // Should still have exactly two decimal places and CAD suffix
+          expect(formatted).toMatch(/^\$\d+\.\d{2} CAD$/);
 
-            // Should preserve the value
-            const numericPart = formatted.substring(1, formatted.length - 4);
-            expect(parseFloat(numericPart)).toBeCloseTo(amount, 2);
-          }
-        ),
+          // Should preserve the value
+          const numericPart = formatted.substring(1, formatted.length - 4);
+          expect(parseFloat(numericPart)).toBeCloseTo(amount, 2);
+        }),
         { numRuns: 100 }
       );
     });

@@ -6,11 +6,18 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
 import Stripe from 'https://esm.sh/stripe@14.5.0?target=deno';
+import { corsHeaders, extractId, requireEnv } from '../_shared/helpers.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
-};
+const STRIPE_SECRET_KEY = requireEnv('STRIPE_SECRET_KEY');
+const STRIPE_WEBHOOK_SECRET = requireEnv('STRIPE_WEBHOOK_SECRET');
+const SUPABASE_URL = requireEnv('SUPABASE_URL');
+const SUPABASE_SERVICE_ROLE_KEY = requireEnv('SUPABASE_SERVICE_ROLE_KEY');
+
+const stripe = new Stripe(STRIPE_SECRET_KEY, {
+  apiVersion: '2023-10-16',
+});
+
+const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 serve(async (req) => {
   // Handle CORS preflight
@@ -19,17 +26,6 @@ serve(async (req) => {
   }
 
   try {
-    // Initialize Stripe
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2023-10-16',
-    });
-
-    // Initialize Supabase client with service role
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') || '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-    );
-
     // Get raw body for signature verification
     const body = await req.text();
     const signature = req.headers.get('stripe-signature');
@@ -44,11 +40,7 @@ serve(async (req) => {
     // Verify webhook signature
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(
-        body,
-        signature,
-        Deno.env.get('STRIPE_WEBHOOK_SECRET') || ''
-      );
+      event = stripe.webhooks.constructEvent(body, signature, STRIPE_WEBHOOK_SECRET);
     } catch (err) {
       console.error('Webhook signature verification failed:', err);
       return new Response(
@@ -119,13 +111,15 @@ async function handleCheckoutCompleted(
     return;
   }
 
+  const customerId = extractId(session.customer, 'session.customer');
+
   // Handle lifetime one-time payment separately
   if (tier === 'lifetime') {
     // Create subscription record with lifetime status (no expiry)
     await supabase.from('subscriptions').upsert({
       user_id: userId,
       stripe_subscription_id: `lifetime_${session.payment_intent || session.id}`,
-      stripe_customer_id: session.customer as string,
+      stripe_customer_id: customerId,
       tier: 'lifetime',
       status: 'lifetime',
       current_period_start: new Date().toISOString(),
@@ -138,9 +132,9 @@ async function handleCheckoutCompleted(
     // Update profile tier to lifetime (maps to max/premium features)
     await supabase
       .from('profiles')
-      .update({ 
+      .update({
         tier: 'lifetime',
-        stripe_customer_id: session.customer as string,
+        stripe_customer_id: customerId,
       })
       .eq('user_id', userId);
 
@@ -149,13 +143,14 @@ async function handleCheckoutCompleted(
   }
 
   // Get subscription details for recurring subscriptions
-  const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+  const subscriptionId = extractId(session.subscription, 'session.subscription');
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
   // Create or update subscription record
   await supabase.from('subscriptions').upsert({
     user_id: userId,
     stripe_subscription_id: subscription.id,
-    stripe_customer_id: session.customer as string,
+    stripe_customer_id: customerId,
     tier,
     status: subscription.status,
     current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
@@ -168,9 +163,9 @@ async function handleCheckoutCompleted(
   // Update profile tier
   await supabase
     .from('profiles')
-    .update({ 
+    .update({
       tier,
-      stripe_customer_id: session.customer as string,
+      stripe_customer_id: customerId,
     })
     .eq('user_id', userId);
 
@@ -186,13 +181,14 @@ async function handleSubscriptionUpdated(
 ) {
   const userId = subscription.metadata?.supabase_user_id;
   const tier = subscription.metadata?.tier as 'pro' | 'max';
+  const customerId = extractId(subscription.customer, 'subscription.customer');
 
   if (!userId) {
     // Try to find user by Stripe customer ID
     const { data: profile } = await supabase
       .from('profiles')
       .select('user_id')
-      .eq('stripe_customer_id', subscription.customer)
+      .eq('stripe_customer_id', customerId)
       .single();
 
     if (!profile) {
@@ -204,7 +200,7 @@ async function handleSubscriptionUpdated(
     await supabase.from('subscriptions').upsert({
       user_id: profile.user_id,
       stripe_subscription_id: subscription.id,
-      stripe_customer_id: subscription.customer as string,
+      stripe_customer_id: customerId,
       tier: tier || 'pro',
       status: subscription.status,
       current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
@@ -226,7 +222,7 @@ async function handleSubscriptionUpdated(
     await supabase.from('subscriptions').upsert({
       user_id: userId,
       stripe_subscription_id: subscription.id,
-      stripe_customer_id: subscription.customer as string,
+      stripe_customer_id: customerId,
       tier,
       status: subscription.status,
       current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
@@ -255,11 +251,13 @@ async function handleSubscriptionDeleted(
   supabase: any,
   subscription: Stripe.Subscription
 ) {
+  const customerId = extractId(subscription.customer, 'subscription.customer');
+
   // Find user by Stripe customer ID
   const { data: profile } = await supabase
     .from('profiles')
     .select('user_id, tier')
-    .eq('stripe_customer_id', subscription.customer)
+    .eq('stripe_customer_id', customerId)
     .single();
 
   if (!profile) {
@@ -296,12 +294,13 @@ async function handlePaymentFailed(
   invoice: Stripe.Invoice
 ) {
   if (!invoice.subscription) return;
+  const subscriptionId = extractId(invoice.subscription, 'invoice.subscription');
 
   // Update subscription status to past_due
   await supabase
     .from('subscriptions')
     .update({ status: 'past_due' })
-    .eq('stripe_subscription_id', invoice.subscription);
+    .eq('stripe_subscription_id', subscriptionId);
 
-  console.log(`Payment failed for subscription ${invoice.subscription}`);
+  console.log(`Payment failed for subscription ${subscriptionId}`);
 }

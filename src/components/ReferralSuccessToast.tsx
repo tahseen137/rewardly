@@ -8,13 +8,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import {
-  Animated,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Props {
   visible: boolean;
@@ -32,7 +26,12 @@ export function ReferralSuccessToast({ visible, onDismiss, autoDismissMs = 5000 
       // Slide in
       Animated.parallel([
         Animated.timing(opacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-        Animated.spring(translateY, { toValue: 0, useNativeDriver: true, damping: 14, stiffness: 200 }),
+        Animated.spring(translateY, {
+          toValue: 0,
+          useNativeDriver: true,
+          damping: 14,
+          stiffness: 200,
+        }),
       ]).start();
 
       // Auto-dismiss

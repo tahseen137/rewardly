@@ -12,56 +12,67 @@ export interface Database {
         Row: CardRow;
         Insert: CardInsert;
         Update: CardUpdate;
+        Relationships: [];
       };
       category_rewards: {
         Row: CategoryRewardRow;
         Insert: CategoryRewardInsert;
         Update: CategoryRewardUpdate;
+        Relationships: [];
       };
       signup_bonuses: {
         Row: SignupBonusRow;
         Insert: SignupBonusInsert;
         Update: SignupBonusUpdate;
+        Relationships: [];
       };
       spending_categories: {
         Row: SpendingCategoryRow;
         Insert: SpendingCategoryInsert;
         Update: SpendingCategoryUpdate;
+        Relationships: [];
       };
       reward_programs: {
         Row: RewardProgramRow;
         Insert: RewardProgramInsert;
         Update: RewardProgramUpdate;
+        Relationships: [];
       };
       point_valuations: {
         Row: PointValuationRow;
         Insert: PointValuationInsert;
         Update: PointValuationUpdate;
+        Relationships: [];
       };
       user_cards: {
         Row: UserCardRow;
         Insert: UserCardInsert;
         Update: UserCardUpdate;
+        Relationships: [];
       };
       user_profiles: {
         Row: UserProfileRow;
         Insert: UserProfileInsert;
         Update: UserProfileUpdate;
+        Relationships: [];
       };
       referral_codes: {
         Row: ReferralCodeRow;
         Insert: ReferralCodeInsert;
         Update: ReferralCodeUpdate;
+        Relationships: [];
       };
       referral_signups: {
         Row: ReferralSignupRow;
         Insert: ReferralSignupInsert;
         Update: ReferralSignupUpdate;
+        Relationships: [];
       };
       referral_clicks: {
         Row: ReferralClickRow;
         Insert: ReferralClickInsert;
         Update: ReferralClickUpdate;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

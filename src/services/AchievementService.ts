@@ -1,6 +1,6 @@
 /**
  * AchievementService - F15: Achievements & Gamification
- * 
+ *
  * Features:
  * - Event-driven achievement tracking (< 5ms per check)
  * - Streak calculation (consecutive days)
@@ -36,37 +36,198 @@ const STORAGE_KEY = '@rewardly/achievements';
 
 export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
   // Getting Started
-  { id: 'GS1', name: 'First Card', description: 'Add your first credit card', category: 'getting_started', icon: '💳', progressTarget: 1 },
-  { id: 'GS2', name: 'Card Collector', description: 'Add 3 credit cards', category: 'getting_started', icon: '🃏', progressTarget: 3 },
-  { id: 'GS3', name: 'Full Deck', description: 'Add 5 credit cards', category: 'getting_started', icon: '🎴', progressTarget: 5 },
-  { id: 'GS4', name: 'Profile Set', description: 'Complete your spending profile', category: 'getting_started', icon: '📊', progressTarget: 1 },
-  { id: 'GS5', name: 'Sage Seeker', description: 'Ask Sage AI your first question', category: 'getting_started', icon: '🔮', progressTarget: 1 },
+  {
+    id: 'GS1',
+    name: 'First Card',
+    description: 'Add your first credit card',
+    category: 'getting_started',
+    icon: '💳',
+    progressTarget: 1,
+  },
+  {
+    id: 'GS2',
+    name: 'Card Collector',
+    description: 'Add 3 credit cards',
+    category: 'getting_started',
+    icon: '🃏',
+    progressTarget: 3,
+  },
+  {
+    id: 'GS3',
+    name: 'Full Deck',
+    description: 'Add 5 credit cards',
+    category: 'getting_started',
+    icon: '🎴',
+    progressTarget: 5,
+  },
+  {
+    id: 'GS4',
+    name: 'Profile Set',
+    description: 'Complete your spending profile',
+    category: 'getting_started',
+    icon: '📊',
+    progressTarget: 1,
+  },
+  {
+    id: 'GS5',
+    name: 'Sage Seeker',
+    description: 'Ask Sage AI your first question',
+    category: 'getting_started',
+    icon: '🔮',
+    progressTarget: 1,
+  },
 
   // Optimization
-  { id: 'OP1', name: 'Optimizer', description: 'Run the Wallet Optimizer', category: 'optimization', icon: '⚡', progressTarget: 1 },
-  { id: 'OP2', name: 'Fee Slayer', description: 'Check a fee breakeven analysis', category: 'optimization', icon: '🗡️', progressTarget: 1 },
-  { id: 'OP3', name: 'Bonus Hunter', description: 'Check a signup bonus ROI', category: 'optimization', icon: '🎯', progressTarget: 1 },
-  { id: 'OP4', name: 'Gap Finder', description: 'Discover a category gap in your portfolio', category: 'optimization', icon: '🔍', progressTarget: 1 },
-  { id: 'OP5', name: 'Perfect Wallet', description: 'Get 90%+ optimization score', category: 'optimization', icon: '👑', progressTarget: 1 },
+  {
+    id: 'OP1',
+    name: 'Optimizer',
+    description: 'Run the Wallet Optimizer',
+    category: 'optimization',
+    icon: '⚡',
+    progressTarget: 1,
+  },
+  {
+    id: 'OP2',
+    name: 'Fee Slayer',
+    description: 'Check a fee breakeven analysis',
+    category: 'optimization',
+    icon: '🗡️',
+    progressTarget: 1,
+  },
+  {
+    id: 'OP3',
+    name: 'Bonus Hunter',
+    description: 'Check a signup bonus ROI',
+    category: 'optimization',
+    icon: '🎯',
+    progressTarget: 1,
+  },
+  {
+    id: 'OP4',
+    name: 'Gap Finder',
+    description: 'Discover a category gap in your portfolio',
+    category: 'optimization',
+    icon: '🔍',
+    progressTarget: 1,
+  },
+  {
+    id: 'OP5',
+    name: 'Perfect Wallet',
+    description: 'Get 90%+ optimization score',
+    category: 'optimization',
+    icon: '👑',
+    progressTarget: 1,
+  },
 
   // Data & Insights
-  { id: 'DI1', name: 'Statement Pro', description: 'Upload your first bank statement', category: 'data_insights', icon: '📄', progressTarget: 1 },
-  { id: 'DI2', name: 'Data Driven', description: 'Upload 3 months of statements', category: 'data_insights', icon: '📈', progressTarget: 3 },
-  { id: 'DI3', name: 'Insight Seeker', description: 'View the insights dashboard', category: 'data_insights', icon: '💡', progressTarget: 1 },
-  { id: 'DI4', name: 'Money Saver', description: 'Discover $100+ left on the table', category: 'data_insights', icon: '💰', progressTarget: 1 },
-  { id: 'DI5', name: 'Trend Watcher', description: 'View spending trends', category: 'data_insights', icon: '📉', progressTarget: 1 },
+  {
+    id: 'DI1',
+    name: 'Statement Pro',
+    description: 'Upload your first bank statement',
+    category: 'data_insights',
+    icon: '📄',
+    progressTarget: 1,
+  },
+  {
+    id: 'DI2',
+    name: 'Data Driven',
+    description: 'Upload 3 months of statements',
+    category: 'data_insights',
+    icon: '📈',
+    progressTarget: 3,
+  },
+  {
+    id: 'DI3',
+    name: 'Insight Seeker',
+    description: 'View the insights dashboard',
+    category: 'data_insights',
+    icon: '💡',
+    progressTarget: 1,
+  },
+  {
+    id: 'DI4',
+    name: 'Money Saver',
+    description: 'Discover $100+ left on the table',
+    category: 'data_insights',
+    icon: '💰',
+    progressTarget: 1,
+  },
+  {
+    id: 'DI5',
+    name: 'Trend Watcher',
+    description: 'View spending trends',
+    category: 'data_insights',
+    icon: '📉',
+    progressTarget: 1,
+  },
 
   // Engagement
-  { id: 'EN1', name: 'Daily Visitor', description: 'Open the app 7 days in a row', category: 'engagement', icon: '🔥', progressTarget: 7 },
-  { id: 'EN2', name: 'Power User', description: 'Open the app 30 days in a row', category: 'engagement', icon: '⚡', progressTarget: 30 },
-  { id: 'EN3', name: 'Comparer', description: 'Compare 2 cards side by side', category: 'engagement', icon: '⚖️', progressTarget: 1 },
-  { id: 'EN4', name: 'Explorer', description: 'Visit every main screen', category: 'engagement', icon: '🧭', progressTarget: 1 },
-  { id: 'EN5', name: 'Card Scholar', description: 'View benefits of 10 different cards', category: 'engagement', icon: '📚', progressTarget: 10 },
+  {
+    id: 'EN1',
+    name: 'Daily Visitor',
+    description: 'Open the app 7 days in a row',
+    category: 'engagement',
+    icon: '🔥',
+    progressTarget: 7,
+  },
+  {
+    id: 'EN2',
+    name: 'Power User',
+    description: 'Open the app 30 days in a row',
+    category: 'engagement',
+    icon: '⚡',
+    progressTarget: 30,
+  },
+  {
+    id: 'EN3',
+    name: 'Comparer',
+    description: 'Compare 2 cards side by side',
+    category: 'engagement',
+    icon: '⚖️',
+    progressTarget: 1,
+  },
+  {
+    id: 'EN4',
+    name: 'Explorer',
+    description: 'Visit every main screen',
+    category: 'engagement',
+    icon: '🧭',
+    progressTarget: 1,
+  },
+  {
+    id: 'EN5',
+    name: 'Card Scholar',
+    description: 'View benefits of 10 different cards',
+    category: 'engagement',
+    icon: '📚',
+    progressTarget: 10,
+  },
 
   // Mastery
-  { id: 'MA1', name: 'Rewards Rookie', description: 'Earn 5 achievements', category: 'mastery', icon: '🌟', progressTarget: 5 },
-  { id: 'MA2', name: 'Rewards Pro', description: 'Earn 15 achievements', category: 'mastery', icon: '⭐', progressTarget: 15 },
-  { id: 'MA3', name: 'Rewards Master', description: 'Earn all achievements', category: 'mastery', icon: '🏆', progressTarget: 23 },
+  {
+    id: 'MA1',
+    name: 'Rewards Rookie',
+    description: 'Earn 5 achievements',
+    category: 'mastery',
+    icon: '🌟',
+    progressTarget: 5,
+  },
+  {
+    id: 'MA2',
+    name: 'Rewards Pro',
+    description: 'Earn 15 achievements',
+    category: 'mastery',
+    icon: '⭐',
+    progressTarget: 15,
+  },
+  {
+    id: 'MA3',
+    name: 'Rewards Master',
+    description: 'Earn all achievements',
+    category: 'mastery',
+    icon: '🏆',
+    progressTarget: 23,
+  },
 ];
 
 export const RANK_DEFINITIONS: RankDefinition[] = [
@@ -79,14 +240,7 @@ export const RANK_DEFINITIONS: RankDefinition[] = [
 ];
 
 // Main screens for Explorer achievement
-const MAIN_SCREENS = [
-  'Home',
-  'Insights',
-  'Sage',
-  'SmartWallet',
-  'MyCards',
-  'Settings',
-];
+const MAIN_SCREENS = ['Home', 'Insights', 'Sage', 'SmartWallet', 'MyCards', 'Settings'];
 
 // ============================================================================
 // In-Memory Cache
@@ -124,21 +278,19 @@ export function calculateStreak(
   currentStreak: number
 ): { newStreak: number; isNewDay: boolean } {
   const today = formatDateYMD(currentDate);
-  
+
   if (!lastVisitDate) {
     return { newStreak: 1, isNewDay: true };
   }
-  
+
   if (lastVisitDate === today) {
     return { newStreak: currentStreak, isNewDay: false };
   }
-  
+
   const lastDate = new Date(lastVisitDate + 'T00:00:00');
   const todayDate = new Date(today + 'T00:00:00');
-  const diffDays = Math.floor(
-    (todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)
-  );
-  
+  const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+
   if (diffDays === 1) {
     // Consecutive day
     return { newStreak: currentStreak + 1, isNewDay: true };
@@ -152,14 +304,14 @@ export function calculateStreak(
  * Check if all main screens have been visited
  */
 export function checkAllScreensVisited(visited: string[]): boolean {
-  return MAIN_SCREENS.every(screen => visited.includes(screen));
+  return MAIN_SCREENS.every((screen) => visited.includes(screen));
 }
 
 /**
  * Get achievement definition by ID
  */
 export function getAchievementDefinition(id: string): AchievementDefinition | undefined {
-  return ACHIEVEMENT_DEFINITIONS.find(a => a.id === id);
+  return ACHIEVEMENT_DEFINITIONS.find((a) => a.id === id);
 }
 
 /**
@@ -167,7 +319,7 @@ export function getAchievementDefinition(id: string): AchievementDefinition | un
  */
 export function createDefaultUserAchievements(userId: string | null): UserAchievements {
   const achievements: Record<string, AchievementProgress> = {};
-  
+
   for (const def of ACHIEVEMENT_DEFINITIONS) {
     achievements[def.id] = {
       achievementId: def.id,
@@ -178,7 +330,7 @@ export function createDefaultUserAchievements(userId: string | null): UserAchiev
       percentComplete: 0,
     };
   }
-  
+
   return {
     userId,
     achievements,
@@ -201,7 +353,7 @@ export function createDefaultUserAchievements(userId: string | null): UserAchiev
 /**
  * Check and update achievement progress
  * Returns unlocked achievement if newly unlocked, null otherwise
- * 
+ *
  * PERFORMANCE: This function must complete in < 5ms
  */
 export function checkAchievement(
@@ -209,7 +361,7 @@ export function checkAchievement(
   state: UserAchievements
 ): { updatedState: UserAchievements; unlocked: AchievementDefinition | null } {
   const startTime = Date.now();
-  
+
   // Clone state to avoid mutation
   const newState: UserAchievements = {
     ...state,
@@ -218,9 +370,9 @@ export function checkAchievement(
     cardBenefitsViewed: [...state.cardBenefitsViewed],
     updatedAt: new Date(),
   };
-  
+
   let unlockedDef: AchievementDefinition | null = null;
-  
+
   // Map event types to achievement checks
   switch (event.type) {
     case 'card_added': {
@@ -233,28 +385,28 @@ export function checkAchievement(
       unlockedDef = unlocked3 || unlocked2 || unlocked1;
       break;
     }
-    
+
     case 'spending_profile_saved':
       unlockedDef = tryUnlockAchievement(newState, 'GS4');
       break;
-    
+
     case 'sage_chat':
       newState.sageChatsCount++;
       unlockedDef = tryUnlockProgressAchievement(newState, 'GS5', newState.sageChatsCount);
       break;
-    
+
     case 'wallet_optimizer_used':
       unlockedDef = tryUnlockAchievement(newState, 'OP1');
       break;
-    
+
     case 'fee_breakeven_viewed':
       unlockedDef = tryUnlockAchievement(newState, 'OP2');
       break;
-    
+
     case 'signup_roi_viewed':
       unlockedDef = tryUnlockAchievement(newState, 'OP3');
       break;
-    
+
     case 'gaps_found': {
       const gapsCount = event.data?.gapsCount || 0;
       if (gapsCount > 0) {
@@ -262,7 +414,7 @@ export function checkAchievement(
       }
       break;
     }
-    
+
     case 'optimization_score_calculated': {
       const score = event.data?.optimizationScore || 0;
       if (score >= 90) {
@@ -270,18 +422,27 @@ export function checkAchievement(
       }
       break;
     }
-    
-    case 'statement_uploaded':
+
+    case 'statement_uploaded': {
       newState.statementsUploaded++;
-      const unlocked_di1 = tryUnlockProgressAchievement(newState, 'DI1', newState.statementsUploaded);
-      const unlocked_di2 = tryUnlockProgressAchievement(newState, 'DI2', newState.statementsUploaded);
+      const unlocked_di1 = tryUnlockProgressAchievement(
+        newState,
+        'DI1',
+        newState.statementsUploaded
+      );
+      const unlocked_di2 = tryUnlockProgressAchievement(
+        newState,
+        'DI2',
+        newState.statementsUploaded
+      );
       unlockedDef = unlocked_di2 || unlocked_di1;
       break;
-    
+    }
+
     case 'insights_viewed':
       unlockedDef = tryUnlockAchievement(newState, 'DI3');
       break;
-    
+
     case 'money_left_on_table_calculated': {
       const amount = event.data?.moneyLeftOnTable || 0;
       if (amount >= 100) {
@@ -289,85 +450,85 @@ export function checkAchievement(
       }
       break;
     }
-    
+
     case 'trends_viewed':
       unlockedDef = tryUnlockAchievement(newState, 'DI5');
       break;
-    
+
     case 'app_opened': {
       const { newStreak, isNewDay } = calculateStreak(
         newState.lastVisitDate || null,
         event.timestamp,
         newState.currentStreak
       );
-      
+
       if (isNewDay) {
         newState.currentStreak = newStreak;
         newState.lastVisitDate = formatDateYMD(event.timestamp);
         newState.longestStreak = Math.max(newState.longestStreak, newStreak);
-        
+
         const unlocked_en1 = tryUnlockProgressAchievement(newState, 'EN1', newStreak);
         const unlocked_en2 = tryUnlockProgressAchievement(newState, 'EN2', newStreak);
         unlockedDef = unlocked_en2 || unlocked_en1;
       }
       break;
     }
-    
+
     case 'card_comparison_viewed':
       newState.comparisonsCount++;
       if (newState.comparisonsCount >= 1) {
         unlockedDef = tryUnlockAchievement(newState, 'EN3');
       }
       break;
-    
+
     case 'screen_visited': {
       const screenName = event.data?.screenName;
       if (screenName && !newState.screensVisited.includes(screenName)) {
         newState.screensVisited.push(screenName);
-        
+
         if (checkAllScreensVisited(newState.screensVisited)) {
           unlockedDef = tryUnlockAchievement(newState, 'EN4');
         }
       }
       break;
     }
-    
+
     case 'card_benefits_viewed': {
       const cardId = event.data?.cardId;
       if (cardId && !newState.cardBenefitsViewed.includes(cardId)) {
         newState.cardBenefitsViewed.push(cardId);
         unlockedDef = tryUnlockProgressAchievement(
-          newState, 
-          'EN5', 
+          newState,
+          'EN5',
           newState.cardBenefitsViewed.length
         );
       }
       break;
     }
   }
-  
+
   // Check mastery achievements (always check, even if another achievement was unlocked)
   const unlocked_ma1 = tryUnlockProgressAchievement(newState, 'MA1', newState.totalUnlocked);
   const unlocked_ma2 = tryUnlockProgressAchievement(newState, 'MA2', newState.totalUnlocked);
   const unlocked_ma3 = tryUnlockProgressAchievement(newState, 'MA3', newState.totalUnlocked);
   const masteryUnlocked = unlocked_ma3 || unlocked_ma2 || unlocked_ma1;
-  
+
   // Return mastery achievement if one was unlocked, otherwise return the primary achievement
   if (masteryUnlocked) {
     unlockedDef = masteryUnlocked;
   }
-  
+
   // Update rank if achievements changed
   const newRank = calculateRank(newState.totalUnlocked);
   newState.rank = newRank.rank;
   newState.rankTitle = newRank.title;
-  
+
   // Performance check
   const elapsed = Date.now() - startTime;
   if (elapsed > 5) {
     console.warn(`[AchievementService] Check took ${elapsed}ms (> 5ms target)`);
   }
-  
+
   return { updatedState: newState, unlocked: unlockedDef };
 }
 
@@ -380,7 +541,7 @@ function tryUnlockAchievement(
 ): AchievementDefinition | null {
   const progress = state.achievements[achievementId];
   if (!progress || progress.isUnlocked) return null;
-  
+
   // Update progress
   state.achievements[achievementId] = {
     ...progress,
@@ -390,7 +551,7 @@ function tryUnlockAchievement(
     percentComplete: 100,
   };
   state.totalUnlocked++;
-  
+
   return getAchievementDefinition(achievementId) || null;
 }
 
@@ -404,12 +565,12 @@ function tryUnlockProgressAchievement(
 ): AchievementDefinition | null {
   const progress = state.achievements[achievementId];
   if (!progress || progress.isUnlocked) return null;
-  
+
   const target = progress.progressTarget;
   const newProgress = Math.min(currentProgress, target);
   const percentComplete = (newProgress / target) * 100;
   const isUnlocked = newProgress >= target;
-  
+
   state.achievements[achievementId] = {
     ...progress,
     progress: newProgress,
@@ -417,12 +578,12 @@ function tryUnlockProgressAchievement(
     isUnlocked,
     unlockedAt: isUnlocked ? new Date() : undefined,
   };
-  
+
   if (isUnlocked) {
     state.totalUnlocked++;
     return getAchievementDefinition(achievementId) || null;
   }
-  
+
   return null;
 }
 
@@ -465,7 +626,7 @@ export async function initializeAchievements(): Promise<void> {
       achievementsCache = createDefaultUserAchievements(null);
       await persistToStorage(achievementsCache);
     }
-    
+
     isInitialized = true;
     setupEventListener();
   } catch (error) {
@@ -482,27 +643,28 @@ export async function initializeAchievements(): Promise<void> {
 function setupEventListener(): void {
   AchievementEventEmitter.onEvent(async (event: AchievementEvent) => {
     if (!achievementsCache) return;
-    
+
     const { updatedState, unlocked } = checkAchievement(event, achievementsCache);
     achievementsCache = updatedState;
-    
+
     // Persist changes
     await persistToStorage(updatedState);
-    
+
     // Notify listeners if achievement unlocked
     if (unlocked) {
       const unlockEvent: AchievementUnlockEvent = {
         achievement: unlocked,
         progress: updatedState.achievements[unlocked.id],
-        newRank: updatedState.rank > (achievementsCache?.rank || 0)
-          ? { rank: updatedState.rank, title: updatedState.rankTitle }
-          : undefined,
+        newRank:
+          updatedState.rank > (achievementsCache?.rank || 0)
+            ? { rank: updatedState.rank, title: updatedState.rankTitle }
+            : undefined,
         timestamp: new Date(),
       };
-      
+
       notifyUnlock(unlockEvent);
     }
-    
+
     // Sync to Supabase (non-blocking)
     syncToSupabase(updatedState).catch(console.error);
   });
@@ -537,10 +699,8 @@ export function getAchievementDefinitions(): AchievementDefinition[] {
 /**
  * Get achievement definitions by category
  */
-export function getAchievementsByCategory(
-  category: AchievementCategory
-): AchievementDefinition[] {
-  return ACHIEVEMENT_DEFINITIONS.filter(a => a.category === category);
+export function getAchievementsByCategory(category: AchievementCategory): AchievementDefinition[] {
+  return ACHIEVEMENT_DEFINITIONS.filter((a) => a.category === category);
 }
 
 /**
@@ -564,12 +724,10 @@ export async function track(
  * Subscribe to achievement unlock events
  * Returns unsubscribe function
  */
-export function onAchievementUnlock(
-  callback: (event: AchievementUnlockEvent) => void
-): () => void {
+export function onAchievementUnlock(callback: (event: AchievementUnlockEvent) => void): () => void {
   unlockCallbacks.push(callback);
   return () => {
-    unlockCallbacks = unlockCallbacks.filter(cb => cb !== callback);
+    unlockCallbacks = unlockCallbacks.filter((cb) => cb !== callback);
   };
 }
 
@@ -592,14 +750,11 @@ function notifyUnlock(event: AchievementUnlockEvent): void {
 export async function resetAchievements(): Promise<void> {
   achievementsCache = createDefaultUserAchievements(null);
   await AsyncStorage.removeItem(STORAGE_KEY);
-  
+
   if (isSupabaseConfigured() && supabase) {
     const user = await getCurrentUser();
     if (user) {
-      await supabase
-        .from('user_achievements')
-        .delete()
-        .eq('user_id', user.id);
+      await supabase.from('user_achievements').delete().eq('user_id', user.id);
     }
   }
 }
@@ -637,7 +792,7 @@ async function persistToStorage(state: UserAchievements): Promise<void> {
 
 function transformFromStorage(data: any): UserAchievements {
   const achievements: Record<string, AchievementProgress> = {};
-  
+
   for (const [id, progress] of Object.entries(data.achievements || {})) {
     const p = progress as any;
     achievements[id] = {
@@ -645,7 +800,7 @@ function transformFromStorage(data: any): UserAchievements {
       unlockedAt: p.unlockedAt ? new Date(p.unlockedAt) : undefined,
     };
   }
-  
+
   return {
     ...data,
     achievements,
@@ -659,7 +814,7 @@ function transformFromStorage(data: any): UserAchievements {
 
 async function syncFromSupabase(): Promise<void> {
   if (!supabase) return;
-  
+
   const user = await getCurrentUser();
   if (!user) return;
 
@@ -681,7 +836,7 @@ async function syncFromSupabase(): Promise<void> {
     achievements[def.id] = {
       achievementId: def.id,
       unlockedAt: row?.unlocked_at ? new Date(row.unlocked_at) : undefined,
-      progress: row ? (def.progressTarget || 1) : 0,
+      progress: row ? def.progressTarget || 1 : 0,
       progressTarget: def.progressTarget || 1,
       isUnlocked: !!row,
       percentComplete: row ? 100 : 0,
@@ -729,11 +884,9 @@ async function syncToSupabase(state: UserAchievements): Promise<void> {
     }));
 
   if (unlockedAchievements.length > 0) {
-    await supabase
-      .from('user_achievements')
-      .upsert(unlockedAchievements as any, { 
-        onConflict: 'user_id,achievement_id',
-        ignoreDuplicates: false,
-      });
+    await supabase.from('user_achievements').upsert(unlockedAchievements as any, {
+      onConflict: 'user_id,achievement_id',
+      ignoreDuplicates: false,
+    });
   }
 }

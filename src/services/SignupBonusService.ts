@@ -1,6 +1,6 @@
 /**
  * SignupBonusService - F22: Signup Bonus ROI Calculator
- * 
+ *
  * Calculates whether a user can realistically hit minimum spend
  * requirements and the total first-year value of a card.
  */
@@ -29,17 +29,14 @@ import { calculateTotalAnnualRewards } from './FeeBreakevenService';
 /**
  * Calculate bonus value in CAD
  */
-export function calculateBonusValueCAD(
-  bonus: SignupBonus,
-  card: Card
-): number {
+export function calculateBonusValueCAD(bonus: SignupBonus, card: Card): number {
   const pointValuation = card.programDetails?.optimalRateCents ?? card.pointValuation ?? 1;
-  
+
   // For cashback bonuses, the amount is already in cents
   if (bonus.currency === 'cashback') {
     return bonus.amount / 100;
   }
-  
+
   // For points/miles, convert using point valuation
   return pointsToCad(bonus.amount, card, pointValuation);
 }
@@ -47,10 +44,7 @@ export function calculateBonusValueCAD(
 /**
  * Calculate months needed to hit minimum spend
  */
-export function calculateMonthsToHit(
-  minimumSpend: number,
-  monthlySpend: number
-): number {
+export function calculateMonthsToHit(minimumSpend: number, monthlySpend: number): number {
   if (monthlySpend <= 0) return Infinity;
   return Math.ceil(minimumSpend / monthlySpend);
 }
@@ -58,10 +52,7 @@ export function calculateMonthsToHit(
 /**
  * Calculate monthly spend needed to hit minimum on time
  */
-export function calculateMonthlySpendNeeded(
-  minimumSpend: number,
-  timeframeDays: number
-): number {
+export function calculateMonthlySpendNeeded(minimumSpend: number, timeframeDays: number): number {
   const months = timeframeDays / 30;
   return Math.ceil(minimumSpend / months);
 }
@@ -69,10 +60,7 @@ export function calculateMonthlySpendNeeded(
 /**
  * Determine if user can hit minimum spend
  */
-export function canHitMinimumSpend(
-  monthsToHit: number,
-  timeframeDays: number
-): boolean {
+export function canHitMinimumSpend(monthsToHit: number, timeframeDays: number): boolean {
   const timeframeMonths = timeframeDays / 30;
   return monthsToHit <= timeframeMonths;
 }
@@ -120,10 +108,7 @@ export function calculateFirstYearValue(
 /**
  * Calculate ongoing annual value (rewards - fee, no bonus)
  */
-export function calculateOngoingValue(
-  annualRewards: number,
-  annualFee: number
-): number {
+export function calculateOngoingValue(annualRewards: number, annualFee: number): number {
   return annualRewards - annualFee;
 }
 
@@ -144,11 +129,7 @@ export function determineVerdict(
   }
 
   // Excellent: Can hit easily (<70% timeframe), FYV > $500, ongoing > $100
-  if (
-    percentOfTimeframeUsed < 70 &&
-    firstYearValue > 500 &&
-    ongoingValue > 100
-  ) {
+  if (percentOfTimeframeUsed < 70 && firstYearValue > 500 && ongoingValue > 100) {
     return {
       verdict: 'excellent',
       reason: `You'll easily hit the minimum spend and earn strong ongoing rewards.`,
@@ -156,11 +137,7 @@ export function determineVerdict(
   }
 
   // Good: Can hit (<100% timeframe), FYV > $200, ongoing > $0
-  if (
-    percentOfTimeframeUsed <= 100 &&
-    firstYearValue > 200 &&
-    ongoingValue > 0
-  ) {
+  if (percentOfTimeframeUsed <= 100 && firstYearValue > 200 && ongoingValue > 0) {
     return {
       verdict: 'good',
       reason: `You can hit the minimum spend, and the card pays for itself after year one.`,
@@ -189,7 +166,7 @@ export function determineVerdict(
 
 /**
  * Calculate signup bonus ROI for a card
- * 
+ *
  * @param cardId - The card to analyze
  * @param spendingProfile - Optional spending profile (uses cached if not provided)
  */
@@ -216,14 +193,17 @@ export function calculateSignupBonusROI(
 
   const bonus = card.signupBonus;
   const userMonthlySpend = calculateTotalMonthlySpend(profile);
-  
+
   // Calculate all metrics
   const bonusValueCAD = calculateBonusValueCAD(bonus, card);
-  const monthlySpendNeeded = calculateMonthlySpendNeeded(bonus.spendRequirement, bonus.timeframeDays);
+  const monthlySpendNeeded = calculateMonthlySpendNeeded(
+    bonus.spendRequirement,
+    bonus.timeframeDays
+  );
   const monthsToHit = calculateMonthsToHit(bonus.spendRequirement, userMonthlySpend);
   const canHit = canHitMinimumSpend(monthsToHit, bonus.timeframeDays);
   const percentOfTimeframeUsed = (monthsToHit / (bonus.timeframeDays / 30)) * 100;
-  
+
   const timeline = generateTimeline(
     userMonthlySpend,
     bonus.spendRequirement,
@@ -232,7 +212,7 @@ export function calculateSignupBonusROI(
 
   const annualRewards = calculateTotalAnnualRewards(card, profile);
   const annualFee = card.annualFee || 0;
-  
+
   const firstYearValue = calculateFirstYearValue(bonusValueCAD, annualRewards, annualFee);
   const ongoingValue = calculateOngoingValue(annualRewards, annualFee);
 
@@ -290,13 +270,13 @@ export function findBestSignupBonuses(
   limit: number = 5
 ): SignupBonusROI[] {
   const allCards = getAllCardsSync();
-  
+
   // Filter to cards with signup bonuses
-  const cardsWithBonus = allCards.filter(c => c.signupBonus);
-  
+  const cardsWithBonus = allCards.filter((c) => c.signupBonus);
+
   // Calculate ROI for each
   return compareSignupBonuses(
-    cardsWithBonus.map(c => c.id),
+    cardsWithBonus.map((c) => c.id),
     spendingProfile
   ).slice(0, limit);
 }

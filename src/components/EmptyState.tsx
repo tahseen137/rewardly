@@ -101,7 +101,7 @@ interface NoResultsStateProps {
 }
 
 export function NoResultsState({ searchQuery, onClear, style }: NoResultsStateProps) {
-  const theme = useTheme();
+  const _theme = useTheme();
 
   return (
     <EmptyState

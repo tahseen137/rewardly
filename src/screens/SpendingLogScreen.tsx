@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
-import { Receipt, ShoppingBag } from 'lucide-react-native';
+import { ShoppingBag } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -49,8 +49,8 @@ export default function SpendingLogScreen() {
         </View>
         <Text style={styles.emptyTitle}>No Purchases Logged Yet</Text>
         <Text style={styles.emptyDescription}>
-          Start tracking your spending to see how much you're earning{'\n'}
-          — and what you could be earning — in credit card rewards.
+          Start tracking your spending to see how much you're earning{'\n'}— and what you could be
+          earning — in credit card rewards.
         </Text>
         <View style={styles.emptyTip}>
           <Text style={styles.emptyTipIcon}>💡</Text>
@@ -87,7 +87,7 @@ export default function SpendingLogScreen() {
       )}
       <FlatList
         data={entries}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

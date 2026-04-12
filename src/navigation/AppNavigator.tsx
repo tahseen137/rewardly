@@ -46,17 +46,25 @@ import {
   ReferralDashboardScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
-import OnboardingScreen from '../screens/OnboardingScreen';
 import PremiumOnboardingScreen from '../screens/PremiumOnboardingScreen';
 import UpgradeScreen from '../screens/UpgradeScreen';
 import LandingPage from '../screens/LandingPage';
 import { ErrorBoundary } from '../components';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
-import { getCurrentUser, onAuthStateChange, continueAsGuest, AuthUser } from '../services/AuthService';
-import { isOnboardingComplete, setOnboardingComplete, initializePreferences } from '../services/PreferenceManager';
+import {
+  getCurrentUser,
+  onAuthStateChange,
+  continueAsGuest,
+  AuthUser,
+} from '../services/AuthService';
+import {
+  isOnboardingComplete,
+  setOnboardingComplete,
+  initializePreferences,
+} from '../services/PreferenceManager';
 import { supabase, isSupabaseConfigured } from '../services/supabase';
-import { initializeSubscription, refreshSubscription, canAccessFeatureSync, getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
+import { initializeSubscription, refreshSubscription } from '../services/SubscriptionService';
 import { initializeAutoPilot } from '../services/AutoPilotService';
 import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 
@@ -151,18 +159,18 @@ function InsightsNavigator() {
         component={RewardsIQScreen}
         options={{ animation: 'slide_from_right', title: 'Rewards IQ' }}
       />
-      <InsightsStack.Screen 
-        name="PortfolioOptimizer" 
+      <InsightsStack.Screen
+        name="PortfolioOptimizer"
         component={PortfolioOptimizerScreen}
         options={{ animation: 'slide_from_right', title: 'Portfolio Optimizer' }}
       />
-      <InsightsStack.Screen 
-        name="WalletOptimizer" 
+      <InsightsStack.Screen
+        name="WalletOptimizer"
         component={WalletOptimizerScreen}
         options={{ animation: 'slide_from_right', title: 'Wallet Optimizer' }}
       />
-      <InsightsStack.Screen 
-        name="SpendingInsights" 
+      <InsightsStack.Screen
+        name="SpendingInsights"
         component={SpendingInsightsScreen}
         options={{ animation: 'slide_from_right', title: 'Spending Insights' }}
       />
@@ -353,7 +361,13 @@ function SageScreenWithErrorBoundary() {
   );
 }
 
-function SettingsScreenWithErrorBoundary({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: () => void }) {
+function SettingsScreenWithErrorBoundary({
+  onSignOut,
+  onSignIn,
+}: {
+  onSignOut: () => void;
+  onSignIn: () => void;
+}) {
   return (
     <ErrorBoundary
       fallbackTitle="Unable to load settings"
@@ -379,7 +393,7 @@ function SmartWalletScreenWithErrorBoundary() {
  * Main tab navigator
  */
 function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: () => void }) {
-  const theme = useTheme();
+  const _theme = useTheme();
 
   return (
     <Tab.Navigator
@@ -392,9 +406,10 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         lazy: true, // Don't pre-render inactive tabs
         tabBarStyle: {
           height: 64, // h-16
-          backgroundColor: Platform.OS === 'web'
-            ? 'rgba(15, 21, 40, 0.97)' // Opaque for web — prevents card text bleed-through
-            : colors.background.secondary,
+          backgroundColor:
+            Platform.OS === 'web'
+              ? 'rgba(15, 21, 40, 0.97)' // Opaque for web — prevents card text bleed-through
+              : colors.background.secondary,
           borderTopWidth: 1,
           borderTopColor: colors.border.light,
           position: 'absolute',
@@ -479,12 +494,15 @@ export default function AppNavigator() {
     const initializeApp = async () => {
       try {
         // Initialize each service independently — one failure shouldn't block the app
-        await initializePreferences().catch(e => console.warn('Preferences init failed:', e));
-        await initializeSubscription().catch(e => console.warn('Subscription init failed:', e));
-        await initializeAutoPilot().catch(e => console.warn('AutoPilot init failed:', e));
+        await initializePreferences().catch((e) => console.warn('Preferences init failed:', e));
+        await initializeSubscription().catch((e) => console.warn('Subscription init failed:', e));
+        await initializeAutoPilot().catch((e) => console.warn('AutoPilot init failed:', e));
 
         // Track app open (non-blocking)
-        try { AchievementEventEmitter.track('app_opened', {}); } catch (_) {}
+        try {
+          AchievementEventEmitter.track('app_opened', {});
+          // eslint-disable-next-line no-empty
+        } catch {}
 
         // ── Demo mode: ?demo=true or ?demo=1 bypasses auth (web only) ──────
         if (Platform.OS === 'web' && typeof window !== 'undefined') {
@@ -538,11 +556,11 @@ export default function AppNavigator() {
         if (!onboardingDone && isSupabaseConfigured() && supabase && !authUser.isAnonymous) {
           try {
             const { data: profile } = await supabase
-              .from('user_profiles')
+              .from('user_profiles' as any)
               .select('onboarding_complete')
               .eq('id', authUser.id)
               .single();
-            if (profile?.onboarding_complete) {
+            if ((profile as any)?.onboarding_complete) {
               onboardingDone = true;
               await setOnboardingComplete(true);
             }
@@ -564,14 +582,20 @@ export default function AppNavigator() {
     const currentUser = await getCurrentUser();
     let onboardingDone = isOnboardingComplete();
     // Check Supabase for returning users on new devices
-    if (!onboardingDone && currentUser && !currentUser.isAnonymous && isSupabaseConfigured() && supabase) {
+    if (
+      !onboardingDone &&
+      currentUser &&
+      !currentUser.isAnonymous &&
+      isSupabaseConfigured() &&
+      supabase
+    ) {
       try {
         const { data: profile } = await supabase
-          .from('user_profiles')
+          .from('user_profiles' as any)
           .select('onboarding_complete')
           .eq('id', currentUser.id)
           .single();
-        if (profile?.onboarding_complete) {
+        if ((profile as any)?.onboarding_complete) {
           onboardingDone = true;
           await setOnboardingComplete(true);
         }
@@ -587,8 +611,11 @@ export default function AppNavigator() {
     if (isSupabaseConfigured() && supabase && user && !user.isAnonymous) {
       try {
         await supabase
-          .from('user_profiles')
-          .upsert({ id: user.id, onboarding_complete: true, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+          .from('user_profiles' as any)
+          .upsert(
+            { id: user.id, onboarding_complete: true, updated_at: new Date().toISOString() } as any,
+            { onConflict: 'id' }
+          );
       } catch (e) {
         console.warn('Failed to sync onboarding to Supabase:', e);
       }
@@ -673,7 +700,7 @@ function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignI
       </RootStack.Screen>
       <RootStack.Screen
         name="Upgrade"
-        component={UpgradeScreen}
+        component={UpgradeScreen as any}
         options={{
           presentation: 'modal',
           animation: 'slide_from_bottom',

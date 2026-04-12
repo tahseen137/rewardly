@@ -4,13 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useAnimatedStyle,
@@ -36,30 +30,27 @@ interface RewardsIQWidgetProps {
 export default function RewardsIQWidget({ onPress, compact = false }: RewardsIQWidgetProps) {
   const [score, setScore] = useState<RewardsIQScore | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const pulseScale = useSharedValue(1);
   const scoreScale = useSharedValue(0);
-  
+
   useEffect(() => {
     loadScore();
   }, []);
-  
+
   useEffect(() => {
     if (score) {
       scoreScale.value = withSpring(1, { damping: 12, stiffness: 100 });
-      
+
       // Subtle pulse animation
       pulseScale.value = withRepeat(
-        withSequence(
-          withTiming(1.02, { duration: 2000 }),
-          withTiming(1, { duration: 2000 })
-        ),
+        withSequence(withTiming(1.02, { duration: 2000 }), withTiming(1, { duration: 2000 })),
         -1,
         true
       );
     }
   }, [score]);
-  
+
   const loadScore = async () => {
     try {
       const data = await calculateRewardsIQ();
@@ -70,16 +61,16 @@ export default function RewardsIQWidget({ onPress, compact = false }: RewardsIQW
       setIsLoading(false);
     }
   };
-  
+
   const pulseStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pulseScale.value }],
   }));
-  
+
   const scoreStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scoreScale.value }],
     opacity: scoreScale.value,
   }));
-  
+
   if (isLoading) {
     return (
       <View style={[styles.container, compact && styles.containerCompact]}>
@@ -87,19 +78,20 @@ export default function RewardsIQWidget({ onPress, compact = false }: RewardsIQW
       </View>
     );
   }
-  
+
   if (!score) {
     return null;
   }
-  
+
   const getScoreColor = () => {
     if (score.overallScore >= 80) return colors.primary.main;
     if (score.overallScore >= 60) return colors.warning.main;
     return colors.error.main;
   };
-  
-  const TrendIcon = score.trend === 'up' ? TrendingUp : score.trend === 'down' ? TrendingDown : null;
-  
+
+  const TrendIcon =
+    score.trend === 'up' ? TrendingUp : score.trend === 'down' ? TrendingDown : null;
+
   if (compact) {
     return (
       <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
@@ -123,7 +115,7 @@ export default function RewardsIQWidget({ onPress, compact = false }: RewardsIQW
       </TouchableOpacity>
     );
   }
-  
+
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
       <Animated.View style={[styles.container, pulseStyle]}>
@@ -141,7 +133,7 @@ export default function RewardsIQWidget({ onPress, compact = false }: RewardsIQW
               <Text style={styles.percentileText}>Top {100 - score.percentile}%</Text>
             </View>
           </View>
-          
+
           {/* Score Display */}
           <View style={styles.scoreSection}>
             <Animated.View style={[styles.scoreCircle, scoreStyle]}>
@@ -152,7 +144,7 @@ export default function RewardsIQWidget({ onPress, compact = false }: RewardsIQW
                 <Text style={styles.scoreNumber}>{score.overallScore}</Text>
               </LinearGradient>
             </Animated.View>
-            
+
             <View style={styles.scoreDetails}>
               <Text style={styles.scoreLabel}>Overall Score</Text>
               {TrendIcon && (
@@ -161,17 +153,20 @@ export default function RewardsIQWidget({ onPress, compact = false }: RewardsIQW
                     size={14}
                     color={score.trend === 'up' ? colors.primary.main : colors.error.main}
                   />
-                  <Text style={[
-                    styles.trendText,
-                    { color: score.trend === 'up' ? colors.primary.main : colors.error.main }
-                  ]}>
-                    {score.trend === 'up' ? '+' : ''}{score.trendAmount} from last time
+                  <Text
+                    style={[
+                      styles.trendText,
+                      { color: score.trend === 'up' ? colors.primary.main : colors.error.main },
+                    ]}
+                  >
+                    {score.trend === 'up' ? '+' : ''}
+                    {score.trendAmount} from last time
                   </Text>
                 </View>
               )}
             </View>
           </View>
-          
+
           {/* Quick Stats */}
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
@@ -185,16 +180,15 @@ export default function RewardsIQWidget({ onPress, compact = false }: RewardsIQW
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={[
-                styles.statValue,
-                score.autoPilotScore === 0 && styles.statValueDisabled
-              ]}>
+              <Text
+                style={[styles.statValue, score.autoPilotScore === 0 && styles.statValueDisabled]}
+              >
                 {score.autoPilotScore > 0 ? score.autoPilotScore : 'Off'}
               </Text>
               <Text style={styles.statLabel}>Smart Wallet</Text>
             </View>
           </View>
-          
+
           {/* CTA */}
           <View style={styles.ctaRow}>
             <Text style={styles.ctaText}>See full breakdown</Text>
@@ -218,7 +212,7 @@ const styles = StyleSheet.create({
   gradient: {
     padding: 16,
   },
-  
+
   // Header
   header: {
     flexDirection: 'row',
@@ -247,7 +241,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.warning.main,
   },
-  
+
   // Score Section
   scoreSection: {
     flexDirection: 'row',
@@ -285,7 +279,7 @@ const styles = StyleSheet.create({
   trendText: {
     fontSize: 13,
   },
-  
+
   // Stats Row
   statsRow: {
     flexDirection: 'row',
@@ -316,7 +310,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: colors.text.tertiary,
   },
-  
+
   // CTA
   ctaRow: {
     flexDirection: 'row',
@@ -329,7 +323,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.primary.main,
   },
-  
+
   // Compact styles
   containerCompact: {
     marginHorizontal: 16,

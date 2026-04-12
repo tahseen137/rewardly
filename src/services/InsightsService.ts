@@ -1,6 +1,6 @@
 /**
  * InsightsService - F25: Spending Insights Dashboard
- * 
+ *
  * Features:
  * - Category breakdown with optimization analysis
  * - Optimization score (0-100)
@@ -20,7 +20,6 @@ import {
   SmartAlertType,
   SpendingInsights,
   MonthlySummary,
-  DateRange,
   Card,
   InsightsError,
   Result,
@@ -53,24 +52,24 @@ export function calculateCategoryBreakdown(
   userCards: Card[]
 ): CategoryBreakdown[] {
   // Filter to purchases only (no credits)
-  const purchases = transactions.filter(t => !t.isCredit);
+  const purchases = transactions.filter((t) => !t.isCredit);
   const totalSpend = purchases.reduce((sum, t) => sum + t.amount, 0);
-  
+
   // Group by category
   const byCategory = new Map<SpendingCategory, ParsedTransaction[]>();
-  
+
   for (const tx of purchases) {
     const existing = byCategory.get(tx.category) || [];
     existing.push(tx);
     byCategory.set(tx.category, existing);
   }
-  
+
   // Calculate breakdown for each category
   const breakdown: CategoryBreakdown[] = [];
-  
+
   for (const [category, txs] of byCategory) {
     const categorySpend = txs.reduce((sum, t) => sum + t.amount, 0);
-    
+
     // Find top merchants
     const merchantTotals = new Map<string, { amount: number; count: number }>();
     for (const tx of txs) {
@@ -79,15 +78,15 @@ export function calculateCategoryBreakdown(
       existing.count++;
       merchantTotals.set(tx.normalizedMerchant, existing);
     }
-    
+
     const topMerchants: MerchantSummary[] = Array.from(merchantTotals.entries())
       .map(([name, { amount, count }]) => ({ name, amount, count, category }))
       .sort((a, b) => b.amount - a.amount)
       .slice(0, 5);
-    
+
     // Find optimal card for this category
     const optimalCard = findOptimalCardForCategory(category, userCards);
-    
+
     // Estimate rewards (we don't know which card was actually used)
     const { rewardsEarned, rewardsPossible } = estimateCategoryRewards(
       categorySpend,
@@ -95,7 +94,7 @@ export function calculateCategoryBreakdown(
       userCards,
       optimalCard
     );
-    
+
     breakdown.push({
       category,
       totalSpend: categorySpend,
@@ -109,7 +108,7 @@ export function calculateCategoryBreakdown(
       rewardsGap: rewardsPossible - rewardsEarned,
     });
   }
-  
+
   // Sort by spend (highest first)
   return breakdown.sort((a, b) => b.totalSpend - a.totalSpend);
 }
@@ -122,10 +121,10 @@ export function findOptimalCardForCategory(
   userCards: Card[]
 ): Card | null {
   if (userCards.length === 0) return null;
-  
+
   let bestCard: Card | null = null;
   let bestRewardRate = 0;
-  
+
   for (const card of userCards) {
     const rate = getApplicableMultiplier(card, category);
     if (rate > bestRewardRate) {
@@ -133,7 +132,7 @@ export function findOptimalCardForCategory(
       bestCard = card;
     }
   }
-  
+
   return bestCard;
 }
 
@@ -150,40 +149,41 @@ export function estimateCategoryRewards(
   if (userCards.length === 0) {
     return { rewardsEarned: 0, rewardsPossible: 0 };
   }
-  
+
   // Calculate possible with optimal card
   let rewardsPossible = 0;
   if (optimalCard) {
     const optimalRate = getApplicableMultiplier(optimalCard, category);
     const points = categorySpend * optimalRate;
-    const valuation = optimalCard.programDetails?.optimalRateCents ?? optimalCard.pointValuation ?? 100;
+    const valuation =
+      optimalCard.programDetails?.optimalRateCents ?? optimalCard.pointValuation ?? 100;
     rewardsPossible = pointsToCad(points, optimalCard, valuation);
   }
-  
+
   // For earned, assume they used average card (conservative estimate)
   // This is a simplification since we don't know actual card used
-  const avgRate = userCards.reduce((sum, card) => {
-    return sum + getApplicableMultiplier(card, category);
-  }, 0) / userCards.length;
-  
+  const avgRate =
+    userCards.reduce((sum, card) => {
+      return sum + getApplicableMultiplier(card, category);
+    }, 0) / userCards.length;
+
   // Use first card's valuation as approximation
   const firstCard = userCards[0];
   const avgPoints = categorySpend * avgRate;
-  const avgValuation = firstCard.programDetails?.optimalRateCents ?? firstCard.pointValuation ?? 100;
+  const avgValuation =
+    firstCard.programDetails?.optimalRateCents ?? firstCard.pointValuation ?? 100;
   const rewardsEarned = pointsToCad(avgPoints, firstCard, avgValuation);
-  
+
   return { rewardsEarned, rewardsPossible };
 }
 
 /**
  * Calculate optimization score (0-100)
  */
-export function calculateOptimizationScore(
-  breakdown: CategoryBreakdown[]
-): OptimizationScore {
+export function calculateOptimizationScore(breakdown: CategoryBreakdown[]): OptimizationScore {
   const totalEarned = breakdown.reduce((sum, b) => sum + b.rewardsEarned, 0);
   const totalPossible = breakdown.reduce((sum, b) => sum + b.rewardsPossible, 0);
-  
+
   // If no possible rewards (no cards), return 0
   if (totalPossible === 0) {
     return {
@@ -196,14 +196,14 @@ export function calculateOptimizationScore(
       improvementPotential: 'Add your credit cards to see optimization opportunities',
     };
   }
-  
+
   const score = Math.round((totalEarned / totalPossible) * 100);
   const gap = totalPossible - totalEarned;
-  
+
   let label: string;
   let emoji: string;
   let improvementPotential: string;
-  
+
   if (score >= OPTIMIZATION_THRESHOLDS.MASTER) {
     label = 'Rewards Master';
     emoji = '🏆';
@@ -221,7 +221,7 @@ export function calculateOptimizationScore(
     emoji = '🎯';
     improvementPotential = `Big opportunity: Switch cards to earn $${gap.toFixed(0)} more per year!`;
   }
-  
+
   return {
     score,
     label,
@@ -236,17 +236,15 @@ export function calculateOptimizationScore(
 /**
  * Group transactions by month
  */
-export function groupByMonth(
-  transactions: ParsedTransaction[]
-): MonthlySummary[] {
+export function groupByMonth(transactions: ParsedTransaction[]): MonthlySummary[] {
   const byMonth = new Map<string, MonthlySummary>();
-  
+
   for (const tx of transactions) {
     if (tx.isCredit) continue;
-    
+
     const monthKey = `${tx.date.getFullYear()}-${String(tx.date.getMonth() + 1).padStart(2, '0')}`;
     const monthDate = new Date(tx.date.getFullYear(), tx.date.getMonth(), 1);
-    
+
     let summary = byMonth.get(monthKey);
     if (!summary) {
       summary = {
@@ -267,15 +265,13 @@ export function groupByMonth(
       };
       byMonth.set(monthKey, summary);
     }
-    
+
     summary.totalSpend += tx.amount;
     summary.byCategory[tx.category] += tx.amount;
     summary.transactionCount++;
   }
-  
-  return Array.from(byMonth.values()).sort(
-    (a, b) => a.month.getTime() - b.month.getTime()
-  );
+
+  return Array.from(byMonth.values()).sort((a, b) => a.month.getTime() - b.month.getTime());
 }
 
 /**
@@ -286,29 +282,28 @@ export function calculateSpendingTrends(
   previousMonth: MonthlySummary | null
 ): SpendingTrend[] {
   const trends: SpendingTrend[] = [];
-  
+
   for (const category of Object.values(SpendingCategory)) {
     const currentSpend = currentMonth.byCategory[category];
     const previousSpend = previousMonth?.byCategory[category] || 0;
-    
+
     const changeAmount = currentSpend - previousSpend;
-    const changePercent = previousSpend > 0 
-      ? (changeAmount / previousSpend) * 100 
-      : currentSpend > 0 ? 100 : 0;
-    
+    const changePercent =
+      previousSpend > 0 ? (changeAmount / previousSpend) * 100 : currentSpend > 0 ? 100 : 0;
+
     let direction: 'up' | 'down' | 'stable';
     if (Math.abs(changePercent) < 10) {
       direction = 'stable';
     } else {
       direction = changePercent > 0 ? 'up' : 'down';
     }
-    
+
     // Generate alert for significant changes
     let alert: SmartAlert | undefined;
     if (Math.abs(changePercent) >= TREND_THRESHOLD_PERCENT && direction !== 'stable') {
       alert = generateTrendAlert(category, changePercent, direction);
     }
-    
+
     trends.push({
       category,
       currentMonth: currentSpend,
@@ -319,7 +314,7 @@ export function calculateSpendingTrends(
       alert,
     });
   }
-  
+
   return trends;
 }
 
@@ -342,23 +337,25 @@ function generateTrendAlert(
     [SpendingCategory.HOME_IMPROVEMENT]: 'home improvement',
     [SpendingCategory.OTHER]: 'other',
   };
-  
+
   const catName = categoryNames[category];
   const percentStr = Math.abs(changePercent).toFixed(0);
-  
+
   const type: SmartAlertType = direction === 'up' ? 'spending_increase' : 'spending_decrease';
   const priority = Math.abs(changePercent) >= 50 ? 'high' : 'medium';
-  
+
   return {
     id: `trend_${category}_${Date.now()}`,
     type,
     priority,
-    title: direction === 'up' 
-      ? `${catName} spending up ${percentStr}%`
-      : `${catName} spending down ${percentStr}%`,
-    message: direction === 'up'
-      ? `Your ${catName} spending increased by ${percentStr}% this month.`
-      : `Your ${catName} spending decreased by ${percentStr}% this month.`,
+    title:
+      direction === 'up'
+        ? `${catName} spending up ${percentStr}%`
+        : `${catName} spending down ${percentStr}%`,
+    message:
+      direction === 'up'
+        ? `Your ${catName} spending increased by ${percentStr}% this month.`
+        : `Your ${catName} spending decreased by ${percentStr}% this month.`,
     category,
     createdAt: new Date(),
     dismissed: false,
@@ -373,14 +370,14 @@ export function generateSmartAlerts(
   trends: SpendingTrend[]
 ): SmartAlert[] {
   const alerts: SmartAlert[] = [];
-  
+
   // Add trend alerts
   for (const trend of trends) {
     if (trend.alert) {
       alerts.push(trend.alert);
     }
   }
-  
+
   // Card switch opportunities (large reward gaps)
   for (const cat of breakdown) {
     if (cat.rewardsGap > 100 && cat.optimalCard) {
@@ -398,13 +395,13 @@ export function generateSmartAlerts(
       });
     }
   }
-  
+
   // Sort by priority and potential savings
   return alerts.sort((a, b) => {
     const priorityScore = { high: 3, medium: 2, low: 1 };
     const aPriority = priorityScore[a.priority];
     const bPriority = priorityScore[b.priority];
-    
+
     if (aPriority !== bPriority) return bPriority - aPriority;
     return (b.potentialSavings || 0) - (a.potentialSavings || 0);
   });
@@ -413,9 +410,7 @@ export function generateSmartAlerts(
 /**
  * Calculate total "money left on table"
  */
-export function calculateMoneyLeftOnTable(
-  breakdown: CategoryBreakdown[]
-): number {
+export function calculateMoneyLeftOnTable(breakdown: CategoryBreakdown[]): number {
   return breakdown.reduce((sum, cat) => sum + cat.rewardsGap, 0);
 }
 
@@ -426,10 +421,13 @@ export function getTopMerchants(
   transactions: ParsedTransaction[],
   limit: number = 10
 ): MerchantSummary[] {
-  const purchases = transactions.filter(t => !t.isCredit);
-  
-  const merchantTotals = new Map<string, { amount: number; count: number; category: SpendingCategory }>();
-  
+  const purchases = transactions.filter((t) => !t.isCredit);
+
+  const merchantTotals = new Map<
+    string,
+    { amount: number; count: number; category: SpendingCategory }
+  >();
+
   for (const tx of purchases) {
     const existing = merchantTotals.get(tx.normalizedMerchant);
     if (existing) {
@@ -443,7 +441,7 @@ export function getTopMerchants(
       });
     }
   }
-  
+
   return Array.from(merchantTotals.entries())
     .map(([name, { amount, count, category }]) => ({ name, amount, count, category }))
     .sort((a, b) => b.amount - a.amount)
@@ -470,42 +468,38 @@ export function generateSpendingInsights(
       message: `Need at least ${MIN_TRANSACTIONS_FOR_INSIGHTS} transactions for insights`,
     });
   }
-  
+
   // Calculate date range
-  const dates = transactions.map(t => t.date.getTime());
+  const dates = transactions.map((t) => t.date.getTime());
   const periodStart = new Date(Math.min(...dates));
   const periodEnd = new Date(Math.max(...dates));
-  
+
   // Calculate total spend
-  const totalSpend = transactions
-    .filter(t => !t.isCredit)
-    .reduce((sum, t) => sum + t.amount, 0);
-  
+  const totalSpend = transactions.filter((t) => !t.isCredit).reduce((sum, t) => sum + t.amount, 0);
+
   // Category breakdown
   const categoryBreakdown = calculateCategoryBreakdown(transactions, userCards);
-  
+
   // Optimization score
   const optimizationScore = calculateOptimizationScore(categoryBreakdown);
-  
+
   // Monthly summaries for trends
   const monthlyData = groupByMonth(transactions);
   const currentMonth = monthlyData[monthlyData.length - 1];
   const previousMonth = monthlyData.length > 1 ? monthlyData[monthlyData.length - 2] : null;
-  
+
   // Spending trends
-  const trends = previousMonth 
-    ? calculateSpendingTrends(currentMonth, previousMonth)
-    : [];
-  
+  const trends = previousMonth ? calculateSpendingTrends(currentMonth, previousMonth) : [];
+
   // Smart alerts
   const alerts = generateSmartAlerts(categoryBreakdown, trends);
-  
+
   // Money left on table
   const moneyLeftOnTable = calculateMoneyLeftOnTable(categoryBreakdown);
-  
+
   // Top merchants
   const topMerchants = getTopMerchants(transactions, 10);
-  
+
   return success({
     periodStart,
     periodEnd,

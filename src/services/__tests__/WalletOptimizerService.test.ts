@@ -1,6 +1,6 @@
 /**
  * WalletOptimizerService - Unit Tests
- * 
+ *
  * Tests wallet optimization algorithm, pruning, combination generation, and ranking
  */
 
@@ -43,7 +43,9 @@ jest.mock('../SpendingProfileService', () => {
 const mockGetAllCardsSync = getAllCardsSync as jest.MockedFunction<typeof getAllCardsSync>;
 const mockGetCardByIdSync = getCardByIdSync as jest.MockedFunction<typeof getCardByIdSync>;
 const mockGetCards = getCards as jest.MockedFunction<typeof getCards>;
-const mockGetSpendingProfileSync = getSpendingProfileSync as jest.MockedFunction<typeof getSpendingProfileSync>;
+const mockGetSpendingProfileSync = getSpendingProfileSync as jest.MockedFunction<
+  typeof getSpendingProfileSync
+>;
 
 // ============================================================================
 // Test Data
@@ -69,7 +71,10 @@ const mockGroceryCard: Card = {
   rewardProgram: 'Points',
   baseRewardRate: { value: 1, type: RewardType.POINTS, unit: 'multiplier' },
   categoryRewards: [
-    { category: SpendingCategory.GROCERIES, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
+    {
+      category: SpendingCategory.GROCERIES,
+      rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' },
+    },
   ],
   annualFee: 120,
   pointValuation: 1,
@@ -82,7 +87,10 @@ const mockDiningCard: Card = {
   rewardProgram: 'Cashback',
   baseRewardRate: { value: 1, type: RewardType.CASHBACK, unit: 'percent' },
   categoryRewards: [
-    { category: SpendingCategory.DINING, rewardRate: { value: 4, type: RewardType.CASHBACK, unit: 'percent' } },
+    {
+      category: SpendingCategory.DINING,
+      rewardRate: { value: 4, type: RewardType.CASHBACK, unit: 'percent' },
+    },
   ],
   annualFee: 95,
 };
@@ -94,8 +102,14 @@ const mockTravelCard: Card = {
   rewardProgram: 'Miles',
   baseRewardRate: { value: 1, type: RewardType.POINTS, unit: 'multiplier' },
   categoryRewards: [
-    { category: SpendingCategory.TRAVEL, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
-    { category: SpendingCategory.DINING, rewardRate: { value: 3, type: RewardType.POINTS, unit: 'multiplier' } },
+    {
+      category: SpendingCategory.TRAVEL,
+      rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' },
+    },
+    {
+      category: SpendingCategory.DINING,
+      rewardRate: { value: 3, type: RewardType.POINTS, unit: 'multiplier' },
+    },
   ],
   annualFee: 150,
   pointValuation: 1,
@@ -123,11 +137,16 @@ const mockConstraints: WalletConstraints = {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  
-  mockGetAllCardsSync.mockReturnValue([mockGroceryCard, mockDiningCard, mockTravelCard, mockNofeeCard]);
+
+  mockGetAllCardsSync.mockReturnValue([
+    mockGroceryCard,
+    mockDiningCard,
+    mockTravelCard,
+    mockNofeeCard,
+  ]);
   mockGetCardByIdSync.mockImplementation((id: string) => {
     const cards = [mockGroceryCard, mockDiningCard, mockTravelCard, mockNofeeCard];
-    return cards.find(c => c.id === id) || null;
+    return cards.find((c) => c.id === id) || null;
   });
   mockGetCards.mockReturnValue([]);
   mockGetSpendingProfileSync.mockReturnValue({
@@ -166,7 +185,7 @@ describe('calculateCategoryRewards', () => {
 describe('calculateTotalAnnualRewards', () => {
   it('should sum rewards across all categories', () => {
     const total = calculateTotalAnnualRewards(mockGroceryCard, mockSpendingProfile);
-    
+
     // Groceries: 800 × 12 × 5 × 0.01 = 480
     // Other categories (excluding transit): (1775 - 800) × 12 × 1 × 0.01 = 117
     // Total: ~597
@@ -188,21 +207,25 @@ describe('evaluateWalletCombination', () => {
       [mockGroceryCard, mockDiningCard],
       mockSpendingProfile
     );
-    
+
     // Should have assignments for categories with non-zero spending
     expect(categoryAssignments.length).toBeGreaterThan(0);
     expect(categoryAssignments.length).toBeLessThanOrEqual(9); // Max 9 categories
-    
+
     // Groceries should be assigned to grocery card
-    const groceryAssignment = categoryAssignments.find(a => a.category === SpendingCategory.GROCERIES);
+    const groceryAssignment = categoryAssignments.find(
+      (a) => a.category === SpendingCategory.GROCERIES
+    );
     expect(groceryAssignment).toBeDefined();
     expect(groceryAssignment?.bestCardId).toBe('grocery-card');
-    
+
     // Dining should be assigned to dining card (4% > 1%)
-    const diningAssignment = categoryAssignments.find(a => a.category === SpendingCategory.DINING);
+    const diningAssignment = categoryAssignments.find(
+      (a) => a.category === SpendingCategory.DINING
+    );
     expect(diningAssignment).toBeDefined();
     expect(diningAssignment?.bestCardId).toBe('dining-card');
-    
+
     expect(totalRewards).toBeGreaterThan(0);
   });
 
@@ -212,13 +235,12 @@ describe('evaluateWalletCombination', () => {
       travel: 0,
       entertainment: 0,
     };
-    
-    const { categoryAssignments } = evaluateWalletCombination(
-      [mockTravelCard],
-      zeroSpendProfile
+
+    const { categoryAssignments } = evaluateWalletCombination([mockTravelCard], zeroSpendProfile);
+
+    const travelAssignment = categoryAssignments.find(
+      (a) => a.category === SpendingCategory.TRAVEL
     );
-    
-    const travelAssignment = categoryAssignments.find(a => a.category === SpendingCategory.TRAVEL);
     expect(travelAssignment).toBeUndefined();
   });
 
@@ -227,8 +249,10 @@ describe('evaluateWalletCombination', () => {
       [mockGroceryCard],
       mockSpendingProfile
     );
-    
-    const groceryAssignment = categoryAssignments.find(a => a.category === SpendingCategory.GROCERIES);
+
+    const groceryAssignment = categoryAssignments.find(
+      (a) => a.category === SpendingCategory.GROCERIES
+    );
     if (groceryAssignment) {
       expect(groceryAssignment.annualRewards).toBeCloseTo(480, 0);
       expect(groceryAssignment.monthlyRewards).toBeCloseTo(40, 0);
@@ -239,14 +263,14 @@ describe('evaluateWalletCombination', () => {
 describe('calculateNetAnnualValue', () => {
   it('should calculate net value correctly', () => {
     const { netValue, totalFees } = calculateNetAnnualValue(500, [mockGroceryCard, mockDiningCard]);
-    
+
     expect(totalFees).toBe(215); // 120 + 95
     expect(netValue).toBe(285); // 500 - 215
   });
 
   it('should handle no-fee cards', () => {
     const { netValue, totalFees } = calculateNetAnnualValue(300, [mockNofeeCard]);
-    
+
     expect(totalFees).toBe(0);
     expect(netValue).toBe(300);
   });
@@ -274,7 +298,7 @@ describe('calculateEffectiveRewardRate', () => {
       transit: 0,
       other: 0,
     };
-    
+
     const rate = calculateEffectiveRewardRate(100, emptyProfile);
     expect(rate).toBe(0);
   });
@@ -290,14 +314,14 @@ describe('pruneCards', () => {
       ...mockConstraints,
       excludedCardIds: ['grocery-card'],
     };
-    
+
     const pruned = pruneCards(
       [mockGroceryCard, mockDiningCard, mockTravelCard, mockNofeeCard],
       mockSpendingProfile,
       constraints
     );
-    
-    expect(pruned.find(p => p.cardId === 'grocery-card')).toBeUndefined();
+
+    expect(pruned.find((p) => p.cardId === 'grocery-card')).toBeUndefined();
   });
 
   it('should filter by preferred banks', () => {
@@ -305,14 +329,14 @@ describe('pruneCards', () => {
       ...mockConstraints,
       preferredBanks: ['Bank A', 'Bank B'],
     };
-    
+
     const pruned = pruneCards(
       [mockGroceryCard, mockDiningCard, mockTravelCard, mockNofeeCard],
       mockSpendingProfile,
       constraints
     );
-    
-    pruned.forEach(p => {
+
+    pruned.forEach((p) => {
       expect(['Bank A', 'Bank B']).toContain(p.card.issuer);
     });
   });
@@ -322,14 +346,14 @@ describe('pruneCards', () => {
       ...mockConstraints,
       preferredRewardType: 'cashback',
     };
-    
+
     const pruned = pruneCards(
       [mockGroceryCard, mockDiningCard, mockTravelCard, mockNofeeCard],
       mockSpendingProfile,
       constraints
     );
-    
-    pruned.forEach(p => {
+
+    pruned.forEach((p) => {
       expect(p.card.baseRewardRate.type).toBe(RewardType.CASHBACK);
     });
   });
@@ -340,19 +364,15 @@ describe('pruneCards', () => {
       id: 'high-fee',
       annualFee: 500,
     };
-    
+
     const constraints: WalletConstraints = {
       ...mockConstraints,
       maxTotalAnnualFees: 300,
     };
-    
-    const pruned = pruneCards(
-      [mockGroceryCard, highFeeCard],
-      mockSpendingProfile,
-      constraints
-    );
-    
-    expect(pruned.find(p => p.cardId === 'high-fee')).toBeUndefined();
+
+    const pruned = pruneCards([mockGroceryCard, highFeeCard], mockSpendingProfile, constraints);
+
+    expect(pruned.find((p) => p.cardId === 'high-fee')).toBeUndefined();
   });
 
   it('should keep top cards per category', () => {
@@ -361,9 +381,9 @@ describe('pruneCards', () => {
       mockSpendingProfile,
       mockConstraints
     );
-    
+
     expect(pruned.length).toBeGreaterThan(0);
-    pruned.forEach(p => {
+    pruned.forEach((p) => {
       expect(p.topCategories.length).toBeGreaterThan(0);
       expect(p.maxCategoryRate).toBeGreaterThan(0);
     });
@@ -374,15 +394,15 @@ describe('pruneCards', () => {
       ...mockSpendingProfile,
       groceries: 0,
     };
-    
+
     const pruned = pruneCards(
       [mockGroceryCard, mockDiningCard],
       zeroGroceryProfile,
       mockConstraints
     );
-    
+
     // Grocery card should not be top for groceries (zero spend)
-    const groceryCardPruned = pruned.find(p => p.cardId === 'grocery-card');
+    const groceryCardPruned = pruned.find((p) => p.cardId === 'grocery-card');
     if (groceryCardPruned) {
       expect(groceryCardPruned.topCategories).not.toContain(SpendingCategory.GROCERIES);
     }
@@ -420,26 +440,26 @@ describe('generateCombinations', () => {
 
   it('should generate 2-card combinations', () => {
     const combos = generateCombinations(prunedCards, 2, 300);
-    
+
     expect(combos.length).toBeGreaterThan(0);
-    combos.forEach(combo => {
+    combos.forEach((combo) => {
       expect(combo.length).toBe(2);
     });
   });
 
   it('should generate 3-card combinations', () => {
     const combos = generateCombinations(prunedCards, 3, 500);
-    
+
     expect(combos.length).toBeGreaterThan(0);
-    combos.forEach(combo => {
+    combos.forEach((combo) => {
       expect(combo.length).toBe(3);
     });
   });
 
   it('should respect fee constraints', () => {
     const combos = generateCombinations(prunedCards, 2, 200);
-    
-    combos.forEach(combo => {
+
+    combos.forEach((combo) => {
       const totalFee = combo.reduce((sum, card) => sum + (card.annualFee || 0), 0);
       expect(totalFee).toBeLessThanOrEqual(200);
     });
@@ -464,9 +484,9 @@ describe('rankCombinations', () => {
 
   it('should rank combinations by net value', () => {
     const ranked = rankCombinations(combos, mockSpendingProfile, 3);
-    
+
     expect(ranked.length).toBeLessThanOrEqual(3);
-    
+
     // Verify descending order
     for (let i = 1; i < ranked.length; i++) {
       expect(ranked[i - 1].netAnnualValue).toBeGreaterThanOrEqual(ranked[i].netAnnualValue);
@@ -475,7 +495,7 @@ describe('rankCombinations', () => {
 
   it('should assign ranks correctly', () => {
     const ranked = rankCombinations(combos, mockSpendingProfile, 3);
-    
+
     ranked.forEach((result, index) => {
       expect(result.rank).toBe(index + 1);
     });
@@ -483,7 +503,7 @@ describe('rankCombinations', () => {
 
   it('should calculate all result fields', () => {
     const ranked = rankCombinations(combos, mockSpendingProfile, 1);
-    
+
     expect(ranked[0].totalAnnualRewards).toBeGreaterThan(0);
     expect(ranked[0].totalAnnualFees).toBeGreaterThan(0);
     expect(ranked[0].categoryAssignments.length).toBeGreaterThan(0);
@@ -503,18 +523,16 @@ describe('rankCombinations', () => {
 describe('compareToCurrentWallet', () => {
   it('should return undefined when user has no cards', () => {
     mockGetCards.mockReturnValue([]);
-    
+
     const comparison = compareToCurrentWallet(500, mockSpendingProfile);
     expect(comparison).toBeUndefined();
   });
 
   it('should calculate improvement correctly', () => {
-    mockGetCards.mockReturnValue([
-      { cardId: 'nofee-card', addedAt: new Date() },
-    ]);
-    
+    mockGetCards.mockReturnValue([{ cardId: 'nofee-card', addedAt: new Date() }]);
+
     const comparison = compareToCurrentWallet(600, mockSpendingProfile);
-    
+
     expect(comparison).toBeDefined();
     if (comparison) {
       expect(comparison.improvement).toBeGreaterThan(0);
@@ -527,9 +545,9 @@ describe('compareToCurrentWallet', () => {
       { cardId: 'grocery-card', addedAt: new Date() },
       { cardId: 'dining-card', addedAt: new Date() },
     ]);
-    
+
     const comparison = compareToCurrentWallet(100, mockSpendingProfile);
-    
+
     expect(comparison).toBeDefined();
     if (comparison) {
       expect(comparison.improvement).toBeLessThan(0);
@@ -544,7 +562,7 @@ describe('compareToCurrentWallet', () => {
 describe('optimizeWallet', () => {
   it('should successfully optimize wallet', () => {
     const result = optimizeWallet(mockSpendingProfile, mockConstraints, 3);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.recommendations.length).toBeGreaterThan(0);
@@ -558,9 +576,9 @@ describe('optimizeWallet', () => {
       ...mockConstraints,
       maxCards: 5 as any,
     };
-    
+
     const result = optimizeWallet(mockSpendingProfile, invalidConstraints);
-    
+
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.type).toBe('INVALID_CONSTRAINTS');
@@ -572,9 +590,9 @@ describe('optimizeWallet', () => {
       ...mockConstraints,
       maxTotalAnnualFees: -100,
     };
-    
+
     const result = optimizeWallet(mockSpendingProfile, invalidConstraints);
-    
+
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.type).toBe('INVALID_CONSTRAINTS');
@@ -583,9 +601,9 @@ describe('optimizeWallet', () => {
 
   it('should fail when no cards available', () => {
     mockGetAllCardsSync.mockReturnValue([]);
-    
+
     const result = optimizeWallet(mockSpendingProfile, mockConstraints);
-    
+
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.type).toBe('NO_CARDS_AVAILABLE');
@@ -594,7 +612,7 @@ describe('optimizeWallet', () => {
 
   it('should include pruning statistics', () => {
     const result = optimizeWallet(mockSpendingProfile, mockConstraints);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.prunedCardCount).toBeGreaterThan(0);
@@ -603,12 +621,10 @@ describe('optimizeWallet', () => {
   });
 
   it('should compare to current wallet when user has cards', () => {
-    mockGetCards.mockReturnValue([
-      { cardId: 'nofee-card', addedAt: new Date() },
-    ]);
-    
+    mockGetCards.mockReturnValue([{ cardId: 'nofee-card', addedAt: new Date() }]);
+
     const result = optimizeWallet(mockSpendingProfile, mockConstraints);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.vsCurrentWallet).toBeDefined();
@@ -621,9 +637,9 @@ describe('optimizeWallet', () => {
       maxCards: 3,
       maxTotalAnnualFees: 500,
     };
-    
+
     const result = optimizeWallet(mockSpendingProfile, constraints3, 2);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.recommendations[0].cards.length).toBe(3);
@@ -634,14 +650,14 @@ describe('optimizeWallet', () => {
 describe('estimateCardValue', () => {
   it('should estimate annual rewards and net value', () => {
     const { annualRewards, netValue } = estimateCardValue(mockGroceryCard, mockSpendingProfile);
-    
+
     expect(annualRewards).toBeGreaterThan(0);
     expect(netValue).toBe(annualRewards - 120);
   });
 
   it('should handle no-fee cards', () => {
     const { annualRewards, netValue } = estimateCardValue(mockNofeeCard, mockSpendingProfile);
-    
+
     expect(netValue).toBe(annualRewards);
   });
 });
@@ -664,7 +680,7 @@ describe('edge cases', () => {
       transit: 0,
       other: 0,
     };
-    
+
     const result = optimizeWallet(minimalProfile, mockConstraints);
     expect(result.success).toBe(true);
   });
@@ -674,7 +690,7 @@ describe('edge cases', () => {
       ...mockConstraints,
       maxTotalAnnualFees: 10000,
     };
-    
+
     const result = optimizeWallet(mockSpendingProfile, highFeeConstraints);
     expect(result.success).toBe(true);
   });
@@ -686,19 +702,19 @@ describe('edge cases', () => {
       id: 'nofee-card-2',
       name: 'Another No Fee Card',
     };
-    
+
     mockGetAllCardsSync.mockReturnValue([mockNofeeCard, noFeeCard2]);
-    
+
     const lowFeeConstraints: WalletConstraints = {
       ...mockConstraints,
       maxTotalAnnualFees: 0,
     };
-    
+
     const result = optimizeWallet(mockSpendingProfile, lowFeeConstraints);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
-      result.value.recommendations.forEach(rec => {
+      result.value.recommendations.forEach((rec) => {
         expect(rec.totalAnnualFees).toBe(0);
       });
     }
@@ -717,14 +733,14 @@ describe('edge cases', () => {
       transit: 0,
       other: 0,
     };
-    
+
     const result = optimizeWallet(singleCategoryProfile, mockConstraints);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       const topResult = result.value.recommendations[0];
       const groceryAssignment = topResult.categoryAssignments.find(
-        a => a.category === SpendingCategory.GROCERIES
+        (a) => a.category === SpendingCategory.GROCERIES
       );
       expect(groceryAssignment).toBeDefined();
     }

@@ -4,6 +4,7 @@ describe('Project Setup', () => {
   });
 
   it('should have fast-check available', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const fc = require('fast-check');
     expect(fc).toBeDefined();
   });

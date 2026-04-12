@@ -6,7 +6,7 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { User, Session, AuthChangeEvent, AuthError } from '@supabase/supabase-js';
+import type { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { ReferralService } from './ReferralService';
 
 // ============================================================================
@@ -66,7 +66,7 @@ async function createGuestUser(): Promise<AuthUser> {
     isAnonymous: true,
     createdAt: new Date().toISOString(),
   };
-  
+
   await AsyncStorage.setItem(GUEST_USER_KEY, JSON.stringify(guestUser));
   return guestUser;
 }
@@ -118,9 +118,8 @@ export async function signUp(email: string, password: string): Promise<AuthResul
       email,
       password,
       options: {
-        emailRedirectTo: Platform.OS === 'web' 
-          ? window.location.origin 
-          : 'rewardly://auth/callback',
+        emailRedirectTo:
+          Platform.OS === 'web' ? window.location.origin : 'rewardly://auth/callback',
       },
     });
 
@@ -137,7 +136,7 @@ export async function signUp(email: string, password: string): Promise<AuthResul
 
     // Complete referral signup if user came via referral link
     if (data.user?.id) {
-      await ReferralService.completeReferralSignup(data.user.id).catch(err => {
+      await ReferralService.completeReferralSignup(data.user.id).catch((err) => {
         console.warn('[AuthService] Failed to complete referral signup:', err);
       });
     }
@@ -223,9 +222,7 @@ export async function signInWithGoogle(): Promise<AuthResult> {
       provider: 'google',
       options: {
         skipBrowserRedirect: Platform.OS !== 'web',
-        redirectTo: Platform.OS === 'web' 
-          ? window.location.origin 
-          : 'rewardly://auth/callback',
+        redirectTo: Platform.OS === 'web' ? window.location.origin : 'rewardly://auth/callback',
       },
     });
 
@@ -278,7 +275,7 @@ export async function signInWithApple(): Promise<AuthResult> {
     if (Platform.OS === 'ios') {
       // Dynamic import to avoid bundling on non-iOS platforms
       const AppleAuthentication = await import('expo-apple-authentication').catch(() => null);
-      
+
       if (!AppleAuthentication) {
         return {
           success: false,
@@ -337,13 +334,11 @@ export async function signInWithApple(): Promise<AuthResult> {
       };
     } else {
       // For web/Android, use OAuth flow
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
         options: {
           skipBrowserRedirect: Platform.OS !== 'web',
-          redirectTo: Platform.OS === 'web' 
-            ? window.location.origin 
-            : 'rewardly://auth/callback',
+          redirectTo: Platform.OS === 'web' ? window.location.origin : 'rewardly://auth/callback',
         },
       });
 
@@ -433,7 +428,10 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
   }
 
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
     if (error || !user) {
       return null;
     }
@@ -452,7 +450,9 @@ export async function getSession(): Promise<Session | null> {
   }
 
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     return session;
   } catch {
     return null;
@@ -470,28 +470,35 @@ export async function getValidSession(): Promise<Session | null> {
 
   try {
     // Get current session
-    const { data: { session }, error } = await supabase.auth.getSession();
-    
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
     if (error) {
       console.error('Session error:', error);
       // Attempt to refresh the session
-      const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+      const {
+        data: { session: refreshedSession },
+      } = await supabase.auth.refreshSession();
       return refreshedSession;
     }
-    
+
     // Check if session is about to expire (within 60 seconds)
     if (session && session.expires_at) {
       const expiresAt = session.expires_at * 1000; // Convert to milliseconds
       const now = Date.now();
       const timeUntilExpiry = expiresAt - now;
-      
+
       // If expiring soon or already expired, refresh it
       if (timeUntilExpiry < 60000) {
-        const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+        const {
+          data: { session: refreshedSession },
+        } = await supabase.auth.refreshSession();
         return refreshedSession;
       }
     }
-    
+
     return session;
   } catch (error) {
     console.error('Failed to get valid session:', error);
@@ -513,17 +520,17 @@ export function isGuestUser(user: AuthUser | null): boolean {
  */
 export async function validateSessionForApiCall(): Promise<boolean> {
   const currentUser = await getCurrentUser();
-  
+
   // Guest users don't need a session
   if (isGuestUser(currentUser)) {
     return true;
   }
-  
+
   // Authenticated users need a valid session
   if (!isSupabaseConfigured() || !supabase) {
     return false;
   }
-  
+
   try {
     const session = await getValidSession();
     return session !== null;
@@ -541,7 +548,9 @@ export function onAuthStateChange(callback: AuthStateChangeCallback): () => void
     return () => {};
   }
 
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((event, session) => {
     callback(event, transformUser(session?.user ?? null));
   });
 
@@ -553,7 +562,9 @@ export function onAuthStateChange(callback: AuthStateChangeCallback): () => void
 /**
  * Send password reset email
  */
-export async function resetPassword(email: string): Promise<{ success: boolean; error: string | null }> {
+export async function resetPassword(
+  email: string
+): Promise<{ success: boolean; error: string | null }> {
   if (!isSupabaseConfigured() || !supabase) {
     return {
       success: false,
@@ -563,9 +574,10 @@ export async function resetPassword(email: string): Promise<{ success: boolean; 
 
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: Platform.OS === 'web' 
-        ? `${window.location.origin}/reset-password` 
-        : 'rewardly://auth/reset-password',
+      redirectTo:
+        Platform.OS === 'web'
+          ? `${window.location.origin}/reset-password`
+          : 'rewardly://auth/reset-password',
     });
 
     if (error) {

@@ -6,8 +6,13 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
 import Stripe from 'https://esm.sh/stripe@14.5.0?target=deno';
+import { requireEnv } from '../_shared/helpers.ts';
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+const STRIPE_SECRET_KEY = requireEnv('STRIPE_SECRET_KEY');
+const SUPABASE_URL = requireEnv('SUPABASE_URL');
+const SUPABASE_SERVICE_ROLE_KEY = requireEnv('SUPABASE_SERVICE_ROLE_KEY');
+
+const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16',
   httpClient: Stripe.createFetchHttpClient(),
 });
@@ -39,10 +44,7 @@ serve(async (req) => {
     const token = authHeader.replace('Bearer ', '');
 
     // Use service role client for database operations
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // Verify user via auth API with explicit token
     const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
@@ -152,9 +154,13 @@ serve(async (req) => {
       });
     }
 
+    if (!session.url) {
+      throw new Error('Stripe did not return a checkout URL');
+    }
+
     return new Response(
       JSON.stringify({ url: session.url }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }

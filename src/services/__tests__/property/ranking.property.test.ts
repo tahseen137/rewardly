@@ -18,7 +18,10 @@ const mockCards: Card[] = [
     annualFee: 0,
     baseRewardRate: { value: 1, type: RewardType.CASHBACK, unit: 'percent' },
     categoryRewards: [
-      { category: SpendingCategory.GROCERIES, rewardRate: { value: 3, type: RewardType.CASHBACK, unit: 'percent' } },
+      {
+        category: SpendingCategory.GROCERIES,
+        rewardRate: { value: 3, type: RewardType.CASHBACK, unit: 'percent' },
+      },
     ],
   },
   {
@@ -29,7 +32,10 @@ const mockCards: Card[] = [
     annualFee: 100,
     baseRewardRate: { value: 1, type: RewardType.POINTS, unit: 'multiplier' },
     categoryRewards: [
-      { category: SpendingCategory.DINING, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
+      {
+        category: SpendingCategory.DINING,
+        rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' },
+      },
     ],
   },
   {
@@ -40,7 +46,10 @@ const mockCards: Card[] = [
     annualFee: 150,
     baseRewardRate: { value: 1.5, type: RewardType.AIRLINE_MILES, unit: 'multiplier' },
     categoryRewards: [
-      { category: SpendingCategory.TRAVEL, rewardRate: { value: 3, type: RewardType.AIRLINE_MILES, unit: 'multiplier' } },
+      {
+        category: SpendingCategory.TRAVEL,
+        rewardRate: { value: 3, type: RewardType.AIRLINE_MILES, unit: 'multiplier' },
+      },
     ],
   },
 ];

@@ -15,12 +15,7 @@ import {
   clearAllStatements,
   resetStatementStorageCache,
 } from '../StatementStorageService';
-import {
-  StatementWithTransactions,
-  ParsedTransaction,
-  SupportedBank,
-  SpendingCategory,
-} from '../../types';
+import { StatementWithTransactions, SupportedBank, SpendingCategory } from '../../types';
 
 // Mock dependencies
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -73,7 +68,7 @@ describe('StatementStorageService', () => {
         date: new Date('2024-01-16'),
         description: 'TIM HORTONS',
         normalizedMerchant: 'Tim Hortons',
-        amount: 5.50,
+        amount: 5.5,
         isCredit: false,
         category: SpendingCategory.DINING,
         categoryConfidence: 'high',
@@ -107,7 +102,7 @@ describe('StatementStorageService', () => {
     it('should save a statement successfully', async () => {
       const statement = createMockStatement();
       const result = await saveStatement(statement);
-      
+
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.value).toBe('stmt_123');
@@ -117,7 +112,7 @@ describe('StatementStorageService', () => {
     it('should save statement to cache', async () => {
       const statement = createMockStatement();
       await saveStatement(statement);
-      
+
       const statements = await getStatements();
       expect(statements).toHaveLength(1);
       expect(statements[0].id).toBe('stmt_123');
@@ -126,7 +121,7 @@ describe('StatementStorageService', () => {
     it('should save transactions to cache', async () => {
       const statement = createMockStatement();
       await saveStatement(statement);
-      
+
       const transactions = await getTransactions();
       expect(transactions).toHaveLength(2);
     });
@@ -145,10 +140,10 @@ describe('StatementStorageService', () => {
     it('should return all saved statements', async () => {
       const statement1 = createMockStatement();
       const statement2 = { ...createMockStatement(), id: 'stmt_456' };
-      
+
       await saveStatement(statement1);
       await saveStatement(statement2);
-      
+
       const statements = await getStatements();
       expect(statements).toHaveLength(2);
     });
@@ -163,7 +158,7 @@ describe('StatementStorageService', () => {
     it('should return statement with transactions', async () => {
       const mockStatement = createMockStatement();
       await saveStatement(mockStatement);
-      
+
       const statement = await getStatementById('stmt_123');
       expect(statement).not.toBeNull();
       expect(statement?.transactions).toHaveLength(2);
@@ -178,12 +173,12 @@ describe('StatementStorageService', () => {
     it('should delete statement and transactions', async () => {
       const statement = createMockStatement();
       await saveStatement(statement);
-      
+
       await deleteStatement('stmt_123');
-      
+
       const statements = await getStatements();
       expect(statements).toHaveLength(0);
-      
+
       const transactions = await getTransactions();
       expect(transactions).toHaveLength(0);
     });
@@ -215,7 +210,7 @@ describe('StatementStorageService', () => {
           end: new Date('2024-01-15'),
         },
       });
-      
+
       expect(transactions).toHaveLength(1);
       expect(transactions[0].description).toBe('LOBLAWS #1234');
     });
@@ -224,7 +219,7 @@ describe('StatementStorageService', () => {
       const transactions = await getTransactions({
         categories: [SpendingCategory.GROCERIES],
       });
-      
+
       expect(transactions).toHaveLength(1);
       expect(transactions[0].category).toBe(SpendingCategory.GROCERIES);
     });
@@ -233,7 +228,7 @@ describe('StatementStorageService', () => {
       const transactions = await getTransactions({
         searchTerm: 'tim',
       });
-      
+
       expect(transactions).toHaveLength(1);
       expect(transactions[0].normalizedMerchant).toBe('Tim Hortons');
     });
@@ -243,7 +238,7 @@ describe('StatementStorageService', () => {
         minAmount: 10,
         maxAmount: 100,
       });
-      
+
       expect(transactions).toHaveLength(1);
       expect(transactions[0].amount).toBe(85.23);
     });
@@ -252,7 +247,7 @@ describe('StatementStorageService', () => {
       const transactions = await getTransactions({
         excludeCredits: true,
       });
-      
+
       // All test transactions are debits
       expect(transactions).toHaveLength(2);
     });
@@ -270,10 +265,10 @@ describe('StatementStorageService', () => {
 
     it('should update transaction category', async () => {
       await updateTransactionCategory('stmt_123_tx1', SpendingCategory.DINING);
-      
+
       const transactions = await getTransactions();
-      const updated = transactions.find(t => t.id === 'stmt_123_tx1');
-      
+      const updated = transactions.find((t) => t.id === 'stmt_123_tx1');
+
       expect(updated?.category).toBe(SpendingCategory.DINING);
       expect(updated?.userCorrected).toBe(true);
     });
@@ -296,20 +291,14 @@ describe('StatementStorageService', () => {
     });
 
     it('should calculate total spend for date range', async () => {
-      const total = await getTotalSpend(
-        new Date('2024-01-01'),
-        new Date('2024-01-31')
-      );
-      
+      const total = await getTotalSpend(new Date('2024-01-01'), new Date('2024-01-31'));
+
       expect(total).toBe(90.73); // 85.23 + 5.50
     });
 
     it('should return 0 for date range with no transactions', async () => {
-      const total = await getTotalSpend(
-        new Date('2024-02-01'),
-        new Date('2024-02-28')
-      );
-      
+      const total = await getTotalSpend(new Date('2024-02-01'), new Date('2024-02-28'));
+
       expect(total).toBe(0);
     });
   });
@@ -322,12 +311,12 @@ describe('StatementStorageService', () => {
     it('should clear all statements and transactions', async () => {
       const statement = createMockStatement();
       await saveStatement(statement);
-      
+
       await clearAllStatements();
-      
+
       const statements = await getStatements();
       const transactions = await getTransactions();
-      
+
       expect(statements).toHaveLength(0);
       expect(transactions).toHaveLength(0);
     });

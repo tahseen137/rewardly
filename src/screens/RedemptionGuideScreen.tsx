@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { Plane, Hotel, CreditCard, Gift, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react-native';
+import { Plane, Hotel, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -52,9 +52,7 @@ function TransferPartnerCard({ partner }: TransferPartnerCardProps) {
             </Text>
           </View>
           <View style={styles.partnerRatio}>
-            <Text style={styles.partnerRatioText}>
-              {partner.transferRatio}:1
-            </Text>
+            <Text style={styles.partnerRatioText}>{partner.transferRatio}:1</Text>
           </View>
           {expanded ? (
             <ChevronUp size={20} color={colors.text.secondary} />
@@ -69,12 +67,14 @@ function TransferPartnerCard({ partner }: TransferPartnerCardProps) {
               <Text style={styles.partnerDetailLabel}>Transfer Time:</Text>
               <Text style={styles.partnerDetailValue}>{partner.transferTime}</Text>
             </View>
-            
+
             {partner.sweetSpots.length > 0 && (
               <>
                 <Text style={styles.sweetSpotsTitle}>Sweet Spots:</Text>
                 {partner.sweetSpots.map((spot, index) => (
-                  <Text key={index} style={styles.sweetSpot}>• {spot}</Text>
+                  <Text key={index} style={styles.sweetSpot}>
+                    • {spot}
+                  </Text>
                 ))}
               </>
             )}
@@ -186,7 +186,7 @@ export default function RedemptionGuideScreen({ route }: Props) {
         {redemption.transferPartners.length > 0 && (
           <>
             <Text style={styles.sectionTitle}>Transfer Partners</Text>
-            {redemption.transferPartners.map(partner => (
+            {redemption.transferPartners.map((partner) => (
               <TransferPartnerCard key={partner.id} partner={partner} />
             ))}
           </>
@@ -196,8 +196,8 @@ export default function RedemptionGuideScreen({ route }: Props) {
           <>
             <Text style={styles.sectionTitle}>Other Redemptions</Text>
             {redemption.redemptionOptions.map((option, index) => (
-              <Animated.View 
-                key={index} 
+              <Animated.View
+                key={index}
                 entering={FadeInDown.delay(index * 50).duration(400)}
                 style={styles.optionCard}
               >
@@ -205,9 +205,7 @@ export default function RedemptionGuideScreen({ route }: Props) {
                   <Text style={styles.optionType}>{option.type}</Text>
                   <Text style={styles.optionCPP}>{formatCPP(option.centsPerPoint)}</Text>
                 </View>
-                {option.notes && (
-                  <Text style={styles.optionNotes}>{option.notes}</Text>
-                )}
+                {option.notes && <Text style={styles.optionNotes}>{option.notes}</Text>}
               </Animated.View>
             ))}
           </>

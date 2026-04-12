@@ -1,6 +1,6 @@
 /**
  * SpendingProfileService - Unit Tests
- * 
+ *
  * Tests spending profile CRUD, validation, aggregation, and storage
  */
 
@@ -22,7 +22,7 @@ import {
   createProfile,
   aggregateSpendingEntries,
 } from '../SpendingProfileService';
-import { SpendingProfileInput, SpendingCategory, SpendingEntry } from '../../types';
+import { SpendingProfileInput, SpendingCategory } from '../../types';
 
 // Mock dependencies
 jest.mock('@react-native-async-storage/async-storage');
@@ -276,7 +276,7 @@ describe('validateSpendingProfile', () => {
 describe('createProfile', () => {
   it('should create profile with all required fields', () => {
     const profile = createProfile(mockSpendingProfile);
-    
+
     expect(profile.id).toBeDefined();
     expect(profile.id).toMatch(/^sp_/);
     expect(profile.userId).toBeNull();
@@ -306,7 +306,7 @@ describe('aggregateSpendingEntries', () => {
 
   it('should aggregate entries into monthly averages', () => {
     const result = aggregateSpendingEntries(mockSpendingEntries);
-    
+
     // Entries span 24 days (Jan 1 to Jan 25), so monthSpan ≈ 0.8
     // Groceries: 300 total
     // Dining: 125 total
@@ -387,7 +387,7 @@ describe('aggregateSpendingEntries', () => {
     ];
 
     const result = aggregateSpendingEntries(allCategories);
-    
+
     expect(result.groceries).toBeGreaterThan(0);
     expect(result.dining).toBeGreaterThan(0);
     expect(result.gas).toBeGreaterThan(0);
@@ -408,7 +408,7 @@ describe('aggregateSpendingEntries', () => {
 describe('getDefaultSpendingProfile', () => {
   it('should return default Canadian household spending', () => {
     const defaults = getDefaultSpendingProfile();
-    
+
     expect(defaults.groceries).toBe(800);
     expect(defaults.dining).toBe(200);
     expect(defaults.gas).toBe(150);
@@ -426,7 +426,7 @@ describe('getSpendingProfile', () => {
   it('should return cached profile after save', async () => {
     await saveSpendingProfile(mockSpendingProfile);
     const profile = await getSpendingProfile();
-    
+
     expect(profile).not.toBeNull();
     expect(profile?.groceries).toBe(800);
   });
@@ -448,13 +448,13 @@ describe('getSpendingProfileSync', () => {
 describe('saveSpendingProfile', () => {
   it('should save valid profile', async () => {
     const result = await saveSpendingProfile(mockSpendingProfile);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.groceries).toBe(800);
       expect(result.value.id).toBeDefined();
     }
-    
+
     expect(mockAsyncStorage.setItem).toHaveBeenCalled();
   });
 
@@ -463,7 +463,7 @@ describe('saveSpendingProfile', () => {
       ...mockSpendingProfile,
       groceries: -100,
     };
-    
+
     const result = await saveSpendingProfile(invalid);
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -474,14 +474,14 @@ describe('saveSpendingProfile', () => {
   it('should update existing profile ID', async () => {
     const result1 = await saveSpendingProfile(mockSpendingProfile);
     expect(result1.success).toBe(true);
-    
+
     const firstId = result1.success ? result1.value.id : '';
-    
+
     const updated: SpendingProfileInput = {
       ...mockSpendingProfile,
       groceries: 900,
     };
-    
+
     const result2 = await saveSpendingProfile(updated);
     expect(result2.success).toBe(true);
     if (result2.success) {
@@ -508,7 +508,7 @@ describe('deleteSpendingProfile', () => {
   it('should delete profile and clear cache', async () => {
     await saveSpendingProfile(mockSpendingProfile);
     expect(await hasSpendingProfile()).toBe(true);
-    
+
     await deleteSpendingProfile();
     expect(await hasSpendingProfile()).toBe(false);
     expect(mockAsyncStorage.removeItem).toHaveBeenCalled();
@@ -531,7 +531,7 @@ describe('getFromSpendingLog', () => {
   it('should aggregate data when sufficient entries exist', async () => {
     mockGetSpendingEntries.mockResolvedValue(mockSpendingEntries);
     const result = await getFromSpendingLog();
-    
+
     expect(result).not.toBeNull();
     if (result) {
       expect(result.groceries).toBeGreaterThan(0);
@@ -541,17 +541,17 @@ describe('getFromSpendingLog', () => {
 
   it('should query last 90 days of data', async () => {
     await getFromSpendingLog();
-    
+
     expect(mockGetSpendingEntries).toHaveBeenCalledWith(
       expect.objectContaining({
         startDate: expect.any(Date),
       }),
       Infinity
     );
-    
+
     const callArgs = mockGetSpendingEntries.mock.calls[0]?.[0];
     expect(callArgs).toBeDefined();
-    
+
     if (callArgs && callArgs.startDate) {
       const startDate = callArgs.startDate;
       const daysDiff = (Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24);
@@ -567,7 +567,7 @@ describe('getFromSpendingLog', () => {
 describe('storage integration', () => {
   it('should persist profile to AsyncStorage', async () => {
     await saveSpendingProfile(mockSpendingProfile);
-    
+
     expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
       '@rewardly/spending_profile',
       expect.stringContaining('"groceries":800')
@@ -575,12 +575,12 @@ describe('storage integration', () => {
   });
 
   it('should serialize dates correctly', async () => {
-    const result = await saveSpendingProfile(mockSpendingProfile);
-    
+    const _result = await saveSpendingProfile(mockSpendingProfile);
+
     const setItemCall = mockAsyncStorage.setItem.mock.calls[0];
     const serialized = setItemCall[1];
     const parsed = JSON.parse(serialized);
-    
+
     expect(parsed.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}/);
     expect(parsed.updatedAt).toMatch(/^\d{4}-\d{2}-\d{2}/);
   });
@@ -592,13 +592,13 @@ describe('storage integration', () => {
       createdAt: savedProfile.createdAt.toISOString(),
       updatedAt: savedProfile.updatedAt.toISOString(),
     });
-    
+
     mockAsyncStorage.getItem.mockResolvedValue(serialized);
     resetSpendingProfileCache();
-    
+
     await initializeSpendingProfile();
     const restored = getSpendingProfileSync();
-    
+
     expect(restored).not.toBeNull();
     expect(restored?.id).toBe('sp_test_123');
     expect(restored?.groceries).toBe(800);
@@ -624,7 +624,7 @@ describe('edge cases', () => {
       transit: 99999,
       other: 99999,
     };
-    
+
     const result = validateSpendingProfile(maxProfile);
     expect(result.success).toBe(true);
   });
@@ -642,7 +642,7 @@ describe('edge cases', () => {
       transit: 0,
       other: 0,
     };
-    
+
     const result = validateSpendingProfile(zeroProfile);
     expect(result.success).toBe(true);
     if (result.success) {
@@ -653,24 +653,24 @@ describe('edge cases', () => {
   it('should handle decimal spending amounts', () => {
     const decimalProfile: SpendingProfileInput = {
       groceries: 799.99,
-      dining: 199.50,
+      dining: 199.5,
       gas: 149.75,
       travel: 99.25,
       onlineShopping: 149.99,
-      entertainment: 74.50,
+      entertainment: 74.5,
       drugstores: 49.99,
       homeImprovement: 49.99,
       transit: 99.99,
       other: 199.99,
     };
-    
+
     const total = calculateTotalMonthlySpend(decimalProfile);
     expect(total).toBeCloseTo(1872.94, 2);
   });
 
   it('should handle initialization errors gracefully', async () => {
     mockAsyncStorage.getItem.mockRejectedValue(new Error('Storage error'));
-    
+
     await expect(initializeSpendingProfile()).resolves.not.toThrow();
     const profile = getSpendingProfileSync();
     expect(profile).toBeNull();

@@ -1,9 +1,9 @@
 /**
  * AppErrorBoundary - Top-Level Error Handler
- * 
+ *
  * Catches any unhandled errors in the React tree and displays
  * a friendly error screen instead of a white screen.
- * 
+ *
  * This should wrap the entire app at the root level.
  */
 
@@ -83,9 +83,9 @@ export class AppErrorBoundary extends Component<Props, State> {
     const subject = encodeURIComponent('Rewardly App Crash Report');
     const body = encodeURIComponent(
       `Error: ${this.state.error?.message || 'Unknown error'}\n\n` +
-      `Stack: ${this.state.error?.stack?.slice(0, 500) || 'No stack trace'}\n\n` +
-      `Platform: ${Platform.OS}\n` +
-      `Time: ${new Date().toISOString()}`
+        `Stack: ${this.state.error?.stack?.slice(0, 500) || 'No stack trace'}\n\n` +
+        `Platform: ${Platform.OS}\n` +
+        `Time: ${new Date().toISOString()}`
     );
     Linking.openURL(`mailto:support@rewardly.app?subject=${subject}&body=${body}`);
   };
@@ -105,10 +105,11 @@ export class AppErrorBoundary extends Component<Props, State> {
 
             {/* Error Title */}
             <Text style={styles.title}>Oops! Something went wrong</Text>
-            
+
             {/* Error Description */}
             <Text style={styles.description}>
-              We're sorry, but something unexpected happened. Our team has been notified and is working on a fix.
+              We're sorry, but something unexpected happened. Our team has been notified and is
+              working on a fix.
             </Text>
 
             {/* Action Buttons */}
@@ -136,39 +137,35 @@ export class AppErrorBoundary extends Component<Props, State> {
             {__DEV__ && this.state.error && (
               <View style={styles.debugContainer}>
                 <Text style={styles.debugTitle}>🔧 Debug Information</Text>
-                
+
                 <Text style={styles.debugLabel}>Error Message:</Text>
                 <Text style={styles.debugText}>{this.state.error.message}</Text>
-                
+
                 <Text style={styles.debugLabel}>Error Name:</Text>
                 <Text style={styles.debugText}>{this.state.error.name}</Text>
-                
+
                 {this.state.error.stack && (
                   <>
                     <Text style={styles.debugLabel}>Stack Trace:</Text>
-                    <ScrollView 
-                      horizontal 
+                    <ScrollView
+                      horizontal
                       showsHorizontalScrollIndicator={true}
                       style={styles.stackScrollView}
                     >
-                      <Text style={styles.stackText}>
-                        {this.state.error.stack}
-                      </Text>
+                      <Text style={styles.stackText}>{this.state.error.stack}</Text>
                     </ScrollView>
                   </>
                 )}
-                
+
                 {this.state.errorInfo?.componentStack && (
                   <>
                     <Text style={styles.debugLabel}>Component Stack:</Text>
-                    <ScrollView 
-                      horizontal 
+                    <ScrollView
+                      horizontal
                       showsHorizontalScrollIndicator={true}
                       style={styles.stackScrollView}
                     >
-                      <Text style={styles.stackText}>
-                        {this.state.errorInfo.componentStack}
-                      </Text>
+                      <Text style={styles.stackText}>{this.state.errorInfo.componentStack}</Text>
                     </ScrollView>
                   </>
                 )}
@@ -176,9 +173,7 @@ export class AppErrorBoundary extends Component<Props, State> {
             )}
 
             {/* Platform Info */}
-            <Text style={styles.platformInfo}>
-              Platform: {Platform.OS} • Version: 1.0.0
-            </Text>
+            <Text style={styles.platformInfo}>Platform: {Platform.OS} • Version: 1.0.0</Text>
           </ScrollView>
         </View>
       );

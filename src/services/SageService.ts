@@ -1,15 +1,13 @@
 /**
  * SageService - AI Assistant API Client
- * 
+ *
  * Calls Supabase Edge Function `sage-chat-stream` for streaming responses.
  * Maintains conversation history in memory and provides card recommendations.
  */
 
 import { Card, UserCard, UserPreferences } from '../types';
 import { getCardByIdSync } from './CardDataService';
-import { generateSageSystemPrompt, SageUserContext } from '../data/sage_system_prompt';
-import { supabase } from './supabase/client';
-import { getValidSession, isGuestUser, getCurrentUser } from './AuthService';
+import { SageUserContext } from '../data/sage_system_prompt';
 import { getCountry } from './PreferenceManager';
 
 // ============================================================================
@@ -17,7 +15,8 @@ import { getCountry } from './PreferenceManager';
 // ============================================================================
 
 const SUPABASE_PROJECT_REF = 'zdlozhpmqrtvvhdzbmrv';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbG96aHBtcXJ0dnZoZHpibXJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxODYwMTEsImV4cCI6MjA4Mzc2MjAxMX0.o7xqSfwRtvxsPoAe7e0kJzb5TXoFyCzDEQqOWkLNkos';
+const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbG96aHBtcXJ0dnZoZHpibXJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxODYwMTEsImV4cCI6MjA4Mzc2MjAxMX0.o7xqSfwRtvxsPoAe7e0kJzb5TXoFyCzDEQqOWkLNkos';
 const SAGE_FUNCTION_URL = `https://${SUPABASE_PROJECT_REF}.supabase.co/functions/v1/sage-chat-stream`;
 const MAX_HISTORY = 10; // Keep last 10 messages in conversation
 
@@ -69,12 +68,36 @@ export interface SageError {
 
 // Quick action suggestions
 export const QUICK_ACTIONS = [
-  { id: 'dining', label: 'Best card for dining', message: 'What\'s my best card for dining and restaurants?' },
-  { id: 'groceries', label: 'Best card for groceries', message: 'Which card should I use for grocery shopping?' },
-  { id: 'travel', label: 'Best card for travel', message: 'What\'s the best card in my wallet for travel purchases?' },
-  { id: 'compare', label: 'Compare my cards', message: 'Compare all my cards side-by-side and show me which is best for each category.' },
-  { id: 'compare_two', label: 'Compare two cards', message: 'Compare my Cobalt vs Gold card - which one is better overall?' },
-  { id: 'redeem', label: 'How to redeem points', message: 'What\'s the best way to redeem my points for maximum value?' },
+  {
+    id: 'dining',
+    label: 'Best card for dining',
+    message: "What's my best card for dining and restaurants?",
+  },
+  {
+    id: 'groceries',
+    label: 'Best card for groceries',
+    message: 'Which card should I use for grocery shopping?',
+  },
+  {
+    id: 'travel',
+    label: 'Best card for travel',
+    message: "What's the best card in my wallet for travel purchases?",
+  },
+  {
+    id: 'compare',
+    label: 'Compare my cards',
+    message: 'Compare all my cards side-by-side and show me which is best for each category.',
+  },
+  {
+    id: 'compare_two',
+    label: 'Compare two cards',
+    message: 'Compare my Cobalt vs Gold card - which one is better overall?',
+  },
+  {
+    id: 'redeem',
+    label: 'How to redeem points',
+    message: "What's the best way to redeem my points for maximum value?",
+  },
 ] as const;
 
 // ============================================================================
@@ -86,7 +109,7 @@ export const QUICK_ACTIONS = [
  */
 function enrichPortfolio(portfolio: UserCard[]): Card[] {
   return portfolio
-    .map(uc => getCardByIdSync(uc.cardId))
+    .map((uc) => getCardByIdSync(uc.cardId))
     .filter((card): card is Card => card !== null);
 }
 
@@ -109,7 +132,7 @@ function extractCardRecommendation(
   for (const card of portfolio) {
     const cardNameLower = card.name.toLowerCase();
     const responseLower = responseText.toLowerCase();
-    
+
     // Check if card name appears in recommendation context
     if (
       responseLower.includes(`use the ${cardNameLower}`) ||
@@ -119,10 +142,8 @@ function extractCardRecommendation(
     ) {
       // Extract a short reason (first sentence mentioning the card)
       const sentences = responseText.split(/[.!?]+/);
-      const relevantSentence = sentences.find(s => 
-        s.toLowerCase().includes(cardNameLower)
-      );
-      
+      const relevantSentence = sentences.find((s) => s.toLowerCase().includes(cardNameLower));
+
       return {
         cardId: card.id,
         cardName: card.name,
@@ -131,7 +152,7 @@ function extractCardRecommendation(
       };
     }
   }
-  
+
   return undefined;
 }
 
@@ -142,7 +163,7 @@ function extractCardRecommendation(
 class SageServiceClass {
   private conversationHistory: Map<string, SageMessage[]> = new Map();
   private currentConversationId: string | null = null;
-  
+
   /**
    * Send a message to Sage and get a streaming response
    */
@@ -156,10 +177,10 @@ class SageServiceClass {
   ): Promise<SendMessageResult> {
     // Get or create conversation ID
     const convId = conversationId || this.currentConversationId || generateConversationId();
-    
+
     // Enrich portfolio with full card data
     const enrichedPortfolio = enrichPortfolio(portfolio);
-    
+
     // Build user context
     const userContext: SageUserContext = {
       cards: enrichedPortfolio,
@@ -168,7 +189,7 @@ class SageServiceClass {
       country: getCountry(),
       subscriptionTier: 'free',
     };
-    
+
     // MVP: Use anon key for auth — edge function handles personalization server-side
     const token: string | null = null;
 
@@ -178,21 +199,21 @@ class SageServiceClass {
 
     try {
       const headers: Record<string, string> = {
-        'apikey': SUPABASE_ANON_KEY,
+        apikey: SUPABASE_ANON_KEY,
         'Content-Type': 'application/json',
-        'Accept': 'text/event-stream',
+        Accept: 'text/event-stream',
         // Always send Authorization header — use user token if available, anon key otherwise
-        'Authorization': `Bearer ${token || SUPABASE_ANON_KEY}`,
+        Authorization: `Bearer ${token || SUPABASE_ANON_KEY}`,
       };
-      
+
       const response = await fetch(SAGE_FUNCTION_URL, {
         method: 'POST',
         headers,
         body: JSON.stringify({
           message,
           conversationId: convId,
-          history: recentHistory.map(m => ({ role: m.role, content: m.content })),
-          userContext // Pass context so backend knows about cards
+          history: recentHistory.map((m) => ({ role: m.role, content: m.content })),
+          userContext, // Pass context so backend knows about cards
         }),
       });
 
@@ -205,8 +226,7 @@ class SageServiceClass {
       }
 
       // Manual SSE Parsing
-      // @ts-ignore - ReadableStream/getReader depends on RN version/polyfills
-      const reader = response.body.getReader();
+      const reader = (response.body as any).getReader();
       const decoder = new TextDecoder();
       let buffer = '';
       let rawBody = ''; // Capture full body for JSON fallback detection
@@ -250,13 +270,13 @@ class SageServiceClass {
               if (data.conversationId) {
                 remoteConversationId = data.conversationId;
               }
-            } catch (e) {
+            } catch {
               // Ignore
             }
           }
-          
+
           if (event === 'error') {
-             throw new Error(dataStr);
+            throw new Error(dataStr);
           }
         }
       }
@@ -272,7 +292,7 @@ class SageServiceClass {
           } else if (fallback.error) {
             throw new Error(fallback.error);
           }
-        } catch (parseErr) {
+        } catch {
           // Not JSON — ignore, will return empty reply
         }
       }
@@ -284,25 +304,22 @@ class SageServiceClass {
         content: message,
         createdAt: new Date(),
       };
-      
+
       const assistantMessage: SageMessage = {
         id: `assistant_${Date.now()}`,
         role: 'assistant',
         content: accumulatedText,
         createdAt: new Date(),
       };
-      
+
       // Update conversation history
       const updatedHistory = [...recentHistory, userMessage, assistantMessage];
       this.conversationHistory.set(convId, updatedHistory);
       this.currentConversationId = convId;
-      
+
       // Try to extract card recommendation
-      const cardRecommendation = extractCardRecommendation(
-        accumulatedText,
-        enrichedPortfolio
-      );
-      
+      const cardRecommendation = extractCardRecommendation(accumulatedText, enrichedPortfolio);
+
       return {
         reply: accumulatedText,
         conversationId: remoteConversationId,
@@ -310,13 +327,12 @@ class SageServiceClass {
         suggestions: [],
         toolsUsed: [],
       };
-
     } catch (error: any) {
       console.error('Stream error:', error);
       throw {
         code: 'NETWORK_ERROR',
         message: error.message || 'Failed to connect to Sage',
-        retryable: true
+        retryable: true,
       };
     }
   }
@@ -332,98 +348,98 @@ class SageServiceClass {
     // Non-streaming fallback or just use stream and wait?
     // We'll just call streamMessage with a no-op callback to behave like a promise
     return this.streamMessage(
-      message, 
-      conversationId, 
-      portfolio, 
-      preferences, 
-      () => {}, 
+      message,
+      conversationId,
+      portfolio,
+      preferences,
+      () => {},
       pointBalances
     );
   }
-  
+
   /**
    * Get list of user's conversations (in-memory only for now)
    */
   async getConversations(limit = 20): Promise<Conversation[]> {
     const conversations: Conversation[] = [];
-    
+
     for (const [id, messages] of this.conversationHistory.entries()) {
       if (messages.length > 0) {
         const firstMessage = messages[0];
         const lastMessage = messages[messages.length - 1];
-        
+
         conversations.push({
           id,
-          title: messages.find(m => m.role === 'user')?.content.slice(0, 50),
+          title: messages.find((m) => m.role === 'user')?.content.slice(0, 50),
           createdAt: firstMessage.createdAt,
           updatedAt: lastMessage.createdAt,
         });
       }
     }
-    
+
     // Sort by most recent first
     conversations.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-    
+
     return conversations.slice(0, limit);
   }
-  
+
   /**
    * Get a specific conversation with messages
    */
   async getConversation(conversationId: string): Promise<Conversation | null> {
     const messages = this.conversationHistory.get(conversationId);
-    
+
     if (!messages || messages.length === 0) {
       return null;
     }
-    
+
     const firstMessage = messages[0];
     const lastMessage = messages[messages.length - 1];
-    
+
     return {
       id: conversationId,
-      title: messages.find(m => m.role === 'user')?.content.slice(0, 50),
+      title: messages.find((m) => m.role === 'user')?.content.slice(0, 50),
       createdAt: firstMessage.createdAt,
       updatedAt: lastMessage.createdAt,
       messages,
     };
   }
-  
+
   /**
    * Start a new conversation
    */
   startNewConversation(): void {
     this.currentConversationId = null;
   }
-  
+
   /**
    * Set the current conversation
    */
   setCurrentConversation(conversationId: string | null): void {
     this.currentConversationId = conversationId;
   }
-  
+
   /**
    * Get the current conversation ID
    */
   getCurrentConversationId(): string | null {
     return this.currentConversationId;
   }
-  
+
   /**
    * Delete a conversation
    */
   async deleteConversation(conversationId: string): Promise<boolean> {
     if (this.conversationHistory.has(conversationId)) {
       this.conversationHistory.delete(conversationId);
-      
+
       if (this.currentConversationId === conversationId) {
         this.currentConversationId = null;
       }
-      
+
       return true;
     }
-    
+
     return false;
   }
 }

@@ -1,17 +1,12 @@
 /**
  * CardRecommendationCard - Rich card display for AI recommendations
- * 
+ *
  * Displays card details when Sage recommends a specific card,
  * with visual card representation and reward information.
  */
 
 import React, { useMemo } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { CreditCard, TrendingUp, Info, ExternalLink } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -45,7 +40,7 @@ export interface CardRecommendationCardProps {
  */
 function getCardGradient(issuer: string): [string, string] {
   const issuerLower = issuer.toLowerCase();
-  
+
   if (issuerLower.includes('amex') || issuerLower.includes('american express')) {
     return ['#006FCF', '#00175A'];
   }
@@ -76,7 +71,7 @@ function getCardGradient(issuer: string): [string, string] {
   if (issuerLower.includes('cibc')) {
     return ['#B30838', '#7A0525'];
   }
-  
+
   // Default gradient
   return [colors.primary.main, colors.primary.dark];
 }
@@ -115,12 +110,9 @@ export const CardRecommendationCard: React.FC<CardRecommendationCardProps> = ({
   const displayRate = Math.max(rewardRate, highestRate.value);
   const rateUnit = card.baseRewardRate.unit === 'percent' ? '%' : 'x';
   const showUpTo = displayRate > card.baseRewardRate.value && !category;
-  
+
   return (
-    <Animated.View
-      entering={FadeInUp.duration(400).springify()}
-      style={styles.container}
-    >
+    <Animated.View entering={FadeInUp.duration(400).springify()} style={styles.container}>
       {/* Header label */}
       <View style={styles.header}>
         <View style={styles.recommendBadge}>
@@ -129,11 +121,9 @@ export const CardRecommendationCard: React.FC<CardRecommendationCardProps> = ({
             {isNewCardSuggestion ? 'Suggested Card' : 'Best Card'}
           </Text>
         </View>
-        {category && (
-          <Text style={styles.categoryText}>for {category}</Text>
-        )}
+        {category && <Text style={styles.categoryText}>for {category}</Text>}
       </View>
-      
+
       {/* Card visual */}
       <View style={styles.cardWrapper}>
         <LinearGradient
@@ -146,17 +136,17 @@ export const CardRecommendationCard: React.FC<CardRecommendationCardProps> = ({
             <Text style={styles.issuerName}>{card.issuer}</Text>
             <CreditCard size={20} color="rgba(255,255,255,0.8)" />
           </View>
-          
+
           <Text style={styles.cardName} numberOfLines={2}>
             {card.name}
           </Text>
-          
+
           <View style={styles.cardFooter}>
             <Text style={styles.programName}>{card.rewardProgram}</Text>
           </View>
         </LinearGradient>
       </View>
-      
+
       {/* Best for subtitle */}
       {bestForText && !category ? (
         <View style={styles.bestForContainer}>
@@ -168,34 +158,32 @@ export const CardRecommendationCard: React.FC<CardRecommendationCardProps> = ({
       <View style={styles.rewardInfo}>
         <View style={styles.rewardMain}>
           <Text style={styles.rewardRate}>
-            {showUpTo ? 'Up to ' : ''}{displayRate}{rateUnit}
+            {showUpTo ? 'Up to ' : ''}
+            {displayRate}
+            {rateUnit}
           </Text>
           <Text style={styles.rewardLabel}>{rewardTypeText}</Text>
         </View>
-        
+
         {card.pointValuation && (
           <View style={styles.rewardSecondary}>
-            <Text style={styles.valuationText}>
-              ~{card.pointValuation}¢ per point
-            </Text>
+            <Text style={styles.valuationText}>~{card.pointValuation}¢ per point</Text>
           </View>
         )}
-        
+
         {estimatedValue && (
           <View style={styles.rewardSecondary}>
-            <Text style={styles.valuationText}>
-              Est. ${estimatedValue.toFixed(0)}/yr value
-            </Text>
+            <Text style={styles.valuationText}>Est. ${estimatedValue.toFixed(0)}/yr value</Text>
           </View>
         )}
       </View>
-      
+
       {/* Reason */}
       <View style={styles.reasonContainer}>
         <Info size={14} color={colors.text.tertiary} />
         <Text style={styles.reasonText}>{reason}</Text>
       </View>
-      
+
       {/* Actions */}
       <View style={styles.actions}>
         {onLearnMore && (
@@ -207,7 +195,7 @@ export const CardRecommendationCard: React.FC<CardRecommendationCardProps> = ({
             <Text style={styles.secondaryButtonText}>Details</Text>
           </TouchableOpacity>
         )}
-        
+
         {isNewCardSuggestion && (
           <TouchableOpacity
             style={styles.primaryButton}
@@ -226,7 +214,7 @@ export const CardRecommendationCard: React.FC<CardRecommendationCardProps> = ({
           </TouchableOpacity>
         )}
       </View>
-      
+
       {/* Affiliate disclosure for new cards */}
       {isNewCardSuggestion && (
         <Text style={styles.disclosure}>

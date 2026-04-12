@@ -1,6 +1,6 @@
 /**
  * ExploreCardsScreen - Browse and apply for new credit cards
- * 
+ *
  * Features:
  * - Search and filter all cards in the database
  * - Filter by Country, Issuer, Reward Type, Annual Fee
@@ -29,19 +29,17 @@ import {
   Search,
   Filter,
   ChevronLeft,
-  ChevronDown,
   ExternalLink,
   CreditCard,
   Gift,
   X,
-  Check,
 } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
-import { Card, RewardType, SpendingCategory } from '../types';
-import { getAllCards, getCardsByCountry } from '../services/CardDataService';
+import { Card, RewardType } from '../types';
+import { getCardsByCountry } from '../services/CardDataService';
 import { getCountry, Country } from '../services/PreferenceManager';
-import { GlassCard, EmptyState } from '../components';
+import { EmptyState } from '../components';
 
 // ============================================================================
 // Types
@@ -123,10 +121,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
               {(['ALL', 'CA', 'US'] as const).map((c) => (
                 <TouchableOpacity
                   key={c}
-                  style={[
-                    filterStyles.chip,
-                    localFilters.country === c && filterStyles.chipActive,
-                  ]}
+                  style={[filterStyles.chip, localFilters.country === c && filterStyles.chipActive]}
                   onPress={() => setLocalFilters({ ...localFilters, country: c })}
                 >
                   <Text
@@ -147,10 +142,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
             <Text style={filterStyles.sectionTitle}>Issuer</Text>
             <View style={filterStyles.chipRow}>
               <TouchableOpacity
-                style={[
-                  filterStyles.chip,
-                  !localFilters.issuer && filterStyles.chipActive,
-                ]}
+                style={[filterStyles.chip, !localFilters.issuer && filterStyles.chipActive]}
                 onPress={() => setLocalFilters({ ...localFilters, issuer: null })}
               >
                 <Text
@@ -282,10 +274,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
           >
             <Text style={filterStyles.resetBtnText}>Reset</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={filterStyles.applyBtn}
-            onPress={() => onApply(localFilters)}
-          >
+          <TouchableOpacity style={filterStyles.applyBtn} onPress={() => onApply(localFilters)}>
             <Text style={filterStyles.applyBtnText}>Apply Filters</Text>
           </TouchableOpacity>
         </View>
@@ -446,7 +435,7 @@ const CardItem: React.FC<CardItemProps> = ({ card, onApply, onPress }) => {
         <View style={cardStyles.detailRow}>
           <Text style={cardStyles.detailLabel}>Annual Fee</Text>
           <Text style={cardStyles.detailValue}>
-            {card.annualFee > 0 ? `$${card.annualFee}` : 'No fee'}
+            {(card.annualFee ?? 0) > 0 ? `$${card.annualFee}` : 'No fee'}
           </Text>
         </View>
 
@@ -467,7 +456,10 @@ const CardItem: React.FC<CardItemProps> = ({ card, onApply, onPress }) => {
                 bestCategoryReward.rewardRate.value,
                 bestCategoryReward.rewardRate.unit
               )}{' '}
-              on {bestCategoryReward.category.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
+              on{' '}
+              {bestCategoryReward.category
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, (c: string) => c.toUpperCase())}
             </Text>
           </View>
         )}
@@ -479,7 +471,8 @@ const CardItem: React.FC<CardItemProps> = ({ card, onApply, onPress }) => {
             <Text style={cardStyles.signupText}>
               {card.signupBonus.amount.toLocaleString()}{' '}
               {card.signupBonus.currency === RewardType.CASHBACK ? 'cash back' : 'points'} after $
-              {card.signupBonus.spendRequirement.toLocaleString()} in {Math.round(card.signupBonus.timeframeDays / 30)} months
+              {card.signupBonus.spendRequirement.toLocaleString()} in{' '}
+              {Math.round(card.signupBonus.timeframeDays / 30)} months
             </Text>
           </View>
         )}
@@ -673,16 +666,18 @@ export default function ExploreCardsScreen() {
     // Annual fee filter
     switch (filters.annualFeeRange) {
       case 'free':
-        result = result.filter((card) => card.annualFee === 0);
+        result = result.filter((card) => (card.annualFee ?? 0) === 0);
         break;
       case 'low':
-        result = result.filter((card) => card.annualFee > 0 && card.annualFee < 100);
+        result = result.filter((card) => (card.annualFee ?? 0) > 0 && (card.annualFee ?? 0) < 100);
         break;
       case 'medium':
-        result = result.filter((card) => card.annualFee >= 100 && card.annualFee < 300);
+        result = result.filter(
+          (card) => (card.annualFee ?? 0) >= 100 && (card.annualFee ?? 0) < 300
+        );
         break;
       case 'premium':
-        result = result.filter((card) => card.annualFee >= 300);
+        result = result.filter((card) => (card.annualFee ?? 0) >= 300);
         break;
     }
 
@@ -692,7 +687,7 @@ export default function ExploreCardsScreen() {
         result.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'fee':
-        result.sort((a, b) => a.annualFee - b.annualFee);
+        result.sort((a, b) => (a.annualFee ?? 0) - (b.annualFee ?? 0));
         break;
       case 'signup_bonus':
         result.sort((a, b) => {
@@ -720,9 +715,12 @@ export default function ExploreCardsScreen() {
   }, [cards, searchQuery, filters]);
 
   // Handle card press — navigate to detail
-  const handleCardPress = useCallback((card: Card) => {
-    navigation.navigate('CardDetail' as never, { cardId: card.id } as never);
-  }, [navigation]);
+  const handleCardPress = useCallback(
+    (card: Card) => {
+      (navigation as any).navigate('CardDetail', { cardId: card.id });
+    },
+    [navigation]
+  );
 
   // Handle apply button
   const handleApply = useCallback((card: Card) => {
@@ -775,9 +773,7 @@ export default function ExploreCardsScreen() {
         </TouchableOpacity>
         <View style={styles.headerTitle}>
           <Text style={styles.title}>Explore Cards</Text>
-          <Text style={styles.subtitle}>
-            {filteredCards.length} cards available
-          </Text>
+          <Text style={styles.subtitle}>{filteredCards.length} cards available</Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
@@ -805,7 +801,10 @@ export default function ExploreCardsScreen() {
           style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
           onPress={() => setShowFilters(true)}
         >
-          <Filter size={18} color={activeFilterCount > 0 ? colors.primary.main : colors.text.secondary} />
+          <Filter
+            size={18}
+            color={activeFilterCount > 0 ? colors.primary.main : colors.text.secondary}
+          />
           {activeFilterCount > 0 && (
             <View style={styles.filterBadge}>
               <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
@@ -836,7 +835,9 @@ export default function ExploreCardsScreen() {
         <FlatList
           data={filteredCards}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <CardItem card={item} onApply={handleApply} onPress={handleCardPress} />}
+          renderItem={({ item }) => (
+            <CardItem card={item} onApply={handleApply} onPress={handleCardPress} />
+          )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           refreshControl={
