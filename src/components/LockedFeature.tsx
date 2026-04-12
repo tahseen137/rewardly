@@ -1,17 +1,11 @@
 /**
  * LockedFeature - Reusable paywall overlay for locked features
- * 
+ *
  * Shows which tier unlocks the feature and provides upgrade CTA
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Lock, Sparkles, Zap, Crown, ArrowRight } from 'lucide-react-native';
@@ -44,7 +38,7 @@ interface LockedFeatureProps {
   children?: React.ReactNode;
 }
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH, height: _SCREEN_HEIGHT } = Dimensions.get('window');
 
 /**
  * Get icon for tier
@@ -84,7 +78,7 @@ export default function LockedFeature({
   children,
 }: LockedFeatureProps) {
   const [showPaywall, setShowPaywall] = useState(false);
-  
+
   const requiredTier = getFeatureUnlockTier(feature);
   const tierConfig = SUBSCRIPTION_TIERS[requiredTier];
   const tierGradient = getTierGradient(requiredTier);
@@ -102,11 +96,7 @@ export default function LockedFeature({
   if (variant === 'card') {
     return (
       <>
-        <TouchableOpacity 
-          style={styles.cardContainer}
-          onPress={handleUpgrade}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity style={styles.cardContainer} onPress={handleUpgrade} activeOpacity={0.8}>
           <View style={styles.cardIconContainer}>
             <Lock size={20} color={colors.text.secondary} />
           </View>
@@ -135,44 +125,32 @@ export default function LockedFeature({
   if (variant === 'inline') {
     return (
       <>
-        <Animated.View 
-          entering={FadeIn.duration(300)}
-          style={styles.inlineContainer}
-        >
+        <Animated.View entering={FadeIn.duration(300)} style={styles.inlineContainer}>
           <View style={styles.inlineIconContainer}>
             {icon || <Lock size={48} color={colors.text.secondary} />}
           </View>
-          
+
           <Text style={styles.inlineTitle}>{title}</Text>
           <Text style={styles.inlineDescription}>{description}</Text>
-          
+
           <View style={styles.tierBadge}>
             {getTierIcon(requiredTier, 18)}
-            <Text style={styles.tierBadgeText}>
-              Requires {tierConfig.name}
-            </Text>
+            <Text style={styles.tierBadgeText}>Requires {tierConfig.name}</Text>
           </View>
-          
-          <TouchableOpacity
-            onPress={handleUpgrade}
-            activeOpacity={0.8}
-          >
+
+          <TouchableOpacity onPress={handleUpgrade} activeOpacity={0.8}>
             <LinearGradient
               colors={tierGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.upgradeButton}
             >
-              <Text style={styles.upgradeButtonText}>
-                Upgrade to {tierConfig.name}
-              </Text>
+              <Text style={styles.upgradeButtonText}>Upgrade to {tierConfig.name}</Text>
               <ArrowRight size={18} color={colors.background.primary} />
             </LinearGradient>
           </TouchableOpacity>
-          
-          <Text style={styles.priceText}>
-            Starting at ${tierConfig.monthlyPrice}/month
-          </Text>
+
+          <Text style={styles.priceText}>Starting at ${tierConfig.monthlyPrice}/month</Text>
         </Animated.View>
 
         <Paywall
@@ -189,34 +167,23 @@ export default function LockedFeature({
     <>
       <View style={styles.overlayContainer}>
         {/* Blurred background content */}
-        <View style={styles.backgroundContent}>
-          {children}
-        </View>
-        
+        <View style={styles.backgroundContent}>{children}</View>
+
         {/* Blur overlay */}
-        <BlurView
-          intensity={20}
-          tint="dark"
-          style={styles.blurOverlay}
-        >
-          <Animated.View 
-            entering={FadeIn.duration(400)}
-            style={styles.overlayContent}
-          >
+        <BlurView intensity={20} tint="dark" style={styles.blurOverlay}>
+          <Animated.View entering={FadeIn.duration(400)} style={styles.overlayContent}>
             <View style={styles.overlayIconContainer}>
               {icon || <Lock size={56} color={colors.text.secondary} />}
             </View>
-            
+
             <Text style={styles.overlayTitle}>{title}</Text>
             <Text style={styles.overlayDescription}>{description}</Text>
-            
+
             <View style={styles.tierBadgeLarge}>
               {getTierIcon(requiredTier, 24)}
-              <Text style={styles.tierBadgeLargeText}>
-                {tierConfig.name} Feature
-              </Text>
+              <Text style={styles.tierBadgeLargeText}>{tierConfig.name} Feature</Text>
             </View>
-            
+
             <TouchableOpacity
               onPress={handleUpgrade}
               activeOpacity={0.8}
@@ -228,13 +195,11 @@ export default function LockedFeature({
                 end={{ x: 1, y: 1 }}
                 style={styles.overlayButton}
               >
-                <Text style={styles.overlayButtonText}>
-                  Upgrade to {tierConfig.name}
-                </Text>
+                <Text style={styles.overlayButtonText}>Upgrade to {tierConfig.name}</Text>
                 <ArrowRight size={20} color={colors.background.primary} />
               </LinearGradient>
             </TouchableOpacity>
-            
+
             <Text style={styles.overlayPriceText}>
               Starting at ${tierConfig.monthlyPrice}/month
               {tierConfig.annualPrice > 0 && ` • $${tierConfig.annualPrice}/year`}

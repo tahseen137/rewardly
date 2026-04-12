@@ -1,6 +1,6 @@
 /**
  * UpgradeScreen - Dedicated screen for viewing and purchasing subscription tiers
- * 
+ *
  * Can be navigated to from anywhere in the app with optional context
  * about which feature prompted the upgrade
  */
@@ -8,7 +8,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
@@ -20,17 +19,20 @@ import { RouteProp } from '@react-navigation/native';
 import { X } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
-import { borderRadius } from '../theme/borders';
 import Paywall from '../components/Paywall';
-import { SubscriptionTier, BillingPeriod, refreshSubscription } from '../services/SubscriptionService';
+import {
+  SubscriptionTier,
+  BillingPeriod,
+  refreshSubscription,
+} from '../services/SubscriptionService';
 
 // Import Feature type from SubscriptionService
 import type { Feature } from '../services/SubscriptionService';
 
 export type RootStackParamList = {
   MainTabs: undefined;
-  Upgrade: { 
-    feature?: Feature; 
+  Upgrade: {
+    feature?: Feature;
     source?: string;
   };
 };
@@ -41,7 +43,7 @@ type UpgradeScreenProps = {
 };
 
 export default function UpgradeScreen({ route, navigation }: UpgradeScreenProps) {
-  const { feature, source } = route.params || {};
+  const { feature, _source } = route.params || {};
   const [showPaywall, setShowPaywall] = useState(true);
 
   // Auto-show paywall on mount
@@ -53,23 +55,26 @@ export default function UpgradeScreen({ route, navigation }: UpgradeScreenProps)
     navigation.goBack();
   }, [navigation]);
 
-  const handleSubscribe = useCallback(async (tier: SubscriptionTier, period: BillingPeriod) => {
-    // Refresh subscription state after successful subscription
-    // The webhook should have already updated the database
-    await refreshSubscription();
-    
-    // Close the screen
-    navigation.goBack();
-  }, [navigation]);
+  const handleSubscribe = useCallback(
+    async (_tier: SubscriptionTier, _period: BillingPeriod) => {
+      // Refresh subscription state after successful subscription
+      // The webhook should have already updated the database
+      await refreshSubscription();
+
+      // Close the screen
+      navigation.goBack();
+    },
+    [navigation]
+  );
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      
+
       {/* Header with close button */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          onPress={handleClose} 
+        <TouchableOpacity
+          onPress={handleClose}
           style={styles.closeButton}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >

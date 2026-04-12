@@ -15,15 +15,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
-import {
-  Bell,
-  DollarSign,
-  TrendingUp,
-  AlertCircle,
-  Gift,
-  FileText,
-  X,
-} from 'lucide-react-native';
+import { Bell, DollarSign, TrendingUp, AlertCircle, Gift, FileText, X } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -71,13 +63,13 @@ interface NotificationItemProps {
 
 function NotificationItem({ notification, onPress, onDelete }: NotificationItemProps) {
   const Icon = getNotificationIcon(notification.type);
-  
+
   const timeAgo = useMemo(() => {
     const diff = Date.now() - notification.createdAt.getTime();
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
-    
+
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
     return `${days}d ago`;
@@ -143,23 +135,29 @@ export default function NotificationsScreen() {
     }
   }, []);
 
-  const handleNotificationPress = useCallback(async (notification: AppNotification) => {
-    // Mark as read
-    if (!notification.isRead) {
-      await markAsRead(notification.id);
+  const handleNotificationPress = useCallback(
+    async (notification: AppNotification) => {
+      // Mark as read
+      if (!notification.isRead) {
+        await markAsRead(notification.id);
+        await loadNotifications();
+      }
+
+      // Navigate if actionUrl exists
+      if (notification.actionUrl) {
+        (navigation as any).navigate(notification.actionUrl, notification.actionData);
+      }
+    },
+    [navigation, loadNotifications]
+  );
+
+  const handleDeleteNotification = useCallback(
+    async (id: string) => {
+      await deleteNotification(id);
       await loadNotifications();
-    }
-
-    // Navigate if actionUrl exists
-    if (notification.actionUrl) {
-      (navigation as any).navigate(notification.actionUrl, notification.actionData);
-    }
-  }, [navigation, loadNotifications]);
-
-  const handleDeleteNotification = useCallback(async (id: string) => {
-    await deleteNotification(id);
-    await loadNotifications();
-  }, [loadNotifications]);
+    },
+    [loadNotifications]
+  );
 
   const handleMarkAllRead = useCallback(async () => {
     await markAllAsRead();
@@ -168,7 +166,7 @@ export default function NotificationsScreen() {
 
   const filteredNotifications = useMemo(() => {
     if (filter === 'unread') {
-      return notifications.filter(n => !n.isRead);
+      return notifications.filter((n) => !n.isRead);
     }
     return notifications;
   }, [notifications, filter]);

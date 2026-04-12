@@ -1,7 +1,7 @@
 /**
  * ConfettiAnimation - Celebration animation for achievements
  * Used when users complete signup bonuses, improve Rewards IQ, etc.
- * 
+ *
  * Uses standard RN Animated for web compatibility
  */
 
@@ -37,11 +37,11 @@ function ConfettiPiece({ index, color, startX, duration, delay, onComplete }: Co
   const rotate = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(1)).current;
   const opacity = useRef(new Animated.Value(1)).current;
-  
+
   useEffect(() => {
     const randomX = (Math.random() - 0.5) * 200;
     const randomRotation = Math.random() * 720 - 360;
-    
+
     const timer = setTimeout(() => {
       Animated.parallel([
         // Fall down
@@ -90,18 +90,18 @@ function ConfettiPiece({ index, color, startX, duration, delay, onComplete }: Co
         }
       });
     }, delay);
-    
+
     return () => clearTimeout(timer);
   }, [duration, delay, index, onComplete, translateY, translateX, rotate, scale, opacity]);
-  
+
   const rotateInterpolation = rotate.interpolate({
     inputRange: [-360, 360],
     outputRange: ['-360deg', '360deg'],
   });
-  
+
   const isSquare = index % 3 === 0;
   const isCircle = index % 3 === 1;
-  
+
   return (
     <Animated.View
       style={[
@@ -113,12 +113,7 @@ function ConfettiPiece({ index, color, startX, duration, delay, onComplete }: Co
           height: isCircle ? 10 : isSquare ? 8 : 14,
           borderRadius: isCircle ? 5 : 2,
           opacity,
-          transform: [
-            { translateX },
-            { translateY },
-            { rotate: rotateInterpolation },
-            { scale },
-          ],
+          transform: [{ translateX }, { translateY }, { rotate: rotateInterpolation }, { scale }],
         },
       ]}
     />
@@ -139,10 +134,10 @@ export default function ConfettiAnimation({
   onComplete,
 }: ConfettiAnimationProps) {
   if (!active) return null;
-  
+
   // Reduce count on web for performance
   const pieceCount = Platform.OS === 'web' ? Math.min(count, 30) : count;
-  
+
   const pieces = Array.from({ length: pieceCount }).map((_, index) => ({
     index,
     color: CONFETTI_COLORS[index % CONFETTI_COLORS.length],
@@ -150,7 +145,7 @@ export default function ConfettiAnimation({
     duration: duration + Math.random() * 1000,
     delay: Math.random() * 500,
   }));
-  
+
   return (
     <View style={styles.container} pointerEvents="none">
       {pieces.map((piece) => (

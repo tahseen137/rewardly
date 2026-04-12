@@ -101,7 +101,7 @@ export function IconButton({
   style,
   ...props
 }: IconButtonProps) {
-  const theme = useTheme();
+  const _theme = useTheme();
   const buttonSize = Math.max(44, size + 16); // Minimum 44px touch target
 
   return (

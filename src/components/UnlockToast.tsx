@@ -5,14 +5,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  Platform,
-  Vibration,
-} from 'react-native';
+import { View, Text, StyleSheet, Animated, Platform, Vibration } from 'react-native';
 import { colors } from '../theme/colors';
 import { AchievementDefinition } from '../types';
 
@@ -91,11 +84,7 @@ export function UnlockToast({ achievement, visible, onHide, newRank }: UnlockToa
           <Text style={styles.title}>Achievement Unlocked!</Text>
           <Text style={styles.achievementName}>{achievement.name}</Text>
           <Text style={styles.description}>{achievement.description}</Text>
-          {newRank && (
-            <Text style={styles.rankUp}>
-              🎉 Rank Up: {newRank.title}!
-            </Text>
-          )}
+          {newRank && <Text style={styles.rankUp}>🎉 Rank Up: {newRank.title}!</Text>}
         </View>
       </View>
     </Animated.View>

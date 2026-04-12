@@ -17,8 +17,14 @@ const mockCards: Card[] = [
     annualFee: 156,
     baseRewardRate: { value: 1, type: RewardType.POINTS, unit: 'multiplier' },
     categoryRewards: [
-      { category: SpendingCategory.DINING, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
-      { category: SpendingCategory.GROCERIES, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
+      {
+        category: SpendingCategory.DINING,
+        rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' },
+      },
+      {
+        category: SpendingCategory.GROCERIES,
+        rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' },
+      },
     ],
   },
   {
@@ -29,8 +35,14 @@ const mockCards: Card[] = [
     annualFee: 139,
     baseRewardRate: { value: 1, type: RewardType.CASHBACK, unit: 'percent' },
     categoryRewards: [
-      { category: SpendingCategory.GROCERIES, rewardRate: { value: 3, type: RewardType.CASHBACK, unit: 'percent' } },
-      { category: SpendingCategory.GAS, rewardRate: { value: 3, type: RewardType.CASHBACK, unit: 'percent' } },
+      {
+        category: SpendingCategory.GROCERIES,
+        rewardRate: { value: 3, type: RewardType.CASHBACK, unit: 'percent' },
+      },
+      {
+        category: SpendingCategory.GAS,
+        rewardRate: { value: 3, type: RewardType.CASHBACK, unit: 'percent' },
+      },
     ],
   },
   {
@@ -41,7 +53,10 @@ const mockCards: Card[] = [
     annualFee: 120,
     baseRewardRate: { value: 1, type: RewardType.CASHBACK, unit: 'percent' },
     categoryRewards: [
-      { category: SpendingCategory.GROCERIES, rewardRate: { value: 4, type: RewardType.CASHBACK, unit: 'percent' } },
+      {
+        category: SpendingCategory.GROCERIES,
+        rewardRate: { value: 4, type: RewardType.CASHBACK, unit: 'percent' },
+      },
     ],
   },
 ];
@@ -54,7 +69,6 @@ jest.mock('../../CardDataService', () => ({
 
 import {
   addCard,
-  removeCard,
   getCards,
   isDuplicate,
   clearPortfolio,

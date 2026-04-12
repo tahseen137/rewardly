@@ -1,6 +1,6 @@
 /**
  * AutoPilotSetupScreen - Opt-in flow for AutoPilot feature
- * 
+ *
  * Clear, non-creepy permission request with privacy messaging
  */
 
@@ -28,10 +28,7 @@ interface AutoPilotSetupScreenProps {
   onSkip: () => void;
 }
 
-export default function AutoPilotSetupScreen({
-  onComplete,
-  onSkip,
-}: AutoPilotSetupScreenProps) {
+export default function AutoPilotSetupScreen({ onComplete, onSkip }: AutoPilotSetupScreenProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<'intro' | 'permissions' | 'done'>('intro');
   const [locationGranted, setLocationGranted] = useState(false);
@@ -40,16 +37,16 @@ export default function AutoPilotSetupScreen({
   const handleSetup = async () => {
     setIsLoading(true);
     setStep('permissions');
-    
+
     try {
       // Request location permission
       const locGranted = await requestLocationPermission();
       setLocationGranted(locGranted);
-      
+
       // Request notification permission
       const notifGranted = await requestNotificationPermission();
       setNotificationGranted(notifGranted);
-      
+
       // If both granted, enable AutoPilot
       if (locGranted && notifGranted) {
         await enableAutoPilot();
@@ -90,7 +87,7 @@ export default function AutoPilotSetupScreen({
             <MapPin size={48} color="#FFFFFF" />
           </LinearGradient>
         </View>
-        
+
         <Text style={styles.title}>Get alerts before you pay</Text>
         <Text style={styles.subtitle}>
           AutoPilot monitors stores YOU choose and recommends the best card for maximum rewards.
@@ -126,11 +123,7 @@ export default function AutoPilotSetupScreen({
 
       {/* Actions */}
       <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.primaryButton}
-          onPress={handleSetup}
-          disabled={isLoading}
-        >
+        <TouchableOpacity style={styles.primaryButton} onPress={handleSetup} disabled={isLoading}>
           <LinearGradient
             colors={[colors.primary.main, colors.primary.dark]}
             style={styles.buttonGradient}
@@ -150,7 +143,7 @@ export default function AutoPilotSetupScreen({
   const renderPermissions = () => (
     <View style={styles.permissionsContainer}>
       <Text style={styles.permissionsTitle}>Setting up AutoPilot...</Text>
-      
+
       <View style={styles.permissionsList}>
         <PermissionRow
           title="Location Access"
@@ -165,7 +158,7 @@ export default function AutoPilotSetupScreen({
           loading={isLoading && locationGranted && !notificationGranted}
         />
       </View>
-      
+
       {isLoading && (
         <ActivityIndicator size="large" color={colors.primary.main} style={styles.loader} />
       )}
@@ -181,7 +174,7 @@ export default function AutoPilotSetupScreen({
       <Text style={styles.doneSubtitle}>
         {locationGranted && notificationGranted
           ? "You'll get alerts when you arrive at your pinned stores."
-          : "You can enable more features in Settings."}
+          : 'You can enable more features in Settings.'}
       </Text>
     </View>
   );

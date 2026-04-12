@@ -21,14 +21,14 @@ export interface RewardCalculationResult {
   rewardProgram: string;
   rewardCurrency: RewardType;
   pointsEarned: number;
-  cadValue: number;           // Converted value in CAD
-  originalPrice: number;      // Purchase amount
-  effectivePrice: number;     // originalPrice - cadValue
+  cadValue: number; // Converted value in CAD
+  originalPrice: number; // Purchase amount
+  effectivePrice: number; // originalPrice - cadValue
   multiplierUsed: number;
   isBaseRate: boolean;
-  isCashback: boolean;        // true if cashback (no conversion)
+  isCashback: boolean; // true if cashback (no conversion)
   annualFee: number;
-  pointValuation: number;     // in CAD cents
+  pointValuation: number; // in CAD cents
 }
 
 /**
@@ -109,9 +109,8 @@ export function pointsToCad(points: number, card: Card, fallbackValuation: numbe
   }
 
   // For points/miles cards, use optimal rate from program details if available
-  const pointValuation = card.programDetails?.optimalRateCents
-    ?? card.pointValuation
-    ?? fallbackValuation;
+  const pointValuation =
+    card.programDetails?.optimalRateCents ?? card.pointValuation ?? fallbackValuation;
 
   return points * (pointValuation / 100);
 }
@@ -131,7 +130,7 @@ export function pointsToCad(points: number, card: Card, fallbackValuation: numbe
 export function calculateRewards(
   input: CalculatorInput,
   cards: Card[],
-  pointValuations: Map<string, number>
+  _pointValuations: Map<string, number>
 ): CalculatorOutput {
   const { category, amount, portfolioCardIds } = input;
 
@@ -148,9 +147,8 @@ export function calculateRewards(
       const isCashback = card.baseRewardRate.type === RewardType.CASHBACK;
 
       // Get point valuation - require database value for non-cashback cards
-      const pointValuation = card.programDetails?.optimalRateCents
-        ?? card.pointValuation
-        ?? (isCashback ? 100 : null); // For cashback, 100 cents = $1
+      const pointValuation =
+        card.programDetails?.optimalRateCents ?? card.pointValuation ?? (isCashback ? 100 : null); // For cashback, 100 cents = $1
 
       // Skip cards without valid point valuation (except cashback)
       if (pointValuation === null) {

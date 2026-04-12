@@ -1,18 +1,12 @@
 /**
  * QuickActions - Suggestion chips for quick interactions with Sage
- * 
+ *
  * Displays horizontally scrollable action chips that users can tap
  * to quickly send common questions.
  */
 
 import React, { useCallback } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
 import {
   Utensils,
@@ -42,41 +36,41 @@ export interface QuickActionsProps {
 
 // Default quick actions
 const DEFAULT_ACTIONS: QuickAction[] = [
-  { 
-    id: 'dining', 
-    label: 'Best for dining', 
+  {
+    id: 'dining',
+    label: 'Best for dining',
     message: "What's my best card for dining and restaurants?",
-    icon: Utensils
+    icon: Utensils,
   },
-  { 
-    id: 'groceries', 
-    label: 'Best for groceries', 
+  {
+    id: 'groceries',
+    label: 'Best for groceries',
     message: 'Which card should I use for grocery shopping?',
-    icon: ShoppingCart
+    icon: ShoppingCart,
   },
-  { 
-    id: 'travel', 
-    label: 'Best for travel', 
+  {
+    id: 'travel',
+    label: 'Best for travel',
     message: "What's the best card in my wallet for travel purchases?",
-    icon: Plane
+    icon: Plane,
   },
-  { 
-    id: 'compare', 
-    label: 'Compare my cards', 
+  {
+    id: 'compare',
+    label: 'Compare my cards',
     message: 'Can you compare my cards and tell me which is best overall?',
-    icon: ArrowLeftRight
+    icon: ArrowLeftRight,
   },
-  { 
-    id: 'redeem', 
-    label: 'Redeem points', 
+  {
+    id: 'redeem',
+    label: 'Redeem points',
     message: "What's the best way to redeem my points for maximum value?",
-    icon: Gift
+    icon: Gift,
   },
-  { 
-    id: 'trip', 
-    label: 'Plan a trip', 
+  {
+    id: 'trip',
+    label: 'Plan a trip',
     message: 'I want to plan a trip using my points. Can you help?',
-    icon: Map
+    icon: Map,
   },
 ];
 
@@ -91,14 +85,11 @@ interface ChipProps {
 
 const ActionChip: React.FC<ChipProps> = ({ action, onPress, disabled, index }) => {
   const Icon = action.icon || Sparkles;
-  
+
   return (
     <AnimatedTouchable
       entering={FadeInRight.delay(index * 50).duration(300)}
-      style={[
-        styles.chip,
-        disabled && styles.chipDisabled
-      ]}
+      style={[styles.chip, disabled && styles.chipDisabled]}
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.7}
@@ -118,12 +109,15 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   disabled = false,
   variant = 'horizontal',
 }) => {
-  const handlePress = useCallback((message: string) => {
-    if (!disabled) {
-      onActionPress(message);
-    }
-  }, [disabled, onActionPress]);
-  
+  const handlePress = useCallback(
+    (message: string) => {
+      if (!disabled) {
+        onActionPress(message);
+      }
+    },
+    [disabled, onActionPress]
+  );
+
   if (variant === 'grid') {
     return (
       <View style={styles.gridContainer}>
@@ -142,7 +136,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       </View>
     );
   }
-  
+
   return (
     <View style={styles.container}>
       <ScrollView

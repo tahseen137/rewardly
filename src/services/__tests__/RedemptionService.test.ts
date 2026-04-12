@@ -1,6 +1,6 @@
 /**
  * RedemptionService - Unit Tests
- * 
+ *
  * Tests redemption guide, transfer partners, and CPP calculations
  */
 
@@ -85,7 +85,7 @@ const mockProgramData = {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  
+
   // Default mock implementations
   mockSupabase!.from = jest.fn().mockReturnValue({
     select: jest.fn().mockReturnValue({
@@ -117,7 +117,7 @@ describe('RedemptionService - Transfer Partners', () => {
   describe('getTransferPartners', () => {
     it('should fetch transfer partners for a program', async () => {
       const partners = await getTransferPartners('program-1');
-      
+
       expect(partners).toHaveLength(2);
       expect(partners[0].partnerName).toBe('Air Canada');
       expect(partners[1].partnerName).toBe('Marriott');
@@ -125,22 +125,22 @@ describe('RedemptionService - Transfer Partners', () => {
 
     it('should return only active partners', async () => {
       const partners = await getTransferPartners('program-1');
-      
-      partners.forEach(p => {
+
+      partners.forEach((p) => {
         expect(p.isActive).toBe(true);
       });
     });
 
     it('should include transfer ratios', async () => {
       const partners = await getTransferPartners('program-1');
-      
+
       expect(partners[0].transferRatio).toBe(1.0);
       expect(partners[1].transferRatio).toBe(0.333);
     });
 
     it('should include sweet spots', async () => {
       const partners = await getTransferPartners('program-1');
-      
+
       expect(Array.isArray(partners[0].sweetSpots)).toBe(true);
       expect(partners[0].sweetSpots.length).toBeGreaterThan(0);
     });
@@ -159,10 +159,10 @@ describe('RedemptionService - Transfer Partners', () => {
           }),
         }),
       }) as any;
-      
+
       await getTransferPartners('program-cache-test');
       await getTransferPartners('program-cache-test');
-      
+
       // Should only call Supabase once due to caching
       expect(mockSupabase!.from).toHaveBeenCalledTimes(1);
     });
@@ -180,7 +180,7 @@ describe('RedemptionService - Transfer Partners', () => {
           }),
         }),
       }) as any;
-      
+
       // Use a unique program ID to avoid cached results
       const partners = await getTransferPartners('program-error-test');
       expect(partners).toEqual([]);
@@ -199,7 +199,7 @@ describe('RedemptionService - Transfer Partners', () => {
           }),
         }),
       }) as any;
-      
+
       // Use a unique program ID to avoid cached results
       const partners = await getTransferPartners('program-empty-test');
       expect(partners).toEqual([]);
@@ -207,14 +207,14 @@ describe('RedemptionService - Transfer Partners', () => {
 
     it('should include transfer time information', async () => {
       const partners = await getTransferPartners('program-1');
-      
+
       expect(partners[0].transferTime).toBe('Instant');
       expect(partners[1].transferTime).toBe('24-48 hours');
     });
 
     it('should differentiate partner types', async () => {
       const partners = await getTransferPartners('program-1');
-      
+
       expect(partners[0].partnerType).toBe('airline');
       expect(partners[1].partnerType).toBe('hotel');
     });
@@ -272,39 +272,39 @@ describe('RedemptionService - Redemption Guide', () => {
   describe('getRedemptionGuide', () => {
     it('should fetch complete redemption guide', async () => {
       const guide = await getRedemptionGuide('program-1');
-      
+
       expect(guide.programName).toBe('Amex Membership Rewards');
       expect(guide.programCategory).toBe('Credit Card Points');
     });
 
     it('should include direct rate', async () => {
       const guide = await getRedemptionGuide('program-1');
-      
+
       expect(guide.directRateCents).toBe(1.0);
     });
 
     it('should include optimal rate', async () => {
       const guide = await getRedemptionGuide('program-1');
-      
+
       expect(guide.optimalRateCents).toBe(2.0);
     });
 
     it('should include optimal method', async () => {
       const guide = await getRedemptionGuide('program-1');
-      
+
       expect(guide.optimalMethod).toBe('Transfer Partners');
     });
 
     it('should include redemption options', async () => {
       const guide = await getRedemptionGuide('program-1');
-      
+
       expect(guide.redemptionOptions).toHaveLength(3);
       expect(guide.redemptionOptions[0].type).toBe('portal');
     });
 
     it('should include transfer partners', async () => {
       const guide = await getRedemptionGuide('program-1');
-      
+
       expect(guide.transferPartners).toHaveLength(2);
     });
 
@@ -314,7 +314,7 @@ describe('RedemptionService - Redemption Guide', () => {
         optimal_rate_cents: null,
         optimal_method: null,
       };
-      
+
       mockSupabase!.from = jest.fn((table: string) => {
         if (table === 'reward_programs') {
           return {
@@ -340,9 +340,9 @@ describe('RedemptionService - Redemption Guide', () => {
         }
         return {} as any;
       }) as any;
-      
+
       const guide = await getRedemptionGuide('program-1');
-      
+
       // Should pick portal (1.25) as optimal
       expect(guide.optimalRateCents).toBe(1.25);
     });
@@ -358,9 +358,9 @@ describe('RedemptionService - Redemption Guide', () => {
           }),
         }),
       })) as any;
-      
+
       const guide = await getRedemptionGuide('program-1');
-      
+
       expect(guide.programName).toBe('Unknown');
       expect(guide.redemptionOptions).toEqual([]);
       expect(guide.transferPartners).toEqual([]);
@@ -392,9 +392,9 @@ describe('RedemptionService - Redemption Guide', () => {
         }
         return {} as any;
       }) as any;
-      
+
       const guide = await getRedemptionGuide('program-1');
-      
+
       expect(guide.redemptionOptions).toEqual([]);
     });
   });
@@ -472,7 +472,7 @@ describe('RedemptionService - Edge Cases', () => {
         transfer_ratio: null,
       },
     ];
-    
+
     mockSupabase!.from = jest.fn().mockReturnValue({
       select: jest.fn().mockReturnValue({
         eq: jest.fn().mockReturnValue({
@@ -485,9 +485,9 @@ describe('RedemptionService - Edge Cases', () => {
         }),
       }),
     }) as any;
-    
+
     const partners = await getTransferPartners('program-null-ratio');
-    
+
     expect(partners[0].transferRatio).toBeNaN();
   });
 
@@ -498,7 +498,7 @@ describe('RedemptionService - Edge Cases', () => {
         sweet_spots: null,
       },
     ];
-    
+
     mockSupabase!.from = jest.fn().mockReturnValue({
       select: jest.fn().mockReturnValue({
         eq: jest.fn().mockReturnValue({
@@ -511,9 +511,9 @@ describe('RedemptionService - Edge Cases', () => {
         }),
       }),
     }) as any;
-    
+
     const partners = await getTransferPartners('program-null-spots');
-    
+
     expect(partners[0].sweetSpots).toEqual([]);
   });
 
@@ -524,7 +524,7 @@ describe('RedemptionService - Edge Cases', () => {
         transfer_time: null,
       },
     ];
-    
+
     mockSupabase!.from = jest.fn().mockReturnValue({
       select: jest.fn().mockReturnValue({
         eq: jest.fn().mockReturnValue({
@@ -537,9 +537,9 @@ describe('RedemptionService - Edge Cases', () => {
         }),
       }),
     }) as any;
-    
+
     const partners = await getTransferPartners('program-null-time');
-    
+
     expect(partners[0].transferTime).toBe('Varies');
   });
 
@@ -555,7 +555,7 @@ describe('RedemptionService - Edge Cases', () => {
         transfer_ratio: 1000,
       },
     ];
-    
+
     mockSupabase!.from = jest.fn().mockReturnValue({
       select: jest.fn().mockReturnValue({
         eq: jest.fn().mockReturnValue({
@@ -568,9 +568,9 @@ describe('RedemptionService - Edge Cases', () => {
         }),
       }),
     }) as any;
-    
+
     const partners = await getTransferPartners('program-large-ratio');
-    
+
     expect(partners[0].transferRatio).toBe(1000);
   });
 
@@ -583,7 +583,7 @@ describe('RedemptionService - Edge Cases', () => {
         notes: null,
       },
     ];
-    
+
     mockSupabase!.from = jest.fn((table: string) => {
       if (table === 'reward_programs') {
         return {
@@ -623,9 +623,9 @@ describe('RedemptionService - Edge Cases', () => {
       }
       return {} as any;
     }) as any;
-    
+
     const guide = await getRedemptionGuide('program-null-test');
-    
+
     if (guide.redemptionOptions.length > 0) {
       expect(guide.redemptionOptions[0].minimumRedemption).toBeNull();
       expect(guide.redemptionOptions[0].notes).toBeNull();

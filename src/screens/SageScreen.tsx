@@ -1,6 +1,6 @@
 /**
  * SageScreen - AI Assistant Chat Interface
- * 
+ *
  * Main screen for interacting with Sage, the AI rewards advisor.
  * Features chat messages, quick actions, and card recommendation cards.
  */
@@ -18,24 +18,18 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
-import { MessageCircle, Plus, History, Sparkles, LogIn, Crown, ArrowRight } from 'lucide-react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { MessageCircle, Plus, History, Sparkles, Crown, ArrowRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme';
 import { colors } from '../theme/colors';
-import { 
-  ChatBubble, 
-  ChatInput, 
-  QuickActions, 
-  CardRecommendationCard 
-} from '../components/chat';
-import { GlassCard } from '../components';
+import { ChatBubble, ChatInput, QuickActions, CardRecommendationCard } from '../components/chat';
 import Paywall from '../components/Paywall';
-import { 
-  SageService, 
-  SageMessage, 
+import {
+  SageService,
+  SageMessage,
   Conversation,
   CardRecommendation,
   SageError,
@@ -45,13 +39,11 @@ import { getCards } from '../services/CardPortfolioManager';
 import { getPreferences } from '../services/PreferenceManager';
 import { getCardByIdSync } from '../services/CardDataService';
 import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
-import { UserPreferences, Card } from '../types';
-import { 
-  canUseSage, 
-  getSageUsage, 
-  incrementSageUsage, 
-  getCurrentTierSync,
-  SAGE_LIMITS,
+import { UserPreferences } from '../types';
+import {
+  canUseSage,
+  getSageUsage,
+  incrementSageUsage,
   SageUsage,
 } from '../services/SubscriptionService';
 
@@ -81,12 +73,27 @@ interface CategoryChip {
 }
 
 const categoryChips: CategoryChip[] = [
-  { id: 'groceries', label: 'Groceries', icon: '🛒', message: "What's my best card for groceries?" },
+  {
+    id: 'groceries',
+    label: 'Groceries',
+    icon: '🛒',
+    message: "What's my best card for groceries?",
+  },
   { id: 'dining', label: 'Dining', icon: '🍽️', message: "What's my best card for dining?" },
   { id: 'gas', label: 'Gas', icon: '⛽', message: "What's my best card for gas?" },
   { id: 'travel', label: 'Travel', icon: '✈️', message: "What's my best card for travel?" },
-  { id: 'online', label: 'Online', icon: '🛍️', message: "What's my best card for online shopping?" },
-  { id: 'entertainment', label: 'Entertainment', icon: '🎬', message: "What's my best card for entertainment?" },
+  {
+    id: 'online',
+    label: 'Online',
+    icon: '🛍️',
+    message: "What's my best card for online shopping?",
+  },
+  {
+    id: 'entertainment',
+    label: 'Entertainment',
+    icon: '🎬',
+    message: "What's my best card for entertainment?",
+  },
   { id: 'pharmacy', label: 'Pharmacy', icon: '💊', message: "What's my best card for pharmacy?" },
   { id: 'home', label: 'Home', icon: '🏠', message: "What's my best card for home improvement?" },
   { id: 'other', label: 'Other', icon: '📦', message: "What's my best card for other purchases?" },
@@ -107,10 +114,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   ];
 
   return (
-    <Animated.View 
-      entering={FadeIn.duration(500)}
-      style={styles.welcomeContainer}
-    >
+    <Animated.View entering={FadeIn.duration(500)} style={styles.welcomeContainer}>
       {/* Avatar and greeting */}
       <View style={styles.welcomeHeader}>
         <View style={styles.sageAvatar}>
@@ -118,11 +122,11 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         </View>
         <Text style={styles.welcomeTitle}>Hey! I'm Sage</Text>
         <Text style={styles.welcomeSubtitle}>
-          Your AI credit card rewards advisor. Ask me anything about maximizing 
-          your rewards, comparing cards, or planning trips with points.
+          Your AI credit card rewards advisor. Ask me anything about maximizing your rewards,
+          comparing cards, or planning trips with points.
         </Text>
       </View>
-      
+
       {/* Suggested conversational prompts - NEW */}
       <View style={styles.welcomeActions}>
         <Text style={styles.sectionTitle}>Try Asking...</Text>
@@ -140,7 +144,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           ))}
         </View>
       </View>
-      
+
       {/* Category quick actions */}
       <View style={styles.welcomeActions}>
         <Text style={styles.sectionTitle}>Find Your Best Card</Text>
@@ -158,7 +162,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           ))}
         </View>
       </View>
-      
+
       {/* History button */}
       {hasHistory && (
         <TouchableOpacity
@@ -179,27 +183,27 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 // ============================================================================
 
 export const SageScreen: React.FC = () => {
-  const theme = useTheme();
+  const _theme = useTheme();
   const navigation = useNavigation();
   const flatListRef = useRef<FlatList>(null);
-  
+
   // State
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<SageError | null>(null);
+  const [_error, setError] = useState<SageError | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [portfolio, setPortfolio] = useState<ReturnType<typeof getCards>>([]);
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [_currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [authCheckLoading, setAuthCheckLoading] = useState(true);
   const [sageUsage, setSageUsage] = useState<SageUsage | null>(null);
   const [chatLimitReached, setChatLimitReached] = useState(false);
   const [chatLimitReason, setChatLimitReason] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
-  
+
   // Check authentication status
   useEffect(() => {
     const checkAuth = async () => {
@@ -209,7 +213,7 @@ export const SageScreen: React.FC = () => {
     };
     checkAuth();
   }, []);
-  
+
   // Load user data
   useEffect(() => {
     const loadUserData = async () => {
@@ -220,7 +224,7 @@ export const SageScreen: React.FC = () => {
     };
     loadUserData();
   }, []);
-  
+
   // Load conversation history
   useEffect(() => {
     const loadHistory = async () => {
@@ -229,13 +233,13 @@ export const SageScreen: React.FC = () => {
     };
     loadHistory();
   }, []);
-  
+
   // Load Sage usage on mount and after each message
   useEffect(() => {
     const loadSageUsage = async () => {
       const usage = await getSageUsage();
       setSageUsage(usage);
-      
+
       // Check if limit reached
       const canUse = await canUseSage();
       setChatLimitReached(!canUse.allowed);
@@ -245,7 +249,7 @@ export const SageScreen: React.FC = () => {
     };
     loadSageUsage();
   }, [messages.length]);
-  
+
   // Scroll to bottom when messages change
   useEffect(() => {
     if (messages.length > 0) {
@@ -254,114 +258,117 @@ export const SageScreen: React.FC = () => {
       }, 100);
     }
   }, [messages]);
-  
-  // Send message handler
-  const handleSendMessage = useCallback(async (messageText: string) => {
-    if (!messageText.trim() || isLoading || !preferences) return;
-    
-    // Check if user can use Sage
-    const canUse = await canUseSage();
-    if (!canUse.allowed) {
-      setError({
-        code: 'RATE_LIMIT',
-        message: canUse.reason || 'Sage limit reached',
-        retryable: false,
-      });
-      setChatLimitReached(true);
-      return;
-    }
-    
-    setError(null);
-    setIsLoading(true);
-    
-    // Add user message optimistically
-    const userMessage: DisplayMessage = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: messageText,
-      createdAt: new Date(),
-    };
-    
-    // Prepare assistant message placeholder
-    const assistantMsgId = `assistant-${Date.now()}`;
-    const assistantMessage: DisplayMessage = {
-      id: assistantMsgId,
-      role: 'assistant',
-      content: '',
-      createdAt: new Date(),
-    };
 
-    setMessages(prev => [...prev, userMessage, assistantMessage]);
-    
-    try {
-      // Use streaming method
-      const result = await SageService.streamMessage(
-        messageText,
-        conversationId,
-        portfolio,
-        preferences,
-        (token) => {
-          setMessages(prev => 
-            prev.map(msg => 
-              msg.id === assistantMsgId 
-                ? { ...msg, content: msg.content + token }
-                : msg
-            )
-          );
-        }
-      );
-      
-      // Update conversation ID if needed
-      if (!conversationId) {
-        setConversationId(result.conversationId);
+  // Send message handler
+  const handleSendMessage = useCallback(
+    async (messageText: string) => {
+      if (!messageText.trim() || isLoading || !preferences) return;
+
+      // Check if user can use Sage
+      const canUse = await canUseSage();
+      if (!canUse.allowed) {
+        setError({
+          code: 'RATE_LIMIT',
+          message: canUse.reason || 'Sage limit reached',
+          retryable: false,
+        });
+        setChatLimitReached(true);
+        return;
       }
-      
-      // Increment Sage usage after successful chat
-      const updatedUsage = await incrementSageUsage();
-      setSageUsage(updatedUsage);
-      
-      // Update final message with metadata (recommendations, etc.)
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === assistantMsgId 
-            ? { 
-                ...msg, 
-                content: result.reply, // Ensure content is exact
-                cardRecommendation: result.cardRecommendation,
-                metadata: {
-                  toolsUsed: result.toolsUsed,
-                  cardRecommendation: result.cardRecommendation,
-                }
-              }
-            : msg
-        )
-      );
-      
-    } catch (err) {
-      const sageError = err as SageError;
-      setError(sageError);
-      
-      // Update the assistant message to show error or remove it?
-      // Usually better to show what was received so far, plus error
-      setMessages(prev => [
-        ...prev, 
-        {
-          id: `error-${Date.now()}`,
-          role: 'assistant',
-          content: `I'm sorry, ${sageError.message}${sageError.retryable ? ' Please try again.' : ''}`,
-          createdAt: new Date(),
+
+      setError(null);
+      setIsLoading(true);
+
+      // Add user message optimistically
+      const userMessage: DisplayMessage = {
+        id: `user-${Date.now()}`,
+        role: 'user',
+        content: messageText,
+        createdAt: new Date(),
+      };
+
+      // Prepare assistant message placeholder
+      const assistantMsgId = `assistant-${Date.now()}`;
+      const assistantMessage: DisplayMessage = {
+        id: assistantMsgId,
+        role: 'assistant',
+        content: '',
+        createdAt: new Date(),
+      };
+
+      setMessages((prev) => [...prev, userMessage, assistantMessage]);
+
+      try {
+        // Use streaming method
+        const result = await SageService.streamMessage(
+          messageText,
+          conversationId,
+          portfolio,
+          preferences,
+          (token) => {
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMsgId ? { ...msg, content: msg.content + token } : msg
+              )
+            );
+          }
+        );
+
+        // Update conversation ID if needed
+        if (!conversationId) {
+          setConversationId(result.conversationId);
         }
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [conversationId, portfolio, preferences, isLoading]);
-  
+
+        // Increment Sage usage after successful chat
+        const updatedUsage = await incrementSageUsage();
+        setSageUsage(updatedUsage);
+
+        // Update final message with metadata (recommendations, etc.)
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMsgId
+              ? {
+                  ...msg,
+                  content: result.reply, // Ensure content is exact
+                  cardRecommendation: result.cardRecommendation,
+                  metadata: {
+                    toolsUsed: result.toolsUsed,
+                    cardRecommendation: result.cardRecommendation,
+                  },
+                }
+              : msg
+          )
+        );
+      } catch (err) {
+        const sageError = err as SageError;
+        setError(sageError);
+
+        // Update the assistant message to show error or remove it?
+        // Usually better to show what was received so far, plus error
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `error-${Date.now()}`,
+            role: 'assistant',
+            content: `I'm sorry, ${sageError.message}${sageError.retryable ? ' Please try again.' : ''}`,
+            createdAt: new Date(),
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [conversationId, portfolio, preferences, isLoading]
+  );
+
   // Quick action handler
-  const handleQuickAction = useCallback((message: string) => {
-    handleSendMessage(message);
-  }, [handleSendMessage]);
-  
+  const handleQuickAction = useCallback(
+    (message: string) => {
+      handleSendMessage(message);
+    },
+    [handleSendMessage]
+  );
+
   // Start new conversation
   const handleNewConversation = useCallback(() => {
     setMessages([]);
@@ -369,17 +376,19 @@ export const SageScreen: React.FC = () => {
     SageService.startNewConversation();
     setShowHistory(false);
   }, []);
-  
+
   // Load existing conversation
   const handleLoadConversation = useCallback(async (convId: string) => {
     setRefreshing(true);
     try {
       const conv = await SageService.getConversation(convId);
       if (conv?.messages) {
-        setMessages(conv.messages.map(m => ({
-          ...m,
-          cardRecommendation: m.metadata?.cardRecommendation,
-        })));
+        setMessages(
+          conv.messages.map((m) => ({
+            ...m,
+            cardRecommendation: m.metadata?.cardRecommendation,
+          }))
+        );
         setConversationId(convId);
         SageService.setCurrentConversation(convId);
       }
@@ -388,7 +397,7 @@ export const SageScreen: React.FC = () => {
       setShowHistory(false);
     }
   }, []);
-  
+
   // Card recommendation action handlers
   const handleCardLearnMore = useCallback((cardId: string) => {
     // Navigate to the card detail modal (root-level screen accessible from anywhere)
@@ -397,69 +406,69 @@ export const SageScreen: React.FC = () => {
       nav.navigate('CardDetail', { cardId });
     }
   }, []);
-  
+
   // Handle sign in navigation
-  const handleSignIn = useCallback(async () => {
+  const _handleSignIn = useCallback(async () => {
     // Sign out current guest session to trigger auth flow
     await signOut();
     // The app navigator will detect the sign out and show AuthScreen
   }, []);
-  
+
   // Render message item
-  const renderMessage: ListRenderItem<DisplayMessage> = useCallback(({ item, index }) => {
-    const showTimestamp = index === 0 || 
-      (messages[index - 1]?.createdAt.getTime() - item.createdAt.getTime() > 60000);
-    
-    return (
-      <View>
-        <ChatBubble
-          message={item.content}
-          role={item.role}
-          timestamp={item.createdAt}
-          showTimestamp={showTimestamp}
-        />
-        
-        {/* Card recommendation card */}
-        {item.cardRecommendation && (
-          <View style={styles.recommendationWrapper}>
-            {(() => {
-              const card = getCardByIdSync(item.cardRecommendation!.cardId);
-              if (!card) return null;
-              
-              return (
-                <CardRecommendationCard
-                  card={card}
-                  reason={item.cardRecommendation!.reason}
-                  rewardRate={item.cardRecommendation!.rewardRate}
-                  category={item.cardRecommendation!.category}
-                  onLearnMore={() => handleCardLearnMore(item.cardRecommendation!.cardId)}
-                />
-              );
-            })()}
-          </View>
-        )}
-      </View>
-    );
-  }, [messages, handleCardLearnMore]);
-  
+  const renderMessage: ListRenderItem<DisplayMessage> = useCallback(
+    ({ item, index }) => {
+      const showTimestamp =
+        index === 0 || messages[index - 1]?.createdAt.getTime() - item.createdAt.getTime() > 60000;
+
+      return (
+        <View>
+          <ChatBubble
+            message={item.content}
+            role={item.role}
+            timestamp={item.createdAt}
+            showTimestamp={showTimestamp}
+          />
+
+          {/* Card recommendation card */}
+          {item.cardRecommendation && (
+            <View style={styles.recommendationWrapper}>
+              {(() => {
+                const card = getCardByIdSync(item.cardRecommendation!.cardId);
+                if (!card) return null;
+
+                return (
+                  <CardRecommendationCard
+                    card={card}
+                    reason={item.cardRecommendation!.reason}
+                    rewardRate={item.cardRecommendation!.rewardRate}
+                    category={item.cardRecommendation!.category}
+                    onLearnMore={() => handleCardLearnMore(item.cardRecommendation!.cardId)}
+                  />
+                );
+              })()}
+            </View>
+          )}
+        </View>
+      );
+    },
+    [messages, handleCardLearnMore]
+  );
+
   // Render history list
   if (showHistory) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity 
-            onPress={() => setShowHistory(false)}
-            style={styles.backButton}
-          >
+          <TouchableOpacity onPress={() => setShowHistory(false)} style={styles.backButton}>
             <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Conversations</Text>
           <View style={styles.headerSpacer} />
         </View>
-        
+
         <FlatList
           data={conversations}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.conversationItem}
@@ -470,9 +479,7 @@ export const SageScreen: React.FC = () => {
                 <Text style={styles.conversationTitle} numberOfLines={1}>
                   {item.title || 'New Conversation'}
                 </Text>
-                <Text style={styles.conversationDate}>
-                  {item.updatedAt.toLocaleDateString()}
-                </Text>
+                <Text style={styles.conversationDate}>{item.updatedAt.toLocaleDateString()}</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -486,7 +493,7 @@ export const SageScreen: React.FC = () => {
       </SafeAreaView>
     );
   }
-  
+
   // Show loading state while checking auth
   if (authCheckLoading) {
     return (
@@ -497,10 +504,10 @@ export const SageScreen: React.FC = () => {
       </SafeAreaView>
     );
   }
-  
+
   // Auth is now optional — Sage works for all users
   // Signed-in users get personalized advice, guests get general advice
-  
+
   // Main chat view
   return (
     <SafeAreaView style={styles.container}>
@@ -513,24 +520,26 @@ export const SageScreen: React.FC = () => {
         >
           <Plus size={20} color={colors.text.primary} />
         </TouchableOpacity>
-        
+
         <View style={styles.headerTitleContainer}>
           <Sparkles size={18} color={colors.primary.main} />
           <Text style={styles.headerTitle}>Sage</Text>
           {/* Show chat counter for Pro users (limited chats) */}
           {sageUsage && sageUsage.limit !== null && sageUsage.remaining !== null && (
             <View style={styles.chatCounterBadge}>
-              <Text style={[
-                styles.chatCounterText,
-                sageUsage.remaining <= 2 && styles.chatCounterTextWarning,
-                sageUsage.remaining === 0 && styles.chatCounterTextDanger,
-              ]}>
+              <Text
+                style={[
+                  styles.chatCounterText,
+                  sageUsage.remaining <= 2 && styles.chatCounterTextWarning,
+                  sageUsage.remaining === 0 && styles.chatCounterTextDanger,
+                ]}
+              >
                 {sageUsage.remaining}/{sageUsage.limit}
               </Text>
             </View>
           )}
         </View>
-        
+
         <TouchableOpacity
           style={styles.headerButton}
           onPress={() => setShowHistory(true)}
@@ -539,7 +548,7 @@ export const SageScreen: React.FC = () => {
           <History size={20} color={colors.text.primary} />
         </TouchableOpacity>
       </View>
-      
+
       {/* Messages or Welcome Screen */}
       {messages.length === 0 ? (
         <WelcomeScreen
@@ -551,7 +560,7 @@ export const SageScreen: React.FC = () => {
         <FlatList
           ref={flatListRef}
           data={messages}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           renderItem={renderMessage}
           contentContainerStyle={styles.messagesList}
           refreshControl={
@@ -564,26 +573,28 @@ export const SageScreen: React.FC = () => {
           ListFooterComponent={null}
         />
       )}
-      
+
       {/* Quick actions bar (when chat has messages) */}
       {messages.length > 0 && !isLoading && (
         <QuickActions
-          actions={QUICK_ACTIONS.slice(0, 4).map(a => ({
+          actions={QUICK_ACTIONS.slice(0, 4).map((a) => ({
             ...a,
-            icon: undefined
+            icon: undefined,
           }))}
           onActionPress={handleQuickAction}
           disabled={isLoading}
         />
       )}
-      
+
       {/* Chat limit reached overlay */}
       {chatLimitReached && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.limitReachedOverlay}>
           <View style={styles.limitReachedContent}>
             <Crown size={32} color={colors.warning.main} />
             <Text style={styles.limitReachedTitle}>
-              {chatLimitReason?.includes('requires Pro') ? 'Upgrade to Unlock Sage' : 'Monthly Limit Reached'}
+              {chatLimitReason?.includes('requires Pro')
+                ? 'Upgrade to Unlock Sage'
+                : 'Monthly Limit Reached'}
             </Text>
             <Text style={styles.limitReachedText}>
               {chatLimitReason || 'Upgrade to Max for unlimited AI conversations.'}
@@ -606,28 +617,30 @@ export const SageScreen: React.FC = () => {
           </View>
         </Animated.View>
       )}
-      
+
       {/* Input bar */}
       <ChatInput
         onSend={handleSendMessage}
         disabled={!preferences || chatLimitReached}
         isLoading={isLoading}
-        placeholder={chatLimitReached
-          ? "Chat limit reached - upgrade for unlimited"
-          : portfolio.length === 0 
-            ? "Add cards to get personalized advice..." 
-            : "Ask Sage anything..."}
+        placeholder={
+          chatLimitReached
+            ? 'Chat limit reached - upgrade for unlimited'
+            : portfolio.length === 0
+              ? 'Add cards to get personalized advice...'
+              : 'Ask Sage anything...'
+        }
       />
-      
+
       {/* Bottom safe area padding for tab bar */}
       <View style={styles.bottomPadding} />
-      
+
       {/* Paywall Modal */}
       <Paywall
         visible={showPaywall}
         onClose={() => setShowPaywall(false)}
         defaultTier="max"
-        onSubscribe={async (tier) => {
+        onSubscribe={async (_tier) => {
           // Refresh Sage usage after subscription
           const usage = await getSageUsage();
           setSageUsage(usage);
@@ -714,7 +727,7 @@ const styles = StyleSheet.create({
   bottomPadding: {
     height: Platform.OS === 'ios' ? 70 : 60,
   },
-  
+
   // Welcome screen styles
   welcomeContainer: {
     flex: 1,
@@ -832,7 +845,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.text.secondary,
   },
-  
+
   // History list styles
   historyList: {
     padding: 16,
@@ -869,7 +882,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text.tertiary,
   },
-  
+
   // Auth overlay styles
   authOverlay: {
     flex: 1,
@@ -933,7 +946,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     lineHeight: 18,
   },
-  
+
   // Chat limit reached styles
   limitReachedOverlay: {
     backgroundColor: colors.background.secondary,

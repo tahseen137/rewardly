@@ -1,6 +1,6 @@
 /**
  * SignupBonusService - Unit Tests
- * 
+ *
  * Tests signup bonus ROI calculations, timeline generation, and verdicts
  */
 
@@ -17,7 +17,7 @@ import {
   compareSignupBonuses,
   findBestSignupBonuses,
 } from '../SignupBonusService';
-import { Card, SignupBonus, SpendingCategory, SpendingProfileInput, RewardType } from '../../types';
+import { Card, SignupBonus, SpendingProfileInput, RewardType } from '../../types';
 import { getAllCardsSync, getCardByIdSync } from '../CardDataService';
 import { getSpendingProfileSync } from '../SpendingProfileService';
 
@@ -31,7 +31,7 @@ jest.mock('../SpendingProfileService', () => {
   };
 });
 jest.mock('../FeeBreakevenService', () => ({
-  calculateTotalAnnualRewards: jest.fn((card: Card, profile: SpendingProfileInput) => {
+  calculateTotalAnnualRewards: jest.fn((_card: Card, _profile: SpendingProfileInput) => {
     // Simple mock: $1875 annual spend × 1% base rate = $225
     return 225;
   }),
@@ -39,7 +39,9 @@ jest.mock('../FeeBreakevenService', () => ({
 
 const mockGetAllCardsSync = getAllCardsSync as jest.MockedFunction<typeof getAllCardsSync>;
 const mockGetCardByIdSync = getCardByIdSync as jest.MockedFunction<typeof getCardByIdSync>;
-const mockGetSpendingProfileSync = getSpendingProfileSync as jest.MockedFunction<typeof getSpendingProfileSync>;
+const mockGetSpendingProfileSync = getSpendingProfileSync as jest.MockedFunction<
+  typeof getSpendingProfileSync
+>;
 
 // ============================================================================
 // Test Data
@@ -123,7 +125,7 @@ const mockHighValueCard: Card = {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  
+
   mockGetAllCardsSync.mockReturnValue([mockCardWithBonus, mockCashbackCard, mockHighValueCard]);
   mockGetCardByIdSync.mockImplementation((id: string) => {
     if (id === 'card-with-bonus') return mockCardWithBonus;
@@ -168,7 +170,7 @@ describe('calculateBonusValueCAD', () => {
       ...mockCardWithBonus,
       pointValuation: undefined,
     };
-    
+
     // Should default to 1 cent per point
     const value = calculateBonusValueCAD(mockSignupBonus, cardNoValuation);
     expect(value).toBeCloseTo(500, 2);
@@ -240,12 +242,12 @@ describe('canHitMinimumSpend', () => {
 describe('generateTimeline', () => {
   it('should generate timeline until target is hit', () => {
     const timeline = generateTimeline(1000, 3000, 6);
-    
+
     expect(timeline.length).toBe(3); // Should stop at month 3
     expect(timeline[0].month).toBe(1);
     expect(timeline[0].cumulativeSpend).toBe(1000);
     expect(timeline[0].hitTarget).toBe(false);
-    
+
     expect(timeline[2].month).toBe(3);
     expect(timeline[2].cumulativeSpend).toBe(3000);
     expect(timeline[2].hitTarget).toBe(true);
@@ -253,7 +255,7 @@ describe('generateTimeline', () => {
 
   it('should calculate percent complete correctly', () => {
     const timeline = generateTimeline(1000, 3000, 6);
-    
+
     expect(timeline[0].percentComplete).toBeCloseTo(33.33, 1);
     expect(timeline[1].percentComplete).toBeCloseTo(66.67, 1);
     expect(timeline[2].percentComplete).toBe(100);
@@ -261,7 +263,7 @@ describe('generateTimeline', () => {
 
   it('should cap at maxMonths if target not hit', () => {
     const timeline = generateTimeline(500, 3000, 3);
-    
+
     expect(timeline.length).toBe(3);
     expect(timeline[2].hitTarget).toBe(false);
     expect(timeline[2].percentComplete).toBe(50);
@@ -269,7 +271,7 @@ describe('generateTimeline', () => {
 
   it('should handle hitting target in month 1', () => {
     const timeline = generateTimeline(3000, 3000, 6);
-    
+
     expect(timeline.length).toBe(1);
     expect(timeline[0].hitTarget).toBe(true);
   });
@@ -346,7 +348,7 @@ describe('determineVerdict', () => {
 describe('calculateSignupBonusROI', () => {
   it('should calculate complete ROI for card with bonus', () => {
     const result = calculateSignupBonusROI('card-with-bonus', mockSpendingProfile);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.card.id).toBe('card-with-bonus');
@@ -358,7 +360,7 @@ describe('calculateSignupBonusROI', () => {
 
   it('should fail for non-existent card', () => {
     const result = calculateSignupBonusROI('non-existent', mockSpendingProfile);
-    
+
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.type).toBe('CARD_NOT_FOUND');
@@ -371,9 +373,9 @@ describe('calculateSignupBonusROI', () => {
       signupBonus: undefined,
     };
     mockGetCardByIdSync.mockReturnValue(cardNoBonus);
-    
+
     const result = calculateSignupBonusROI('card-with-bonus', mockSpendingProfile);
-    
+
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.type).toBe('NO_SIGNUP_BONUS');
@@ -382,9 +384,9 @@ describe('calculateSignupBonusROI', () => {
 
   it('should fail when no spending profile exists', () => {
     mockGetSpendingProfileSync.mockReturnValue(null);
-    
+
     const result = calculateSignupBonusROI('card-with-bonus');
-    
+
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.type).toBe('SPENDING_PROFILE_REQUIRED');
@@ -404,9 +406,9 @@ describe('calculateSignupBonusROI', () => {
       transit: 0,
       other: 0,
     }; // Total: $400/month
-    
+
     const result = calculateSignupBonusROI('card-with-bonus', lowSpendProfile);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.canHitMinimum).toBe(false);
@@ -416,7 +418,7 @@ describe('calculateSignupBonusROI', () => {
 
   it('should calculate timeline correctly', () => {
     const result = calculateSignupBonusROI('card-with-bonus', mockSpendingProfile);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.timeline.length).toBeGreaterThan(0);
@@ -426,7 +428,7 @@ describe('calculateSignupBonusROI', () => {
 
   it('should handle cashback bonuses', () => {
     const result = calculateSignupBonusROI('cashback-card', mockSpendingProfile);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.bonusValueCAD).toBeCloseTo(200, 0);
@@ -436,7 +438,7 @@ describe('calculateSignupBonusROI', () => {
 
   it('should handle high-value cards with optimal rates', () => {
     const result = calculateSignupBonusROI('high-value-card', mockSpendingProfile);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.bonusValueCAD).toBeCloseTo(2000, 0);
@@ -456,9 +458,9 @@ describe('calculateSignupBonusROI', () => {
       transit: 0,
       other: 0,
     }; // Total: $150/month
-    
+
     const result = calculateSignupBonusROI('card-with-bonus', veryLowSpendProfile);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.monthsToHit).toBeLessThanOrEqual(12);
@@ -472,7 +474,7 @@ describe('compareSignupBonuses', () => {
       ['card-with-bonus', 'cashback-card', 'high-value-card'],
       mockSpendingProfile
     );
-    
+
     expect(results.length).toBe(3);
     // Should be sorted descending by first year value
     expect(results[0].firstYearValue).toBeGreaterThanOrEqual(results[1].firstYearValue);
@@ -484,7 +486,7 @@ describe('compareSignupBonuses', () => {
       ['card-with-bonus', 'non-existent', 'cashback-card'],
       mockSpendingProfile
     );
-    
+
     expect(results.length).toBe(2);
   });
 
@@ -497,7 +499,7 @@ describe('compareSignupBonuses', () => {
 describe('findBestSignupBonuses', () => {
   it('should find best signup bonuses for spending profile', () => {
     const results = findBestSignupBonuses(mockSpendingProfile, 2);
-    
+
     expect(results.length).toBeLessThanOrEqual(2);
     expect(results[0].card.signupBonus).toBeDefined();
   });
@@ -523,17 +525,13 @@ describe('findBestSignupBonuses', () => {
       categoryRewards: [],
       annualFee: 0,
     };
-    
-    mockGetAllCardsSync.mockReturnValue([
-      mockCardWithBonus,
-      cardNoBonus,
-      mockCashbackCard,
-    ]);
-    
+
+    mockGetAllCardsSync.mockReturnValue([mockCardWithBonus, cardNoBonus, mockCashbackCard]);
+
     const results = findBestSignupBonuses(mockSpendingProfile, 10);
-    
+
     // Should only return cards with bonuses
-    results.forEach(result => {
+    results.forEach((result) => {
       expect(result.card.signupBonus).toBeDefined();
     });
   });
@@ -551,14 +549,14 @@ describe('edge cases', () => {
       spendRequirement: 1000,
       timeframeDays: 30,
     };
-    
+
     const card: Card = {
       ...mockCardWithBonus,
       signupBonus: shortBonus,
     };
-    
+
     mockGetCardByIdSync.mockReturnValue(card);
-    
+
     const result = calculateSignupBonusROI('card-with-bonus', mockSpendingProfile);
     expect(result.success).toBe(true);
     if (result.success) {
@@ -573,14 +571,14 @@ describe('edge cases', () => {
       spendRequirement: 10000,
       timeframeDays: 365,
     };
-    
+
     const card: Card = {
       ...mockCardWithBonus,
       signupBonus: longBonus,
     };
-    
+
     mockGetCardByIdSync.mockReturnValue(card);
-    
+
     const result = calculateSignupBonusROI('card-with-bonus', mockSpendingProfile);
     expect(result.success).toBe(true);
   });
@@ -592,14 +590,14 @@ describe('edge cases', () => {
       spendRequirement: 20000,
       timeframeDays: 90,
     };
-    
+
     const card: Card = {
       ...mockCardWithBonus,
       signupBonus: highSpendBonus,
     };
-    
+
     mockGetCardByIdSync.mockReturnValue(card);
-    
+
     const result = calculateSignupBonusROI('card-with-bonus', mockSpendingProfile);
     expect(result.success).toBe(true);
     if (result.success) {
@@ -609,7 +607,7 @@ describe('edge cases', () => {
 
   it('should handle zero annual fee cards', () => {
     const result = calculateSignupBonusROI('cashback-card', mockSpendingProfile);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.firstYearValue).toBeGreaterThan(0);

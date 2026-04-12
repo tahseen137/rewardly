@@ -1,6 +1,6 @@
 /**
  * WalletOptimizerService - F21: Portfolio Builder
- * 
+ *
  * Finds optimal 2-3 card combinations for a spending profile.
  * Uses aggressive pruning to handle 354 cards within 2 second constraint.
  */
@@ -8,7 +8,6 @@
 import {
   Card,
   SpendingCategory,
-  SpendingProfile,
   SpendingProfileInput,
   WalletConstraints,
   WalletCombination,
@@ -25,7 +24,7 @@ import {
 import { getAllCardsSync, getCardByIdSync } from './CardDataService';
 import { getCards } from './CardPortfolioManager';
 import { getSpendingProfileSync, getSpendForCategory } from './SpendingProfileService';
-import { getApplicableMultiplier, pointsToCad } from './RewardsCalculatorService';
+import { getApplicableMultiplier } from './RewardsCalculatorService';
 
 // ============================================================================
 // Constants
@@ -71,7 +70,7 @@ export function calculateCategoryRewards(
 ): number {
   const rate = getApplicableMultiplier(card, category);
   const annualSpend = monthlySpend * 12;
-  
+
   // For cashback cards, rate is percentage (e.g., 4 for 4%)
   // For points cards, rate is multiplier (e.g., 5 for 5x)
   if (card.baseRewardRate.type === RewardType.CASHBACK) {
@@ -113,7 +112,7 @@ export function evaluateWalletCombination(
 
   for (const category of EVALUATION_CATEGORIES) {
     const monthlySpend = getSpendForCategory(spendingProfile, category);
-    
+
     if (monthlySpend <= 0) {
       continue;
     }
@@ -175,7 +174,7 @@ export function calculateEffectiveRewardRate(
   for (const category of EVALUATION_CATEGORIES) {
     totalSpend += getSpendForCategory(spendingProfile, category) * 12;
   }
-  
+
   if (totalSpend === 0) return 0;
   return (totalRewards / totalSpend) * 100;
 }
@@ -190,7 +189,7 @@ export function pruneCards(
   constraints: WalletConstraints
 ): PrunedCard[] {
   // Apply hard filters first
-  let filtered = cards.filter(card => {
+  const filtered = cards.filter((card) => {
     // Excluded cards
     if (constraints.excludedCardIds?.includes(card.id)) {
       return false;
@@ -221,25 +220,22 @@ export function pruneCards(
 
   // For each category, find top N cards
   const topCardsByCategory = new Map<SpendingCategory, Set<string>>();
-  
+
   for (const category of EVALUATION_CATEGORIES) {
     const monthlySpend = getSpendForCategory(spendingProfile, category);
-    
+
     if (monthlySpend <= 0) continue;
 
     // Rank cards for this category
     const ranked = filtered
-      .map(card => ({
+      .map((card) => ({
         card,
         rewards: calculateCategoryRewards(card, category, monthlySpend),
       }))
       .sort((a, b) => b.rewards - a.rewards)
       .slice(0, TOP_CARDS_PER_CATEGORY);
 
-    topCardsByCategory.set(
-      category,
-      new Set(ranked.map(r => r.card.id))
-    );
+    topCardsByCategory.set(category, new Set(ranked.map((r) => r.card.id)));
   }
 
   // Collect all cards that appear in any top category
@@ -252,9 +248,9 @@ export function pruneCards(
 
   // Convert to PrunedCard array
   const prunedCards: PrunedCard[] = [];
-  
+
   for (const cardId of candidateCardIds) {
-    const card = filtered.find(c => c.id === cardId);
+    const card = filtered.find((c) => c.id === cardId);
     if (!card) continue;
 
     // Find which categories this card is top for
@@ -313,16 +309,10 @@ export function generateCombinations(
     for (let i = 0; i < n; i++) {
       for (let j = i + 1; j < n; j++) {
         for (let k = j + 1; k < n; k++) {
-          const totalFees = 
-            prunedCards[i].annualFee + 
-            prunedCards[j].annualFee + 
-            prunedCards[k].annualFee;
+          const totalFees =
+            prunedCards[i].annualFee + prunedCards[j].annualFee + prunedCards[k].annualFee;
           if (totalFees <= maxTotalFees) {
-            combinations.push([
-              prunedCards[i].card,
-              prunedCards[j].card,
-              prunedCards[k].card,
-            ]);
+            combinations.push([prunedCards[i].card, prunedCards[j].card, prunedCards[k].card]);
           }
           if (combinations.length >= MAX_COMBINATIONS) return combinations;
         }
@@ -344,16 +334,13 @@ export function rankCombinations(
   const results: WalletCombination[] = [];
 
   for (const cards of combinations) {
-    const { categoryAssignments, totalRewards } = evaluateWalletCombination(
-      cards,
-      spendingProfile
-    );
+    const { categoryAssignments, totalRewards } = evaluateWalletCombination(cards, spendingProfile);
     const { netValue, totalFees } = calculateNetAnnualValue(totalRewards, cards);
     const effectiveRate = calculateEffectiveRewardRate(totalRewards, spendingProfile);
 
     results.push({
       rank: 0, // Will be set after sorting
-      cardIds: cards.map(c => c.id),
+      cardIds: cards.map((c) => c.id),
       cards,
       totalAnnualRewards: totalRewards,
       totalAnnualFees: totalFees,
@@ -395,12 +382,15 @@ export function compareToCurrentWallet(
   const { netValue: currentNetValue } = calculateNetAnnualValue(totalRewards, currentCards);
 
   const improvement = optimizedNetValue - currentNetValue;
-  const improvementPercent = currentNetValue !== 0
-    ? (improvement / Math.abs(currentNetValue)) * 100
-    : improvement > 0 ? 100 : 0;
+  const improvementPercent =
+    currentNetValue !== 0
+      ? (improvement / Math.abs(currentNetValue)) * 100
+      : improvement > 0
+        ? 100
+        : 0;
 
   return {
-    currentCardIds: currentCards.map(c => c.id),
+    currentCardIds: currentCards.map((c) => c.id),
     currentNetValue,
     improvement,
     improvementPercent,
@@ -413,7 +403,7 @@ export function compareToCurrentWallet(
 
 /**
  * Run the wallet optimizer
- * 
+ *
  * @param spendingProfile - User's spending profile
  * @param constraints - Optimization constraints
  * @param topN - Number of top combinations to return (default 3)
@@ -451,7 +441,7 @@ export function optimizeWallet(
 
   // Step 1: Prune cards to top performers
   const prunedCards = pruneCards(allCards, spendingProfile, constraints);
-  
+
   if (prunedCards.length < constraints.maxCards) {
     return failure({
       type: 'NO_CARDS_AVAILABLE',
@@ -478,9 +468,10 @@ export function optimizeWallet(
   const recommendations = rankCombinations(combinations, spendingProfile, topN);
 
   // Step 4: Compare to current wallet (if user has cards)
-  const vsCurrentWallet = recommendations.length > 0
-    ? compareToCurrentWallet(recommendations[0].netAnnualValue, spendingProfile)
-    : undefined;
+  const vsCurrentWallet =
+    recommendations.length > 0
+      ? compareToCurrentWallet(recommendations[0].netAnnualValue, spendingProfile)
+      : undefined;
 
   const computeTimeMs = Date.now() - startTime;
 

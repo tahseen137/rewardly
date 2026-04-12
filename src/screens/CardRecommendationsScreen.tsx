@@ -1,5 +1,5 @@
 /**
- * CardRecommendationsScreen - F8: Card Recommendation Engine  
+ * CardRecommendationsScreen - F8: Card Recommendation Engine
  * Personalized card suggestions based on spending patterns
  * Tier: Pro+ (basic), Max (with affiliate links)
  */
@@ -13,7 +13,6 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  Linking,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
@@ -28,8 +27,12 @@ import {
   CardRecommendation,
   RecommendationAnalysis,
 } from '../services/CardRecommendationEngine';
-import { handleApplyNow, getApplicationUrl } from '../services/AffiliateService';
-import { formatUpToRate, formatTopCategoryRates, formatBestForCategories } from '../utils/rewardFormatUtils';
+import { handleApplyNow } from '../services/AffiliateService';
+import {
+  formatUpToRate,
+  formatTopCategoryRates,
+  formatBestForCategories,
+} from '../utils/rewardFormatUtils';
 
 // ============================================================================
 // Recommendation Card Component
@@ -41,8 +44,12 @@ interface RecommendationCardProps {
   onPress?: (cardId: string) => void;
 }
 
-function RecommendationCard({ recommendation, showAffiliateLink, onPress }: RecommendationCardProps) {
-  const { card, reason, estimatedAnnualRewards, signupBonus, affiliateUrl } = recommendation;
+function RecommendationCard({
+  recommendation,
+  showAffiliateLink,
+  onPress,
+}: RecommendationCardProps) {
+  const { card, reason, estimatedAnnualRewards, signupBonus, _affiliateUrl } = recommendation;
   const upToRate = formatUpToRate(card);
   const categoryRates = formatTopCategoryRates(card, 3);
   const bestFor = formatBestForCategories(card, 3);
@@ -54,7 +61,7 @@ function RecommendationCard({ recommendation, showAffiliateLink, onPress }: Reco
 
   return (
     <Animated.View entering={FadeInDown.duration(400)} style={styles.recommendationCard}>
-      <TouchableOpacity 
+      <TouchableOpacity
         onPress={() => onPress?.(card.id)}
         activeOpacity={0.7}
         accessibilityRole="button"
@@ -71,42 +78,37 @@ function RecommendationCard({ recommendation, showAffiliateLink, onPress }: Reco
           </View>
         </View>
 
-      {/* Category context — shows WHY this card is recommended */}
-      {categoryRates ? (
-        <View style={styles.categoryContext}>
-          <Text style={styles.categoryContextText}>{categoryRates}</Text>
-        </View>
-      ) : bestFor ? (
-        <View style={styles.categoryContext}>
-          <Text style={styles.categoryContextText}>{bestFor}</Text>
-        </View>
-      ) : null}
-
-      <Text style={styles.reason}>{reason}</Text>
-
-      <View style={styles.estimatesRow}>
-        <View style={styles.estimate}>
-          <TrendingUp size={16} color={colors.success.main} />
-          <Text style={styles.estimateLabel}>Est. Annual Rewards</Text>
-          <Text style={styles.estimateValue}>${estimatedAnnualRewards.toFixed(0)}/year</Text>
-        </View>
-
-        {signupBonus && (
-          <View style={styles.estimate}>
-            <Sparkles size={16} color={colors.warning.main} />
-            <Text style={styles.estimateLabel}>Sign-Up Bonus</Text>
-            <Text style={styles.estimateValue}>
-              {signupBonus.amount.toLocaleString()} pts
-            </Text>
+        {/* Category context — shows WHY this card is recommended */}
+        {categoryRates ? (
+          <View style={styles.categoryContext}>
+            <Text style={styles.categoryContextText}>{categoryRates}</Text>
           </View>
-        )}
-      </View>
+        ) : bestFor ? (
+          <View style={styles.categoryContext}>
+            <Text style={styles.categoryContextText}>{bestFor}</Text>
+          </View>
+        ) : null}
 
+        <Text style={styles.reason}>{reason}</Text>
+
+        <View style={styles.estimatesRow}>
+          <View style={styles.estimate}>
+            <TrendingUp size={16} color={colors.success.main} />
+            <Text style={styles.estimateLabel}>Est. Annual Rewards</Text>
+            <Text style={styles.estimateValue}>${estimatedAnnualRewards.toFixed(0)}/year</Text>
+          </View>
+
+          {signupBonus && (
+            <View style={styles.estimate}>
+              <Sparkles size={16} color={colors.warning.main} />
+              <Text style={styles.estimateLabel}>Sign-Up Bonus</Text>
+              <Text style={styles.estimateValue}>{signupBonus.amount.toLocaleString()} pts</Text>
+            </View>
+          )}
+        </View>
       </TouchableOpacity>
       <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
-        <Text style={styles.applyButtonText}>
-          {showAffiliateLink ? 'Apply Now' : 'Learn More'}
-        </Text>
+        <Text style={styles.applyButtonText}>{showAffiliateLink ? 'Apply Now' : 'Learn More'}</Text>
         <ExternalLink size={18} color={colors.background.primary} />
       </TouchableOpacity>
     </Animated.View>
@@ -127,9 +129,12 @@ export default function CardRecommendationsScreen() {
   const tier = getCurrentTierSync();
   const showAffiliateLinks = tier === 'max';
 
-  const handleCardPress = useCallback((cardId: string) => {
-    (navigation as any).navigate('CardDetail', { cardId });
-  }, [navigation]);
+  const handleCardPress = useCallback(
+    (cardId: string) => {
+      (navigation as any).navigate('CardDetail', { cardId });
+    },
+    [navigation]
+  );
 
   const loadRecommendations = useCallback(async () => {
     try {
@@ -177,9 +182,7 @@ export default function CardRecommendationsScreen() {
     <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
       >
         <View style={styles.header}>
           <Text style={styles.title}>Card Recommendations</Text>
@@ -195,7 +198,7 @@ export default function CardRecommendationsScreen() {
                 <Text style={styles.categorySpend}>${cat.monthlySpend.toFixed(0)}/mo</Text>
               </View>
             ))}
-            
+
             {analysis.currentGaps.length > 0 && (
               <View style={styles.gapNotice}>
                 <Target size={16} color={colors.warning.main} />
@@ -210,7 +213,7 @@ export default function CardRecommendationsScreen() {
         {analysis && analysis.recommendations.length > 0 ? (
           <>
             <Text style={styles.sectionTitle}>Recommended for You</Text>
-            {analysis.recommendations.map((rec, index) => (
+            {analysis.recommendations.map((rec, _index) => (
               <RecommendationCard
                 key={rec.card.id}
                 recommendation={rec}

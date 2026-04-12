@@ -1,15 +1,15 @@
 /**
  * WalletOptimizerScreen - F21: Wallet Optimizer (Portfolio Builder)
- * 
+ *
  * 3-step wizard:
  * Step 1: Spending Profile input
  * Step 2: Constraints (max fees, max cards, preferred banks)
  * Step 3: Results
- * 
+ *
  * Tier gating: Free sees top result with some cards blurred, Pro/Max see all
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,10 +17,16 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { ArrowLeft, ArrowRight, Settings, TrendingUp, CreditCard, Award } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Settings,
+  TrendingUp,
+  CreditCard,
+  Award,
+} from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { colors } from '../theme/colors';
@@ -46,7 +52,7 @@ const getCategoryDisplayName = (category: SpendingCategory): string => {
   return category
     .replace(/_/g, ' ')
     .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 };
 
@@ -91,7 +97,7 @@ export default function WalletOptimizerScreen() {
 
   const handleNextFromStep1 = async () => {
     if (!spendingProfile) return;
-    
+
     // Save spending profile
     await saveSpendingProfile(spendingProfile);
     setStep(2);
@@ -105,11 +111,11 @@ export default function WalletOptimizerScreen() {
 
     try {
       const optimizerResult = optimizeWallet(spendingProfile, constraints, 5);
-      
+
       if (optimizerResult.success) {
         setResult(optimizerResult.value);
         setStep(3);
-        
+
         // Track achievement
         AchievementEventEmitter.track('wallet_optimizer_used', {});
       } else {
@@ -172,9 +178,7 @@ export default function WalletOptimizerScreen() {
         {/* Max Annual Fees */}
         <View style={styles.constraintCard}>
           <Text style={styles.constraintLabel}>Maximum Total Annual Fees</Text>
-          <Text style={styles.constraintSubtext}>
-            Total fees across all recommended cards
-          </Text>
+          <Text style={styles.constraintSubtext}>Total fees across all recommended cards</Text>
           <View style={styles.constraintOptions}>
             {[0, 200, 500, 1000].map((value) => (
               <TouchableOpacity
@@ -201,9 +205,7 @@ export default function WalletOptimizerScreen() {
         {/* Max Cards */}
         <View style={styles.constraintCard}>
           <Text style={styles.constraintLabel}>Maximum Cards in Wallet</Text>
-          <Text style={styles.constraintSubtext}>
-            How many cards do you want to carry?
-          </Text>
+          <Text style={styles.constraintSubtext}>How many cards do you want to carry?</Text>
           <View style={styles.constraintOptions}>
             {[2, 3].map((value) => (
               <TouchableOpacity
@@ -230,9 +232,7 @@ export default function WalletOptimizerScreen() {
         {/* Preferred Reward Type */}
         <View style={styles.constraintCard}>
           <Text style={styles.constraintLabel}>Preferred Reward Type</Text>
-          <Text style={styles.constraintSubtext}>
-            Cashback, points, or both?
-          </Text>
+          <Text style={styles.constraintSubtext}>Cashback, points, or both?</Text>
           <View style={styles.constraintOptions}>
             {[
               { value: 'any', label: 'Any' },
@@ -255,7 +255,8 @@ export default function WalletOptimizerScreen() {
                 <Text
                   style={[
                     styles.optionButtonText,
-                    constraints.preferredRewardType === option.value && styles.optionButtonTextActive,
+                    constraints.preferredRewardType === option.value &&
+                      styles.optionButtonTextActive,
                   ]}
                 >
                   {option.label}
@@ -291,14 +292,17 @@ export default function WalletOptimizerScreen() {
 
     const userCards = getCards();
     const isFree = tier === 'free';
-    const visibleResults = isFree ? result.recommendations.slice(0, 1) : result.recommendations.slice(0, 3);
+    const visibleResults = isFree
+      ? result.recommendations.slice(0, 1)
+      : result.recommendations.slice(0, 3);
 
     return (
       <View style={styles.stepContainer}>
         <View style={styles.stepHeader}>
           <Text style={styles.stepTitle}>🎯 Your Optimized Wallet</Text>
           <Text style={styles.stepSubtitle}>
-            Top {visibleResults.length} card combination{visibleResults.length !== 1 ? 's' : ''} for your spending
+            Top {visibleResults.length} card combination{visibleResults.length !== 1 ? 's' : ''} for
+            your spending
           </Text>
         </View>
 
@@ -340,9 +344,8 @@ export default function WalletOptimizerScreen() {
               <View style={[styles.comparisonRow, styles.comparisonRowTotal]}>
                 <Text style={styles.comparisonLabelTotal}>Improvement</Text>
                 <Text style={styles.comparisonImprovement}>
-                  +${result.vsCurrentWallet.improvement.toFixed(0)}/yr
-                  {' '}
-                  ({result.vsCurrentWallet.improvementPercent > 0 ? '+' : ''}
+                  +${result.vsCurrentWallet.improvement.toFixed(0)}/yr (
+                  {result.vsCurrentWallet.improvementPercent > 0 ? '+' : ''}
                   {result.vsCurrentWallet.improvementPercent.toFixed(0)}%)
                 </Text>
               </View>
@@ -353,12 +356,7 @@ export default function WalletOptimizerScreen() {
         {/* Results */}
         <View style={styles.resultsContainer}>
           {visibleResults.map((combo, index) => (
-            <WalletCombinationCard
-              key={index}
-              combination={combo}
-              index={index}
-              isLocked={false}
-            />
+            <WalletCombinationCard key={index} combination={combo} index={index} isLocked={false} />
           ))}
 
           {/* Locked results for free tier */}
@@ -371,7 +369,8 @@ export default function WalletOptimizerScreen() {
             >
               <View style={styles.lockedResults}>
                 <Text style={styles.lockedText}>
-                  +{result.recommendations.length - 1} more combination{result.recommendations.length - 1 !== 1 ? 's' : ''}
+                  +{result.recommendations.length - 1} more combination
+                  {result.recommendations.length - 1 !== 1 ? 's' : ''}
                 </Text>
               </View>
             </LockedFeature>
@@ -421,9 +420,7 @@ export default function WalletOptimizerScreen() {
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary.main} />
             <Text style={styles.loadingText}>Optimizing your wallet...</Text>
-            <Text style={styles.loadingSubtext}>
-              Evaluating thousands of card combinations
-            </Text>
+            <Text style={styles.loadingSubtext}>Evaluating thousands of card combinations</Text>
           </View>
         ) : error ? (
           <View style={styles.errorContainer}>
@@ -479,7 +476,10 @@ function WalletCombinationCard({ combination, index, isLocked }: WalletCombinati
         {combination.cards.map((card, idx) => (
           <View key={card.id} style={styles.cardItem}>
             <CreditCard size={16} color={colors.primary.main} />
-            <Text style={[styles.cardName, isLocked && idx > 0 && styles.cardNameBlurred]} numberOfLines={1}>
+            <Text
+              style={[styles.cardName, isLocked && idx > 0 && styles.cardNameBlurred]}
+              numberOfLines={1}
+            >
               {isLocked && idx > 0 ? '████████████' : card.name}
             </Text>
           </View>
@@ -494,13 +494,13 @@ function WalletCombinationCard({ combination, index, isLocked }: WalletCombinati
         </View>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>Annual Fees</Text>
-          <Text style={styles.summaryValueNegative}>-${combination.totalAnnualFees.toFixed(0)}</Text>
+          <Text style={styles.summaryValueNegative}>
+            -${combination.totalAnnualFees.toFixed(0)}
+          </Text>
         </View>
         <View style={[styles.summaryRow, styles.summaryRowTotal]}>
           <Text style={styles.summaryLabelTotal}>Net Annual Value</Text>
-          <Text style={styles.summaryValueTotal}>
-            ${combination.netAnnualValue.toFixed(0)}/yr
-          </Text>
+          <Text style={styles.summaryValueTotal}>${combination.netAnnualValue.toFixed(0)}/yr</Text>
         </View>
       </View>
 

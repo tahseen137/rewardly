@@ -11,11 +11,11 @@ import { SubscriptionTier, getCurrentTierSync } from './SubscriptionService';
 // Types
 // ============================================================================
 
-export type NotificationType = 
-  | 'sub_deadline' 
-  | 'fee_renewal' 
-  | 'bonus_category' 
-  | 'monthly_report' 
+export type NotificationType =
+  | 'sub_deadline'
+  | 'fee_renewal'
+  | 'bonus_category'
+  | 'monthly_report'
   | 'new_card_offer'
   | 'spending_alert'
   | 'general';
@@ -80,7 +80,7 @@ function canReceiveNotificationType(type: NotificationType): boolean {
 
 export async function initializeNotifications(): Promise<void> {
   if (isInitialized) return;
-  
+
   try {
     // Load from AsyncStorage first (local cache)
     const stored = await AsyncStorage.getItem(NOTIFICATIONS_KEY);
@@ -92,10 +92,10 @@ export async function initializeNotifications(): Promise<void> {
         expiresAt: n.expiresAt ? new Date(n.expiresAt) : undefined,
       }));
     }
-    
+
     // Sync with Supabase
     await syncNotifications();
-    
+
     isInitialized = true;
   } catch (error) {
     console.error('Failed to initialize notifications:', error);
@@ -107,16 +107,15 @@ async function syncNotifications(): Promise<void> {
     if (!supabase) return;
     const user = await supabase.auth.getUser();
     if (!user.data.user) return;
-    
-    const { data, error } = await (supabase
-      .from('notifications') as any)
+
+    const { data, error } = await (supabase.from('notifications') as any)
       .select('*')
       .eq('user_id', user.data.user.id)
       .order('created_at', { ascending: false })
       .limit(50);
-    
+
     if (error) throw error;
-    
+
     if (data) {
       notificationsCache = (data as any[]).map((row: any) => ({
         id: row.id,
@@ -130,7 +129,7 @@ async function syncNotifications(): Promise<void> {
         expiresAt: row.expires_at ? new Date(row.expires_at) : undefined,
         createdAt: new Date(row.created_at),
       }));
-      
+
       await AsyncStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notificationsCache));
       await updateUnreadCount();
     }
@@ -145,20 +144,20 @@ async function syncNotifications(): Promise<void> {
 
 export async function getNotifications(limit?: number): Promise<AppNotification[]> {
   await initializeNotifications();
-  
+
   // Filter out expired notifications
   const now = new Date();
-  let valid = notificationsCache.filter(n => !n.expiresAt || n.expiresAt > now);
-  
+  let valid = notificationsCache.filter((n) => !n.expiresAt || n.expiresAt > now);
+
   // Filter by tier access
   const tier = getCurrentTierSync();
   const allowedTypes = getNotificationTypesForTier(tier);
-  valid = valid.filter(n => allowedTypes.includes(n.type));
-  
+  valid = valid.filter((n) => allowedTypes.includes(n.type));
+
   if (limit) {
     return valid.slice(0, limit);
   }
-  
+
   return valid;
 }
 
@@ -169,29 +168,28 @@ export async function getUnreadCount(): Promise<number> {
 
 async function updateUnreadCount(): Promise<void> {
   const notifications = await getNotifications();
-  unreadCount = notifications.filter(n => !n.isRead).length;
+  unreadCount = notifications.filter((n) => !n.isRead).length;
   await AsyncStorage.setItem(UNREAD_COUNT_KEY, unreadCount.toString());
 }
 
 export async function markAsRead(id: string): Promise<void> {
   await initializeNotifications();
-  
+
   try {
     if (!supabase) return;
     const user = await supabase.auth.getUser();
     if (!user.data.user) return;
-    
+
     // Update in Supabase
-    const { error } = await (supabase
-      .from('notifications') as any)
+    const { error } = await (supabase.from('notifications') as any)
       .update({ is_read: true })
       .eq('id', id)
       .eq('user_id', user.data.user.id);
-    
+
     if (error) throw error;
-    
+
     // Update cache
-    const notification = notificationsCache.find(n => n.id === id);
+    const notification = notificationsCache.find((n) => n.id === id);
     if (notification) {
       notification.isRead = true;
       await AsyncStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notificationsCache));
@@ -204,23 +202,24 @@ export async function markAsRead(id: string): Promise<void> {
 
 export async function markAllAsRead(): Promise<void> {
   await initializeNotifications();
-  
+
   try {
     if (!supabase) return;
     const user = await supabase.auth.getUser();
     if (!user.data.user) return;
-    
+
     // Update all in Supabase
-    const { error } = await (supabase
-      .from('notifications') as any)
+    const { error } = await (supabase.from('notifications') as any)
       .update({ is_read: true })
       .eq('user_id', user.data.user.id)
       .eq('is_read', false);
-    
+
     if (error) throw error;
-    
+
     // Update cache
-    notificationsCache.forEach(n => { n.isRead = true; });
+    notificationsCache.forEach((n) => {
+      n.isRead = true;
+    });
     await AsyncStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notificationsCache));
     await updateUnreadCount();
   } catch (error) {
@@ -230,23 +229,22 @@ export async function markAllAsRead(): Promise<void> {
 
 export async function deleteNotification(id: string): Promise<void> {
   await initializeNotifications();
-  
+
   try {
     if (!supabase) return;
     const user = await supabase.auth.getUser();
     if (!user.data.user) return;
-    
+
     // Delete from Supabase
-    const { error } = await (supabase
-      .from('notifications') as any)
+    const { error } = await (supabase.from('notifications') as any)
       .delete()
       .eq('id', id)
       .eq('user_id', user.data.user.id);
-    
+
     if (error) throw error;
-    
+
     // Update cache
-    notificationsCache = notificationsCache.filter(n => n.id !== id);
+    notificationsCache = notificationsCache.filter((n) => n.id !== id);
     await AsyncStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notificationsCache));
     await updateUnreadCount();
   } catch (error) {
@@ -258,19 +256,18 @@ export async function createNotification(
   notification: Omit<AppNotification, 'id' | 'userId' | 'isRead' | 'createdAt'>
 ): Promise<AppNotification | null> {
   await initializeNotifications();
-  
+
   // Check tier access
   if (!canReceiveNotificationType(notification.type)) {
     return null;
   }
-  
+
   try {
     if (!supabase) return null;
     const user = await supabase.auth.getUser();
     if (!user.data.user) return null;
-    
-    const { data, error } = await (supabase
-      .from('notifications') as any)
+
+    const { data, error } = await (supabase.from('notifications') as any)
       .insert({
         user_id: user.data.user.id,
         type: notification.type,
@@ -282,9 +279,9 @@ export async function createNotification(
       })
       .select()
       .single();
-    
+
     if (error) throw error;
-    
+
     const d = data as any;
     const newNotification: AppNotification = {
       id: d.id,
@@ -298,11 +295,11 @@ export async function createNotification(
       expiresAt: d.expires_at ? new Date(d.expires_at) : undefined,
       createdAt: new Date(d.created_at),
     };
-    
+
     notificationsCache.unshift(newNotification);
     await AsyncStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notificationsCache));
     await updateUnreadCount();
-    
+
     return newNotification;
   } catch (error) {
     console.error('Failed to create notification:', error);
@@ -318,7 +315,7 @@ export async function generateSUBDeadlineAlert(sub: any): Promise<void> {
   const daysRemaining = Math.ceil(
     (new Date(sub.deadlineDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   );
-  
+
   await createNotification({
     type: 'sub_deadline',
     title: 'Sign-Up Bonus Deadline Approaching',

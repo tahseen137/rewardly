@@ -1,9 +1,9 @@
 /**
  * ApplyNowButton - Reusable CTA for card application affiliate links
- * 
+ *
  * Prominent "Apply Now" button that opens the card's application URL
  * in the device browser and tracks clicks for affiliate analytics.
- * 
+ *
  * Variants:
  * - primary: Full-width, solid background (for card detail pages)
  * - compact: Smaller, inline button (for list items)
@@ -11,13 +11,7 @@
  */
 
 import React, { useCallback } from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  View,
-} from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from 'react-native';
 import { ExternalLink } from 'lucide-react-native';
 import { Card } from '../types';
 import { handleApplyNow } from '../services/AffiliateService';
@@ -84,8 +78,7 @@ export function ApplyNowButton({
     variant === 'outline' && styles.textOutline,
   ];
 
-  const iconColor =
-    variant === 'outline' ? colors.primary.main : colors.background.primary;
+  const iconColor = variant === 'outline' ? colors.primary.main : colors.background.primary;
   const iconSize = variant === 'compact' ? 14 : 18;
 
   return (

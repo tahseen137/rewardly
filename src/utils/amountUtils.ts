@@ -11,11 +11,11 @@ export interface AmountValidationResult {
 
 /**
  * Validates a purchase amount input
- * 
+ *
  * Requirements:
  * - 3.1: Accept numeric values representing CAD dollars
  * - 3.3: Reject invalid amounts (non-numeric, negative, or zero)
- * 
+ *
  * @param input - The input value to validate (string or number)
  * @returns Validation result with isValid flag, error message, and parsed value
  */
@@ -33,11 +33,11 @@ export function validateAmount(input: string | number | null | undefined): Amoun
   if (typeof input === 'string') {
     // Trim whitespace
     const trimmed = input.trim();
-    
+
     // Check if string is purely numeric (allows optional decimal point and digits)
     // This regex matches: optional minus, digits, optional decimal point with digits
     const numericRegex = /^-?\d+(\.\d+)?$/;
-    
+
     if (!numericRegex.test(trimmed)) {
       return {
         isValid: false,
@@ -87,9 +87,9 @@ export function validateAmount(input: string | number | null | undefined): Amoun
 
 /**
  * Formats a numeric amount as currency in "$X.XX" format
- * 
+ *
  * Requirement 3.2: Format amount as currency with exactly two decimal places
- * 
+ *
  * @param amount - The numeric amount to format
  * @returns Formatted currency string (e.g., "$100.00")
  */
@@ -99,9 +99,9 @@ export function formatCurrency(amount: number): string {
 
 /**
  * Formats a CAD value with currency symbol and "CAD" suffix
- * 
+ *
  * Requirement 5.3: Format CAD value as "$X.XX CAD"
- * 
+ *
  * @param amount - The numeric amount to format
  * @returns Formatted CAD value string (e.g., "$100.00 CAD")
  */

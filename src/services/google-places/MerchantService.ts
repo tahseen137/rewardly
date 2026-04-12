@@ -12,12 +12,7 @@
 import { SpendingCategory, Result, success, failure } from '../../types';
 import { GOOGLE_PLACES_CONFIG, isGooglePlacesConfigured, getPlacesApiUrl } from './config';
 import { getCategoryFromGoogleTypes } from './categoryMapping';
-import {
-  getCachedSearchResults,
-  cacheSearchResults,
-  getCachedMerchant,
-  cacheMerchants,
-} from './MerchantCache';
+import { getCachedSearchResults, cacheSearchResults } from './MerchantCache';
 import {
   Merchant,
   MerchantError,

@@ -1,6 +1,6 @@
 /**
  * StatementUploadScreen - F24: CSV Statement Upload
- * 
+ *
  * Features:
  * - File picker (DocumentPicker for mobile, input for web)
  * - Auto bank detection
@@ -19,7 +19,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Platform,
-  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Upload, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react-native';
@@ -29,7 +28,7 @@ import { TransactionReviewList } from '../components/TransactionReviewList';
 import { parseStatement } from '../services/StatementParserService';
 import { saveStatement } from '../services/StatementStorageService';
 import { updateFromParsedTransactions } from '../services/SpendingProfileService';
-import { CSVParseResult, SupportedBank, ParsedTransaction } from '../types';
+import { CSVParseResult } from '../types';
 
 type UploadState = 'idle' | 'parsing' | 'review' | 'saving' | 'success' | 'error';
 
@@ -73,7 +72,7 @@ export default function StatementUploadScreen() {
           parseCSVContent(text, asset.name);
         }
       }
-    } catch (error) {
+    } catch {
       setState('error');
       setErrorMessage('Failed to read file');
     }
@@ -126,10 +125,8 @@ export default function StatementUploadScreen() {
   const handleCategoryUpdate = (transactionId: string, newCategory: SpendingCategory) => {
     if (!parseResult) return;
 
-    const updatedTransactions = parseResult.transactions.map(tx =>
-      tx.id === transactionId
-        ? { ...tx, category: newCategory, userCorrected: true }
-        : tx
+    const updatedTransactions = parseResult.transactions.map((tx) =>
+      tx.id === transactionId ? { ...tx, category: newCategory, userCorrected: true } : tx
     );
 
     setParseResult({
@@ -171,20 +168,22 @@ export default function StatementUploadScreen() {
       }
 
       // CYCLE 4 INTEGRATION: Auto-update spending profile from parsed transactions
-      await updateFromParsedTransactions(parseResult.transactions.map(t => ({
-        amount: t.amount,
-        category: t.category,
-        transactionDate: t.date,
-        isCredit: t.isCredit,
-      })));
+      await updateFromParsedTransactions(
+        parseResult.transactions.map((t) => ({
+          amount: t.amount,
+          category: t.category,
+          transactionDate: t.date,
+          isCredit: t.isCredit,
+        }))
+      );
 
       setState('success');
-      
+
       // Navigate back after 2 seconds
       setTimeout(() => {
         navigation.goBack();
       }, 2000);
-    } catch (error) {
+    } catch {
       setState('error');
       setErrorMessage('Failed to save statement');
     }
@@ -234,7 +233,8 @@ export default function StatementUploadScreen() {
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Period:</Text>
             <Text style={styles.summaryValue}>
-              {parseResult.periodStart.toLocaleDateString()} - {parseResult.periodEnd.toLocaleDateString()}
+              {parseResult.periodStart.toLocaleDateString()} -{' '}
+              {parseResult.periodEnd.toLocaleDateString()}
             </Text>
           </View>
           <View style={styles.summaryRow}>
@@ -248,20 +248,14 @@ export default function StatementUploadScreen() {
         </View>
 
         <Text style={styles.reviewTitle}>Review Transactions</Text>
-        <Text style={styles.reviewSubtitle}>
-          Check categories and tap to change if needed
-        </Text>
+        <Text style={styles.reviewSubtitle}>Check categories and tap to change if needed</Text>
 
         <TransactionReviewList
           transactions={parseResult.transactions}
           onCategoryUpdate={handleCategoryUpdate}
         />
 
-        <TouchableOpacity
-          style={styles.confirmButton}
-          onPress={handleConfirm}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm} activeOpacity={0.8}>
           <CheckCircle size={20} color="#fff" />
           <Text style={styles.confirmButtonText}>Confirm & Save</Text>
         </TouchableOpacity>

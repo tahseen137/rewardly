@@ -3,7 +3,7 @@
  */
 
 import React, { ReactNode } from 'react';
-import { View, StyleSheet, ViewStyle, TouchableOpacity } from 'react-native';
+import { View, ViewStyle, TouchableOpacity } from 'react-native';
 import { useTheme } from '../theme';
 
 export type CardVariant = 'elevated' | 'outlined' | 'filled';

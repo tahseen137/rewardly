@@ -1,6 +1,6 @@
 /**
  * NotificationService - Unit Tests
- * 
+ *
  * Tests notification CRUD, tier gating, and notification generators
  */
 
@@ -19,7 +19,6 @@ import {
   generateMonthlyReportNotification,
 } from '../NotificationService';
 import { AppNotification, NotificationType } from '../../types';
-import { SubscriptionTier } from '../SubscriptionService';
 
 // Mock dependencies
 jest.mock('@react-native-async-storage/async-storage');
@@ -74,7 +73,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockAsyncStorage.getItem.mockResolvedValue(null);
   mockAsyncStorage.setItem.mockResolvedValue();
-  
+
   mockSupabase.from = jest.fn().mockReturnValue({
     select: jest.fn().mockReturnValue({
       eq: jest.fn().mockReturnValue({
@@ -97,7 +96,7 @@ describe('NotificationService - Tier Gating', () => {
   describe('getNotificationTypesForTier', () => {
     it('should allow only basic notifications for free tier', () => {
       const types = getNotificationTypesForTier('free');
-      
+
       expect(types).toContain('sub_deadline');
       expect(types).toContain('fee_renewal');
       expect(types).not.toContain('bonus_category');
@@ -106,7 +105,7 @@ describe('NotificationService - Tier Gating', () => {
 
     it('should allow all notifications for pro tier', () => {
       const types = getNotificationTypesForTier('pro');
-      
+
       expect(types).toContain('sub_deadline');
       expect(types).toContain('fee_renewal');
       expect(types).toContain('bonus_category');
@@ -116,13 +115,13 @@ describe('NotificationService - Tier Gating', () => {
 
     it('should allow all notifications for max tier', () => {
       const types = getNotificationTypesForTier('max');
-      
+
       expect(types.length).toBeGreaterThan(2);
     });
 
     it('should allow all notifications for admin tier', () => {
       const types = getNotificationTypesForTier('admin');
-      
+
       expect(types.length).toBeGreaterThan(2);
     });
 
@@ -137,8 +136,8 @@ describe('NotificationService - Tier Gating', () => {
         'spending_alert',
         'general',
       ];
-      
-      expected.forEach(type => {
+
+      expected.forEach((type) => {
         expect(types).toContain(type);
       });
     });
@@ -161,18 +160,18 @@ describe('NotificationService - Initialization', () => {
         createdAt: mockNotification1.createdAt.toISOString(),
       },
     ];
-    
+
     mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(stored));
-    
+
     await initializeNotifications();
     const notifications = await getNotifications();
-    
+
     expect(notifications.length).toBeGreaterThanOrEqual(0);
   });
 
   it('should handle initialization errors gracefully', async () => {
     mockAsyncStorage.getItem.mockRejectedValue(new Error('Storage error'));
-    
+
     await expect(initializeNotifications()).resolves.not.toThrow();
   });
 
@@ -180,11 +179,11 @@ describe('NotificationService - Initialization', () => {
     // Service may already be initialized from previous tests
     // Multiple calls should not trigger additional AsyncStorage reads
     const callsBefore = mockAsyncStorage.getItem.mock.calls.length;
-    
+
     await initializeNotifications();
     await initializeNotifications();
     await initializeNotifications();
-    
+
     // No additional calls should be made (already initialized)
     expect(mockAsyncStorage.getItem).toHaveBeenCalledTimes(callsBefore);
   });
@@ -202,7 +201,7 @@ describe('NotificationService - CRUD Operations', () => {
   describe('createNotification', () => {
     it('should create notification for allowed type', async () => {
       mockGetCurrentTierSync.mockReturnValue('free');
-      
+
       mockSupabase.from = jest.fn().mockReturnValue({
         insert: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
@@ -221,30 +220,30 @@ describe('NotificationService - CRUD Operations', () => {
           }),
         }),
       }) as any;
-      
+
       mockSupabase.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: { id: 'user-1' } },
       });
-      
+
       const notification = await createNotification({
         type: 'sub_deadline',
         title: 'Test',
         message: 'Test message',
       });
-      
+
       expect(notification).toBeTruthy();
       expect(notification?.type).toBe('sub_deadline');
     });
 
     it('should not create notification for disallowed type', async () => {
       mockGetCurrentTierSync.mockReturnValue('free');
-      
+
       const notification = await createNotification({
         type: 'bonus_category', // Not allowed for free tier
         title: 'Test',
         message: 'Test message',
       });
-      
+
       expect(notification).toBeNull();
     });
 
@@ -252,13 +251,13 @@ describe('NotificationService - CRUD Operations', () => {
       mockSupabase.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: null },
       });
-      
+
       const notification = await createNotification({
         type: 'sub_deadline',
         title: 'Test',
         message: 'Test message',
       });
-      
+
       expect(notification).toBeNull();
     });
 
@@ -283,11 +282,11 @@ describe('NotificationService - CRUD Operations', () => {
           }),
         }),
       }) as any;
-      
+
       mockSupabase.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: { id: 'user-1' } },
       });
-      
+
       const notification = await createNotification({
         type: 'sub_deadline',
         title: 'Test',
@@ -295,7 +294,7 @@ describe('NotificationService - CRUD Operations', () => {
         actionUrl: 'SUBTracker',
         actionData: { subId: 'sub-1' },
       });
-      
+
       expect(notification?.actionUrl).toBe('SUBTracker');
       expect(notification?.actionData).toEqual({ subId: 'sub-1' });
     });
@@ -304,32 +303,34 @@ describe('NotificationService - CRUD Operations', () => {
   describe('getNotifications', () => {
     it('should filter by tier access', async () => {
       mockGetCurrentTierSync.mockReturnValue('free');
-      
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([
-        { ...mockNotification1, createdAt: mockNotification1.createdAt.toISOString() },
-        { 
-          ...mockNotification1, 
-          id: 'notif-pro',
-          type: 'monthly_report', 
-          createdAt: mockNotification1.createdAt.toISOString() 
-        },
-      ]));
-      
+
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify([
+          { ...mockNotification1, createdAt: mockNotification1.createdAt.toISOString() },
+          {
+            ...mockNotification1,
+            id: 'notif-pro',
+            type: 'monthly_report',
+            createdAt: mockNotification1.createdAt.toISOString(),
+          },
+        ])
+      );
+
       await initializeNotifications();
       const notifications = await getNotifications();
-      
+
       // Free tier should not see monthly_report
-      expect(notifications.find(n => n.type === 'monthly_report')).toBeUndefined();
+      expect(notifications.find((n) => n.type === 'monthly_report')).toBeUndefined();
     });
 
     it('should filter out expired notifications', async () => {
       // Service is already initialized with cached notifications from previous tests
       // getNotifications() should filter any notifications based on expiry
       const notifications = await getNotifications();
-      
+
       // Verify that all returned notifications are either not expired or have no expiry
       const now = new Date();
-      notifications.forEach(n => {
+      notifications.forEach((n) => {
         if (n.expiresAt) {
           expect(n.expiresAt.getTime()).toBeGreaterThan(now.getTime());
         }
@@ -337,15 +338,17 @@ describe('NotificationService - CRUD Operations', () => {
     });
 
     it('should respect limit parameter', async () => {
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([
-        { ...mockNotification1, id: '1', createdAt: mockNotification1.createdAt.toISOString() },
-        { ...mockNotification1, id: '2', createdAt: mockNotification1.createdAt.toISOString() },
-        { ...mockNotification1, id: '3', createdAt: mockNotification1.createdAt.toISOString() },
-      ]));
-      
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify([
+          { ...mockNotification1, id: '1', createdAt: mockNotification1.createdAt.toISOString() },
+          { ...mockNotification1, id: '2', createdAt: mockNotification1.createdAt.toISOString() },
+          { ...mockNotification1, id: '3', createdAt: mockNotification1.createdAt.toISOString() },
+        ])
+      );
+
       await initializeNotifications();
       const notifications = await getNotifications(2);
-      
+
       expect(notifications.length).toBeLessThanOrEqual(2);
     });
   });
@@ -361,15 +364,17 @@ describe('NotificationService - CRUD Operations', () => {
           }),
         }),
       }) as any;
-      
+
       mockSupabase.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: { id: 'user-1' } },
       });
-      
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([
-        { ...mockNotification1, createdAt: mockNotification1.createdAt.toISOString() },
-      ]));
-      
+
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify([
+          { ...mockNotification1, createdAt: mockNotification1.createdAt.toISOString() },
+        ])
+      );
+
       await initializeNotifications();
       await expect(markAsRead('notif-1')).resolves.not.toThrow();
     });
@@ -384,21 +389,27 @@ describe('NotificationService - CRUD Operations', () => {
           }),
         }),
       }) as any;
-      
+
       mockSupabase.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: { id: 'user-1' } },
       });
-      
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([
-        { ...mockNotification1, isRead: false, createdAt: mockNotification1.createdAt.toISOString() },
-      ]));
-      
+
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify([
+          {
+            ...mockNotification1,
+            isRead: false,
+            createdAt: mockNotification1.createdAt.toISOString(),
+          },
+        ])
+      );
+
       await initializeNotifications();
       const beforeCount = await getUnreadCount();
-      
+
       await markAsRead('notif-1');
       const afterCount = await getUnreadCount();
-      
+
       expect(afterCount).toBeLessThanOrEqual(beforeCount);
     });
   });
@@ -414,11 +425,11 @@ describe('NotificationService - CRUD Operations', () => {
           }),
         }),
       }) as any;
-      
+
       mockSupabase.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: { id: 'user-1' } },
       });
-      
+
       await expect(markAllAsRead()).resolves.not.toThrow();
     });
   });
@@ -434,11 +445,11 @@ describe('NotificationService - CRUD Operations', () => {
           }),
         }),
       }) as any;
-      
+
       mockSupabase.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: { id: 'user-1' } },
       });
-      
+
       await expect(deleteNotification('notif-1')).resolves.not.toThrow();
     });
   });
@@ -450,26 +461,36 @@ describe('NotificationService - CRUD Operations', () => {
 
 describe('NotificationService - Unread Count', () => {
   it('should calculate unread count correctly', async () => {
-    mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([
-      { ...mockNotification1, isRead: false, createdAt: mockNotification1.createdAt.toISOString() },
-      { ...mockNotification2, isRead: true, createdAt: mockNotification2.createdAt.toISOString() },
-    ]));
-    
+    mockAsyncStorage.getItem.mockResolvedValue(
+      JSON.stringify([
+        {
+          ...mockNotification1,
+          isRead: false,
+          createdAt: mockNotification1.createdAt.toISOString(),
+        },
+        {
+          ...mockNotification2,
+          isRead: true,
+          createdAt: mockNotification2.createdAt.toISOString(),
+        },
+      ])
+    );
+
     await initializeNotifications();
     const count = await getUnreadCount();
-    
+
     expect(count).toBeGreaterThanOrEqual(0);
   });
 
   it('should respect tier filtering in unread count', async () => {
     mockGetCurrentTierSync.mockReturnValue('free');
-    
+
     // Service is already initialized, so getUnreadCount returns cached count
     // The count reflects notifications accessible to the current tier
     const count = await getUnreadCount();
     const notifications = await getNotifications();
-    const expectedCount = notifications.filter(n => !n.isRead).length;
-    
+    const expectedCount = notifications.filter((n) => !n.isRead).length;
+
     // Unread count should match the number of unread notifications
     // that are accessible to the current tier
     expect(count).toBe(expectedCount);
@@ -500,7 +521,7 @@ describe('NotificationService - Notification Generators', () => {
         }),
       }),
     }) as any;
-    
+
     mockSupabase.auth.getUser = jest.fn().mockResolvedValue({
       data: { user: { id: 'user-1' } },
     });
@@ -513,7 +534,7 @@ describe('NotificationService - Notification Generators', () => {
         cardId: 'card-1',
         deadlineDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
       };
-      
+
       await expect(generateSUBDeadlineAlert(sub)).resolves.not.toThrow();
     });
 
@@ -523,10 +544,11 @@ describe('NotificationService - Notification Generators', () => {
         cardId: 'card-1',
         deadlineDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       };
-      
+
       await generateSUBDeadlineAlert(sub);
-      
-      const insertCall = (mockSupabase.from as jest.Mock).mock.results[0].value.insert.mock.calls[0][0];
+
+      const insertCall = (mockSupabase.from as jest.Mock).mock.results[0].value.insert.mock
+        .calls[0][0];
       expect(insertCall.message).toContain('7');
     });
 
@@ -536,10 +558,11 @@ describe('NotificationService - Notification Generators', () => {
         cardId: 'card-1',
         deadlineDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
       };
-      
+
       await generateSUBDeadlineAlert(sub);
-      
-      const insertCall = (mockSupabase.from as jest.Mock).mock.results[0].value.insert.mock.calls[0][0];
+
+      const insertCall = (mockSupabase.from as jest.Mock).mock.results[0].value.insert.mock
+        .calls[0][0];
       expect(insertCall.action_data).toEqual({ subId: 'sub-1' });
     });
   });
@@ -551,8 +574,9 @@ describe('NotificationService - Notification Generators', () => {
 
     it('should include days until renewal', async () => {
       await generateFeeRenewalAlert('card-1', 15);
-      
-      const insertCall = (mockSupabase.from as jest.Mock).mock.results[0].value.insert.mock.calls[0][0];
+
+      const insertCall = (mockSupabase.from as jest.Mock).mock.results[0].value.insert.mock
+        .calls[0][0];
       expect(insertCall.message).toContain('15');
     });
   });
@@ -564,7 +588,7 @@ describe('NotificationService - Notification Generators', () => {
 
     it('should include report ID in action data', async () => {
       await generateMonthlyReportNotification('report-123');
-      
+
       // Check if from was called and has results
       const fromMock = mockSupabase.from as jest.Mock;
       if (fromMock.mock.results.length > 0 && fromMock.mock.results[0].value) {
@@ -584,37 +608,45 @@ describe('NotificationService - Notification Generators', () => {
 
 describe('NotificationService - Edge Cases', () => {
   it('should handle null expiry date', async () => {
-    mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([
-      { ...mockNotification1, expiresAt: null, createdAt: mockNotification1.createdAt.toISOString() },
-    ]));
-    
+    mockAsyncStorage.getItem.mockResolvedValue(
+      JSON.stringify([
+        {
+          ...mockNotification1,
+          expiresAt: null,
+          createdAt: mockNotification1.createdAt.toISOString(),
+        },
+      ])
+    );
+
     await initializeNotifications();
     const notifications = await getNotifications();
-    
+
     expect(notifications.length).toBeGreaterThan(0);
   });
 
   it('should handle future expiry date', async () => {
     const futureDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    
-    mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([
-      { 
-        ...mockNotification1, 
-        expiresAt: futureDate.toISOString(),
-        createdAt: mockNotification1.createdAt.toISOString() 
-      },
-    ]));
-    
+
+    mockAsyncStorage.getItem.mockResolvedValue(
+      JSON.stringify([
+        {
+          ...mockNotification1,
+          expiresAt: futureDate.toISOString(),
+          createdAt: mockNotification1.createdAt.toISOString(),
+        },
+      ])
+    );
+
     await initializeNotifications();
     const notifications = await getNotifications();
-    
+
     expect(notifications.length).toBeGreaterThan(0);
   });
 
   it('should handle empty notification cache', async () => {
     await initializeNotifications();
     const count = await getUnreadCount();
-    
+
     // Unread count reflects the current cache state from all tests
     expect(count).toBeGreaterThanOrEqual(0);
   });
@@ -629,7 +661,7 @@ describe('NotificationService - Edge Cases', () => {
         }),
       }),
     }) as any;
-    
+
     await expect(initializeNotifications()).resolves.not.toThrow();
   });
 });

@@ -13,23 +13,16 @@ import {
   getAchievementDefinition,
   createDefaultUserAchievements,
   checkAchievement,
-  getAchievements,
   getAchievementsSync,
   getAchievementDefinitions,
   getAchievementsByCategory,
   getRankDefinitions,
   track,
-  onAchievementUnlock,
-  resetAchievements,
   resetAchievementsCache,
   initializeAchievements,
 } from '../AchievementService';
 import { AchievementEventEmitter } from '../AchievementEventEmitter';
-import {
-  UserAchievements,
-  AchievementEvent,
-  AchievementCategory,
-} from '../../types';
+import { AchievementEvent } from '../../types';
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -75,11 +68,12 @@ describe('AchievementService', () => {
 
     it('should have correct achievement distribution', () => {
       const byCategory = {
-        getting_started: ACHIEVEMENT_DEFINITIONS.filter(a => a.category === 'getting_started').length,
-        optimization: ACHIEVEMENT_DEFINITIONS.filter(a => a.category === 'optimization').length,
-        data_insights: ACHIEVEMENT_DEFINITIONS.filter(a => a.category === 'data_insights').length,
-        engagement: ACHIEVEMENT_DEFINITIONS.filter(a => a.category === 'engagement').length,
-        mastery: ACHIEVEMENT_DEFINITIONS.filter(a => a.category === 'mastery').length,
+        getting_started: ACHIEVEMENT_DEFINITIONS.filter((a) => a.category === 'getting_started')
+          .length,
+        optimization: ACHIEVEMENT_DEFINITIONS.filter((a) => a.category === 'optimization').length,
+        data_insights: ACHIEVEMENT_DEFINITIONS.filter((a) => a.category === 'data_insights').length,
+        engagement: ACHIEVEMENT_DEFINITIONS.filter((a) => a.category === 'engagement').length,
+        mastery: ACHIEVEMENT_DEFINITIONS.filter((a) => a.category === 'mastery').length,
       };
 
       expect(byCategory.getting_started).toBe(5);
@@ -90,20 +84,20 @@ describe('AchievementService', () => {
     });
 
     it('should have unique achievement IDs', () => {
-      const ids = ACHIEVEMENT_DEFINITIONS.map(a => a.id);
+      const ids = ACHIEVEMENT_DEFINITIONS.map((a) => a.id);
       const uniqueIds = new Set(ids);
       expect(uniqueIds.size).toBe(ids.length);
     });
 
     it('should have emoji icons for all achievements', () => {
-      ACHIEVEMENT_DEFINITIONS.forEach(a => {
+      ACHIEVEMENT_DEFINITIONS.forEach((a) => {
         expect(a.icon).toBeTruthy();
         expect(typeof a.icon).toBe('string');
       });
     });
 
     it('should have progress targets for all achievements', () => {
-      ACHIEVEMENT_DEFINITIONS.forEach(a => {
+      ACHIEVEMENT_DEFINITIONS.forEach((a) => {
         expect(a.progressTarget).toBeGreaterThan(0);
       });
     });
@@ -128,7 +122,7 @@ describe('AchievementService', () => {
     });
 
     it('should have emoji for each rank', () => {
-      RANK_DEFINITIONS.forEach(r => {
+      RANK_DEFINITIONS.forEach((r) => {
         expect(r.emoji).toBeTruthy();
       });
     });
@@ -224,7 +218,15 @@ describe('AchievementService', () => {
     });
 
     it('should return true with extra screens visited', () => {
-      const screens = ['Home', 'Insights', 'Sage', 'SmartWallet', 'MyCards', 'Settings', 'CardTracker'];
+      const screens = [
+        'Home',
+        'Insights',
+        'Sage',
+        'SmartWallet',
+        'MyCards',
+        'Settings',
+        'CardTracker',
+      ];
       expect(checkAllScreensVisited(screens)).toBe(true);
     });
   });
@@ -249,7 +251,7 @@ describe('AchievementService', () => {
   describe('createDefaultUserAchievements', () => {
     it('should create default achievements with all locked', () => {
       const defaults = createDefaultUserAchievements(null);
-      
+
       expect(defaults.totalUnlocked).toBe(0);
       expect(defaults.totalAchievements).toBe(23);
       expect(defaults.rank).toBe(1);
@@ -260,8 +262,8 @@ describe('AchievementService', () => {
 
     it('should initialize all achievements as locked', () => {
       const defaults = createDefaultUserAchievements(null);
-      
-      Object.values(defaults.achievements).forEach(progress => {
+
+      Object.values(defaults.achievements).forEach((progress) => {
         expect(progress.isUnlocked).toBe(false);
         expect(progress.progress).toBe(0);
         expect(progress.percentComplete).toBe(0);
@@ -270,7 +272,7 @@ describe('AchievementService', () => {
 
     it('should set correct progress targets', () => {
       const defaults = createDefaultUserAchievements(null);
-      
+
       expect(defaults.achievements['GS1'].progressTarget).toBe(1);
       expect(defaults.achievements['GS2'].progressTarget).toBe(3);
       expect(defaults.achievements['GS3'].progressTarget).toBe(5);
@@ -291,9 +293,9 @@ describe('AchievementService', () => {
         data: { cardCount: 1 },
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked).toBeDefined();
       expect(result.unlocked?.id).toBe('GS1');
       expect(result.updatedState.achievements['GS1'].isUnlocked).toBe(true);
@@ -307,9 +309,9 @@ describe('AchievementService', () => {
         data: { cardCount: 3 },
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('GS2');
       expect(result.updatedState.achievements['GS2'].isUnlocked).toBe(true);
     });
@@ -321,9 +323,9 @@ describe('AchievementService', () => {
         data: { cardCount: 5 },
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('GS3');
     });
 
@@ -334,9 +336,9 @@ describe('AchievementService', () => {
         data: { cardCount: 2 },
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.updatedState.achievements['GS2'].progress).toBe(2);
       expect(result.updatedState.achievements['GS2'].percentComplete).toBe(66.66666666666666);
       expect(result.updatedState.achievements['GS2'].isUnlocked).toBe(false);
@@ -350,9 +352,9 @@ describe('AchievementService', () => {
         type: 'spending_profile_saved',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('GS4');
     });
 
@@ -362,9 +364,9 @@ describe('AchievementService', () => {
         type: 'sage_chat',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('GS5');
       expect(result.updatedState.sageChatsCount).toBe(1);
     });
@@ -375,9 +377,9 @@ describe('AchievementService', () => {
         type: 'wallet_optimizer_used',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('OP1');
     });
 
@@ -387,9 +389,9 @@ describe('AchievementService', () => {
         type: 'fee_breakeven_viewed',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('OP2');
     });
 
@@ -399,9 +401,9 @@ describe('AchievementService', () => {
         type: 'signup_roi_viewed',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('OP3');
     });
 
@@ -412,9 +414,9 @@ describe('AchievementService', () => {
         data: { gapsCount: 1 },
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('OP4');
     });
 
@@ -425,9 +427,9 @@ describe('AchievementService', () => {
         data: { optimizationScore: 92 },
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('OP5');
     });
 
@@ -438,9 +440,9 @@ describe('AchievementService', () => {
         data: { optimizationScore: 75 },
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked).toBeNull();
     });
   });
@@ -452,9 +454,9 @@ describe('AchievementService', () => {
         type: 'statement_uploaded',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('DI1');
       expect(result.updatedState.statementsUploaded).toBe(1);
     });
@@ -462,14 +464,14 @@ describe('AchievementService', () => {
     it('should unlock DI2 on 3 statement uploads', () => {
       const state = createDefaultUserAchievements(null);
       state.statementsUploaded = 2;
-      
+
       const event: AchievementEvent = {
         type: 'statement_uploaded',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('DI2');
       expect(result.updatedState.statementsUploaded).toBe(3);
     });
@@ -482,9 +484,9 @@ describe('AchievementService', () => {
         type: 'insights_viewed',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('DI3');
     });
 
@@ -495,9 +497,9 @@ describe('AchievementService', () => {
         data: { moneyLeftOnTable: 150 },
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('DI4');
     });
 
@@ -507,9 +509,9 @@ describe('AchievementService', () => {
         type: 'trends_viewed',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('DI5');
     });
   });
@@ -519,14 +521,14 @@ describe('AchievementService', () => {
       const state = createDefaultUserAchievements(null);
       state.currentStreak = 6;
       state.lastVisitDate = '2026-02-13';
-      
+
       const event: AchievementEvent = {
         type: 'app_opened',
         timestamp: new Date('2026-02-14T10:00:00'),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('EN1');
       expect(result.updatedState.currentStreak).toBe(7);
     });
@@ -535,14 +537,14 @@ describe('AchievementService', () => {
       const state = createDefaultUserAchievements(null);
       state.currentStreak = 29;
       state.lastVisitDate = '2026-02-13';
-      
+
       const event: AchievementEvent = {
         type: 'app_opened',
         timestamp: new Date('2026-02-14T10:00:00'),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('EN2');
       expect(result.updatedState.currentStreak).toBe(30);
     });
@@ -553,9 +555,9 @@ describe('AchievementService', () => {
         type: 'card_comparison_viewed',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('EN3');
       expect(result.updatedState.comparisonsCount).toBe(1);
     });
@@ -563,31 +565,41 @@ describe('AchievementService', () => {
     it('should unlock EN4 when all screens visited', () => {
       const state = createDefaultUserAchievements(null);
       state.screensVisited = ['Home', 'Insights', 'Sage', 'SmartWallet', 'MyCards'];
-      
+
       const event: AchievementEvent = {
         type: 'screen_visited',
         data: { screenName: 'Settings' },
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('EN4');
       expect(result.updatedState.screensVisited).toContain('Settings');
     });
 
     it('should unlock EN5 on 10 different card benefits viewed', () => {
       const state = createDefaultUserAchievements(null);
-      state.cardBenefitsViewed = ['card1', 'card2', 'card3', 'card4', 'card5', 'card6', 'card7', 'card8', 'card9'];
-      
+      state.cardBenefitsViewed = [
+        'card1',
+        'card2',
+        'card3',
+        'card4',
+        'card5',
+        'card6',
+        'card7',
+        'card8',
+        'card9',
+      ];
+
       const event: AchievementEvent = {
         type: 'card_benefits_viewed',
         data: { cardId: 'card10' },
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.unlocked?.id).toBe('EN5');
       expect(result.updatedState.cardBenefitsViewed).toHaveLength(10);
     });
@@ -602,14 +614,14 @@ describe('AchievementService', () => {
       state.achievements['GS2'].isUnlocked = true;
       state.achievements['GS3'].isUnlocked = true;
       state.achievements['OP1'].isUnlocked = true;
-      
+
       const event: AchievementEvent = {
         type: 'spending_profile_saved',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       // Should unlock GS4 (making it 5 total), which triggers MA1 unlock (making it 6 total)
       expect(result.updatedState.achievements['GS4'].isUnlocked).toBe(true);
       expect(result.updatedState.achievements['MA1'].isUnlocked).toBe(true);
@@ -619,14 +631,14 @@ describe('AchievementService', () => {
     it('should update rank when achievements increase', () => {
       const state = createDefaultUserAchievements(null);
       state.totalUnlocked = 2;
-      
+
       const event: AchievementEvent = {
         type: 'spending_profile_saved',
         timestamp: new Date(),
       };
-      
+
       const result = checkAchievement(event, state);
-      
+
       expect(result.updatedState.totalUnlocked).toBe(3);
       expect(result.updatedState.rank).toBe(2);
       expect(result.updatedState.rankTitle).toBe('Card Curious');
@@ -655,7 +667,7 @@ describe('AchievementService', () => {
     it('should return getting_started achievements', () => {
       const achievements = getAchievementsByCategory('getting_started');
       expect(achievements).toHaveLength(5);
-      expect(achievements.every(a => a.category === 'getting_started')).toBe(true);
+      expect(achievements.every((a) => a.category === 'getting_started')).toBe(true);
     });
 
     it('should return optimization achievements', () => {
@@ -700,7 +712,7 @@ describe('AchievementService', () => {
     it('should initialize with default achievements when no storage', async () => {
       await initializeAchievements();
       const achievements = getAchievementsSync();
-      
+
       expect(achievements).not.toBeNull();
       expect(achievements?.totalUnlocked).toBe(0);
       expect(achievements?.totalAchievements).toBe(23);
@@ -710,7 +722,7 @@ describe('AchievementService', () => {
       const storedData = createDefaultUserAchievements('user123');
       storedData.totalUnlocked = 5;
       storedData.achievements['GS1'].isUnlocked = true;
-      
+
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
         JSON.stringify({
           ...storedData,
@@ -726,11 +738,11 @@ describe('AchievementService', () => {
           ),
         })
       );
-      
+
       resetAchievementsCache();
       await initializeAchievements();
       const achievements = getAchievementsSync();
-      
+
       expect(achievements?.totalUnlocked).toBe(5);
       expect(achievements?.achievements['GS1'].isUnlocked).toBe(true);
     });
@@ -740,9 +752,9 @@ describe('AchievementService', () => {
     it('should track events via track() function', (done) => {
       const callback = jest.fn();
       AchievementEventEmitter.onEvent(callback);
-      
+
       track('card_added', { cardCount: 1 });
-      
+
       setTimeout(() => {
         expect(callback).toHaveBeenCalled();
         done();
@@ -758,11 +770,11 @@ describe('AchievementService', () => {
         data: { cardCount: 3 },
         timestamp: new Date(),
       };
-      
+
       const start = Date.now();
       checkAchievement(event, state);
       const elapsed = Date.now() - start;
-      
+
       expect(elapsed).toBeLessThan(5);
     });
   });

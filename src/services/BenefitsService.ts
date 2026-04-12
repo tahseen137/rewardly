@@ -1,11 +1,11 @@
 /**
  * BenefitsService - Manages card benefits display and filtering
- * 
+ *
  * Tier: Pro+ (Free sees first 2 benefits + locked overlay)
  * Benefits are stored in the cards table as JSONB
  */
 
-import { Benefit, BenefitCategory, Card } from '../types';
+import { Benefit, BenefitCategory } from '../types';
 import { getCardByIdSync } from './CardDataService';
 import { getCurrentTierSync, SubscriptionTier } from './SubscriptionService';
 
@@ -25,7 +25,7 @@ const FREE_TIER_BENEFIT_LIMIT = 2;
 export function getBenefitsForCard(cardId: string): Benefit[] {
   const card = getCardByIdSync(cardId);
   if (!card) return [];
-  
+
   // Benefits are stored in the card data (will be loaded from Supabase)
   // For now, return empty array - benefits will be added via migration + data import
   return [];
@@ -42,7 +42,7 @@ export function getBenefitsByCategory(benefits: Benefit[]): Record<BenefitCatego
     lifestyle: [],
   };
 
-  benefits.forEach(benefit => {
+  benefits.forEach((benefit) => {
     if (grouped[benefit.category]) {
       grouped[benefit.category].push(benefit);
     }
@@ -56,7 +56,7 @@ export function getBenefitsByCategory(benefits: Benefit[]): Record<BenefitCatego
  */
 export function getVisibleBenefits(benefits: Benefit[], tier?: SubscriptionTier): Benefit[] {
   const currentTier = tier || getCurrentTierSync();
-  
+
   if (currentTier === 'free') {
     return benefits.slice(0, FREE_TIER_BENEFIT_LIMIT);
   }
@@ -77,7 +77,7 @@ export function canViewAllBenefits(tier?: SubscriptionTier): boolean {
  */
 export function getLockedBenefitsCount(totalBenefits: number, tier?: SubscriptionTier): number {
   const currentTier = tier || getCurrentTierSync();
-  
+
   if (currentTier === 'free' && totalBenefits > FREE_TIER_BENEFIT_LIMIT) {
     return totalBenefits - FREE_TIER_BENEFIT_LIMIT;
   }

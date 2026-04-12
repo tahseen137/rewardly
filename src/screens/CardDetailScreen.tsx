@@ -1,34 +1,34 @@
 /**
  * CardDetailScreen - Full card detail view accessible from anywhere
- * 
+ *
  * A root-level screen that shows complete card information:
  * - Card name, issuer, network
  * - All reward rates by category
  * - Annual fee and sign-up bonus
  * - Benefits summary
  * - "Apply Now" button
- * 
+ *
  * This screen is registered in RootStack for easy navigation from any tab.
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
-import { ArrowLeft, CreditCard, DollarSign, Gift, TrendingUp, Star, ChevronRight } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  CreditCard,
+  DollarSign,
+  Gift,
+  TrendingUp,
+  Star,
+  ChevronRight,
+} from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
-import { Card, SpendingCategory } from '../types';
-import { getCardByIdSync, getAllCardsSync } from '../services/CardDataService';
+import { SpendingCategory } from '../types';
+import { getCardByIdSync } from '../services/CardDataService';
 import { getCards } from '../services/CardPortfolioManager';
 import { getBenefitsForCard } from '../services/BenefitsService';
 import { getSpendingProfileSync } from '../services/SpendingProfileService';
@@ -75,9 +75,7 @@ function RewardRateCard({ category, rate, isBase, index }: RewardRateCardProps) 
       <Text style={styles.rateCategory}>
         {CATEGORY_LABELS[category] || category.replace(/_/g, ' ')}
       </Text>
-      <Text style={[styles.rateValue, isBase && styles.rateValueBase]}>
-        {rate}x
-      </Text>
+      <Text style={[styles.rateValue, isBase && styles.rateValueBase]}>{rate}x</Text>
       {isBase && <Text style={styles.baseLabel}>Base</Text>}
     </Animated.View>
   );
@@ -101,9 +99,7 @@ function InfoRow({ icon, label, value, valueColor }: InfoRowProps) {
         {icon}
         <Text style={styles.infoLabel}>{label}</Text>
       </View>
-      <Text style={[styles.infoValue, valueColor && { color: valueColor }]}>
-        {value}
-      </Text>
+      <Text style={[styles.infoValue, valueColor && { color: valueColor }]}>{value}</Text>
     </View>
   );
 }
@@ -131,7 +127,11 @@ export default function CardDetailScreen() {
 
   // Track achievement on mount
   useEffect(() => {
-    try { AchievementEventEmitter.track('card_benefits_viewed', { cardId }); } catch (_e) { /* setImmediate not available on web */ }
+    try {
+      AchievementEventEmitter.track('card_benefits_viewed', { cardId });
+    } catch {
+      /* setImmediate not available on web */
+    }
   }, [cardId]);
 
   // Load fee breakeven and signup bonus analysis
@@ -139,10 +139,10 @@ export default function CardDetailScreen() {
     const loadAnalysis = async () => {
       setLoadingAnalysis(true);
       const profile = getSpendingProfileSync();
-      
+
       if (profile) {
         setHasSpendingProfile(true);
-        
+
         // Calculate fee breakeven if card has annual fee
         if (card?.annualFee && card.annualFee > 0) {
           const feeResult = calculateFeeBreakeven(cardId, profile);
@@ -150,7 +150,7 @@ export default function CardDetailScreen() {
             setFeeBreakevenResult(feeResult.value);
           }
         }
-        
+
         // Calculate signup bonus ROI if card has signup bonus
         if (card?.signupBonus) {
           const bonusResult = calculateSignupBonusROI(cardId, profile);
@@ -161,10 +161,10 @@ export default function CardDetailScreen() {
       } else {
         setHasSpendingProfile(false);
       }
-      
+
       setLoadingAnalysis(false);
     };
-    
+
     if (card) {
       loadAnalysis();
     }
@@ -206,7 +206,7 @@ export default function CardDetailScreen() {
     // Navigate to CardBenefits in Insights stack for full benefits view
     (navigation as any).navigate('Insights', {
       screen: 'CardBenefits',
-      params: { cardId }
+      params: { cardId },
     });
   }, [navigation, cardId]);
 
@@ -232,12 +232,14 @@ export default function CardDetailScreen() {
         <TouchableOpacity style={styles.backIconButton} onPress={handleGoBack}>
           <ArrowLeft size={24} color={colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>Card Details</Text>
+        <Text style={styles.headerTitle} numberOfLines={1}>
+          Card Details
+        </Text>
         <View style={styles.headerSpacer} />
       </View>
 
-      <ScrollView 
-        style={styles.scrollView} 
+      <ScrollView
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
@@ -248,9 +250,7 @@ export default function CardDetailScreen() {
           </View>
           <Text style={styles.cardName}>{card.name}</Text>
           <Text style={styles.cardIssuer}>{card.issuer}</Text>
-          {card.rewardProgram && (
-            <Text style={styles.cardNetwork}>{card.rewardProgram}</Text>
-          )}
+          {card.rewardProgram && <Text style={styles.cardNetwork}>{card.rewardProgram}</Text>}
         </View>
 
         {/* Key Info Section */}
@@ -319,10 +319,7 @@ export default function CardDetailScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Benefits</Text>
-              <TouchableOpacity 
-                style={styles.viewAllButton}
-                onPress={handleViewAllBenefits}
-              >
+              <TouchableOpacity style={styles.viewAllButton} onPress={handleViewAllBenefits}>
                 <Text style={styles.viewAllText}>View All</Text>
                 <ChevronRight size={16} color={colors.primary.main} />
               </TouchableOpacity>
@@ -337,9 +334,7 @@ export default function CardDetailScreen() {
                 </View>
               ))}
               {benefits.length > 3 && (
-                <Text style={styles.moreBenefits}>
-                  +{benefits.length - 3} more benefits
-                </Text>
+                <Text style={styles.moreBenefits}>+{benefits.length - 3} more benefits</Text>
               )}
             </View>
           </View>
@@ -355,9 +350,11 @@ export default function CardDetailScreen() {
               </Text>
               <TouchableOpacity
                 style={styles.ctaButton}
-                onPress={() => (navigation as any).navigate('Insights', {
-                  screen: 'WalletOptimizer'
-                })}
+                onPress={() =>
+                  (navigation as any).navigate('Insights', {
+                    screen: 'WalletOptimizer',
+                  })
+                }
               >
                 <Text style={styles.ctaButtonText}>Set Up Profile</Text>
               </TouchableOpacity>
@@ -387,7 +384,9 @@ export default function CardDetailScreen() {
                   <View style={styles.infoRowLeft}>
                     <DollarSign size={18} color={colors.success.main} />
                     <Text style={styles.infoLabel}>
-                      {cr.category.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                      {cr.category
+                        .replace(/_/g, ' ')
+                        .replace(/\b\w/g, (c: string) => c.toUpperCase())}
                     </Text>
                   </View>
                   <Text style={[styles.infoValue, { color: colors.success.main }]}>

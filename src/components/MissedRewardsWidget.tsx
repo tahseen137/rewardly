@@ -4,23 +4,16 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   FadeIn,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { TrendingDown, AlertCircle, ChevronRight } from 'lucide-react-native';
+import { AlertCircle, ChevronRight } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -35,15 +28,15 @@ interface MissedRewardsWidgetProps {
 export default function MissedRewardsWidget({ onPress }: MissedRewardsWidgetProps) {
   const [analysis, setAnalysis] = useState<MissedRewardsAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const shakeValue = useSharedValue(0);
-  const countValue = useSharedValue(0);
+  const _countValue = useSharedValue(0);
   const [displayValue, setDisplayValue] = useState(0);
-  
+
   useEffect(() => {
     loadData();
   }, []);
-  
+
   useEffect(() => {
     if (analysis) {
       // Animate the count up
@@ -54,7 +47,7 @@ export default function MissedRewardsWidget({ onPress }: MissedRewardsWidgetProp
         const progress = Math.min(elapsed / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
         setDisplayValue(Math.round(analysis.totalMissed * eased * 100) / 100);
-        
+
         if (progress >= 1) {
           clearInterval(interval);
           // Attention shake
@@ -66,11 +59,11 @@ export default function MissedRewardsWidget({ onPress }: MissedRewardsWidgetProp
           );
         }
       }, 16);
-      
+
       return () => clearInterval(interval);
     }
   }, [analysis]);
-  
+
   const loadData = async () => {
     try {
       const data = await analyzeMissedRewards();
@@ -81,11 +74,11 @@ export default function MissedRewardsWidget({ onPress }: MissedRewardsWidgetProp
       setIsLoading(false);
     }
   };
-  
+
   const shakeStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: shakeValue.value * 3 }],
   }));
-  
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -93,7 +86,7 @@ export default function MissedRewardsWidget({ onPress }: MissedRewardsWidgetProp
       </View>
     );
   }
-  
+
   if (!analysis || analysis.totalMissed === 0) {
     // Show positive message if no missed rewards
     return (
@@ -117,12 +110,10 @@ export default function MissedRewardsWidget({ onPress }: MissedRewardsWidgetProp
       </TouchableOpacity>
     );
   }
-  
+
   // Get top 3 missed categories
-  const topCategories = analysis.byCategory
-    .filter(c => c.totalMissed > 0)
-    .slice(0, 3);
-  
+  const topCategories = analysis.byCategory.filter((c) => c.totalMissed > 0).slice(0, 3);
+
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
       <Animated.View style={[styles.containerAnimated, shakeStyle]}>
@@ -143,7 +134,7 @@ export default function MissedRewardsWidget({ onPress }: MissedRewardsWidgetProp
               <Text style={styles.periodText}>This Month</Text>
             </View>
           </View>
-          
+
           {/* Category breakdown */}
           <View style={styles.categoriesRow}>
             {topCategories.map((cat) => {
@@ -151,24 +142,24 @@ export default function MissedRewardsWidget({ onPress }: MissedRewardsWidgetProp
               return (
                 <View key={cat.category} style={styles.categoryChip}>
                   <Text style={styles.categoryEmoji}>{info.icon}</Text>
-                  <Text style={styles.categoryMissed}>
-                    ${cat.totalMissed.toFixed(0)}
-                  </Text>
+                  <Text style={styles.categoryMissed}>${cat.totalMissed.toFixed(0)}</Text>
                 </View>
               );
             })}
           </View>
-          
+
           {/* Projected yearly */}
           <View style={styles.projectionRow}>
             <AlertCircle size={14} color={colors.warning.main} />
             <Text style={styles.projectionText}>
-              That's <Text style={styles.projectionAmount}>
+              That's{' '}
+              <Text style={styles.projectionAmount}>
                 ${analysis.projectedYearlyMissed.toLocaleString()}
-              </Text>/year
+              </Text>
+              /year
             </Text>
           </View>
-          
+
           {/* CTA */}
           <View style={styles.ctaRow}>
             <Text style={styles.ctaText}>See what you're missing</Text>
@@ -200,7 +191,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.error.main + '30',
   },
-  
+
   // Header
   header: {
     flexDirection: 'row',
@@ -240,7 +231,7 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     fontWeight: '500',
   },
-  
+
   // Categories
   categoriesRow: {
     flexDirection: 'row',
@@ -264,7 +255,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.error.main,
   },
-  
+
   // Projection
   projectionRow: {
     flexDirection: 'row',
@@ -283,7 +274,7 @@ const styles = StyleSheet.create({
   projectionAmount: {
     fontWeight: '700',
   },
-  
+
   // CTA
   ctaRow: {
     flexDirection: 'row',
@@ -296,7 +287,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.error.main,
   },
-  
+
   // Success state
   iconSuccess: {
     width: 40,

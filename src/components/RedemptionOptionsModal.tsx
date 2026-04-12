@@ -40,7 +40,7 @@ export const RedemptionOptionsModal: React.FC<RedemptionOptionsModalProps> = ({
 }) => {
   const theme = useTheme();
   const styles = createStyles(theme);
-  
+
   // Calculate rewards for each redemption option
   const calculateRedemptions = (): CalculatedRedemption[] => {
     if (!card.programDetails?.redemptionOptions) {
@@ -73,12 +73,7 @@ export const RedemptionOptionsModal: React.FC<RedemptionOptionsModalProps> = ({
   }
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           {/* Header */}
@@ -101,12 +96,10 @@ export const RedemptionOptionsModal: React.FC<RedemptionOptionsModalProps> = ({
           {/* Redemption Options */}
           <ScrollView style={styles.optionsList}>
             <Text style={styles.sectionTitle}>Redemption Options</Text>
-            
+
             {redemptions.length === 0 ? (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>
-                  No redemption options available for this card.
-                </Text>
+                <Text style={styles.emptyText}>No redemption options available for this card.</Text>
               </View>
             ) : (
               redemptions.map((redemption, index) => (
@@ -150,9 +143,7 @@ export const RedemptionOptionsModal: React.FC<RedemptionOptionsModalProps> = ({
                   )}
 
                   {/* Notes */}
-                  {redemption.notes && (
-                    <Text style={styles.notesText}>{redemption.notes}</Text>
-                  )}
+                  {redemption.notes && <Text style={styles.notesText}>{redemption.notes}</Text>}
                 </View>
               ))
             )}
@@ -182,174 +173,175 @@ export const RedemptionOptionsModal: React.FC<RedemptionOptionsModalProps> = ({
 // Styles
 // ============================================================================
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContainer: {
-    backgroundColor: theme.colors.background.primary,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '90%',
-    paddingBottom: theme.spacing.lg,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    padding: theme.spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border.light,
-  },
-  headerContent: {
-    flex: 1,
-  },
-  title: {
-    ...theme.textStyles.h3,
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.xs,
-  },
-  subtitle: {
-    ...theme.textStyles.body,
-    color: theme.colors.text.secondary,
-  },
-  closeButton: {
-    padding: theme.spacing.sm,
-  },
-  closeButtonText: {
-    fontSize: 24,
-    color: theme.colors.text.secondary,
-  },
-  purchaseInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: theme.spacing.lg,
-    backgroundColor: theme.colors.background.secondary,
-    marginHorizontal: theme.spacing.lg,
-    marginTop: theme.spacing.md,
-    borderRadius: 12,
-  },
-  purchaseLabel: {
-    ...theme.textStyles.body,
-    color: theme.colors.text.secondary,
-  },
-  purchaseAmount: {
-    ...theme.textStyles.h3,
-    color: theme.colors.primary.main,
-  },
-  optionsList: {
-    flex: 1,
-    padding: theme.spacing.lg,
-  },
-  sectionTitle: {
-    ...theme.textStyles.h4,
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.md,
-  },
-  optionCard: {
-    backgroundColor: theme.colors.background.secondary,
-    borderRadius: 12,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border.light,
-  },
-  optionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.sm,
-  },
-  optionType: {
-    ...theme.textStyles.h4,
-    color: theme.colors.text.primary,
-    flex: 1,
-  },
-  bestBadge: {
-    backgroundColor: theme.colors.success.main,
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: 6,
-  },
-  bestBadgeText: {
-    ...theme.textStyles.caption,
-    color: theme.colors.background.primary,
-    fontWeight: '700',
-  },
-  valueRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing.sm,
-  },
-  valueItem: {
-    flex: 1,
-  },
-  valueLabel: {
-    ...theme.textStyles.caption,
-    color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.xs,
-  },
-  valueAmount: {
-    ...theme.textStyles.h4,
-    color: theme.colors.text.primary,
-  },
-  cadValue: {
-    color: theme.colors.primary.main,
-  },
-  rateText: {
-    ...theme.textStyles.body,
-    color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.xs,
-  },
-  minimumText: {
-    ...theme.textStyles.caption,
-    color: theme.colors.warning.main,
-    marginBottom: theme.spacing.xs,
-  },
-  notesText: {
-    ...theme.textStyles.caption,
-    color: theme.colors.text.secondary,
-    fontStyle: 'italic',
-  },
-  tipCard: {
-    backgroundColor: theme.colors.info.main + '20',
-    borderRadius: 12,
-    padding: theme.spacing.md,
-    marginTop: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.info.main,
-  },
-  tipTitle: {
-    ...theme.textStyles.h4,
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.xs,
-  },
-  tipText: {
-    ...theme.textStyles.body,
-    color: theme.colors.text.primary,
-  },
-  emptyState: {
-    padding: theme.spacing.xl,
-    alignItems: 'center',
-  },
-  emptyText: {
-    ...theme.textStyles.body,
-    color: theme.colors.text.secondary,
-    textAlign: 'center',
-  },
-  closeButtonBottom: {
-    backgroundColor: theme.colors.primary.main,
-    marginHorizontal: theme.spacing.lg,
-    marginTop: theme.spacing.md,
-    padding: theme.spacing.md,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  closeButtonBottomText: {
-    ...theme.textStyles.button,
-    color: theme.colors.primary.contrast,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalContainer: {
+      backgroundColor: theme.colors.background.primary,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      maxHeight: '90%',
+      paddingBottom: theme.spacing.lg,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      padding: theme.spacing.lg,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.light,
+    },
+    headerContent: {
+      flex: 1,
+    },
+    title: {
+      ...theme.textStyles.h3,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.xs,
+    },
+    subtitle: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.secondary,
+    },
+    closeButton: {
+      padding: theme.spacing.sm,
+    },
+    closeButtonText: {
+      fontSize: 24,
+      color: theme.colors.text.secondary,
+    },
+    purchaseInfo: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: theme.spacing.lg,
+      backgroundColor: theme.colors.background.secondary,
+      marginHorizontal: theme.spacing.lg,
+      marginTop: theme.spacing.md,
+      borderRadius: 12,
+    },
+    purchaseLabel: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.secondary,
+    },
+    purchaseAmount: {
+      ...theme.textStyles.h3,
+      color: theme.colors.primary.main,
+    },
+    optionsList: {
+      flex: 1,
+      padding: theme.spacing.lg,
+    },
+    sectionTitle: {
+      ...theme.textStyles.h4,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.md,
+    },
+    optionCard: {
+      backgroundColor: theme.colors.background.secondary,
+      borderRadius: 12,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      borderWidth: 1,
+      borderColor: theme.colors.border.light,
+    },
+    optionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: theme.spacing.sm,
+    },
+    optionType: {
+      ...theme.textStyles.h4,
+      color: theme.colors.text.primary,
+      flex: 1,
+    },
+    bestBadge: {
+      backgroundColor: theme.colors.success.main,
+      paddingHorizontal: theme.spacing.sm,
+      paddingVertical: theme.spacing.xs,
+      borderRadius: 6,
+    },
+    bestBadgeText: {
+      ...theme.textStyles.caption,
+      color: theme.colors.background.primary,
+      fontWeight: '700',
+    },
+    valueRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: theme.spacing.sm,
+    },
+    valueItem: {
+      flex: 1,
+    },
+    valueLabel: {
+      ...theme.textStyles.caption,
+      color: theme.colors.text.secondary,
+      marginBottom: theme.spacing.xs,
+    },
+    valueAmount: {
+      ...theme.textStyles.h4,
+      color: theme.colors.text.primary,
+    },
+    cadValue: {
+      color: theme.colors.primary.main,
+    },
+    rateText: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.secondary,
+      marginBottom: theme.spacing.xs,
+    },
+    minimumText: {
+      ...theme.textStyles.caption,
+      color: theme.colors.warning.main,
+      marginBottom: theme.spacing.xs,
+    },
+    notesText: {
+      ...theme.textStyles.caption,
+      color: theme.colors.text.secondary,
+      fontStyle: 'italic',
+    },
+    tipCard: {
+      backgroundColor: theme.colors.info.main + '20',
+      borderRadius: 12,
+      padding: theme.spacing.md,
+      marginTop: theme.spacing.md,
+      borderWidth: 1,
+      borderColor: theme.colors.info.main,
+    },
+    tipTitle: {
+      ...theme.textStyles.h4,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.xs,
+    },
+    tipText: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.primary,
+    },
+    emptyState: {
+      padding: theme.spacing.xl,
+      alignItems: 'center',
+    },
+    emptyText: {
+      ...theme.textStyles.body,
+      color: theme.colors.text.secondary,
+      textAlign: 'center',
+    },
+    closeButtonBottom: {
+      backgroundColor: theme.colors.primary.main,
+      marginHorizontal: theme.spacing.lg,
+      marginTop: theme.spacing.md,
+      padding: theme.spacing.md,
+      borderRadius: 12,
+      alignItems: 'center',
+    },
+    closeButtonBottomText: {
+      ...theme.textStyles.button,
+      color: theme.colors.primary.contrast,
+    },
+  });

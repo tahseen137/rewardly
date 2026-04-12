@@ -141,7 +141,7 @@ describe('MerchantPatternService', () => {
       expect(result.merchantName).toBe('Tim Hortons');
     });
 
-    it('should categorize McDonald\'s as DINING', () => {
+    it("should categorize McDonald's as DINING", () => {
       const result = categorizeTransaction('MCDONALDS #12345');
       expect(result.category).toBe(SpendingCategory.DINING);
       expect(result.merchantName).toBe("McDonald's");
@@ -233,28 +233,43 @@ describe('MerchantPatternService', () => {
   describe('User Mappings', () => {
     it('should prioritize user mappings over built-in patterns', async () => {
       await addUserMapping('starbucks', SpendingCategory.ENTERTAINMENT, 'Starbucks', 'user123');
-      
+
       const result = categorizeTransaction('STARBUCKS #12345', getUserMappingsSync());
       expect(result.category).toBe(SpendingCategory.ENTERTAINMENT);
       expect(result.confidence).toBe('high');
     });
 
     it('should add user mappings to cache', async () => {
-      const mapping = await addUserMapping('test.*store', SpendingCategory.GROCERIES, 'Test Store', 'user123');
-      
+      const mapping = await addUserMapping(
+        'test.*store',
+        SpendingCategory.GROCERIES,
+        'Test Store',
+        'user123'
+      );
+
       expect(getUserMappingsSync()).toContainEqual(mapping);
     });
 
     it('should remove user mappings', async () => {
-      const mapping = await addUserMapping('test.*store', SpendingCategory.GROCERIES, 'Test Store', 'user123');
+      const mapping = await addUserMapping(
+        'test.*store',
+        SpendingCategory.GROCERIES,
+        'Test Store',
+        'user123'
+      );
       await removeUserMapping(mapping.id);
-      
+
       expect(getUserMappingsSync()).not.toContainEqual(mapping);
     });
 
     it('should learn from corrections', async () => {
-      await learnFromCorrection('LOCAL BAKERY SHOP', SpendingCategory.DINING, 'Local Bakery', 'user123');
-      
+      await learnFromCorrection(
+        'LOCAL BAKERY SHOP',
+        SpendingCategory.DINING,
+        'Local Bakery',
+        'user123'
+      );
+
       const mappings = getUserMappingsSync();
       expect(mappings.length).toBeGreaterThan(0);
     });
@@ -272,14 +287,10 @@ describe('MerchantPatternService', () => {
 
   describe('categorizeTransactions', () => {
     it('should categorize multiple transactions', () => {
-      const descriptions = [
-        'LOBLAWS #1234',
-        'STARBUCKS #567',
-        'ESSO #890',
-      ];
-      
+      const descriptions = ['LOBLAWS #1234', 'STARBUCKS #567', 'ESSO #890'];
+
       const results = categorizeTransactions(descriptions);
-      
+
       expect(results[0].category).toBe(SpendingCategory.GROCERIES);
       expect(results[1].category).toBe(SpendingCategory.DINING);
       expect(results[2].category).toBe(SpendingCategory.GAS);
@@ -344,7 +355,7 @@ describe('MerchantPatternService', () => {
 
     it('should calculate category totals', () => {
       const stats = getCategoryStats(mockTransactions);
-      
+
       expect(stats[SpendingCategory.GROCERIES].totalAmount).toBe(180);
       expect(stats[SpendingCategory.GROCERIES].count).toBe(2);
       expect(stats[SpendingCategory.DINING].totalAmount).toBe(5);
@@ -353,7 +364,7 @@ describe('MerchantPatternService', () => {
 
     it('should exclude credits from stats', () => {
       const stats = getCategoryStats(mockTransactions);
-      
+
       // Payment is a credit, should not be counted
       expect(stats[SpendingCategory.OTHER].totalAmount).toBe(0);
       expect(stats[SpendingCategory.OTHER].count).toBe(0);
@@ -370,10 +381,8 @@ describe('MerchantPatternService', () => {
     });
 
     it('should cover all spending categories', () => {
-      const categoriesCovered = new Set(
-        EXTENDED_MERCHANT_PATTERNS.map(p => p.category)
-      );
-      
+      const categoriesCovered = new Set(EXTENDED_MERCHANT_PATTERNS.map((p) => p.category));
+
       expect(categoriesCovered.has(SpendingCategory.GROCERIES)).toBe(true);
       expect(categoriesCovered.has(SpendingCategory.DINING)).toBe(true);
       expect(categoriesCovered.has(SpendingCategory.GAS)).toBe(true);
@@ -385,9 +394,9 @@ describe('MerchantPatternService', () => {
     });
 
     it('should have varying confidence levels', () => {
-      const highConfidence = EXTENDED_MERCHANT_PATTERNS.filter(p => p.confidence === 'high');
-      const mediumConfidence = EXTENDED_MERCHANT_PATTERNS.filter(p => p.confidence === 'medium');
-      
+      const highConfidence = EXTENDED_MERCHANT_PATTERNS.filter((p) => p.confidence === 'high');
+      const mediumConfidence = EXTENDED_MERCHANT_PATTERNS.filter((p) => p.confidence === 'medium');
+
       expect(highConfidence.length).toBeGreaterThan(0);
       expect(mediumConfidence.length).toBeGreaterThan(0);
     });

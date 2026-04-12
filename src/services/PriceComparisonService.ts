@@ -7,7 +7,6 @@
 
 import {
   Store,
-  SpendingCategory,
   RewardType,
   RankedCard,
   UserCard,
@@ -20,11 +19,10 @@ import {
   failure,
   RecommendationError,
 } from '../types';
-import { searchProduct, Product } from './ProductService';
+import { searchProduct } from './ProductService';
 import { lookupPrices, StorePrice } from './PriceService';
-import { rankCardsForCategory, getRewardRateForCategory } from './RecommendationEngine';
+import { rankCardsForCategory } from './RecommendationEngine';
 import { getCardByIdSync } from './CardDataService';
-import { getAllStores } from './StoreDataService';
 
 // ============================================================================
 // Reward Value Calculation

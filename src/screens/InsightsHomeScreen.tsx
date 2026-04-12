@@ -1,11 +1,11 @@
 /**
  * InsightsHomeScreen - Dashboard for all analytics features
  * The "holy shit" screen that shows users their full rewards picture
- * 
+ *
  * Note: Requires Pro+ subscription (free users see paywall)
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -52,10 +52,15 @@ import {
 import { getAllCards } from '../services/CardDataService';
 import { CATEGORY_INFO } from '../services/MockTransactionData';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
-import { canAccessFeatureSync, getCurrentTierSync, refreshSubscription, SubscriptionTier } from '../services/SubscriptionService';
+import {
+  canAccessFeatureSync,
+  getCurrentTierSync,
+  refreshSubscription,
+  SubscriptionTier,
+} from '../services/SubscriptionService';
 import { LockedFeature } from '../components';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
 type NavigationProp = NativeStackNavigationProp<InsightsStackParamList>;
 
@@ -81,9 +86,7 @@ function QuickStatCard({ icon, label, value, subtext, color, onPress, delay }: Q
         onPress={onPress}
         activeOpacity={0.7}
       >
-        <View style={[styles.quickStatIcon, { backgroundColor: color + '15' }]}>
-          {icon}
-        </View>
+        <View style={[styles.quickStatIcon, { backgroundColor: color + '15' }]}>{icon}</View>
         <View style={styles.quickStatContent}>
           <Text style={[styles.quickStatValue, { color }]}>{value}</Text>
           <Text style={styles.quickStatLabel}>{label}</Text>
@@ -101,18 +104,18 @@ function QuickStatCard({ icon, label, value, subtext, color, onPress, delay }: Q
 
 export default function InsightsHomeScreen() {
   const navigation = useNavigation<NavigationProp>();
-  
+
   const [rewardsIQ, setRewardsIQ] = useState<RewardsIQScore | null>(null);
   const [missedRewards, setMissedRewards] = useState<MissedRewardsAnalysis | null>(null);
   const [optimization, setOptimization] = useState<PortfolioOptimization | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasAccess, setHasAccess] = useState(true);
-  const [currentTier, setCurrentTier] = useState<SubscriptionTier>('free');
-  
+  const [_currentTier, setCurrentTier] = useState<SubscriptionTier>('free');
+
   const scoreScale = useSharedValue(0);
   const pulseScale = useSharedValue(1);
-  
+
   // Check subscription access on focus
   useFocusEffect(
     useCallback(() => {
@@ -125,31 +128,28 @@ export default function InsightsHomeScreen() {
       checkAccess();
     }, [])
   );
-  
+
   const loadData = useCallback(async () => {
     try {
       // Ensure cards are loaded first before calculating insights
       await getAllCards();
-      
+
       const [iq, missed, opt] = await Promise.all([
         calculateRewardsIQ(),
         analyzeMissedRewards(),
         getPortfolioOptimization(),
       ]);
-      
+
       setRewardsIQ(iq);
       setMissedRewards(missed);
       setOptimization(opt);
-      
+
       // Animate score appearance
       scoreScale.value = withSpring(1, { damping: 12, stiffness: 100 });
-      
+
       // Subtle pulse
       pulseScale.value = withRepeat(
-        withSequence(
-          withTiming(1.02, { duration: 2000 }),
-          withTiming(1, { duration: 2000 })
-        ),
+        withSequence(withTiming(1.02, { duration: 2000 }), withTiming(1, { duration: 2000 })),
         -1,
         true
       );
@@ -160,31 +160,37 @@ export default function InsightsHomeScreen() {
       setIsRefreshing(false);
     }
   }, []);
-  
+
   useEffect(() => {
     loadData();
   }, [loadData]);
-  
+
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
     loadData();
   }, [loadData]);
-  
-  const scoreStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scoreScale.value }],
-    opacity: scoreScale.value,
-  } as any));
 
-  const pulseStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseScale.value }],
-  } as any));
-  
+  const scoreStyle = useAnimatedStyle(
+    () =>
+      ({
+        transform: [{ scale: scoreScale.value }],
+        opacity: scoreScale.value,
+      }) as any
+  );
+
+  const pulseStyle = useAnimatedStyle(
+    () =>
+      ({
+        transform: [{ scale: pulseScale.value }],
+      }) as any
+  );
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return colors.primary.main;
     if (score >= 60) return colors.warning.main;
     return colors.error.main;
   };
-  
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -195,7 +201,7 @@ export default function InsightsHomeScreen() {
       </View>
     );
   }
-  
+
   // Show paywall for free users
   if (!hasAccess) {
     return (
@@ -212,7 +218,7 @@ export default function InsightsHomeScreen() {
       />
     );
   }
-  
+
   return (
     <ScrollView
       style={styles.container}
@@ -226,48 +232,45 @@ export default function InsightsHomeScreen() {
       }
     >
       {/* Header */}
-      <Animated.View 
-        entering={FadeInDown.duration(400)}
-        style={styles.header}
-      >
+      <Animated.View entering={FadeInDown.duration(400)} style={styles.header}>
         <Text style={styles.headerTitle}>Your Rewards Insights</Text>
         <Text style={styles.headerSubtitle}>
           See the full picture of your optimization potential
         </Text>
       </Animated.View>
-      
+
       {/* Hero: Rewards IQ Score */}
       {rewardsIQ && (
         <Animated.View style={[pulseStyle]}>
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => navigation.navigate('RewardsIQ')}
-          >
-            <Animated.View 
-              entering={FadeInDown.delay(100).duration(500)}
-              style={scoreStyle}
-            >
+          <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate('RewardsIQ')}>
+            <Animated.View entering={FadeInDown.delay(100).duration(500)} style={scoreStyle}>
               <LinearGradient
-                colors={[colors.background.secondary, colors.background.tertiary] as [string, string]}
+                colors={
+                  [colors.background.secondary, colors.background.tertiary] as [string, string]
+                }
                 style={styles.heroCard}
               >
                 {/* Score Circle */}
                 <View style={styles.heroScoreSection}>
-                  <View style={[
-                    styles.scoreCircle,
-                    { borderColor: getScoreColor(rewardsIQ.overallScore) }
-                  ]}>
+                  <View
+                    style={[
+                      styles.scoreCircle,
+                      { borderColor: getScoreColor(rewardsIQ.overallScore) },
+                    ]}
+                  >
                     <LinearGradient
-                      colors={[
-                        getScoreColor(rewardsIQ.overallScore),
-                        getScoreColor(rewardsIQ.overallScore) + 'CC'
-                      ] as [string, string]}
+                      colors={
+                        [
+                          getScoreColor(rewardsIQ.overallScore),
+                          getScoreColor(rewardsIQ.overallScore) + 'CC',
+                        ] as [string, string]
+                      }
                       style={styles.scoreGradient}
                     >
                       <Text style={styles.scoreNumber}>{rewardsIQ.overallScore}</Text>
                     </LinearGradient>
                   </View>
-                  
+
                   <View style={styles.heroInfo}>
                     <View style={styles.heroTitleRow}>
                       <Target size={18} color={colors.primary.main} />
@@ -283,19 +286,25 @@ export default function InsightsHomeScreen() {
                         ) : (
                           <TrendingDown size={14} color={colors.error.main} />
                         )}
-                        <Text style={[
-                          styles.trendText,
-                          { color: rewardsIQ.trend === 'up' ? colors.primary.main : colors.error.main }
-                        ]}>
-                          {rewardsIQ.trend === 'up' ? '+' : ''}{rewardsIQ.trendAmount} from last time
+                        <Text
+                          style={[
+                            styles.trendText,
+                            {
+                              color:
+                                rewardsIQ.trend === 'up' ? colors.primary.main : colors.error.main,
+                            },
+                          ]}
+                        >
+                          {rewardsIQ.trend === 'up' ? '+' : ''}
+                          {rewardsIQ.trendAmount} from last time
                         </Text>
                       </View>
                     )}
                   </View>
-                  
+
                   <ChevronRight size={24} color={colors.text.tertiary} />
                 </View>
-                
+
                 {/* Component Scores */}
                 <View style={styles.componentScores}>
                   <View style={styles.componentItem}>
@@ -304,15 +313,19 @@ export default function InsightsHomeScreen() {
                   </View>
                   <View style={styles.componentDivider} />
                   <View style={styles.componentItem}>
-                    <Text style={styles.componentValue}>{rewardsIQ.portfolioOptimizationScore}</Text>
+                    <Text style={styles.componentValue}>
+                      {rewardsIQ.portfolioOptimizationScore}
+                    </Text>
                     <Text style={styles.componentLabel}>Portfolio</Text>
                   </View>
                   <View style={styles.componentDivider} />
                   <View style={styles.componentItem}>
-                    <Text style={[
-                      styles.componentValue,
-                      rewardsIQ.autoPilotScore === 0 && styles.componentValueOff
-                    ]}>
+                    <Text
+                      style={[
+                        styles.componentValue,
+                        rewardsIQ.autoPilotScore === 0 && styles.componentValueOff,
+                      ]}
+                    >
                       {rewardsIQ.autoPilotScore > 0 ? rewardsIQ.autoPilotScore : 'Off'}
                     </Text>
                     <Text style={styles.componentLabel}>Smart Wallet</Text>
@@ -323,11 +336,11 @@ export default function InsightsHomeScreen() {
           </TouchableOpacity>
         </Animated.View>
       )}
-      
+
       {/* Quick Stats Grid */}
       <View style={styles.quickStatsSection}>
         <Text style={styles.sectionTitle}>Your Numbers</Text>
-        
+
         {/* Missed Rewards - The Hook */}
         {missedRewards && missedRewards.totalMissed > 0 && (
           <QuickStatCard
@@ -340,7 +353,7 @@ export default function InsightsHomeScreen() {
             delay={200}
           />
         )}
-        
+
         {/* Portfolio Optimization */}
         {optimization && optimization.annualGain > 0 && (
           <QuickStatCard
@@ -353,7 +366,7 @@ export default function InsightsHomeScreen() {
             delay={300}
           />
         )}
-        
+
         {/* Current Portfolio Value */}
         {optimization && (
           <QuickStatCard
@@ -367,17 +380,17 @@ export default function InsightsHomeScreen() {
           />
         )}
       </View>
-      
+
       {/* Top Categories Section */}
       {missedRewards && missedRewards.byCategory.length > 0 && (
-        <Animated.View 
+        <Animated.View
           entering={FadeInUp.delay(500).duration(400)}
           style={styles.categoriesSection}
         >
           <Text style={styles.sectionTitle}>Where You're Missing Out</Text>
-          
+
           <View style={styles.categoriesList}>
-            {missedRewards.byCategory.slice(0, 4).map((cat, index) => {
+            {missedRewards.byCategory.slice(0, 4).map((cat, _index) => {
               const info = CATEGORY_INFO[cat.category];
               return (
                 <TouchableOpacity
@@ -391,18 +404,14 @@ export default function InsightsHomeScreen() {
                   </View>
                   <View style={styles.categoryInfo}>
                     <Text style={styles.categoryLabel}>{info.label}</Text>
-                    <Text style={styles.categorySpend}>
-                      ${cat.totalSpend.toFixed(0)} spent
-                    </Text>
+                    <Text style={styles.categorySpend}>${cat.totalSpend.toFixed(0)} spent</Text>
                   </View>
-                  <Text style={styles.categoryMissed}>
-                    -${cat.totalMissed.toFixed(2)}
-                  </Text>
+                  <Text style={styles.categoryMissed}>-${cat.totalMissed.toFixed(2)}</Text>
                 </TouchableOpacity>
               );
             })}
           </View>
-          
+
           <TouchableOpacity
             style={styles.seeAllButton}
             onPress={() => navigation.navigate('MissedRewards')}
@@ -412,14 +421,11 @@ export default function InsightsHomeScreen() {
           </TouchableOpacity>
         </Animated.View>
       )}
-      
+
       {/* Action Cards */}
-      <Animated.View 
-        entering={FadeInUp.delay(600).duration(400)}
-        style={styles.actionsSection}
-      >
+      <Animated.View entering={FadeInUp.delay(600).duration(400)} style={styles.actionsSection}>
         <Text style={styles.sectionTitle}>Quick Actions</Text>
-        
+
         <View style={styles.actionsList}>
           <TouchableOpacity
             style={styles.actionCard}
@@ -435,7 +441,7 @@ export default function InsightsHomeScreen() {
               <Text style={styles.actionDesc}>Get tips to boost your Rewards IQ</Text>
             </LinearGradient>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={styles.actionCard}
             onPress={() => navigation.navigate('PortfolioOptimizer')}
@@ -451,7 +457,7 @@ export default function InsightsHomeScreen() {
             </LinearGradient>
           </TouchableOpacity>
         </View>
-        
+
         <TouchableOpacity
           style={styles.actionCardFull}
           onPress={() => navigation.navigate('SpendingInsights')}
@@ -469,7 +475,7 @@ export default function InsightsHomeScreen() {
             <ChevronRight size={20} color={colors.text.tertiary} />
           </LinearGradient>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={styles.actionCardFull}
           onPress={() => navigation.navigate('CardTracker')}
@@ -488,7 +494,7 @@ export default function InsightsHomeScreen() {
           </LinearGradient>
         </TouchableOpacity>
       </Animated.View>
-      
+
       {/* Bottom padding */}
       <View style={{ height: 100 }} />
     </ScrollView>
@@ -527,7 +533,7 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     fontSize: 16,
   },
-  
+
   // Header
   header: {
     alignItems: 'center',
@@ -544,7 +550,7 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     textAlign: 'center',
   },
-  
+
   // Hero Card
   heroCard: {
     borderRadius: borderRadius.xl,
@@ -635,7 +641,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: colors.text.tertiary,
   },
-  
+
   // Quick Stats
   quickStatsSection: {
     marginBottom: 24,
@@ -680,7 +686,7 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     marginTop: 2,
   },
-  
+
   // Categories
   categoriesSection: {
     marginBottom: 24,
@@ -739,7 +745,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.primary.main,
   },
-  
+
   // Actions
   actionsSection: {
     marginBottom: 24,

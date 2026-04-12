@@ -23,11 +23,7 @@ import {
   getRankDefinitions,
   initializeAchievements,
 } from '../services/AchievementService';
-import {
-  UserAchievements,
-  AchievementDefinition,
-  AchievementCategory,
-} from '../types';
+import { UserAchievements, AchievementCategory } from '../types';
 
 type FilterType = 'all' | AchievementCategory;
 
@@ -61,12 +57,12 @@ export default function AchievementsScreen() {
 
   const currentRank = useMemo(() => {
     if (!achievements) return ranks[0];
-    return ranks.find(r => r.rank === achievements.rank) || ranks[0];
+    return ranks.find((r) => r.rank === achievements.rank) || ranks[0];
   }, [achievements, ranks]);
 
   const filteredAchievements = useMemo(() => {
     if (filter === 'all') return allDefinitions;
-    return allDefinitions.filter(a => a.category === filter);
+    return allDefinitions.filter((a) => a.category === filter);
   }, [allDefinitions, filter]);
 
   const categoryStats = useMemo(() => {
@@ -78,7 +74,7 @@ export default function AchievementsScreen() {
       mastery: { earned: 0, total: 0 },
     };
 
-    allDefinitions.forEach(def => {
+    allDefinitions.forEach((def) => {
       stats[def.category].total++;
       if (achievements?.achievements[def.id]?.isUnlocked) {
         stats[def.category].earned++;
@@ -144,30 +140,26 @@ export default function AchievementsScreen() {
             <Text style={styles.rankProgress}>
               {achievements.totalUnlocked} / {achievements.totalAchievements} Achievements
             </Text>
-            
+
             {/* Progress bar */}
             <View style={styles.progressBarContainer}>
-              <View 
+              <View
                 style={[
                   styles.progressBarFill,
-                  { 
-                    width: `${(achievements.totalUnlocked / achievements.totalAchievements) * 100}%` 
-                  }
-                ]} 
+                  {
+                    width: `${(achievements.totalUnlocked / achievements.totalAchievements) * 100}%`,
+                  },
+                ]}
               />
             </View>
-            
+
             {/* Streak display */}
             {achievements.currentStreak > 0 && (
               <View style={styles.streakContainer}>
                 <Text style={styles.streakEmoji}>🔥</Text>
-                <Text style={styles.streakText}>
-                  {achievements.currentStreak} day streak
-                </Text>
+                <Text style={styles.streakText}>{achievements.currentStreak} day streak</Text>
                 {achievements.longestStreak > achievements.currentStreak && (
-                  <Text style={styles.longestStreak}>
-                    (Best: {achievements.longestStreak})
-                  </Text>
+                  <Text style={styles.longestStreak}>(Best: {achievements.longestStreak})</Text>
                 )}
               </View>
             )}
@@ -175,8 +167,8 @@ export default function AchievementsScreen() {
         </View>
 
         {/* Category Filters */}
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filterContainer}
         >
@@ -193,8 +185,11 @@ export default function AchievementsScreen() {
             style={[styles.filterButton, filter === 'getting_started' && styles.filterButtonActive]}
             onPress={() => setFilter('getting_started')}
           >
-            <Text style={[styles.filterText, filter === 'getting_started' && styles.filterTextActive]}>
-              Getting Started ({categoryStats.getting_started.earned}/{categoryStats.getting_started.total})
+            <Text
+              style={[styles.filterText, filter === 'getting_started' && styles.filterTextActive]}
+            >
+              Getting Started ({categoryStats.getting_started.earned}/
+              {categoryStats.getting_started.total})
             </Text>
           </TouchableOpacity>
 
@@ -211,7 +206,9 @@ export default function AchievementsScreen() {
             style={[styles.filterButton, filter === 'data_insights' && styles.filterButtonActive]}
             onPress={() => setFilter('data_insights')}
           >
-            <Text style={[styles.filterText, filter === 'data_insights' && styles.filterTextActive]}>
+            <Text
+              style={[styles.filterText, filter === 'data_insights' && styles.filterTextActive]}
+            >
               Insights ({categoryStats.data_insights.earned}/{categoryStats.data_insights.total})
             </Text>
           </TouchableOpacity>
@@ -237,7 +234,7 @@ export default function AchievementsScreen() {
 
         {/* Achievement Grid */}
         <View style={styles.achievementGrid}>
-          {filteredAchievements.map(definition => {
+          {filteredAchievements.map((definition) => {
             const progress = achievements.achievements[definition.id];
             const isUnlocked = progress?.isUnlocked || false;
             const percentComplete = progress?.percentComplete || 0;
@@ -246,40 +243,28 @@ export default function AchievementsScreen() {
             return (
               <View
                 key={definition.id}
-                style={[
-                  styles.achievementCard,
-                  !isUnlocked && styles.achievementCardLocked,
-                ]}
+                style={[styles.achievementCard, !isUnlocked && styles.achievementCardLocked]}
               >
                 <View style={styles.achievementIconContainer}>
-                  <Text style={[
-                    styles.achievementIcon,
-                    !isUnlocked && styles.achievementIconLocked,
-                  ]}>
+                  <Text
+                    style={[styles.achievementIcon, !isUnlocked && styles.achievementIconLocked]}
+                  >
                     {definition.icon}
                   </Text>
                 </View>
-                
-                <Text style={[
-                  styles.achievementName,
-                  !isUnlocked && styles.achievementNameLocked,
-                ]}>
+
+                <Text style={[styles.achievementName, !isUnlocked && styles.achievementNameLocked]}>
                   {definition.name}
                 </Text>
-                
-                <Text style={styles.achievementDescription}>
-                  {definition.description}
-                </Text>
+
+                <Text style={styles.achievementDescription}>{definition.description}</Text>
 
                 {/* Progress bar for progressive achievements */}
                 {hasProgress && (
                   <View style={styles.achievementProgressContainer}>
                     <View style={styles.achievementProgressBar}>
                       <View
-                        style={[
-                          styles.achievementProgressFill,
-                          { width: `${percentComplete}%` },
-                        ]}
+                        style={[styles.achievementProgressFill, { width: `${percentComplete}%` }]}
                       />
                     </View>
                     <Text style={styles.achievementProgressText}>
@@ -303,7 +288,7 @@ export default function AchievementsScreen() {
   );
 }
 
-const createStyles = (theme: Theme) =>
+const createStyles = (_theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,

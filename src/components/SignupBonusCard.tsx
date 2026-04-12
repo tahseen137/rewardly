@@ -48,7 +48,12 @@ export function SignupBonusCard({ result }: SignupBonusCardProps) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Signup Bonus Analysis</Text>
-        <View style={[styles.verdictBadge, { backgroundColor: verdictColor + '20', borderColor: verdictColor }]}>
+        <View
+          style={[
+            styles.verdictBadge,
+            { backgroundColor: verdictColor + '20', borderColor: verdictColor },
+          ]}
+        >
           <VerdictIcon size={16} color={verdictColor} />
           <Text style={[styles.verdictText, { color: verdictColor }]}>
             {verdict.replace(/_/g, ' ').toUpperCase()}
@@ -75,10 +80,7 @@ export function SignupBonusCard({ result }: SignupBonusCardProps) {
         </View>
         <View style={styles.spendRow}>
           <Text style={styles.spendLabel}>Your Monthly Spend</Text>
-          <Text style={[
-            styles.spendValue,
-            canHitMinimum ? styles.positive : styles.negative
-          ]}>
+          <Text style={[styles.spendValue, canHitMinimum ? styles.positive : styles.negative]}>
             ${userMonthlySpend.toFixed(0)}
           </Text>
         </View>
@@ -100,9 +102,7 @@ export function SignupBonusCard({ result }: SignupBonusCardProps) {
                   styles.timelineSegment,
                   {
                     flex: 1,
-                    backgroundColor: entry.hitTarget
-                      ? colors.success.main
-                      : colors.border.light,
+                    backgroundColor: entry.hitTarget ? colors.success.main : colors.border.light,
                   },
                 ]}
               >
@@ -116,20 +116,21 @@ export function SignupBonusCard({ result }: SignupBonusCardProps) {
       <View style={styles.values}>
         <View style={styles.valueCard}>
           <Text style={styles.valueLabel}>Year 1 Total Value</Text>
-          <Text style={[
-            styles.valueAmount,
-            firstYearValue >= 0 ? styles.positive : styles.negative
-          ]}>
+          <Text
+            style={[styles.valueAmount, firstYearValue >= 0 ? styles.positive : styles.negative]}
+          >
             {firstYearValue >= 0 ? '+' : ''}${firstYearValue.toFixed(0)}
           </Text>
           <Text style={styles.valueSubtext}>Bonus + Rewards - Fee</Text>
         </View>
         <View style={styles.valueCard}>
           <Text style={styles.valueLabel}>Year 2+ Value</Text>
-          <Text style={[
-            styles.valueAmount,
-            ongoingAnnualValue >= 0 ? styles.positive : styles.negative
-          ]}>
+          <Text
+            style={[
+              styles.valueAmount,
+              ongoingAnnualValue >= 0 ? styles.positive : styles.negative,
+            ]}
+          >
             {ongoingAnnualValue >= 0 ? '+' : ''}${ongoingAnnualValue.toFixed(0)}
           </Text>
           <Text style={styles.valueSubtext}>Rewards - Fee</Text>

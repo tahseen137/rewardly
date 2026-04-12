@@ -14,7 +14,12 @@ import { RewardType } from '../../../types';
 /**
  * Generate a valid reward amount (positive number)
  */
-const rewardAmountArb = fc.double({ min: 0.01, max: 1000000, noNaN: true, noDefaultInfinity: true });
+const rewardAmountArb = fc.double({
+  min: 0.01,
+  max: 1000000,
+  noNaN: true,
+  noDefaultInfinity: true,
+});
 
 /**
  * Generate a RewardType enum value
@@ -29,10 +34,7 @@ const rewardTypeArb = fc.constantFrom(
 /**
  * Generate a valid annual fee (0 or positive)
  */
-const annualFeeArb = fc.oneof(
-  fc.constant(0),
-  fc.integer({ min: 1, max: 10000 })
-);
+const annualFeeArb = fc.oneof(fc.constant(0), fc.integer({ min: 1, max: 10000 }));
 
 // ============================================================================
 // Property Tests
@@ -57,7 +59,7 @@ describe('rewardFormatUtils - Property Tests', () => {
 
           // Should end with the reward type label
           const expectedLabels = ['Cash Back', 'Points', 'Miles', 'Hotel Points'];
-          const endsWithLabel = expectedLabels.some(label => formatted.endsWith(label));
+          const endsWithLabel = expectedLabels.some((label) => formatted.endsWith(label));
           expect(endsWithLabel).toBe(true);
         }),
         { numRuns: 100 }
@@ -136,7 +138,7 @@ describe('rewardFormatUtils - Property Tests', () => {
         RewardType.HOTEL_POINTS,
       ];
 
-      rewardTypes.forEach(rewardType => {
+      rewardTypes.forEach((rewardType) => {
         const formatted = formatRewardEarned(0, rewardType);
 
         // Should format zero appropriately
@@ -157,7 +159,7 @@ describe('rewardFormatUtils - Property Tests', () => {
 
             // Should contain the reward type label
             const expectedLabels = ['Cash Back', 'Points', 'Miles', 'Hotel Points'];
-            const endsWithLabel = expectedLabels.some(label => formatted.endsWith(label));
+            const endsWithLabel = expectedLabels.some((label) => formatted.endsWith(label));
             expect(endsWithLabel).toBe(true);
           }
         ),
@@ -204,19 +206,16 @@ describe('rewardFormatUtils - Property Tests', () => {
      */
     it('should format non-zero annual fees with correct pattern', () => {
       fc.assert(
-        fc.property(
-          fc.integer({ min: 1, max: 10000 }),
-          (fee: number) => {
-            const formatted = formatAnnualFee(fee);
+        fc.property(fc.integer({ min: 1, max: 10000 }), (fee: number) => {
+          const formatted = formatAnnualFee(fee);
 
-            // Should match the pattern "Annual fee: $X"
-            expect(formatted).toMatch(/^Annual fee: \$\d+$/);
+          // Should match the pattern "Annual fee: $X"
+          expect(formatted).toMatch(/^Annual fee: \$\d+$/);
 
-            // Extract the numeric part and verify it matches
-            const numericPart = formatted.replace('Annual fee: $', '');
-            expect(parseInt(numericPart, 10)).toBe(fee);
-          }
-        ),
+          // Extract the numeric part and verify it matches
+          const numericPart = formatted.replace('Annual fee: $', '');
+          expect(parseInt(numericPart, 10)).toBe(fee);
+        }),
         { numRuns: 100 }
       );
     });
@@ -249,7 +248,7 @@ describe('rewardFormatUtils - Property Tests', () => {
     it('should format common annual fee amounts correctly', () => {
       const commonFees = [0, 50, 95, 120, 150, 399, 499, 599];
 
-      commonFees.forEach(fee => {
+      commonFees.forEach((fee) => {
         const formatted = formatAnnualFee(fee);
 
         if (fee === 0) {
@@ -274,32 +273,26 @@ describe('rewardFormatUtils - Property Tests', () => {
 
     it('should handle very large annual fees', () => {
       fc.assert(
-        fc.property(
-          fc.integer({ min: 1000, max: 100000 }),
-          (fee: number) => {
-            const formatted = formatAnnualFee(fee);
+        fc.property(fc.integer({ min: 1000, max: 100000 }), (fee: number) => {
+          const formatted = formatAnnualFee(fee);
 
-            expect(formatted).toMatch(/^Annual fee: \$\d+$/);
-            expect(formatted).toBe(`Annual fee: $${fee}`);
-          }
-        ),
+          expect(formatted).toMatch(/^Annual fee: \$\d+$/);
+          expect(formatted).toBe(`Annual fee: $${fee}`);
+        }),
         { numRuns: 100 }
       );
     });
 
     it('should differentiate between zero and non-zero fees', () => {
       fc.assert(
-        fc.property(
-          fc.integer({ min: 1, max: 10000 }),
-          (fee: number) => {
-            const zeroFormatted = formatAnnualFee(0);
-            const nonZeroFormatted = formatAnnualFee(fee);
+        fc.property(fc.integer({ min: 1, max: 10000 }), (fee: number) => {
+          const zeroFormatted = formatAnnualFee(0);
+          const nonZeroFormatted = formatAnnualFee(fee);
 
-            expect(zeroFormatted).not.toBe(nonZeroFormatted);
-            expect(zeroFormatted).toBe('No annual fee');
-            expect(nonZeroFormatted).toContain('Annual fee:');
-          }
-        ),
+          expect(zeroFormatted).not.toBe(nonZeroFormatted);
+          expect(zeroFormatted).toBe('No annual fee');
+          expect(nonZeroFormatted).toContain('Annual fee:');
+        }),
         { numRuns: 100 }
       );
     });

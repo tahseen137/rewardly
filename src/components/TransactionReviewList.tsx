@@ -1,6 +1,6 @@
 /**
  * TransactionReviewList - Scrollable transaction list with category editing
- * 
+ *
  * Features:
  * - Display all parsed transactions
  * - Color-coded category pills
@@ -51,7 +51,10 @@ const CATEGORY_COLORS: Record<SpendingCategory, string> = {
   [SpendingCategory.OTHER]: '#6b7280',
 };
 
-export function TransactionReviewList({ transactions, onCategoryUpdate }: TransactionReviewListProps) {
+export function TransactionReviewList({
+  transactions,
+  onCategoryUpdate,
+}: TransactionReviewListProps) {
   const [selectedTransaction, setSelectedTransaction] = useState<ParsedTransaction | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -71,9 +74,8 @@ export function TransactionReviewList({ transactions, onCategoryUpdate }: Transa
   const renderTransaction = ({ item }: { item: ParsedTransaction }) => {
     const categoryColor = CATEGORY_COLORS[item.category];
     const categoryLabel = CATEGORY_LABELS[item.category];
-    const confidenceEmoji = 
-      item.categoryConfidence === 'high' ? '✓' :
-      item.categoryConfidence === 'medium' ? '~' : '?';
+    const confidenceEmoji =
+      item.categoryConfidence === 'high' ? '✓' : item.categoryConfidence === 'medium' ? '~' : '?';
 
     return (
       <View style={styles.transactionCard}>
@@ -83,16 +85,14 @@ export function TransactionReviewList({ transactions, onCategoryUpdate }: Transa
             {item.isCredit ? '+' : ''}${item.amount.toFixed(2)}
           </Text>
         </View>
-        
+
         <Text style={styles.description} numberOfLines={1}>
           {item.description}
         </Text>
-        
+
         <View style={styles.transactionFooter}>
-          <Text style={styles.date}>
-            {item.date.toLocaleDateString()}
-          </Text>
-          
+          <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
+
           <TouchableOpacity
             style={[styles.categoryPill, { backgroundColor: categoryColor + '20' }]}
             onPress={() => handleCategoryPress(item)}
@@ -104,7 +104,7 @@ export function TransactionReviewList({ transactions, onCategoryUpdate }: Transa
             <Edit2 size={14} color={categoryColor} />
           </TouchableOpacity>
         </View>
-        
+
         {item.userCorrected && (
           <View style={styles.correctedBadge}>
             <Text style={styles.correctedText}>User corrected</Text>
@@ -139,7 +139,7 @@ export function TransactionReviewList({ transactions, onCategoryUpdate }: Transa
           <View style={styles.modalContent}>
             <View style={styles.modalHandle} />
             <Text style={styles.modalTitle}>Select Category</Text>
-            
+
             <ScrollView style={styles.categoryList}>
               {Object.values(SpendingCategory).map((category) => (
                 <TouchableOpacity
@@ -152,14 +152,9 @@ export function TransactionReviewList({ transactions, onCategoryUpdate }: Transa
                   activeOpacity={0.7}
                 >
                   <View
-                    style={[
-                      styles.categoryDot,
-                      { backgroundColor: CATEGORY_COLORS[category] },
-                    ]}
+                    style={[styles.categoryDot, { backgroundColor: CATEGORY_COLORS[category] }]}
                   />
-                  <Text style={styles.categoryOptionText}>
-                    {CATEGORY_LABELS[category]}
-                  </Text>
+                  <Text style={styles.categoryOptionText}>{CATEGORY_LABELS[category]}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>

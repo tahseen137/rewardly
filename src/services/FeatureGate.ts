@@ -3,7 +3,12 @@
  * Controls access to features based on subscription tier
  */
 
-import { SubscriptionTier, getCurrentTierSync, canUseSage, incrementSageUsage } from './SubscriptionService';
+import {
+  SubscriptionTier,
+  getCurrentTierSync,
+  canUseSage,
+  incrementSageUsage,
+} from './SubscriptionService';
 
 // ============================================================================
 // Types
@@ -155,14 +160,14 @@ const TIER_HIERARCHY: Record<SubscriptionTier, number> = {
 export function isFeatureEnabled(feature: Feature, userTier?: SubscriptionTier): boolean {
   const tier = userTier ?? getCurrentTierSync();
   const config = FEATURE_CONFIGS[feature];
-  
+
   if (!config) {
     return false;
   }
-  
+
   const userTierLevel = TIER_HIERARCHY[tier];
   const requiredTierLevel = TIER_HIERARCHY[config.requiredTier];
-  
+
   return userTierLevel >= requiredTierLevel;
 }
 
@@ -173,7 +178,7 @@ export function isFeatureEnabled(feature: Feature, userTier?: SubscriptionTier):
 export async function checkFeatureAccess(feature: Feature): Promise<FeatureCheckResult> {
   const tier = getCurrentTierSync();
   const config = FEATURE_CONFIGS[feature];
-  
+
   if (!config) {
     return {
       enabled: false,
@@ -181,11 +186,11 @@ export async function checkFeatureAccess(feature: Feature): Promise<FeatureCheck
       showPaywall: false,
     };
   }
-  
+
   // Check tier access
   const userTierLevel = TIER_HIERARCHY[tier];
   const requiredTierLevel = TIER_HIERARCHY[config.requiredTier];
-  
+
   if (userTierLevel < requiredTierLevel) {
     return {
       enabled: false,
@@ -194,7 +199,7 @@ export async function checkFeatureAccess(feature: Feature): Promise<FeatureCheck
       showPaywall: true,
     };
   }
-  
+
   // Check usage limits for applicable features
   if (config.hasUsageLimit) {
     const limitFeature = mapFeatureToUsageType(feature);
@@ -209,7 +214,7 @@ export async function checkFeatureAccess(feature: Feature): Promise<FeatureCheck
       }
     }
   }
-  
+
   return {
     enabled: true,
     showPaywall: false,
@@ -263,11 +268,14 @@ export function getFeaturesForTier(tier: SubscriptionTier): Feature[] {
 /**
  * Get features that would be unlocked by upgrading to a tier
  */
-export function getNewFeaturesForTier(currentTier: SubscriptionTier, targetTier: SubscriptionTier): Feature[] {
+export function getNewFeaturesForTier(
+  currentTier: SubscriptionTier,
+  targetTier: SubscriptionTier
+): Feature[] {
   const currentFeatures = new Set(getFeaturesForTier(currentTier));
   const targetFeatures = getFeaturesForTier(targetTier);
-  
-  return targetFeatures.filter(feature => !currentFeatures.has(feature));
+
+  return targetFeatures.filter((feature) => !currentFeatures.has(feature));
 }
 
 /**
@@ -279,15 +287,15 @@ export async function withFeatureGate<T>(
   action: () => Promise<T>
 ): Promise<T | null> {
   const access = await checkFeatureAccess(feature);
-  
+
   if (!access.enabled) {
     // Paywall should be shown by the calling UI component
     return null;
   }
-  
+
   // Track usage
   await trackFeatureUsage(feature);
-  
+
   return action();
 }
 
@@ -317,7 +325,7 @@ export function getUpgradeMessage(feature: Feature): string {
     lifetime: 'Lifetime',
     admin: 'Admin',
   };
-  
+
   return `Upgrade to ${tierNames[config.requiredTier]} to unlock ${config.name}`;
 }
 
@@ -326,10 +334,10 @@ export function getUpgradeMessage(feature: Feature): string {
  */
 export function checkMultipleFeatures(features: Feature[]): Record<Feature, boolean> {
   const result: Partial<Record<Feature, boolean>> = {};
-  
+
   for (const feature of features) {
     result[feature] = isFeatureEnabled(feature);
   }
-  
+
   return result as Record<Feature, boolean>;
 }

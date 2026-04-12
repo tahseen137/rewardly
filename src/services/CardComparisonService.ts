@@ -1,6 +1,6 @@
 /**
  * CardComparisonService - Side-by-side card comparison
- * 
+ *
  * Tier: Free (2 cards), Pro+ (3 cards)
  * Compares cards across all spending categories, fees, bonuses, benefits
  */
@@ -50,9 +50,7 @@ export function getMaxCardsForTier(tier?: SubscriptionTier): number {
  * Compare multiple cards side-by-side
  */
 export function compareCards(cardIds: string[]): ComparisonResult {
-  const cards = cardIds
-    .map(id => getCardByIdSync(id))
-    .filter(Boolean) as Card[];
+  const cards = cardIds.map((id) => getCardByIdSync(id)).filter(Boolean) as Card[];
 
   if (cards.length === 0) {
     return {
@@ -63,11 +61,11 @@ export function compareCards(cardIds: string[]): ComparisonResult {
     };
   }
 
-  const categoryComparisons = COMPARISON_CATEGORIES.map(category => 
+  const categoryComparisons = COMPARISON_CATEGORIES.map((category) =>
     compareCategory(cards, category)
   );
 
-  const overallScores = cards.map(card => ({
+  const overallScores = cards.map((card) => ({
     cardId: card.id,
     score: calculateOverallScore(card),
   }));
@@ -87,11 +85,8 @@ export function compareCards(cardIds: string[]): ComparisonResult {
 /**
  * Compare cards for a specific category
  */
-function compareCategory(
-  cards: Card[],
-  category: SpendingCategory | string
-): CategoryComparison {
-  const values = cards.map(card => {
+function compareCategory(cards: Card[], category: SpendingCategory | string): CategoryComparison {
+  const values = cards.map((card) => {
     let value: number | string;
 
     if (category === 'annual_fee') {
@@ -116,16 +111,16 @@ function compareCategory(
   // Determine winner(s)
   if (category === 'annual_fee') {
     // Lower is better for fees
-    const minFee = Math.min(...values.map(v => typeof v.value === 'number' ? v.value : 0));
-    values.forEach(v => {
+    const minFee = Math.min(...values.map((v) => (typeof v.value === 'number' ? v.value : 0)));
+    values.forEach((v) => {
       if (typeof v.value === 'number' && v.value === minFee) {
         v.isWinner = true;
       }
     });
   } else {
     // Higher is better for rewards, bonuses, benefits
-    const maxValue = Math.max(...values.map(v => typeof v.value === 'number' ? v.value : 0));
-    values.forEach(v => {
+    const maxValue = Math.max(...values.map((v) => (typeof v.value === 'number' ? v.value : 0)));
+    values.forEach((v) => {
       if (typeof v.value === 'number' && v.value === maxValue && maxValue > 0) {
         v.isWinner = true;
       }
@@ -149,9 +144,10 @@ export function calculateOverallScore(card: Card): number {
   score += Math.min(baseRate * 4, 20);
 
   // Category bonuses (0-40 points)
-  const avgCategoryReward = card.categoryRewards.reduce((sum, cr) => {
-    return sum + cr.rewardRate.value;
-  }, 0) / (card.categoryRewards.length || 1);
+  const avgCategoryReward =
+    card.categoryRewards.reduce((sum, cr) => {
+      return sum + cr.rewardRate.value;
+    }, 0) / (card.categoryRewards.length || 1);
   score += Math.min(avgCategoryReward * 5, 40);
 
   // Signup bonus (0-20 points)
@@ -219,9 +215,9 @@ export function getCategoryDisplayName(category: SpendingCategory | string): str
     [SpendingCategory.DRUGSTORES]: 'Pharmacy',
     [SpendingCategory.HOME_IMPROVEMENT]: 'Home Improvement',
     [SpendingCategory.OTHER]: 'Everything Else',
-    'annual_fee': 'Annual Fee',
-    'signup_bonus': 'Sign-Up Bonus',
-    'benefits_count': 'Benefits',
+    annual_fee: 'Annual Fee',
+    signup_bonus: 'Sign-Up Bonus',
+    benefits_count: 'Benefits',
   };
 
   return names[category] || category;

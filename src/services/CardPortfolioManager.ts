@@ -8,7 +8,7 @@ import { UserCard, Result, PortfolioError, success, failure } from '../types';
 import { getCardByIdSync } from './CardDataService';
 import { canAddCardSync, getCardLimitSync } from './SubscriptionService';
 import { supabase, isSupabaseConfigured } from './supabase';
-import { getCurrentUser, isGuestUser, onAuthStateChange, type AuthUser } from './AuthService';
+import { getCurrentUser, isGuestUser, onAuthStateChange } from './AuthService';
 
 const PORTFOLIO_STORAGE_KEY = '@rewards_optimizer/card_portfolio';
 
@@ -102,7 +102,9 @@ async function loadFromSupabase(userId: string): Promise<UserCard[] | null> {
         cardId: row.card_key,
         addedAt: new Date(row.added_at),
         pointBalance: notesData.pointBalance,
-        balanceUpdatedAt: notesData.balanceUpdatedAt ? new Date(notesData.balanceUpdatedAt) : undefined,
+        balanceUpdatedAt: notesData.balanceUpdatedAt
+          ? new Date(notesData.balanceUpdatedAt)
+          : undefined,
         nickname: row.nickname ?? undefined,
       };
     });
@@ -120,19 +122,21 @@ async function loadFromAsyncStorage(): Promise<UserCard[]> {
     const stored = await AsyncStorage.getItem(PORTFOLIO_STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      return parsed.map((item: { 
-        cardId: string; 
-        addedAt: string;
-        pointBalance?: number;
-        balanceUpdatedAt?: string;
-        nickname?: string;
-      }) => ({
-        cardId: item.cardId,
-        addedAt: new Date(item.addedAt),
-        pointBalance: item.pointBalance,
-        balanceUpdatedAt: item.balanceUpdatedAt ? new Date(item.balanceUpdatedAt) : undefined,
-        nickname: item.nickname,
-      }));
+      return parsed.map(
+        (item: {
+          cardId: string;
+          addedAt: string;
+          pointBalance?: number;
+          balanceUpdatedAt?: string;
+          nickname?: string;
+        }) => ({
+          cardId: item.cardId,
+          addedAt: new Date(item.addedAt),
+          pointBalance: item.pointBalance,
+          balanceUpdatedAt: item.balanceUpdatedAt ? new Date(item.balanceUpdatedAt) : undefined,
+          nickname: item.nickname,
+        })
+      );
     }
   } catch {
     // Ignore errors
@@ -163,11 +167,9 @@ async function saveCardToSupabase(userId: string, card: UserCard): Promise<boole
       added_at: card.addedAt.toISOString(),
     };
 
-    const { error } = await supabase
-      .from('user_cards')
-      .upsert(insertData as never, {
-        onConflict: 'user_id,card_key',
-      });
+    const { error } = await supabase.from('user_cards').upsert(insertData as never, {
+      onConflict: 'user_id,card_key',
+    });
 
     if (error) {
       console.error('Failed to save card to Supabase:', error);
@@ -222,7 +224,7 @@ async function mergeLocalCardsToSupabase(userId: string): Promise<void> {
     return; // Supabase unavailable, skip merge
   }
 
-  const existingCardKeys = new Set(supabaseCards.map(c => c.cardId));
+  const existingCardKeys = new Set(supabaseCards.map((c) => c.cardId));
 
   // Only add cards that don't already exist in Supabase
   for (const localCard of localCards) {
@@ -248,7 +250,7 @@ function setupAuthListener(): void {
     if (event === 'SIGNED_IN' && user && !isGuestUser(user)) {
       // User just signed in - merge any local cards and reload from Supabase
       await mergeLocalCardsToSupabase(user.id);
-      
+
       // Reload portfolio from Supabase
       const supabaseCards = await loadFromSupabase(user.id);
       if (supabaseCards !== null) {
@@ -346,8 +348,8 @@ export async function addCard(cardId: string): Promise<Result<UserCard, Portfoli
   const currentCount = portfolioCache!.length;
   if (!canAddCardSync(currentCount)) {
     const limit = getCardLimitSync();
-    return failure({ 
-      type: 'LIMIT_REACHED', 
+    return failure({
+      type: 'LIMIT_REACHED',
       message: `You can only have ${limit} card${limit !== 1 ? 's' : ''} on the Free plan. Upgrade to Pro for unlimited cards.`,
       limit,
     });
@@ -368,7 +370,7 @@ export async function addCard(cardId: string): Promise<Result<UserCard, Portfoli
     // before onboarding completes
     await saveCardToSupabase(userId, userCard);
   }
-  
+
   // Always persist to AsyncStorage as backup
   await persistPortfolio();
 
@@ -437,10 +439,7 @@ export async function clearPortfolio(): Promise<void> {
   const { authenticated, userId } = await isUserAuthenticated();
   if (authenticated && userId && isSupabaseConfigured() && supabase) {
     try {
-      await supabase
-        .from('user_cards')
-        .delete()
-        .eq('user_id', userId);
+      await supabase.from('user_cards').delete().eq('user_id', userId);
     } catch (err) {
       console.error('Failed to clear portfolio from Supabase:', err);
     }
@@ -464,7 +463,7 @@ export function resetCache(): void {
  * @returns Result with the updated UserCard or a PortfolioError
  */
 export async function updatePointBalance(
-  cardId: string, 
+  cardId: string,
   pointBalance: number | undefined
 ): Promise<Result<UserCard, PortfolioError>> {
   if (portfolioCache === null) {
@@ -542,10 +541,11 @@ export function getPortfolioTotalValue(valuations: Map<string, number>): number 
       const card = getCardByIdSync(userCard.cardId);
       if (card) {
         // Get valuation from map or use card's default
-        const centsPerPoint = valuations.get(card.rewardProgram) 
-          ?? card.pointValuation 
-          ?? card.programDetails?.optimalRateCents
-          ?? 1;
+        const centsPerPoint =
+          valuations.get(card.rewardProgram) ??
+          card.pointValuation ??
+          card.programDetails?.optimalRateCents ??
+          1;
         total += userCard.pointBalance * (centsPerPoint / 100);
       }
     }

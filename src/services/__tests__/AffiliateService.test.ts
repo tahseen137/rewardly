@@ -1,6 +1,6 @@
 /**
  * AffiliateService - Unit Tests
- * 
+ *
  * Tests URL resolution, UTM parameters, issuer mapping, and click tracking.
  */
 
@@ -68,7 +68,10 @@ const mockCard: Card = {
   rewardProgram: 'Aeroplan',
   baseRewardRate: { value: 1, type: RewardType.POINTS, unit: 'multiplier' },
   categoryRewards: [
-    { category: SpendingCategory.GROCERIES, rewardRate: { value: 1.5, type: RewardType.POINTS, unit: 'multiplier' } },
+    {
+      category: SpendingCategory.GROCERIES,
+      rewardRate: { value: 1.5, type: RewardType.POINTS, unit: 'multiplier' },
+    },
   ],
   annualFee: 139,
 };
@@ -102,7 +105,7 @@ describe('AffiliateService - UTM Parameters', () => {
   describe('generateUTMParams', () => {
     it('should generate correct UTM parameters', () => {
       const params = generateUTMParams('card-123');
-      
+
       expect(params.utm_source).toBe('rewardly');
       expect(params.utm_medium).toBe('app');
       expect(params.utm_campaign).toBe('card_apply');
@@ -111,7 +114,7 @@ describe('AffiliateService - UTM Parameters', () => {
 
     it('should handle special characters in card ID', () => {
       const params = generateUTMParams('td-aeroplan-visa-infinite');
-      
+
       expect(params.utm_content).toBe('td-aeroplan-visa-infinite');
     });
   });
@@ -119,7 +122,7 @@ describe('AffiliateService - UTM Parameters', () => {
   describe('appendUTMParams', () => {
     it('should append UTM parameters with ? for clean URLs', () => {
       const url = appendUTMParams('https://example.com/apply', 'card-1');
-      
+
       expect(url).toContain('?');
       expect(url).toContain('utm_source=rewardly');
       expect(url).toContain('utm_medium=app');
@@ -129,14 +132,14 @@ describe('AffiliateService - UTM Parameters', () => {
 
     it('should append UTM parameters with & for URLs with existing params', () => {
       const url = appendUTMParams('https://example.com/apply?ref=123', 'card-1');
-      
+
       expect(url).toContain('&utm_source=rewardly');
       expect(url).not.toContain('?utm_source');
     });
 
     it('should URL-encode the card ID', () => {
       const url = appendUTMParams('https://example.com', 'card with spaces');
-      
+
       expect(url).toContain('utm_content=card%20with%20spaces');
     });
   });
@@ -150,9 +153,18 @@ describe('AffiliateService - Issuer URL Mapping', () => {
   describe('ISSUER_APPLICATION_URLS', () => {
     it('should have URLs for all major Canadian issuers', () => {
       const requiredIssuers = [
-        'TD', 'RBC', 'Scotiabank', 'CIBC', 'American Express',
-        'BMO', 'Capital One', 'MBNA', 'National Bank', 'Desjardins',
-        'HSBC', 'Tangerine',
+        'TD',
+        'RBC',
+        'Scotiabank',
+        'CIBC',
+        'American Express',
+        'BMO',
+        'Capital One',
+        'MBNA',
+        'National Bank',
+        'Desjardins',
+        'HSBC',
+        'Tangerine',
       ];
 
       for (const issuer of requiredIssuers) {
@@ -162,7 +174,7 @@ describe('AffiliateService - Issuer URL Mapping', () => {
     });
 
     it('should have valid URLs (https)', () => {
-      for (const [issuer, url] of Object.entries(ISSUER_APPLICATION_URLS)) {
+      for (const [_issuer, url] of Object.entries(ISSUER_APPLICATION_URLS)) {
         expect(url).toMatch(/^https:\/\//);
       }
     });
@@ -171,35 +183,35 @@ describe('AffiliateService - Issuer URL Mapping', () => {
   describe('getIssuerApplicationUrl', () => {
     it('should return URL for exact issuer match', () => {
       const url = getIssuerApplicationUrl('TD');
-      
+
       expect(url).toBeTruthy();
       expect(url).toContain('td.com');
     });
 
     it('should handle case-insensitive matching', () => {
       const url = getIssuerApplicationUrl('td');
-      
+
       expect(url).toBeTruthy();
       expect(url).toContain('td.com');
     });
 
     it('should handle partial matching', () => {
       const url = getIssuerApplicationUrl('TD Canada Trust');
-      
+
       expect(url).toBeTruthy();
       expect(url).toContain('td.com');
     });
 
     it('should return null for unknown issuer', () => {
       const url = getIssuerApplicationUrl('Unknown Bank XYZ');
-      
+
       expect(url).toBeNull();
     });
 
     it('should find Amex by alias', () => {
       const url1 = getIssuerApplicationUrl('Amex');
       const url2 = getIssuerApplicationUrl('American Express');
-      
+
       expect(url1).toBeTruthy();
       expect(url2).toBeTruthy();
     });
@@ -214,7 +226,7 @@ describe('AffiliateService - Application URL Resolution', () => {
   describe('getApplicationUrl', () => {
     it('should use affiliateUrl when available (highest priority)', () => {
       const url = getApplicationUrl(mockCardWithUrls as any);
-      
+
       expect(url).toContain('affiliate.example.com');
       expect(url).toContain('utm_source=rewardly');
     });
@@ -222,28 +234,28 @@ describe('AffiliateService - Application URL Resolution', () => {
     it('should use applicationUrl when no affiliateUrl', () => {
       const cardWithAppUrl = { ...mockCard, applicationUrl: 'https://example.com/apply/specific' };
       const url = getApplicationUrl(cardWithAppUrl as any);
-      
+
       expect(url).toContain('example.com/apply/specific');
       expect(url).toContain('utm_source=rewardly');
     });
 
     it('should use issuer URL when no card-specific URLs', () => {
       const url = getApplicationUrl(mockCard);
-      
+
       expect(url).toContain('td.com');
       expect(url).toContain('utm_source=rewardly');
     });
 
     it('should fall back to Google search for unknown issuers', () => {
       const url = getApplicationUrl(mockUnknownIssuerCard);
-      
+
       expect(url).toContain('google.com/search');
       expect(url).toContain(encodeURIComponent(mockUnknownIssuerCard.name));
     });
 
     it('should always include UTM parameters (except Google fallback)', () => {
       const url = getApplicationUrl(mockCard);
-      
+
       expect(url).toContain('utm_source=rewardly');
       expect(url).toContain('utm_medium=app');
       expect(url).toContain('utm_campaign=card_apply');
@@ -264,9 +276,9 @@ describe('AffiliateService - Click Tracking', () => {
       mockSupabase.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: { id: 'user-1' } },
       });
-      
+
       await trackAffiliateClick(mockCard, 'CardBenefits', 'pro');
-      
+
       expect(mockSupabase.from).toHaveBeenCalledWith('affiliate_clicks');
       expect(mockInsert).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -286,9 +298,9 @@ describe('AffiliateService - Click Tracking', () => {
       mockSupabase.auth.getUser = jest.fn().mockResolvedValue({
         data: { user: null },
       });
-      
+
       await trackAffiliateClick(mockCard, 'Home', 'free');
-      
+
       expect(mockInsert).toHaveBeenCalledWith(
         expect.objectContaining({
           user_id: null,
@@ -300,7 +312,7 @@ describe('AffiliateService - Click Tracking', () => {
       mockSupabase.from = jest.fn().mockReturnValue({
         insert: jest.fn().mockRejectedValue(new Error('Network error')),
       });
-      
+
       // Should not throw
       await expect(trackAffiliateClick(mockCard, 'Home', 'free')).resolves.not.toThrow();
     });
@@ -309,7 +321,7 @@ describe('AffiliateService - Click Tracking', () => {
   describe('handleApplyNow', () => {
     it('should open the URL in external browser', async () => {
       await handleApplyNow(mockCard, 'CardBenefits', 'pro');
-      
+
       expect(mockLinking.openURL).toHaveBeenCalled();
       const calledUrl = (mockLinking.openURL as jest.Mock).mock.calls[0][0];
       expect(calledUrl).toContain('td.com');
@@ -318,15 +330,15 @@ describe('AffiliateService - Click Tracking', () => {
     it('should track the click', async () => {
       const mockInsert = jest.fn().mockResolvedValue({ data: null, error: null });
       mockSupabase.from = jest.fn().mockReturnValue({ insert: mockInsert });
-      
+
       await handleApplyNow(mockCard, 'Comparison', 'max');
-      
+
       expect(mockSupabase.from).toHaveBeenCalledWith('affiliate_clicks');
     });
 
     it('should handle Linking failure gracefully', async () => {
       mockLinking.openURL = jest.fn().mockRejectedValue(new Error('Cannot open URL'));
-      
+
       // Should not throw
       await expect(handleApplyNow(mockCard, 'Home', 'free')).resolves.not.toThrow();
     });
@@ -350,7 +362,7 @@ describe('AffiliateService - Edge Cases', () => {
 
   it('should handle all major Canadian issuers', () => {
     const issuers = ['TD', 'RBC', 'Scotiabank', 'CIBC', 'BMO', 'Amex', 'Capital One'];
-    
+
     for (const issuer of issuers) {
       const card: Card = { ...mockCard, issuer };
       const url = getApplicationUrl(card);

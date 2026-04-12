@@ -1,6 +1,6 @@
 /**
  * ChatInput - Message input component for chat UI
- * 
+ *
  * Features a text input with send button and optional voice input.
  * Handles multi-line input and keyboard management.
  */
@@ -11,16 +11,11 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Keyboard,
   Platform,
   KeyboardAvoidingView,
   ViewStyle,
 } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  withSpring,
-  useSharedValue,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withSpring, useSharedValue } from 'react-native-reanimated';
 import { Send, Sparkles } from 'lucide-react-native';
 import { useTheme } from '../../theme';
 import { colors } from '../../theme/colors';
@@ -46,61 +41,61 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   isLoading = false,
   maxLength = 2000,
 }) => {
-  const theme = useTheme();
+  const _theme = useTheme();
   const inputRef = useRef<TextInput>(null);
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [inputHeight, setInputHeight] = useState(44);
-  
+
   const sendScale = useSharedValue(1);
-  
+
   const canSend = message.trim().length > 0 && !disabled && !isLoading;
-  
+
   const handleSend = useCallback(() => {
     if (!canSend) return;
-    
+
     const trimmedMessage = message.trim();
     setMessage('');
     setInputHeight(44);
-    
+
     // Animate send button
     sendScale.value = withSpring(0.8, { damping: 15 }, () => {
       sendScale.value = withSpring(1, { damping: 15 });
     });
-    
+
     onSend(trimmedMessage);
-    
+
     // Keep keyboard open for quick follow-up
     // Keyboard.dismiss();
   }, [canSend, message, onSend, sendScale]);
-  
+
   const handleFocus = useCallback(() => {
     setIsFocused(true);
     onFocus?.();
   }, [onFocus]);
-  
+
   const handleBlur = useCallback(() => {
     setIsFocused(false);
     onBlur?.();
   }, [onBlur]);
-  
+
   const handleContentSizeChange = useCallback((event: any) => {
     const height = event.nativeEvent.contentSize.height;
     // Clamp between min and max height
     const newHeight = Math.min(Math.max(44, height), 120);
     setInputHeight(newHeight);
   }, []);
-  
+
   const sendButtonStyle = useAnimatedStyle(() => ({
     transform: [{ scale: sendScale.value }],
   }));
-  
+
   const containerStyle: ViewStyle = {
     ...styles.container,
     borderColor: isFocused ? colors.primary.main : colors.border.light,
     backgroundColor: colors.background.secondary,
   };
-  
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -110,18 +105,15 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         <View style={containerStyle}>
           {/* Sparkle icon */}
           <View style={styles.iconContainer}>
-            <Sparkles
-              size={18}
-              color={isFocused ? colors.primary.main : colors.text.tertiary}
-            />
+            <Sparkles size={18} color={isFocused ? colors.primary.main : colors.text.tertiary} />
           </View>
-          
+
           {/* Text input */}
           <TextInput
             ref={inputRef}
             style={[
               styles.input,
-              { height: Math.max(inputHeight, 44), color: colors.text.primary }
+              { height: Math.max(inputHeight, 44), color: colors.text.primary },
             ]}
             value={message}
             onChangeText={setMessage}
@@ -139,7 +131,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             accessibilityLabel="Message input"
             accessibilityHint="Type your message to Sage"
           />
-          
+
           {/* Send button */}
           <AnimatedTouchable
             style={[
@@ -148,7 +140,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               {
                 backgroundColor: canSend ? colors.primary.main : colors.background.tertiary,
                 opacity: canSend ? 1 : 0.5,
-              }
+              },
             ]}
             onPress={handleSend}
             disabled={!canSend}
@@ -156,13 +148,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             accessibilityRole="button"
             accessibilityState={{ disabled: !canSend }}
           >
-            <Send
-              size={18}
-              color={canSend ? colors.text.inverse : colors.text.tertiary}
-            />
+            <Send size={18} color={canSend ? colors.text.inverse : colors.text.tertiary} />
           </AnimatedTouchable>
         </View>
-        
+
         {/* Character count when near limit */}
         {message.length > maxLength * 0.8 && (
           <Animated.Text style={styles.charCount}>

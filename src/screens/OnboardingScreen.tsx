@@ -3,7 +3,7 @@
  * Step 1: Select your country (🇺🇸 / 🇨🇦)
  * Step 2: Add your credit cards
  * Step 3: Meet Sage, your AI assistant
- * 
+ *
  * Feb 27, 2026: Implemented onboarding fixes from ONBOARDING_AUDIT.md
  * - Added back button (P0)
  * - Added Popular/All/Search tabs for cards (P0)
@@ -18,20 +18,23 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  FlatList,
   ScrollView,
   Alert,
   TextInput,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, {
-  useAnimatedStyle,
-  withSpring,
-  useSharedValue,
-  interpolate,
-} from 'react-native-reanimated';
-import { CreditCard, MessageCircle, MapPin, ChevronRight, ChevronLeft, Check, Search, Sparkles } from 'lucide-react-native';
+import { withSpring, useSharedValue } from 'react-native-reanimated';
+import {
+  CreditCard,
+  MessageCircle,
+  MapPin,
+  ChevronRight,
+  ChevronLeft,
+  Check,
+  Search,
+  Sparkles,
+} from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -51,7 +54,7 @@ interface OnboardingScreenProps {
   onComplete: () => void;
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 const TOTAL_STEPS = 3;
 
 // Popular Canadian cards (most common rewards cards)
@@ -86,7 +89,7 @@ type CardViewMode = 'popular' | 'all' | 'search';
 
 export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const { t } = useTranslation();
-  
+
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedCountry, setSelectedCountry] = useState<Country>(getCountry());
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
@@ -94,7 +97,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [cardViewMode, setCardViewMode] = useState<CardViewMode>('popular');
-  
+
   const animatedStep = useSharedValue(0);
 
   // Load cards when country changes
@@ -103,7 +106,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       try {
         const cards = await getAllCards();
         setAvailableCards(cards);
-      } catch (err) {
+      } catch {
         setAvailableCards([]);
       }
     };
@@ -121,17 +124,18 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
 
     // Apply view mode filter
     if (cardViewMode === 'popular') {
-      cards = cards.filter(card => 
-        popularCardIds.some(popId => 
-          card.id.toLowerCase().includes(popId.toLowerCase()) ||
-          card.name.toLowerCase().includes(popId.toLowerCase())
+      cards = cards.filter((card) =>
+        popularCardIds.some(
+          (popId) =>
+            card.id.toLowerCase().includes(popId.toLowerCase()) ||
+            card.name.toLowerCase().includes(popId.toLowerCase())
         )
       );
     } else if (cardViewMode === 'search' || searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      cards = cards.filter(card => 
-        card.name.toLowerCase().includes(query) ||
-        card.issuer.toLowerCase().includes(query)
+      cards = cards.filter(
+        (card) =>
+          card.name.toLowerCase().includes(query) || card.issuer.toLowerCase().includes(query)
       );
     }
 
@@ -148,7 +152,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
   // Load existing portfolio
   useEffect(() => {
     const existingCards = getCards();
-    setSelectedCards(existingCards.map(c => c.cardId));
+    setSelectedCards(existingCards.map((c) => c.cardId));
   }, []);
 
   // Animate step changes
@@ -163,20 +167,20 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     setSelectedCountry(country);
     await setCountry(country);
     await onCountryChange();
-    
+
     // Reload cards for new country
     try {
       const cards = await getAllCards();
       setAvailableCards(cards);
-    } catch (err) {
+    } catch {
       setAvailableCards([]);
     }
   }, []);
 
   const handleCardToggle = useCallback((cardId: string) => {
-    setSelectedCards(prev => {
+    setSelectedCards((prev) => {
       if (prev.includes(cardId)) {
-        return prev.filter(id => id !== cardId);
+        return prev.filter((id) => id !== cardId);
       }
       return [...prev, cardId];
     });
@@ -194,8 +198,8 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       // Save selected cards
       setIsLoading(true);
       try {
-        const existingCards = getCards().map(c => c.cardId);
-        
+        const existingCards = getCards().map((c) => c.cardId);
+
         // Add new cards
         for (const cardId of selectedCards) {
           if (!existingCards.includes(cardId)) {
@@ -221,24 +225,20 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
   const handleSkip = useCallback(() => {
     if (currentStep === 1 && selectedCards.length === 0) {
       // Show confirmation dialog on card step if no cards selected
-      Alert.alert(
-        t('onboarding.skipCardTitle'),
-        t('onboarding.skipCardMessage'),
-        [
-          { 
-            text: t('onboarding.skipCardAddNow'), 
-            style: 'cancel' 
+      Alert.alert(t('onboarding.skipCardTitle'), t('onboarding.skipCardMessage'), [
+        {
+          text: t('onboarding.skipCardAddNow'),
+          style: 'cancel',
+        },
+        {
+          text: t('onboarding.skipCardConfirm'),
+          onPress: async () => {
+            await setOnboardingComplete(true);
+            onComplete();
           },
-          { 
-            text: t('onboarding.skipCardConfirm'), 
-            onPress: async () => {
-              await setOnboardingComplete(true);
-              onComplete();
-            },
-            style: 'destructive' 
-          }
-        ]
-      );
+          style: 'destructive',
+        },
+      ]);
     } else {
       // Skip without confirmation on other steps
       setOnboardingComplete(true).then(onComplete);
@@ -264,9 +264,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
   const renderValueCallout = (messageKey: string) => (
     <View style={styles.valueCallout}>
       <Sparkles size={16} color={colors.primary.main} />
-      <Text style={styles.valueCalloutText}>
-        {t(messageKey)}
-      </Text>
+      <Text style={styles.valueCalloutText}>{t(messageKey)}</Text>
     </View>
   );
 
@@ -282,7 +280,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       {renderValueCallout('onboarding.countryValue')}
 
       <View style={styles.countryOptions}>
-        {(['US', 'CA'] as Country[]).map(country => (
+        {(['US', 'CA'] as Country[]).map((country) => (
           <TouchableOpacity
             key={country}
             style={[
@@ -293,10 +291,12 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
             activeOpacity={0.7}
           >
             <Text style={styles.countryFlag}>{getCountryFlag(country)}</Text>
-            <Text style={[
-              styles.countryName,
-              selectedCountry === country && styles.countryNameSelected,
-            ]}>
+            <Text
+              style={[
+                styles.countryName,
+                selectedCountry === country && styles.countryNameSelected,
+              ]}
+            >
               {getCountryName(country)}
             </Text>
             {selectedCountry === country && (
@@ -322,9 +322,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       {renderValueCallout('onboarding.cardsValue')}
 
       {/* P1: Guidance text */}
-      <Text style={styles.cardGuidance}>
-        {t('onboarding.cardsGuidance')}
-      </Text>
+      <Text style={styles.cardGuidance}>{t('onboarding.cardsGuidance')}</Text>
 
       {/* P0: Card View Mode Tabs */}
       <View style={styles.cardTabs}>
@@ -335,14 +333,13 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
             setSearchQuery('');
           }}
         >
-          <Text style={[
-            styles.cardTabText,
-            cardViewMode === 'popular' && styles.cardTabTextActive
-          ]}>
+          <Text
+            style={[styles.cardTabText, cardViewMode === 'popular' && styles.cardTabTextActive]}
+          >
             {t('onboarding.popularTab')}
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[styles.cardTab, cardViewMode === 'all' && styles.cardTabActive]}
           onPress={() => {
@@ -350,22 +347,16 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
             setSearchQuery('');
           }}
         >
-          <Text style={[
-            styles.cardTabText,
-            cardViewMode === 'all' && styles.cardTabTextActive
-          ]}>
+          <Text style={[styles.cardTabText, cardViewMode === 'all' && styles.cardTabTextActive]}>
             {t('onboarding.allTab')}
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[styles.cardTab, cardViewMode === 'search' && styles.cardTabActive]}
           onPress={() => setCardViewMode('search')}
         >
-          <Text style={[
-            styles.cardTabText,
-            cardViewMode === 'search' && styles.cardTabTextActive
-          ]}>
+          <Text style={[styles.cardTabText, cardViewMode === 'search' && styles.cardTabTextActive]}>
             {t('onboarding.searchTab')}
           </Text>
         </TouchableOpacity>
@@ -389,11 +380,11 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       )}
 
       {/* Result Count */}
-      {(cardViewMode === 'search' && searchQuery.trim()) && (
+      {cardViewMode === 'search' && searchQuery.trim() && (
         <Text style={styles.resultCount}>
-          {t('onboarding.showingCards', { 
-            count: displayedCards.length, 
-            total: availableCards.length 
+          {t('onboarding.showingCards', {
+            count: displayedCards.length,
+            total: availableCards.length,
           })}
         </Text>
       )}
@@ -404,13 +395,13 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
           <Text style={styles.selectedCardsTitle}>
             {t('onboarding.selectedCards', { count: selectedCards.length })}
           </Text>
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.selectedCardsList}
           >
-            {selectedCards.map(cardId => {
-              const card = availableCards.find(c => c.id === cardId);
+            {selectedCards.map((cardId) => {
+              const card = availableCards.find((c) => c.id === cardId);
               if (!card) return null;
               return (
                 <TouchableOpacity
@@ -432,7 +423,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
         </View>
       )}
 
-      <ScrollView 
+      <ScrollView
         style={styles.cardList}
         contentContainerStyle={styles.cardListContent}
         showsVerticalScrollIndicator={false}
@@ -444,14 +435,13 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
         ) : displayedCards.length === 0 ? (
           <View style={styles.emptyCards}>
             <Text style={styles.emptyCardsText}>
-              {cardViewMode === 'search' 
+              {cardViewMode === 'search'
                 ? t('onboarding.noCardsFound')
-                : t('onboarding.noPopularCards')
-              }
+                : t('onboarding.noPopularCards')}
             </Text>
           </View>
         ) : (
-          displayedCards.map(card => (
+          displayedCards.map((card) => (
             <TouchableOpacity
               key={card.id}
               style={[
@@ -462,13 +452,17 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
               activeOpacity={0.7}
             >
               <View style={styles.cardInfo}>
-                <Text style={styles.cardName} numberOfLines={1}>{card.name}</Text>
+                <Text style={styles.cardName} numberOfLines={1}>
+                  {card.name}
+                </Text>
                 <Text style={styles.cardIssuer}>{card.issuer}</Text>
               </View>
-              <View style={[
-                styles.cardCheckbox,
-                selectedCards.includes(card.id) && styles.cardCheckboxSelected,
-              ]}>
+              <View
+                style={[
+                  styles.cardCheckbox,
+                  selectedCards.includes(card.id) && styles.cardCheckboxSelected,
+                ]}
+              >
                 {selectedCards.includes(card.id) && (
                   <Check size={16} color={colors.background.primary} />
                 )}
@@ -555,19 +549,13 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
         ) : (
           <View style={styles.backButton} />
         )}
-        
+
         {renderProgressDots()}
-        
+
         {/* P1: Make skip less prominent on card step */}
         <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-          <Text style={[
-            styles.skipText,
-            currentStep === 1 && styles.skipTextSubtle
-          ]}>
-            {currentStep === 1 
-              ? t('onboarding.skipLater') 
-              : t('onboarding.skip')
-            }
+          <Text style={[styles.skipText, currentStep === 1 && styles.skipTextSubtle]}>
+            {currentStep === 1 ? t('onboarding.skipLater') : t('onboarding.skip')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -577,11 +565,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
 
       {/* Footer with CTA */}
       <View style={styles.footer}>
-        <TouchableOpacity
-          onPress={handleNext}
-          disabled={isLoading}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity onPress={handleNext} disabled={isLoading} activeOpacity={0.8}>
           <LinearGradient
             colors={[colors.primary.main, colors.primary.dark]}
             start={{ x: 0, y: 0 }}

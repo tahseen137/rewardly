@@ -35,24 +35,24 @@ describe('AppNavigator - Navigation Structure', () => {
       // The fix should either:
       // 1. Make "Sage" tab show HomeScreen instead of SageScreen
       // 2. Add a separate "Home" route that shows HomeScreen
-      
+
       // This test documents the current broken state
       // After fix, verify Home tab shows HomeScreen, not SageScreen
-      
+
       expect(true).toBe(true); // Placeholder - will be replaced with actual component test
     });
 
     it('should not show SageScreen on Home tab', () => {
       // This is the core bug: Home tab shows Sage sign-in wall
       // instead of the rewards calculator (HomeScreen)
-      
+
       // Expected behavior after fix:
       // - Home tab -> HomeScreen (calculator with CategoryGrid)
       // - Sage can be a separate tab OR accessible from Home
-      
+
       // This test will fail until the bug is fixed
       // After fix: verify Home tab renders HomeScreen component
-      
+
       expect(true).toBe(true); // Placeholder
     });
   });
@@ -65,10 +65,10 @@ describe('AppNavigator - Navigation Structure', () => {
       // Navigation configuration should have:
       // - unmountOnBlur: true (unmount inactive tabs)
       // - lazy: true (don't pre-render tabs)
-      
+
       // This prevents the bug where both Sage and MyCards
       // render simultaneously on mobile viewport
-      
+
       // After fix, verify tab navigator has these options
       expect(true).toBe(true); // Placeholder
     });
@@ -76,7 +76,7 @@ describe('AppNavigator - Navigation Structure', () => {
     it('should only render one tab screen at a time', () => {
       // When user switches tabs, only the active tab's screen should be in DOM
       // Inactive tabs should be unmounted or hidden
-      
+
       // This catches the mobile viewport overlap bug
       expect(true).toBe(true); // Placeholder
     });

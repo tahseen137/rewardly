@@ -1,6 +1,6 @@
 /**
  * AffiliateService - Manages affiliate/application URLs and click tracking
- * 
+ *
  * Provides issuer-level application URL mapping, UTM parameter generation,
  * and Supabase-backed click analytics for monetization.
  */
@@ -18,25 +18,25 @@ import { supabase, isSupabaseConfigured } from './supabase';
  * Used as fallback when a card doesn't have a specific applicationUrl.
  */
 export const ISSUER_APPLICATION_URLS: Record<string, string> = {
-  'TD': 'https://www.td.com/ca/en/personal-banking/products/credit-cards/',
-  'RBC': 'https://www.rbcroyalbank.com/credit-cards/',
-  'Scotiabank': 'https://www.scotiabank.com/ca/en/personal/credit-cards/',
-  'CIBC': 'https://www.cibc.com/en/personal-banking/credit-cards.html',
+  TD: 'https://www.td.com/ca/en/personal-banking/products/credit-cards/',
+  RBC: 'https://www.rbcroyalbank.com/credit-cards/',
+  Scotiabank: 'https://www.scotiabank.com/ca/en/personal/credit-cards/',
+  CIBC: 'https://www.cibc.com/en/personal-banking/credit-cards.html',
   'American Express': 'https://www.americanexpress.com/ca/credit-cards/',
-  'Amex': 'https://www.americanexpress.com/ca/credit-cards/',
-  'BMO': 'https://www.bmo.com/main/personal/credit-cards/',
+  Amex: 'https://www.americanexpress.com/ca/credit-cards/',
+  BMO: 'https://www.bmo.com/main/personal/credit-cards/',
   'Capital One': 'https://www.capitalone.ca/credit-cards/',
-  'MBNA': 'https://www.mbna.ca/credit-cards/',
+  MBNA: 'https://www.mbna.ca/credit-cards/',
   'National Bank': 'https://www.nbc.ca/en/personal/credit-cards/',
-  'Desjardins': 'https://www.desjardins.com/ca/personal/loans-credit/credit-cards/',
-  'HSBC': 'https://www.hsbc.ca/credit-cards/',
-  'Tangerine': 'https://www.tangerine.ca/en/products/spending/creditcard',
+  Desjardins: 'https://www.desjardins.com/ca/personal/loans-credit/credit-cards/',
+  HSBC: 'https://www.hsbc.ca/credit-cards/',
+  Tangerine: 'https://www.tangerine.ca/en/products/spending/creditcard',
   'PC Financial': 'https://www.pcfinancial.ca/en/credit-cards/',
-  'Simplii': 'https://www.simplii.com/en/credit-cards.html',
+  Simplii: 'https://www.simplii.com/en/credit-cards.html',
   'Neo Financial': 'https://www.neofinancial.com/credit',
-  'Rogers': 'https://www.rogers.com/plans/credit-cards',
-  'Triangle': 'https://www.triangle.com/credit-cards/',
-  'Brim': 'https://bfrfinancial.com/credit-cards/',
+  Rogers: 'https://www.rogers.com/plans/credit-cards',
+  Triangle: 'https://www.triangle.com/credit-cards/',
+  Brim: 'https://bfrfinancial.com/credit-cards/',
 };
 
 // ============================================================================
@@ -87,7 +87,7 @@ export function appendUTMParams(baseUrl: string, cardId: string): string {
  * 2. Card-specific applicationUrl (direct bank link for this specific card)
  * 3. Issuer-level application page (generic issuer URL)
  * 4. Google search fallback
- * 
+ *
  * All URLs are tagged with UTM parameters.
  */
 export function getApplicationUrl(card: Card): string {
@@ -167,13 +167,15 @@ export interface AffiliateClick {
 export async function trackAffiliateClick(
   card: Card,
   sourceScreen: string,
-  userTier: string,
+  userTier: string
 ): Promise<void> {
   try {
     if (!isSupabaseConfigured() || !supabase) return;
 
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const click: AffiliateClick = {
       card_id: card.id,
       card_name: card.name,
@@ -202,7 +204,7 @@ export async function trackAffiliateClick(
 export async function handleApplyNow(
   card: Card,
   sourceScreen: string,
-  userTier: string = 'free',
+  userTier: string = 'free'
 ): Promise<void> {
   const url = getApplicationUrl(card);
 
@@ -244,11 +246,12 @@ export async function getMyClickAnalytics(): Promise<ClickAnalytics | null> {
   try {
     if (!isSupabaseConfigured() || !supabase) return null;
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return null;
 
-    const { data: clicks, error } = await (supabase
-      .from('affiliate_clicks') as any)
+    const { data: clicks, error } = await (supabase.from('affiliate_clicks') as any)
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })

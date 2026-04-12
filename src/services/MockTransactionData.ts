@@ -12,45 +12,113 @@ import { Transaction } from '../types/rewards-iq';
 
 const CANADIAN_MERCHANTS: Record<SpendingCategory, string[]> = {
   [SpendingCategory.GROCERIES]: [
-    'Loblaws', 'Metro', 'Sobeys', 'No Frills', 'Real Canadian Superstore',
-    'Whole Foods', 'Costco', 'Walmart Grocery', 'Farm Boy', 'Fortinos',
+    'Loblaws',
+    'Metro',
+    'Sobeys',
+    'No Frills',
+    'Real Canadian Superstore',
+    'Whole Foods',
+    'Costco',
+    'Walmart Grocery',
+    'Farm Boy',
+    'Fortinos',
   ],
   [SpendingCategory.DINING]: [
-    'Tim Hortons', 'McDonald\'s', 'Earls', 'The Keg', 'Boston Pizza',
-    'Swiss Chalet', 'Montana\'s', 'Moxies', 'Cactus Club', 'Milestone\'s',
+    'Tim Hortons',
+    "McDonald's",
+    'Earls',
+    'The Keg',
+    'Boston Pizza',
+    'Swiss Chalet',
+    "Montana's",
+    'Moxies',
+    'Cactus Club',
+    "Milestone's",
   ],
   [SpendingCategory.GAS]: [
-    'Petro-Canada', 'Esso', 'Shell', 'Canadian Tire Gas', 'Costco Gas',
-    'Pioneer', 'Mobil', 'Husky', 'Ultramar', 'Co-op Gas',
+    'Petro-Canada',
+    'Esso',
+    'Shell',
+    'Canadian Tire Gas',
+    'Costco Gas',
+    'Pioneer',
+    'Mobil',
+    'Husky',
+    'Ultramar',
+    'Co-op Gas',
   ],
   [SpendingCategory.TRAVEL]: [
-    'Air Canada', 'WestJet', 'Marriott', 'Hilton', 'Airbnb',
-    'Expedia', 'Booking.com', 'Porter Airlines', 'VIA Rail', 'Enterprise',
+    'Air Canada',
+    'WestJet',
+    'Marriott',
+    'Hilton',
+    'Airbnb',
+    'Expedia',
+    'Booking.com',
+    'Porter Airlines',
+    'VIA Rail',
+    'Enterprise',
   ],
   [SpendingCategory.ONLINE_SHOPPING]: [
-    'Amazon.ca', 'Best Buy', 'Indigo', 'Hudson\'s Bay', 'Simons',
-    'Wayfair', 'Apple Store', 'eBay', 'Etsy', 'Shopify Store',
+    'Amazon.ca',
+    'Best Buy',
+    'Indigo',
+    "Hudson's Bay",
+    'Simons',
+    'Wayfair',
+    'Apple Store',
+    'eBay',
+    'Etsy',
+    'Shopify Store',
   ],
   [SpendingCategory.ENTERTAINMENT]: [
-    'Cineplex', 'Netflix', 'Spotify', 'Ticketmaster', 'Live Nation',
-    'Xbox/PlayStation', 'Steam', 'Nintendo', 'Rec Room', 'Dave & Buster\'s',
+    'Cineplex',
+    'Netflix',
+    'Spotify',
+    'Ticketmaster',
+    'Live Nation',
+    'Xbox/PlayStation',
+    'Steam',
+    'Nintendo',
+    'Rec Room',
+    "Dave & Buster's",
   ],
   [SpendingCategory.DRUGSTORES]: [
-    'Shoppers Drug Mart', 'Rexall', 'London Drugs', 'Pharmasave',
-    'Jean Coutu', 'Guardian', 'Loblaw Pharmacy', 'Costco Pharmacy',
+    'Shoppers Drug Mart',
+    'Rexall',
+    'London Drugs',
+    'Pharmasave',
+    'Jean Coutu',
+    'Guardian',
+    'Loblaw Pharmacy',
+    'Costco Pharmacy',
   ],
   [SpendingCategory.HOME_IMPROVEMENT]: [
-    'Home Depot', 'Home Hardware', 'Lowe\'s', 'RONA', 'Canadian Tire',
-    'IKEA', 'Wayfair', 'Structube', 'Leon\'s', 'The Brick',
+    'Home Depot',
+    'Home Hardware',
+    "Lowe's",
+    'RONA',
+    'Canadian Tire',
+    'IKEA',
+    'Wayfair',
+    'Structube',
+    "Leon's",
+    'The Brick',
   ],
   [SpendingCategory.OTHER]: [
-    'Amazon.ca', 'Service Station', 'Government of Canada', 'Utilities',
-    'Insurance', 'Gym Membership', 'Subscription', 'Professional Services',
+    'Amazon.ca',
+    'Service Station',
+    'Government of Canada',
+    'Utilities',
+    'Insurance',
+    'Gym Membership',
+    'Subscription',
+    'Professional Services',
   ],
 };
 
 // Typical monthly spending by category (Canadian averages)
-const MONTHLY_SPENDING_RANGES: Record<SpendingCategory, { min: number; max: number }> = {
+const _MONTHLY_SPENDING_RANGES: Record<SpendingCategory, { min: number; max: number }> = {
   [SpendingCategory.GROCERIES]: { min: 400, max: 800 },
   [SpendingCategory.DINING]: { min: 150, max: 400 },
   [SpendingCategory.GAS]: { min: 100, max: 300 },
@@ -105,7 +173,7 @@ export function generateMockTransactions(
   transactionCount: number = 25
 ): Transaction[] {
   const transactions: Transaction[] = [];
-  
+
   // Weight categories by typical spending frequency
   const categoryWeights: { category: SpendingCategory; weight: number }[] = [
     { category: SpendingCategory.GROCERIES, weight: 6 },
@@ -118,14 +186,14 @@ export function generateMockTransactions(
     { category: SpendingCategory.HOME_IMPROVEMENT, weight: 1 },
     { category: SpendingCategory.OTHER, weight: 2 },
   ];
-  
+
   const totalWeight = categoryWeights.reduce((sum, cw) => sum + cw.weight, 0);
-  
+
   for (let i = 0; i < transactionCount; i++) {
     // Select category based on weight
     let random = Math.random() * totalWeight;
     let selectedCategory = SpendingCategory.OTHER;
-    
+
     for (const cw of categoryWeights) {
       random -= cw.weight;
       if (random <= 0) {
@@ -133,14 +201,14 @@ export function generateMockTransactions(
         break;
       }
     }
-    
+
     // For demo: User often uses wrong card (to show missed rewards)
     // 40% chance of using optimal card, 60% chance of using random card
-    const useOptimal = Math.random() < 0.4;
+    const _useOptimal = Math.random() < 0.4;
     const cardUsed = userCardIds[Math.floor(Math.random() * userCardIds.length)];
-    
+
     const amount = getRandomAmount(selectedCategory);
-    
+
     transactions.push({
       id: `txn-${Date.now()}-${i}`,
       merchantName: getRandomMerchant(selectedCategory),
@@ -151,7 +219,7 @@ export function generateMockTransactions(
       rewardsEarned: 0, // Will be calculated by analysis service
     });
   }
-  
+
   // Sort by date descending
   return transactions.sort((a, b) => b.date.getTime() - a.date.getTime());
 }
@@ -161,7 +229,7 @@ export function generateMockTransactions(
  */
 export function getDefaultSpendingProfile(): Map<SpendingCategory, number> {
   const profile = new Map<SpendingCategory, number>();
-  
+
   // Canadian average monthly spending
   profile.set(SpendingCategory.GROCERIES, 600);
   profile.set(SpendingCategory.DINING, 250);
@@ -172,14 +240,17 @@ export function getDefaultSpendingProfile(): Map<SpendingCategory, number> {
   profile.set(SpendingCategory.DRUGSTORES, 75);
   profile.set(SpendingCategory.HOME_IMPROVEMENT, 100);
   profile.set(SpendingCategory.OTHER, 200);
-  
+
   return profile;
 }
 
 /**
  * Get category display info
  */
-export const CATEGORY_INFO: Record<SpendingCategory, { label: string; icon: string; color: string }> = {
+export const CATEGORY_INFO: Record<
+  SpendingCategory,
+  { label: string; icon: string; color: string }
+> = {
   [SpendingCategory.GROCERIES]: { label: 'Groceries', icon: '🛒', color: '#4CAF50' },
   [SpendingCategory.DINING]: { label: 'Dining', icon: '🍽️', color: '#FF5722' },
   [SpendingCategory.GAS]: { label: 'Gas', icon: '⛽', color: '#FFC107' },

@@ -3,7 +3,7 @@
  * Requirements: 5.2, 6.1, 6.2
  */
 
-import { Card, RewardType, RewardRate, CategoryReward, SpendingCategory } from '../types';
+import { Card, RewardType, RewardRate, CategoryReward } from '../types';
 
 /**
  * Labels for reward types
@@ -39,13 +39,12 @@ export const REWARD_TYPE_ICONS: Record<RewardType, string> = {
  */
 export function formatRewardEarned(amount: number, rewardType: RewardType): string {
   const label = REWARD_TYPE_LABELS[rewardType];
-  
+
   // Format amount with appropriate decimal places
   // For cashback, show 2 decimal places; for points/miles, show whole numbers
-  const formattedAmount = rewardType === RewardType.CASHBACK
-    ? amount.toFixed(2)
-    : Math.round(amount).toString();
-  
+  const formattedAmount =
+    rewardType === RewardType.CASHBACK ? amount.toFixed(2) : Math.round(amount).toString();
+
   return `${formattedAmount} ${label}`;
 }
 
@@ -120,9 +119,10 @@ export function formatUpToRate(card: Card): string {
   const isHigherThanBase = highest.value > card.baseRewardRate.value;
 
   const typeLabel = REWARD_TYPE_LABELS[highest.type].toLowerCase();
-  const rateStr = highest.unit === 'percent'
-    ? `${highest.value}% ${typeLabel}`
-    : `${highest.value}x ${typeLabel}`;
+  const rateStr =
+    highest.unit === 'percent'
+      ? `${highest.value}% ${typeLabel}`
+      : `${highest.value}x ${typeLabel}`;
 
   if (hasCategories && isHigherThanBase) {
     return `Up to ${rateStr}`;
@@ -201,6 +201,6 @@ export function formatAnnualFee(fee: number | undefined): string {
   if (!fee || fee === 0) {
     return 'No annual fee';
   }
-  
+
   return `Annual fee: $${fee}`;
 }

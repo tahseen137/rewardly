@@ -57,23 +57,24 @@ function detectCountryFromLocale(): Country {
     }
 
     let locale = 'en-US';
-    
+
     if (Platform.OS === 'ios') {
-      locale = NativeModules.SettingsManager?.settings?.AppleLocale ||
-               NativeModules.SettingsManager?.settings?.AppleLanguages?.[0] ||
-               'en-US';
+      locale =
+        NativeModules.SettingsManager?.settings?.AppleLocale ||
+        NativeModules.SettingsManager?.settings?.AppleLanguages?.[0] ||
+        'en-US';
     } else if (Platform.OS === 'android') {
       locale = NativeModules.I18nManager?.localeIdentifier || 'en_US';
     }
-    
+
     // Extract country code from locale (e.g., "en-CA" -> "CA", "en_CA" -> "CA")
     const parts = locale.replace('_', '-').split('-');
     const countryCode = parts.length > 1 ? parts[1].toUpperCase() : '';
-    
+
     if (countryCode === 'CA') {
       return 'CA';
     }
-    
+
     return 'US';
   } catch {
     return 'CA'; // Default to CA — our primary market
@@ -85,12 +86,13 @@ function detectCountryFromLocale(): Country {
  */
 export async function initializePreferences(): Promise<void> {
   try {
-    const [storedNewCardSuggestions, storedLanguage, storedCountry, storedOnboarding] = await Promise.all([
-      AsyncStorage.getItem(NEW_CARD_SUGGESTIONS_STORAGE_KEY),
-      AsyncStorage.getItem(LANGUAGE_STORAGE_KEY),
-      AsyncStorage.getItem(COUNTRY_STORAGE_KEY),
-      AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY),
-    ]);
+    const [storedNewCardSuggestions, storedLanguage, storedCountry, storedOnboarding] =
+      await Promise.all([
+        AsyncStorage.getItem(NEW_CARD_SUGGESTIONS_STORAGE_KEY),
+        AsyncStorage.getItem(LANGUAGE_STORAGE_KEY),
+        AsyncStorage.getItem(COUNTRY_STORAGE_KEY),
+        AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY),
+      ]);
 
     if (storedNewCardSuggestions !== null) {
       newCardSuggestionsCache = storedNewCardSuggestions === 'true';
@@ -277,7 +279,7 @@ export async function getPreferences(): Promise<{
   if (newCardSuggestionsCache === null) {
     await initializePreferences();
   }
-  
+
   return {
     rewardType: 'POINTS', // Default to points, could be made configurable later
     newCardSuggestionsEnabled: isNewCardSuggestionsEnabled(),

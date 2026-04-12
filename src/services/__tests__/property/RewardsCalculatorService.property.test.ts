@@ -10,7 +10,7 @@ import {
   pointsToCad,
   CalculatorInput,
 } from '../../RewardsCalculatorService';
-import { Card, SpendingCategory, RewardType, CategoryReward } from '../../../types';
+import { Card, SpendingCategory, RewardType } from '../../../types';
 
 // ============================================================================
 // Generators
@@ -255,7 +255,11 @@ describe('RewardsCalculatorService - Property Tests', () => {
               return;
             }
             // Create card without program details and pointValuation to use fallback
-            const cardWithoutValuation = { ...card, programDetails: undefined, pointValuation: undefined };
+            const cardWithoutValuation = {
+              ...card,
+              programDetails: undefined,
+              pointValuation: undefined,
+            };
             const cadValue = pointsToCad(points, cardWithoutValuation, pointValuation);
             const expectedValue = points * (pointValuation / 100);
             expect(cadValue).toBeCloseTo(expectedValue, 10);
@@ -304,15 +308,11 @@ describe('RewardsCalculatorService - Property Tests', () => {
 
     it('should return zero CAD value for zero points', () => {
       fc.assert(
-        fc.property(
-          pointValuationArb,
-          cardArb,
-          (pointValuation: number, card: Card) => {
-            const cardWithoutProgram = { ...card, programDetails: undefined };
-            const cadValue = pointsToCad(0, cardWithoutProgram, pointValuation);
-            expect(cadValue).toBe(0);
-          }
-        ),
+        fc.property(pointValuationArb, cardArb, (pointValuation: number, card: Card) => {
+          const cardWithoutProgram = { ...card, programDetails: undefined };
+          const cadValue = pointsToCad(0, cardWithoutProgram, pointValuation);
+          expect(cadValue).toBe(0);
+        }),
         { numRuns: 100 }
       );
     });
@@ -329,7 +329,11 @@ describe('RewardsCalculatorService - Property Tests', () => {
               return; // Skip cashback cards
             }
             // Remove card's pointValuation and programDetails to test fallback behavior
-            const cardWithoutValuation = { ...card, programDetails: undefined, pointValuation: undefined };
+            const cardWithoutValuation = {
+              ...card,
+              programDetails: undefined,
+              pointValuation: undefined,
+            };
             const cadValue1 = pointsToCad(points, cardWithoutValuation, pointValuation);
             const cadValue2 = pointsToCad(points, cardWithoutValuation, pointValuation * 2);
 

@@ -1,7 +1,7 @@
 /**
  * AnimatedNumber - Smooth number counting animation
  * Used throughout the app for engaging number reveals
- * 
+ *
  * Note: Uses requestAnimationFrame for web compatibility (no reanimated dependency)
  */
 
@@ -31,25 +31,25 @@ export default function AnimatedNumber({
 }: AnimatedNumberProps) {
   const [displayValue, setDisplayValue] = useState(0);
   const previousValue = useRef(0);
-  const animationStartTime = useRef<number | null>(null);
+  const _animationStartTime = useRef<number | null>(null);
   const animationFrame = useRef<number | null>(null);
-  
+
   useEffect(() => {
     const startAnimation = () => {
       const startValue = previousValue.current;
       const endValue = value;
       const startTime = Date.now();
-      
+
       const animate = () => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         // Easing function - ease out cubic
         const eased = 1 - Math.pow(1 - progress, 3);
-        
+
         const currentValue = startValue + (endValue - startValue) * eased;
         setDisplayValue(currentValue);
-        
+
         if (progress < 1) {
           animationFrame.current = requestAnimationFrame(animate);
         } else {
@@ -57,10 +57,10 @@ export default function AnimatedNumber({
           previousValue.current = endValue;
         }
       };
-      
+
       animationFrame.current = requestAnimationFrame(animate);
     };
-    
+
     if (delay > 0) {
       const timeout = setTimeout(startAnimation, delay);
       return () => {
@@ -78,14 +78,16 @@ export default function AnimatedNumber({
       };
     }
   }, [value, duration, delay]);
-  
+
   const formattedValue = formatFunction
     ? formatFunction(displayValue)
     : displayValue.toFixed(decimals);
-  
+
   return (
     <Text style={style}>
-      {prefix}{formattedValue}{suffix}
+      {prefix}
+      {formattedValue}
+      {suffix}
     </Text>
   );
 }
@@ -112,7 +114,7 @@ export function AnimatedCurrency({
 }: AnimatedCurrencyProps) {
   const sign = showSign && value > 0 ? '+' : value < 0 ? '-' : '';
   const absValue = Math.abs(value);
-  
+
   return (
     <AnimatedNumber
       value={absValue}
@@ -121,10 +123,12 @@ export function AnimatedCurrency({
       prefix={`${sign}${currency}`}
       decimals={2}
       style={style}
-      formatFunction={(v) => v.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}
+      formatFunction={(v) =>
+        v.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+      }
     />
   );
 }
@@ -139,12 +143,7 @@ interface AnimatedPointsProps {
   style?: TextStyle;
 }
 
-export function AnimatedPoints({
-  value,
-  duration = 1500,
-  delay = 0,
-  style,
-}: AnimatedPointsProps) {
+export function AnimatedPoints({ value, duration = 1500, delay = 0, style }: AnimatedPointsProps) {
   return (
     <AnimatedNumber
       value={value}
@@ -176,7 +175,7 @@ export function AnimatedPercent({
   showPlusSign = false,
 }: AnimatedPercentProps) {
   const sign = showPlusSign && value > 0 ? '+' : '';
-  
+
   return (
     <AnimatedNumber
       value={value}

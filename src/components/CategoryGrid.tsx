@@ -72,16 +72,10 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
         return (
           <Animated.View
             key={category.id}
-            style={[
-              styles.itemWrapper,
-              { transform: [{ scale: scaleAnim }] },
-            ]}
+            style={[styles.itemWrapper, { transform: [{ scale: scaleAnim }] }]}
           >
             <TouchableOpacity
-              style={[
-                styles.item,
-                isSelected ? styles.itemSelected : styles.itemUnselected,
-              ]}
+              style={[styles.item, isSelected ? styles.itemSelected : styles.itemUnselected]}
               onPress={() => onCategorySelect(category.id)}
               onPressIn={handlePressIn}
               onPressOut={handlePressOut}
@@ -91,13 +85,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
               accessibilityState={{ selected: isSelected }}
             >
               <Text style={styles.icon}>{category.icon}</Text>
-              <Text
-                style={[
-                  styles.label,
-                  isSelected && styles.labelSelected,
-                ]}
-                numberOfLines={2}
-              >
+              <Text style={[styles.label, isSelected && styles.labelSelected]} numberOfLines={2}>
                 {category.label}
               </Text>
             </TouchableOpacity>
