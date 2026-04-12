@@ -15,7 +15,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       line-height: 1.6;
       color: #333;
-      max-width: 800px;
+      max-width: 860px;
       margin: 0 auto;
       padding: 40px 20px;
     }
@@ -33,24 +33,33 @@
     }
 
     h2 {
-      font-size: 24px;
-      margin-top: 32px;
-      margin-bottom: 16px;
+      font-size: 22px;
+      margin-top: 40px;
+      margin-bottom: 12px;
       color: #1f2937;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 6px;
+    }
+
+    h3 {
+      font-size: 17px;
+      margin-top: 24px;
+      margin-bottom: 10px;
+      color: #374151;
     }
 
     p {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       color: #4b5563;
     }
 
-    ul {
-      margin-bottom: 16px;
+    ul, ol {
+      margin-bottom: 14px;
       padding-left: 24px;
     }
 
     li {
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       color: #4b5563;
     }
 
@@ -58,16 +67,108 @@
       color: #1f2937;
     }
 
+    code {
+      background: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-size: 13px;
+      font-family: "SF Mono", "Fira Code", monospace;
+    }
+
     .highlight-box {
       background: #f0f4ff;
       border-left: 4px solid #667eea;
-      padding: 16px;
+      padding: 16px 20px;
       margin: 24px 0;
       border-radius: 4px;
     }
 
     .highlight-box p {
       margin: 0;
+    }
+
+    .platform-tag {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 10px;
+      margin-left: 6px;
+      vertical-align: middle;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .platform-tag.mobile {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .platform-tag.extension {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .platform-tag.web {
+      background: #ede9fe;
+      color: #6d28d9;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f9fafb;
+      text-align: left;
+      padding: 10px 12px;
+      border: 1px solid #e5e7eb;
+      color: #374151;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 9px 12px;
+      border: 1px solid #e5e7eb;
+      color: #4b5563;
+      vertical-align: top;
+    }
+
+    tr:hover td {
+      background: #f9fafb;
+    }
+
+    .toc {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 20px 24px;
+      margin-bottom: 36px;
+    }
+
+    .toc h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 15px;
+      color: #374151;
+    }
+
+    .toc ol {
+      margin-bottom: 0;
+    }
+
+    .toc a {
+      color: #667eea;
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
     }
 
     a {
@@ -80,7 +181,7 @@
     }
 
     footer {
-      margin-top: 48px;
+      margin-top: 56px;
       padding-top: 24px;
       border-top: 1px solid #e5e7eb;
       text-align: center;
@@ -91,112 +192,302 @@
 </head>
 <body>
   <h1>Privacy Policy</h1>
-  <p class="last-updated">Last updated: April 11, 2026</p>
+  <p class="last-updated">Last updated: April 12, 2026</p>
 
   <div class="highlight-box">
-    <p><strong>TL;DR:</strong> Rewardly stores your card selections, loyalty memberships, and shopping activity (merchant, category, page URL, and the estimated reward value of each transaction) locally on your device. We never send any of this to our servers. We never see your bank credentials, card numbers, or your identity. Card selections and settings sync across your own Chrome browsers via Google's built-in Chrome Sync. Your privacy is non-negotiable.</p>
+    <p><strong>TL;DR:</strong> Rewardly collects only what is necessary to deliver its service. Your financial data (card numbers, bank credentials, account balances) is never collected. Location is processed on-device for the AutoPilot feature. AI chat history and card portfolio data sync to our servers so you can access them across your devices. Payment processing is handled by Stripe — we never see or store your card number. You can delete your account and all associated data at any time.</p>
   </div>
 
-  <h2>What Data We Collect</h2>
-  <p>Rewardly collects the minimum data needed to provide its core service. All of the following is stored on your own device (and, for items marked "synced," across your own Chrome browsers via Google's Chrome Sync):</p>
+  <div class="toc">
+    <h3>Table of Contents</h3>
+    <ol>
+      <li><a href="#scope">Scope of This Policy</a></li>
+      <li><a href="#data-collected">What Data We Collect</a></li>
+      <li><a href="#data-not-collected">What We Do NOT Collect</a></li>
+      <li><a href="#how-we-use">How We Use Your Data</a></li>
+      <li><a href="#third-parties">Third-Party Services</a></li>
+      <li><a href="#storage">Data Storage and Security</a></li>
+      <li><a href="#retention">Data Retention</a></li>
+      <li><a href="#rights">Your Rights</a></li>
+      <li><a href="#children">Children's Privacy</a></li>
+      <li><a href="#changes">Changes to This Policy</a></li>
+      <li><a href="#contact">Contact Us</a></li>
+    </ol>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="scope">1. Scope of This Policy</h2>
+
+  <p>This policy applies to all Rewardly products operated by <strong>Motu Inc.</strong>:</p>
   <ul>
-    <li><strong>Credit cards you own:</strong> Card identifiers only — e.g., <code>amex-cobalt</code> or <code>rbc-avion-visa-infinite</code>. We never ask for and never store card numbers, CVVs, expiry dates, or cardholder names. <em>Stored in <code>chrome.storage.sync</code> (synced across your Chrome browsers).</em></li>
-    <li><strong>Loyalty programs you belong to:</strong> Program identifiers only — e.g., <code>pc-optimum</code>, <code>scene-plus</code>. No membership numbers, points balances, or personal details. <em>Stored in <code>chrome.storage.sync</code>.</em></li>
-    <li><strong>Extension settings:</strong> Your preferences (blacklisted sites, popup settings, notification preferences). <em>Stored in <code>chrome.storage.sync</code>.</em></li>
-    <li><strong>Savings log:</strong> For each visit to a supported Canadian merchant, the extension records the merchant name, spend category, the card it recommended, an estimated reward value derived from the cart total shown on the page, a checkout flag, the page URL, and a timestamp. Example entry: <code>{ merchant: "Loblaws", category: "groceries", cardRecommended: "amex-cobalt", estimatedSavings: 4.20, url: "loblaws.ca/cart", timestamp: ... }</code>. <em>Stored in <code>chrome.storage.local</code> on this device only.</em></li>
-    <li><strong>Internal analytics log:</strong> Extension events (popup shown, card recommendation displayed, upgrade suggestion clicked, etc.) with timestamp, the URL of the page where the event occurred, and the user agent string of your browser. Used to power the in-extension savings dashboard. <em>Stored in <code>chrome.storage.local</code> on this device only.</em></li>
-    <li><strong>Cached card and merchant data:</strong> A daily refresh of the 393-card reward-rate database and 240-merchant list, fetched from our backend so you don't pay network costs on every checkout. This is application data, not your data. <em>Stored in <code>chrome.storage.local</code>.</em></li>
+    <li><span class="platform-tag mobile">Mobile</span> <strong>Rewardly iOS &amp; Android app</strong> — distributed through the Apple App Store and Google Play Store</li>
+    <li><span class="platform-tag web">Web</span> <strong>Rewardly web app</strong> — available at <a href="https://rewardly.ca">rewardly.ca</a></li>
+    <li><span class="platform-tag extension">Extension</span> <strong>Rewardly Chrome extension</strong> — available on the Chrome Web Store</li>
+  </ul>
+  <p>Where data practices differ between platforms, each item is labelled with the relevant tag above.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="data-collected">2. What Data We Collect</h2>
+
+  <h3>2.1 Account and Identity</h3>
+  <p><span class="platform-tag mobile">Mobile</span> <span class="platform-tag web">Web</span></p>
+  <p>When you create a Rewardly account, we collect:</p>
+  <ul>
+    <li><strong>Email address</strong> — used for authentication, transactional emails (password reset, subscription receipts), and account communications.</li>
+    <li><strong>Password</strong> — stored as a bcrypt hash by Supabase Auth. We never see your plaintext password.</li>
+    <li><strong>Display name and avatar URL</strong> — optional profile fields you can set in Settings.</li>
+    <li><strong>Preferred language</strong> — English or French, set during onboarding.</li>
+    <li><strong>Country</strong> — Canada or United States, used to filter the card database to your region.</li>
+    <li><strong>Onboarding completion status</strong> — a boolean flag so we know whether to show the onboarding flow.</li>
+  </ul>
+  <p>Guest mode is available on the web app. Guest sessions are stored locally in your browser and are not synced to our servers unless you create an account.</p>
+
+  <h3>2.2 Card Portfolio</h3>
+  <p><span class="platform-tag mobile">Mobile</span> <span class="platform-tag web">Web</span></p>
+  <p>When you add credit cards to your wallet, we store:</p>
+  <ul>
+    <li><strong>Card identifiers</strong> (e.g. <code>amex-cobalt</code>, <code>rbc-avion-visa-infinite</code>) — internal keys that reference our card database. We never ask for your card number, CVV, expiry date, or cardholder name.</li>
+    <li><strong>Optional nickname and notes</strong> — personal labels you attach to a card.</li>
+    <li><strong>Date added</strong> — timestamp of when you added the card to your wallet.</li>
+  </ul>
+  <p>This data is synced to Supabase so your wallet is available across your devices.</p>
+
+  <h3>2.3 Spending Profile and Transaction Data</h3>
+  <p><span class="platform-tag mobile">Mobile</span> <span class="platform-tag web">Web</span></p>
+  <p>To power the recommendation engine and spending insights, we collect:</p>
+  <ul>
+    <li><strong>Spending profile</strong> — estimated monthly spend by category (groceries, dining, travel, gas, etc.) that you enter manually.</li>
+    <li><strong>Statement uploads</strong> — if you upload a CSV bank statement, we store the parsed transaction records (merchant name, amount, date, inferred category) in our database. We support CSV exports from 8 Canadian banks. Raw CSV files are processed server-side and then discarded; only the structured transaction records are retained.</li>
+    <li><strong>Merchant category mappings</strong> — any custom merchant-to-category assignments you create are saved to your account.</li>
+  </ul>
+  <p><strong>We never ask for and never receive your online banking login credentials.</strong> Statement import is CSV-only, not a live bank connection.</p>
+
+  <h3>2.4 AI Chat History (Sage)</h3>
+  <p><span class="platform-tag mobile">Mobile</span> <span class="platform-tag web">Web</span></p>
+  <p>Sage is Rewardly's AI assistant, powered by Anthropic Claude or OpenAI GPT (depending on availability). When you use Sage:</p>
+  <ul>
+    <li><strong>Conversation messages</strong> — your messages and Sage's replies are stored in our database, associated with your user account, so you can access your conversation history across sessions.</li>
+    <li><strong>Conversation metadata</strong> — title (auto-generated from the first message), timestamps, and the AI model used.</li>
+    <li><strong>Token usage</strong> — aggregate token counts per billing period, used to enforce usage limits on free-tier accounts.</li>
+    <li><strong>Card and portfolio context</strong> — your wallet and spending profile are sent to the AI provider as context for each message, so Sage can give personalized recommendations. This context is not stored separately; it is assembled from your existing profile data at request time.</li>
+  </ul>
+  <p>Your messages are transmitted to a third-party AI provider (Anthropic or OpenAI) to generate responses. See <a href="#third-parties">Section 5</a> for details on their data handling.</p>
+
+  <h3>2.5 Location Data (AutoPilot)</h3>
+  <p><span class="platform-tag mobile">Mobile</span></p>
+  <p>AutoPilot is an opt-in feature that sends you a push notification recommending the best card in your wallet when you arrive near a pinned merchant location. Location handling is privacy-first:</p>
+  <ul>
+    <li><strong>GPS coordinates are processed entirely on-device.</strong> The app uses iOS/Android geofencing APIs to detect when you enter a merchant's radius (approximately 150 m). The raw coordinates are never sent to our servers.</li>
+    <li><strong>Geofence configurations</strong> (merchant name, category, latitude, longitude, radius) are stored in device-local storage only (<code>AsyncStorage</code>). They are not synced to our backend.</li>
+    <li><strong>Only locations you explicitly pin</strong> are monitored. AutoPilot does not track your movement in the background beyond the specific geofences you configure.</li>
+    <li>You can disable AutoPilot at any time in Settings, which immediately stops all background location access.</li>
   </ul>
 
-  <h2>What We DON'T Collect</h2>
+  <h3>2.6 Subscription and Payment</h3>
+  <p><span class="platform-tag mobile">Mobile</span> <span class="platform-tag web">Web</span></p>
+  <p>Paid subscriptions (Pro, Max, Lifetime) are processed by <strong>Stripe</strong>. Rewardly stores:</p>
   <ul>
-    <li>❌ Bank account credentials or passwords</li>
-    <li>❌ Credit card numbers, CVVs, expiry dates, or cardholder names</li>
+    <li><strong>Subscription tier and status</strong> — e.g. <code>pro</code>, <code>active</code>, renewal date.</li>
+    <li><strong>Stripe customer ID</strong> — an opaque identifier (e.g. <code>cus_abc123</code>) that Stripe assigns to you. We use this to look up your subscription without storing payment details ourselves.</li>
+    <li><strong>Billing period and provider</strong> — monthly, annual, or lifetime; payment platform (Stripe, Apple, or Google).</li>
+  </ul>
+  <p>Stripe handles all payment processing. Rewardly never sees, transmits, or stores your credit card number, bank account number, or billing address. Stripe's data practices are governed by the <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe Privacy Policy</a>.</p>
+  <p>On mobile, subscriptions may also be processed by Apple (App Store) or Google (Play Store), governed by their respective privacy policies.</p>
+
+  <h3>2.7 Achievements and Gamification</h3>
+  <p><span class="platform-tag mobile">Mobile</span> <span class="platform-tag web">Web</span></p>
+  <p>We store which in-app achievements you have unlocked and when, associated with your user account. This is used to display your progress in the Achievements screen.</p>
+
+  <h3>2.8 Card Applications and Referrals</h3>
+  <p><span class="platform-tag mobile">Mobile</span> <span class="platform-tag web">Web</span></p>
+  <ul>
+    <li><strong>Card application tracking</strong> — if you use the 5/24 application tracker, we store the card name, application date, and status (approved, pending, declined).</li>
+    <li><strong>Referral codes and signups</strong> — if you share your referral code, we track which referral code was used at signup to attribute referral credits. We record your referral code, the date of the referred signup, and aggregate referral counts.</li>
+    <li><strong>Affiliate link clicks</strong> — when you click a "Apply Now" link for a card, we log the click (card identifier, timestamp) to track affiliate conversions. No personal identifiers are included in data sent to affiliate partners.</li>
+  </ul>
+
+  <h3>2.9 Usage Tracking</h3>
+  <p><span class="platform-tag mobile">Mobile</span> <span class="platform-tag web">Web</span></p>
+  <p>We track feature usage counts (e.g. number of AI messages sent per billing period) to enforce free-tier limits and to understand which features are used most. This data is associated with your account but is aggregated and not shared externally.</p>
+
+  <h3>2.10 Analytics</h3>
+  <p><span class="platform-tag web">Web</span></p>
+  <p>The Rewardly web app uses <strong>Umami Analytics</strong> for privacy-respecting page-view analytics. Umami does not use cookies, does not track users across sites, and does not collect personal identifiers. Only aggregate page-view and session data is collected.</p>
+
+  <h3>2.11 Chrome Extension Data</h3>
+  <p><span class="platform-tag extension">Extension</span></p>
+  <p>The Chrome extension stores data locally using Chrome's built-in storage APIs and does not require a Rewardly account. All of the following stays on your device (or, for items marked "synced," across your own Chrome browsers via Google's Chrome Sync):</p>
+  <ul>
+    <li><strong>Credit cards you own</strong> — card identifiers only (e.g. <code>amex-cobalt</code>). No card numbers, CVVs, expiry dates, or cardholder names. <em>Stored in <code>chrome.storage.sync</code>.</em></li>
+    <li><strong>Loyalty programs</strong> — program identifiers only (e.g. <code>pc-optimum</code>, <code>scene-plus</code>). No membership numbers or points balances. <em>Stored in <code>chrome.storage.sync</code>.</em></li>
+    <li><strong>Extension settings</strong> — blacklisted sites, popup preferences, notification settings. <em>Stored in <code>chrome.storage.sync</code>.</em></li>
+    <li><strong>Savings log</strong> — for each visit to a supported merchant: merchant name, spend category, recommended card, estimated reward value, page URL, and timestamp. <em>Stored in <code>chrome.storage.local</code> on this device only.</em></li>
+    <li><strong>Internal analytics log</strong> — extension events (popup shown, card recommendation displayed, etc.) with timestamps and page URLs. Used to power the in-extension savings dashboard. <em>Stored in <code>chrome.storage.local</code> only.</em></li>
+    <li><strong>Cached card and merchant data</strong> — a daily refresh of the card reward-rate database and merchant list, fetched anonymously from our backend. This is application data, not your personal data. <em>Stored in <code>chrome.storage.local</code>.</em></li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2 id="data-not-collected">3. What We Do NOT Collect</h2>
+
+  <ul>
+    <li>❌ Bank account credentials, online banking usernames, or passwords</li>
+    <li>❌ Credit or debit card numbers, CVVs, expiry dates, or cardholder names</li>
     <li>❌ Loyalty program membership numbers or points balances</li>
-    <li>❌ Your name, email address, phone number, postal address, or date of birth</li>
-    <li>❌ Your credit score, creditworthiness, or lending history</li>
-    <li>❌ Individual items in your shopping cart (product names, SKUs, descriptions)</li>
-    <li>❌ IP address, GPS location, or any geolocation data</li>
-    <li>❌ Cookies or cross-site tracking identifiers</li>
-    <li>❌ Any of the above via third-party analytics, ad networks, or tracking pixels</li>
+    <li>❌ Credit score, creditworthiness, or lending history</li>
+    <li>❌ Raw GPS coordinates (location is processed on-device for AutoPilot only)</li>
+    <li>❌ Individual shopping cart contents (product names, SKUs, or prices)</li>
+    <li>❌ IP address or device identifiers beyond what Supabase Auth requires for session management</li>
+    <li>❌ Cross-site tracking identifiers or advertising IDs</li>
+    <li>❌ Data from third-party analytics, ad networks, or tracking pixels (beyond Umami on web, which is cookieless)</li>
   </ul>
 
-  <h2>Where Your Data is Stored</h2>
-  <p>Rewardly uses Chrome's built-in storage APIs. We do not operate any user database or server-side store of your personal data.</p>
+  <!-- ============================================================ -->
+  <h2 id="how-we-use">4. How We Use Your Data</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Purpose</th>
+        <th>Data used</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Provide the core recommendation service (best card for a purchase)</td>
+        <td>Card portfolio, spending profile, card database</td>
+      </tr>
+      <tr>
+        <td>Personalize AI chat responses (Sage)</td>
+        <td>Card portfolio, spending profile, conversation history</td>
+      </tr>
+      <tr>
+        <td>Show spending insights and savings reports</td>
+        <td>Parsed transactions, spending profile</td>
+      </tr>
+      <tr>
+        <td>Send AutoPilot push notifications</td>
+        <td>Geofences (on-device), card portfolio</td>
+      </tr>
+      <tr>
+        <td>Manage your subscription and enforce usage limits</td>
+        <td>Subscription tier/status, usage tracking, Stripe customer ID</td>
+      </tr>
+      <tr>
+        <td>Sync your wallet and preferences across devices</td>
+        <td>Card portfolio, user preferences, profile</td>
+      </tr>
+      <tr>
+        <td>Send transactional emails (password reset, receipts)</td>
+        <td>Email address</td>
+      </tr>
+      <tr>
+        <td>Track achievements and gamification progress</td>
+        <td>Usage events, achievement records</td>
+      </tr>
+      <tr>
+        <td>Attribute affiliate and referral conversions</td>
+        <td>Referral codes, affiliate click logs</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>We do <strong>not</strong> use your data to:</p>
   <ul>
-    <li><strong><code>chrome.storage.sync</code>:</strong> Your selected cards, loyalty programs, and settings. This data is encrypted and synced by Google across Chrome browsers where you are signed in to the same Google account. Google's handling of sync data is governed by the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</li>
-    <li><strong><code>chrome.storage.local</code>:</strong> Savings log, internal analytics log, affiliate-suggestion state, and the cached card/merchant database. This data stays on this device only and is never uploaded anywhere.</li>
+    <li>Sell your data to third parties or data brokers</li>
+    <li>Build profiles for advertising or retargeting</li>
+    <li>Share your data with card issuers, banks, or loyalty programs</li>
+    <li>Determine creditworthiness or make lending decisions</li>
+    <li>Send marketing emails without your explicit opt-in</li>
   </ul>
-  <p>We do not operate any backend that stores user data. The only server-side component Rewardly talks to is a public, read-only card-database endpoint (described below).</p>
 
-  <h2>What We Do With Your Data</h2>
-  <p>Your data is used solely to provide Rewardly's core features:</p>
+  <!-- ============================================================ -->
+  <h2 id="third-parties">5. Third-Party Services</h2>
+
+  <h3>Supabase (database and authentication)</h3>
+  <p>Rewardly uses <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a> for user authentication (Supabase Auth) and database storage (PostgreSQL). Your account data, card portfolio, transaction records, and AI chat history are stored on Supabase-managed infrastructure. All tables have Row Level Security (RLS) policies enforced so that users can only access their own data. Supabase's data handling is governed by the <a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase Privacy Policy</a>.</p>
+
+  <h3>Stripe (payments)</h3>
+  <p><a href="https://stripe.com" target="_blank" rel="noopener">Stripe</a> processes all subscription and one-time payments. When you check out, you are directed to a Stripe-hosted page. Rewardly receives only a Stripe customer ID and subscription status — never your payment details. Governed by the <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe Privacy Policy</a>.</p>
+
+  <h3>Anthropic / OpenAI (AI)</h3>
+  <p>Sage AI chat messages are processed by <a href="https://www.anthropic.com" target="_blank" rel="noopener">Anthropic</a> (Claude) or <a href="https://openai.com" target="_blank" rel="noopener">OpenAI</a> (GPT). Your message and card context are sent to these providers to generate a response. Please review their privacy policies: <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">Anthropic Privacy Policy</a>, <a href="https://openai.com/privacy" target="_blank" rel="noopener">OpenAI Privacy Policy</a>. You can delete your Sage conversation history at any time from the app.</p>
+
+  <h3>Google Places API</h3>
+  <p>When you search for merchant locations to add to AutoPilot, the search query is sent to the Google Places API. This is an anonymous search — no account identifier is included in the request. Governed by the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</p>
+
+  <h3>Apple / Google (mobile platforms)</h3>
+  <p>The iOS and Android apps are distributed through Apple and Google's app stores. Platform-level services (push notifications, geofencing, in-app purchases) are subject to Apple's and Google's privacy policies.</p>
+
+  <h3>Chrome Sync (extension)</h3>
+  <p>The Chrome extension uses <code>chrome.storage.sync</code> to sync your card selections and settings across Chrome browsers signed into the same Google account. This data is encrypted and managed by Google. Governed by the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</p>
+
+  <h3>Umami Analytics (web)</h3>
+  <p>The web app uses <a href="https://umami.is" target="_blank" rel="noopener">Umami</a> for cookieless page-view analytics. No personal data is collected. Aggregate session data only.</p>
+
+  <h3>Card issuers (affiliate links)</h3>
+  <p>When you click an "Apply Now" link, you are redirected to the card issuer's website. Rewardly may receive a referral commission for successful applications. The card issuer has their own privacy policy. We do not share your personal data with card issuers as part of this referral; the link contains only an affiliate tracking code.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="storage">6. Data Storage and Security</h2>
+
+  <p>Your data is stored on Supabase-managed PostgreSQL databases. Key security measures:</p>
   <ul>
-    <li>Show you the best credit card recommendation at checkout</li>
-    <li>Calculate your estimated savings over time for the in-extension dashboard</li>
-    <li>Suggest a different card from your wallet when it would consistently earn you more (only when the estimated monthly gain is at least $10)</li>
-    <li>Respect your blacklist and settings preferences</li>
+    <li><strong>Row Level Security (RLS)</strong> — database-level policies ensure that queries from authenticated users can only access their own rows.</li>
+    <li><strong>Encrypted connections</strong> — all data in transit uses TLS/HTTPS.</li>
+    <li><strong>Passwords</strong> — hashed by Supabase Auth (bcrypt). We cannot recover your password.</li>
+    <li><strong>Location data</strong> — never transmitted to our servers. Stored only in device-local storage.</li>
+    <li><strong>Payment data</strong> — never stored by Rewardly. Handled entirely by Stripe's PCI-DSS compliant infrastructure.</li>
   </ul>
-  <p>We do NOT:</p>
+  <p>Despite these measures, no system is completely secure. We recommend using a strong, unique password for your Rewardly account and enabling two-factor authentication if available.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="retention">7. Data Retention</h2>
+
+  <p>We retain your data for as long as your account is active. When you delete your account:</p>
   <ul>
-    <li>Sell your data to third parties</li>
-    <li>Share your data with advertisers or data brokers</li>
-    <li>Use your data for cross-site advertising or retargeting</li>
-    <li>Build user profiles for marketing</li>
-    <li>Use or transfer your data to determine creditworthiness or for lending purposes</li>
+    <li>Your profile, card portfolio, spending data, AI chat history, achievements, and all other personal records are deleted from our database.</li>
+    <li>Stripe retains billing records as required for financial and legal compliance (typically 7 years) — this is governed by Stripe's policies, not ours.</li>
+    <li>Anonymized, aggregate analytics data (e.g. total number of users who used Sage) may be retained, but this data cannot be linked back to you.</li>
   </ul>
+  <p>You can delete your account at any time from <strong>Settings → Account → Delete Account</strong>.</p>
 
-  <h2>Third-Party Services</h2>
-  <p>Rewardly makes anonymous, read-only HTTPS requests to a Supabase-hosted public database (<code>https://zdlozhpmqrtvvhdzbmrv.supabase.co</code>) to fetch the latest credit card reward rates, reward programs, and point valuations. These requests:</p>
+  <p>For the Chrome extension specifically: all data is stored on your device and is deleted when you uninstall the extension. We do not have backups because we never receive this data.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="rights">8. Your Rights</h2>
+
+  <p>Depending on where you live, you may have the following rights under applicable privacy laws (including PIPEDA in Canada and GDPR for EU/UK users):</p>
   <ul>
-    <li>Use a public anonymous API key — no user login</li>
-    <li>Contain no personal data of any kind in the request body, headers, or query string</li>
-    <li>Are issued roughly once per day by the background service worker for caching purposes</li>
-    <li>Return JSON data only — no remote code is ever loaded or executed</li>
+    <li><strong>Access</strong> — request a copy of the personal data we hold about you.</li>
+    <li><strong>Correction</strong> — update inaccurate data via Settings, or contact us.</li>
+    <li><strong>Deletion</strong> — delete your account and all associated data (Settings → Account → Delete Account), or contact us.</li>
+    <li><strong>Portability</strong> — request your data in a machine-readable format.</li>
+    <li><strong>Withdrawal of consent</strong> — disable AutoPilot location access at any time in Settings; withdraw AI chat processing by not using Sage.</li>
+    <li><strong>Objection</strong> — object to specific data processing by contacting us.</li>
   </ul>
-  <p>If you click a "learn more" or card-application link, you will be redirected to the card issuer's website (e.g., American Express, RBC, Scotiabank). Those sites have their own privacy policies — we recommend reading them before applying. Rewardly may be compensated for successful applications through affiliate relationships with card issuers; this does not change the recommendation algorithm, which always shows the card in your own wallet that earns the most.</p>
+  <p>To exercise any of these rights, email us at <a href="mailto:privacy@rewardly.ca">privacy@rewardly.ca</a>. We will respond within 30 days.</p>
 
-  <h2>Cookies and Tracking</h2>
-  <p>Rewardly does NOT use cookies or any tracking technologies. We don't integrate with Google Analytics, Facebook Pixel, or any third-party analytics services.</p>
+  <!-- ============================================================ -->
+  <h2 id="children">9. Children's Privacy</h2>
 
-  <h2>Data Retention</h2>
-  <p>Your data is stored locally until you:</p>
-  <ul>
-    <li>Uninstall the extension (all data is deleted automatically)</li>
-    <li>Manually clear your Chrome storage</li>
-    <li>Remove specific cards or loyalty programs through the settings</li>
-  </ul>
-  <p>We do NOT have backups of your data because we never receive it in the first place.</p>
+  <p>Rewardly is not intended for users under 18 years of age. We do not knowingly collect personal data from minors. If you believe a minor has created an account, please contact us and we will delete the account promptly.</p>
 
-  <h2>Your Rights</h2>
-  <p>You have full control over your data:</p>
-  <ul>
-    <li><strong>Access:</strong> View all your data by opening the extension popup → Settings</li>
-    <li><strong>Delete:</strong> Remove individual cards/programs or uninstall the extension entirely</li>
-    <li><strong>Export:</strong> Chrome's sync storage can be accessed via Developer Tools (for power users)</li>
-  </ul>
+  <!-- ============================================================ -->
+  <h2 id="changes">10. Changes to This Policy</h2>
 
-  <h2>Security</h2>
-  <p>Because all data is stored locally on your device, security is managed by Chrome's built-in protections. We recommend:</p>
-  <ul>
-    <li>Keeping Chrome up-to-date</li>
-    <li>Using a strong device password</li>
-    <li>Enabling two-factor authentication on your Google account (if using Chrome sync)</li>
-  </ul>
+  <p>We may update this policy from time to time. When we make material changes, we will update the "Last updated" date above and, where required by law, notify you by email or in-app notification. Continued use of Rewardly after changes constitutes acceptance of the updated policy. The latest version is always available at <a href="https://rewardly.ca/privacy-policy">rewardly.ca/privacy-policy</a>.</p>
 
-  <h2>Children's Privacy</h2>
-  <p>Rewardly is not intended for children under 18. We do not knowingly collect data from minors. If you're under 18, please do not use this extension.</p>
+  <!-- ============================================================ -->
+  <h2 id="contact">11. Contact Us</h2>
 
-  <h2>Changes to This Policy</h2>
-  <p>We may update this privacy policy from time to time. Changes will be posted at <a href="https://rewardly.ca/privacy">rewardly.ca/privacy</a> with an updated "Last updated" date. Continued use of the extension after changes means you accept the new policy.</p>
-
-  <h2>Contact Us</h2>
-  <p>Questions or concerns? Email us:</p>
-  <p><strong>Email:</strong> <a href="mailto:support@rewardly.ca">support@rewardly.ca</a></p>
+  <p>Questions, concerns, or data requests:</p>
+  <p><strong>Email:</strong> <a href="mailto:privacy@rewardly.ca">privacy@rewardly.ca</a></p>
+  <p><strong>General support:</strong> <a href="mailto:support@rewardly.ca">support@rewardly.ca</a></p>
   <p><strong>Website:</strong> <a href="https://rewardly.ca">rewardly.ca</a></p>
+  <p><strong>Company:</strong> Motu Inc., Canada</p>
 
   <footer>
-    <p>&copy; 2026 Rewardly. Built in Canada, for Canadians.</p>
+    <p>&copy; 2026 Rewardly by Motu Inc. Built in Canada, for Canadians.</p>
   </footer>
 </body>
 </html>
