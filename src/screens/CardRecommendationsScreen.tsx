@@ -49,7 +49,13 @@ function RecommendationCard({
   showAffiliateLink,
   onPress,
 }: RecommendationCardProps) {
-  const { card, reason, estimatedAnnualRewards, signupBonus, _affiliateUrl } = recommendation;
+  const {
+    card,
+    reason,
+    estimatedAnnualRewards,
+    signupBonus,
+    affiliateUrl: _affiliateUrl,
+  } = recommendation;
   const upToRate = formatUpToRate(card);
   const categoryRates = formatTopCategoryRates(card, 3);
   const bestFor = formatBestForCategories(card, 3);

@@ -22,9 +22,9 @@ interface StoreSelectorProps {
 
 export function StoreSelector({
   onStoreSelect,
-  _onCategorySelect,
+  onCategorySelect: _onCategorySelect,
   selectedStore,
-  _selectedCategory,
+  selectedCategory: _selectedCategory,
   label = 'Select Store',
   placeholder = 'Search for a store...',
 }: StoreSelectorProps) {

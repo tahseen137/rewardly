@@ -13,7 +13,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { AlertCircle, ChevronRight } from 'lucide-react-native';
+import { AlertCircle, ChevronRight, TrendingDown } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';

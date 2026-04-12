@@ -226,8 +226,7 @@ class SageServiceClass {
       }
 
       // Manual SSE Parsing
-      // @ts-expect-error - ReadableStream/getReader depends on RN version/polyfills
-      const reader = response.body.getReader();
+      const reader = (response.body as any).getReader();
       const decoder = new TextDecoder();
       let buffer = '';
       let rawBody = ''; // Capture full body for JSON fallback detection

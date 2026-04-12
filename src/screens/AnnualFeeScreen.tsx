@@ -50,7 +50,7 @@ interface WorthBadgeProps {
   reason?: string;
 }
 
-function WorthBadge({ worth, _reason }: WorthBadgeProps) {
+function WorthBadge({ worth, reason: _reason }: WorthBadgeProps) {
   const config = {
     yes: {
       icon: CheckCircle,

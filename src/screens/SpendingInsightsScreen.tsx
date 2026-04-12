@@ -64,7 +64,7 @@ interface PieChartProps {
   onSlicePress?: (slice: PieSlice) => void;
 }
 
-function AnimatedPieChart({ slices, totalSpending, _onSlicePress }: PieChartProps) {
+function AnimatedPieChart({ slices, totalSpending, onSlicePress: _onSlicePress }: PieChartProps) {
   const animationProgress = useSharedValue(0);
 
   useEffect(() => {

@@ -43,7 +43,7 @@ type UpgradeScreenProps = {
 };
 
 export default function UpgradeScreen({ route, navigation }: UpgradeScreenProps) {
-  const { feature, _source } = route.params || {};
+  const { feature, source: _source } = route.params || {};
   const [showPaywall, setShowPaywall] = useState(true);
 
   // Auto-show paywall on mount
