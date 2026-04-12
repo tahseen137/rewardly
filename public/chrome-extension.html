@@ -118,7 +118,7 @@ nav{background:#0a0a1a;padding:14px 24px;display:flex;align-items:center;justify
 .calc-result{background:#fff;border-radius:14px;padding:24px;text-align:center;border:1px solid #ede9fe;box-shadow:0 4px 16px rgba(124,58,237,.08)}
 .calc-result .result-num{font-size:2.6rem;font-weight:800;color:#7c3aed;line-height:1}
 .calc-result .result-label{font-size:.9rem;color:#666;margin-top:6px}
-.calc-result .result-sub{font-size:.8rem;color:#999;margin-top:4px}
+.calc-result .result-sub{font-size:.8rem;color:#767676;margin-top:4px}
 .calc-note{font-size:.82rem;color:#888;margin-top:14px;text-align:center}
 
 /* FEATURES */
@@ -332,7 +332,7 @@ footer a:hover{color:#fff}
       <div class="store-chip">Home Depot<div class="cashback">up to 2.0%</div></div>
       <div class="store-chip">Winners<div class="cashback">up to 3.5%</div></div>
       <div class="store-chip">MEC<div class="cashback">up to 4.0%</div></div>
-      <div class="store-chip">+ 98 more<div class="cashback" style="color:#888">stores</div></div>
+      <div class="store-chip">+ 98 more<div class="cashback">stores</div></div>
     </div>
 
     <p class="stores-more">Also covers: fashion, travel, health &amp; beauty, home, electronics, and more. <strong>New stores added weekly.</strong></p>
@@ -349,12 +349,12 @@ footer a:hover{color:#fff}
     <div class="calc-box">
       <div class="calc-row">
         <div class="calc-field">
-          <label>Monthly online spending</label>
+          <label for="spend-slider">Monthly online spending</label>
           <span class="val" id="spend-val">$500/month</span>
           <input type="range" id="spend-slider" min="100" max="3000" step="50" value="500">
         </div>
         <div class="calc-field">
-          <label>Avg. cashback % you use now</label>
+          <label for="rate-slider">Avg. cashback % you use now</label>
           <span class="val" id="rate-val">1.0%</span>
           <input type="range" id="rate-slider" min="0" max="3" step="0.1" value="1.0">
         </div>

@@ -276,7 +276,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
-                autoComplete="password"
+                autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                 editable={!isLoading}
               />
               <TouchableOpacity
