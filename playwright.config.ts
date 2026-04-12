@@ -13,10 +13,12 @@ export default defineConfig({
     trace: 'on-first-retry',
     // Give SPA time to render
     actionTimeout: 15_000,
+    screenshot: 'only-on-failure',
+  },
 
+  expect: {
     // Visual regression defaults — lenient enough for anti-aliasing + sub-pixel
     // differences across platforms while still catching real layout breaks.
-    screenshot: 'only-on-failure',
     toHaveScreenshot: {
       // Up to 3% of pixels may differ (covers font-hinting, GPU rasterization)
       maxDiffPixelRatio: 0.03,
