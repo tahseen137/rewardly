@@ -195,14 +195,24 @@ serve(async (req: Request) => {
     const bestCard = cardRewards[0];
     const alternativeCards = cardRewards.slice(1);
 
-    // Log analytics (optional - can be disabled in production)
+    // Log analytics (optional - can be disabled in production). Failures are
+    // non-fatal but must be logged with enough context to diagnose later.
     if (userId) {
-      await supabase.from('autopilot_analytics').insert({
+      const { error: analyticsError } = await supabase.from('autopilot_analytics').insert({
         user_id: userId,
         event_type: 'recommendation_generated',
         merchant_category: effectiveCategory,
         card_id: bestCard.cardId,
-      }).catch(console.error); // Don't fail on analytics error
+      });
+      if (analyticsError) {
+        console.error('[get-best-card] analytics insert failed', {
+          userId,
+          category: effectiveCategory,
+          cardId: bestCard.cardId,
+          error: analyticsError.message,
+          code: analyticsError.code,
+        });
+      }
     }
 
     return new Response(

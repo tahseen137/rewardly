@@ -1,11 +1,11 @@
 /**
  * Lazy Screen Loader - Safe Screen Loading with Error Boundaries
- * 
+ *
  * Wrap screens that use native-only features with this utility to:
  * 1. Lazy load the screen (reduce initial bundle impact)
  * 2. Catch errors during loading and render a fallback
  * 3. Prevent a single broken screen from crashing the whole app
- * 
+ *
  * Usage:
  *   const MyScreen = lazyScreen(() => import('../screens/MyScreen'));
  */
@@ -13,6 +13,7 @@
 import React, { Suspense, ComponentType, lazy } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '../theme/colors';
+import { reportError } from './errorReporting';
 
 // ============================================================================
 // Loading Fallback Component
@@ -32,7 +33,7 @@ export function LoadingFallback({ message = 'Loading...' }: LoadingFallbackProps
 }
 
 // ============================================================================
-// Error Fallback Component  
+// Error Fallback Component
 // ============================================================================
 
 interface ErrorFallbackProps {
@@ -48,9 +49,7 @@ export function ScreenErrorFallback({ error, resetError, screenName }: ErrorFall
       <Text style={styles.errorTitle}>
         {screenName ? `${screenName} failed to load` : 'Screen failed to load'}
       </Text>
-      <Text style={styles.errorMessage}>
-        {error.message || 'An unexpected error occurred'}
-      </Text>
+      <Text style={styles.errorMessage}>{error.message || 'An unexpected error occurred'}</Text>
       {resetError && (
         <TouchableOpacity style={styles.retryButton} onPress={resetError}>
           <Text style={styles.retryText}>Try Again</Text>
@@ -93,8 +92,13 @@ class LazyScreenErrorBoundary extends React.Component<LazyErrorBoundaryProps, Er
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error(`[LazyScreen] Error in ${this.props.screenName || 'screen'}:`, error, errorInfo);
-    
-    // TODO: Send to error tracking service (Sentry, etc.)
+
+    // Route to the error reporter (Sentry/Bugsnag/noop — see errorReporting.ts).
+    reportError(error, {
+      source: 'LazyScreen',
+      screenName: this.props.screenName,
+      componentStack: errorInfo.componentStack,
+    });
   }
 
   resetError = () => {
@@ -136,7 +140,7 @@ interface LazyScreenOptions {
 
 /**
  * Create a lazy-loaded screen component with built-in error handling
- * 
+ *
  * @example
  * const AutoPilotScreen = lazyScreen(
  *   () => import('../screens/AutoPilotScreen'),
@@ -152,7 +156,13 @@ export function lazyScreen<P extends object>(
 
   const WrappedScreen: ComponentType<P> = (props: P) => (
     <LazyScreenErrorBoundary screenName={screenName} fallback={errorComponent}>
-      <Suspense fallback={loadingComponent || <LoadingFallback message={screenName ? `Loading ${screenName}...` : 'Loading...'} />}>
+      <Suspense
+        fallback={
+          loadingComponent || (
+            <LoadingFallback message={screenName ? `Loading ${screenName}...` : 'Loading...'} />
+          )
+        }
+      >
         <LazyComponent {...props} />
       </Suspense>
     </LazyScreenErrorBoundary>

@@ -4,7 +4,7 @@
  * Requirements: 8.1, 8.2, 8.3, 8.4
  */
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -116,9 +116,9 @@ export default function HomeScreen() {
   const [recommendations, setRecommendations] = useState<CardRecommendation[]>([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  
+
   // Top cards for category - shown when user has no portfolio
-  const [topCardsForCategory, setTopCardsForCategory] = useState<CalculatorOutput | null>(null);
+  const [, setTopCardsForCategory] = useState<CalculatorOutput | null>(null);
 
   // Function to load data
   const loadData = useCallback(async () => {
@@ -128,7 +128,7 @@ export default function HomeScreen() {
       const userHasCards = portfolio.length > 0;
       setHasCards(userHasCards);
       setState((prev) => ({ ...prev, isLoading: false, loadError: null }));
-      
+
       // Load recommendations only for users with cards
       if (userHasCards) {
         setRecommendationsLoading(true);
@@ -173,18 +173,25 @@ export default function HomeScreen() {
     setRefreshing(false);
   }, [loadData]);
 
-  // Subscribe to country changes
+  // Subscribe to country changes. Use a monotonic request ID to discard
+  // stale responses — if the user toggles country twice rapidly, only the
+  // most recent refresh is allowed to update state.
+  const countryRequestId = useRef(0);
   useEffect(() => {
     const unsubscribe = CountryChangeEmitter.subscribe(async () => {
-      // Re-fetch data when country changes - use refreshCards to clear cache
+      const requestId = ++countryRequestId.current;
       setState((prev) => ({ ...prev, isLoading: true, results: null }));
       setRecommendations([]);
       try {
         await refreshCards(); // Clears cache and fetches new country's cards
-        await loadData(); // BUG FIX: Await loadData to prevent race condition
+        // Abort if a newer country change has started in the meantime.
+        if (requestId !== countryRequestId.current) return;
+        await loadData();
       } catch (err) {
         console.warn('Failed to refresh cards for new country:', err);
-        setState((prev) => ({ ...prev, isLoading: false }));
+        if (requestId === countryRequestId.current) {
+          setState((prev) => ({ ...prev, isLoading: false }));
+        }
       }
     });
     return unsubscribe;
@@ -215,10 +222,13 @@ export default function HomeScreen() {
   }, []);
 
   // Handle CategoryGrid selection (converts CategoryType to SpendingCategory)
-  const handleCategoryGridSelect = useCallback((categoryType: CategoryType) => {
-    const spendingCat = categoryTypeToSpendingCategory(categoryType);
-    handleCategorySelect(spendingCat);
-  }, [handleCategorySelect]);
+  const handleCategoryGridSelect = useCallback(
+    (categoryType: CategoryType) => {
+      const spendingCat = categoryTypeToSpendingCategory(categoryType);
+      handleCategorySelect(spendingCat);
+    },
+    [handleCategorySelect]
+  );
 
   // Handle amount change
   const handleAmountChange = useCallback((amount: number | null) => {
@@ -321,7 +331,12 @@ export default function HomeScreen() {
       <View style={styles.container}>
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
           <View style={styles.header}>
-            <Skeleton width="60%" height={28} borderRadius={8} style={{ alignSelf: 'center', marginBottom: 8 }} />
+            <Skeleton
+              width="60%"
+              height={28}
+              borderRadius={8}
+              style={{ alignSelf: 'center', marginBottom: 8 }}
+            />
             <Skeleton width="80%" height={14} borderRadius={4} style={{ alignSelf: 'center' }} />
           </View>
           <SkeletonCard style={{ marginBottom: 16 }} />
@@ -337,7 +352,9 @@ export default function HomeScreen() {
   // Show error state if database failed to load
   if (state.loadError) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+      <View
+        style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}
+      >
         <Text style={[styles.title, { marginBottom: 10 }]}>Unable to Load Data</Text>
         <Text style={[styles.subtitle, { textAlign: 'center' }]}>{state.loadError}</Text>
       </View>
@@ -388,20 +405,18 @@ export default function HomeScreen() {
 
         {/* Category Grid - Replaces CategoryPicker */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>
-            {t('home.category') || 'Category'}
-          </Text>
+          <Text style={styles.sectionLabel}>{t('home.category') || 'Category'}</Text>
           <CategoryGrid
-            selectedCategory={state.selectedCategory ? spendingCategoryToCategoryType(state.selectedCategory) : null}
+            selectedCategory={
+              state.selectedCategory ? spendingCategoryToCategoryType(state.selectedCategory) : null
+            }
             onCategorySelect={handleCategoryGridSelect}
           />
         </View>
 
         {/* Amount Input */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>
-            {t('home.purchaseAmount') || 'Purchase Amount'}
-          </Text>
+          <Text style={styles.sectionLabel}>{t('home.purchaseAmount') || 'Purchase Amount'}</Text>
           <AmountInput
             value={state.amount}
             onChange={handleAmountChange}
@@ -442,7 +457,9 @@ export default function HomeScreen() {
               amount={state.amount || 0}
               cards={getAllCardsSync()}
               category={state.selectedCategory || undefined}
-              onCardPress={(result) => navigation.navigate('CardDetail' as never, { cardId: result.cardId } as never)}
+              onCardPress={(result) =>
+                navigation.navigate('CardDetail' as never, { cardId: result.cardId } as never)
+              }
             />
           </View>
         ) : state.selectedCategory && state.amount ? (
@@ -473,7 +490,7 @@ export default function HomeScreen() {
                   {t('home.recommendedCards') || 'Recommended Cards'}
                 </Text>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.seeAllButton}
                 onPress={() => navigation.navigate('Insights', { screen: 'ExploreCards' } as never)}
                 accessibilityRole="button"
@@ -494,10 +511,12 @@ export default function HomeScreen() {
                 {recommendations.map((rec, index) => {
                   const upToRate = formatUpToRate(rec.card);
                   return (
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       key={rec.card.id}
                       style={styles.recommendationItem}
-                      onPress={() => navigation.navigate('CardDetail' as never, { cardId: rec.card.id } as never)}
+                      onPress={() =>
+                        navigation.navigate('CardDetail' as never, { cardId: rec.card.id } as never)
+                      }
                       accessibilityRole="button"
                       accessibilityLabel={`View ${rec.card.name} details`}
                     >
@@ -521,9 +540,7 @@ export default function HomeScreen() {
                             ${rec.estimatedAnnualRewards.toFixed(0)}/yr
                           </Text>
                         ) : (
-                          <Text style={styles.rewardValue}>
-                            {upToRate}
-                          </Text>
+                          <Text style={styles.rewardValue}>{upToRate}</Text>
                         )}
                       </View>
                     </TouchableOpacity>
@@ -533,7 +550,8 @@ export default function HomeScreen() {
             ) : (
               <View style={styles.noRecommendations}>
                 <Text style={styles.noRecommendationsText}>
-                  {t('home.noRecommendations') || 'Add spending data to get personalized recommendations'}
+                  {t('home.noRecommendations') ||
+                    'Add spending data to get personalized recommendations'}
                 </Text>
               </View>
             )}
@@ -548,7 +566,7 @@ export default function HomeScreen() {
 // Styles
 // ============================================================================
 
-const createStyles = (theme: Theme) =>
+const createStyles = (_t: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
