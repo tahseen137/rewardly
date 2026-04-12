@@ -61,8 +61,8 @@ export interface SignupBonus {
   spendRequirement: number; // In CAD
   timeframeDays: number;
   // Enhanced display fields
-  description?: string;    // Human-readable (e.g., "15,000 MR points")
-  value?: number;          // Dollar value of bonus in CAD
+  description?: string; // Human-readable (e.g., "15,000 MR points")
+  value?: number; // Dollar value of bonus in CAD
   timeframeMonths?: number; // Timeframe in months (e.g., 3 for 3 months)
 }
 
@@ -380,11 +380,11 @@ export interface CategoryComparison {
 /**
  * F9: Notifications
  */
-export type NotificationType = 
-  | 'sub_deadline' 
-  | 'fee_renewal' 
-  | 'bonus_category' 
-  | 'monthly_report' 
+export type NotificationType =
+  | 'sub_deadline'
+  | 'fee_renewal'
+  | 'bonus_category'
+  | 'monthly_report'
   | 'new_card_offer'
   | 'spending_alert'
   | 'general';
@@ -410,7 +410,7 @@ export interface AppNotification {
  * Spending categories matching existing SpendingCategory enum
  * Extended to include 'transit' for the spending profile
  */
-export type SpendingProfileCategory = 
+export type SpendingProfileCategory =
   | 'groceries'
   | 'dining'
   | 'gas'
@@ -427,8 +427,8 @@ export type SpendingProfileCategory =
  */
 export interface SpendingProfile {
   id: string;
-  userId: string | null;  // null for anonymous/local-only users
-  groceries: number;      // Monthly $ amount
+  userId: string | null; // null for anonymous/local-only users
+  groceries: number; // Monthly $ amount
   dining: number;
   gas: number;
   travel: number;
@@ -462,10 +462,10 @@ export interface SpendingProfileInput {
  * F21: Wallet Optimizer Constraints
  */
 export interface WalletConstraints {
-  maxTotalAnnualFees: number;        // e.g., $300/yr max across all cards
-  maxCards: 2 | 3;                   // Number of cards in combination
-  preferredBanks?: string[];         // e.g., ["TD", "RBC"]
-  excludedCardIds?: string[];        // Cards user doesn't want
+  maxTotalAnnualFees: number; // e.g., $300/yr max across all cards
+  maxCards: 2 | 3; // Number of cards in combination
+  preferredBanks?: string[]; // e.g., ["TD", "RBC"]
+  excludedCardIds?: string[]; // Cards user doesn't want
   country: 'CA' | 'US';
   preferredRewardType?: 'cashback' | 'points' | 'any';
 }
@@ -477,11 +477,11 @@ export interface CategoryAssignment {
   category: SpendingCategory;
   bestCardId: string;
   bestCardName: string;
-  rewardRate: number;                // e.g., 4 for 4% or 4x
+  rewardRate: number; // e.g., 4 for 4% or 4x
   rewardType: RewardType;
   monthlySpend: number;
-  monthlyRewards: number;            // In CAD
-  annualRewards: number;             // In CAD
+  monthlyRewards: number; // In CAD
+  annualRewards: number; // In CAD
 }
 
 /**
@@ -491,11 +491,11 @@ export interface WalletCombination {
   rank: number;
   cardIds: string[];
   cards: Card[];
-  totalAnnualRewards: number;        // Before fees, in CAD
+  totalAnnualRewards: number; // Before fees, in CAD
   totalAnnualFees: number;
-  netAnnualValue: number;            // Rewards - Fees
+  netAnnualValue: number; // Rewards - Fees
   categoryAssignments: CategoryAssignment[];
-  effectiveRewardRate: number;       // Weighted average across all spending
+  effectiveRewardRate: number; // Weighted average across all spending
 }
 
 /**
@@ -504,7 +504,7 @@ export interface WalletCombination {
 export interface CurrentWalletComparison {
   currentCardIds: string[];
   currentNetValue: number;
-  improvement: number;               // $ more per year
+  improvement: number; // $ more per year
   improvementPercent: number;
 }
 
@@ -514,9 +514,9 @@ export interface CurrentWalletComparison {
 export interface WalletOptimizerResult {
   spendingProfile: SpendingProfile;
   constraints: WalletConstraints;
-  recommendations: WalletCombination[];  // Top N combinations
+  recommendations: WalletCombination[]; // Top N combinations
   totalCombinationsEvaluated: number;
-  prunedCardCount: number;               // Cards after pruning
+  prunedCardCount: number; // Cards after pruning
   computeTimeMs: number;
   vsCurrentWallet?: CurrentWalletComparison;
 }
@@ -525,7 +525,7 @@ export interface WalletOptimizerResult {
  * F22: Timeline entry for signup bonus progress
  */
 export interface SignupBonusTimelineEntry {
-  month: number;                     // 1, 2, 3, etc.
+  month: number; // 1, 2, 3, etc.
   cumulativeSpend: number;
   hitTarget: boolean;
   percentComplete: number;
@@ -541,17 +541,17 @@ export type SignupBonusVerdict = 'excellent' | 'good' | 'marginal' | 'not_worth_
  */
 export interface SignupBonusROI {
   card: Card;
-  bonusValueCAD: number;             // Converted to CAD
+  bonusValueCAD: number; // Converted to CAD
   minimumSpend: number;
   timeframeDays: number;
-  monthlySpendNeeded: number;        // To hit minimum on time
-  userMonthlySpend: number;          // From spending profile
+  monthlySpendNeeded: number; // To hit minimum on time
+  userMonthlySpend: number; // From spending profile
   canHitMinimum: boolean;
   monthsToHit: number;
-  percentOfTimeframeUsed: number;    // monthsToHit / (timeframeDays / 30)
+  percentOfTimeframeUsed: number; // monthsToHit / (timeframeDays / 30)
   timeline: SignupBonusTimelineEntry[];
-  firstYearValue: number;            // Bonus + rewards - fee
-  ongoingAnnualValue: number;        // Year 2+ rewards - fee
+  firstYearValue: number; // Bonus + rewards - fee
+  ongoingAnnualValue: number; // Year 2+ rewards - fee
   verdict: SignupBonusVerdict;
   verdictReason: string;
 }
@@ -564,7 +564,7 @@ export interface FeeCategoryBreakdown {
   monthlySpend: number;
   rewardRate: number;
   annualRewards: number;
-  percentOfFeeRecovered: number;     // This category alone covers X% of fee
+  percentOfFeeRecovered: number; // This category alone covers X% of fee
 }
 
 /**
@@ -573,8 +573,8 @@ export interface FeeCategoryBreakdown {
 export interface NoFeeComparison {
   bestNoFeeCard: Card;
   noFeeAnnualRewards: number;
-  feeCardAdvantage: number;          // Can be negative
-  verdict: string;                   // Human-readable verdict
+  feeCardAdvantage: number; // Can be negative
+  verdict: string; // Human-readable verdict
 }
 
 /**
@@ -589,13 +589,13 @@ export interface FeeBreakevenResult {
   card: Card;
   annualFee: number;
   annualRewardsEarned: number;
-  netValue: number;                  // Rewards - Fee
-  breakEvenMonthlySpend: number;     // Total spend needed to justify fee
+  netValue: number; // Rewards - Fee
+  breakEvenMonthlySpend: number; // Total spend needed to justify fee
   userMonthlySpend: number;
   userAnnualSpend: number;
   exceedsBreakeven: boolean;
-  surplusOverBreakeven: number;      // How much above breakeven (or deficit if negative)
-  multiplierOverFee: number;         // e.g., 2.5 means rewards are 2.5x the fee
+  surplusOverBreakeven: number; // How much above breakeven (or deficit if negative)
+  multiplierOverFee: number; // e.g., 2.5 means rewards are 2.5x the fee
   categoryBreakdown: FeeCategoryBreakdown[];
   noFeeComparison?: NoFeeComparison;
   verdict: FeeBreakevenVerdict;
@@ -609,7 +609,7 @@ export interface PrunedCard {
   cardId: string;
   card: Card;
   topCategories: SpendingCategory[]; // Categories where this card is top 15
-  maxCategoryRate: number;           // Highest category rate
+  maxCategoryRate: number; // Highest category rate
   annualFee: number;
 }
 
@@ -644,7 +644,7 @@ export type FeeBreakevenError =
 /**
  * F24: Supported banks for CSV parsing
  */
-export type SupportedBank = 
+export type SupportedBank =
   | 'td'
   | 'rbc'
   | 'cibc'
@@ -659,8 +659,8 @@ export type SupportedBank =
  */
 export interface BankDetectionResult {
   bank: SupportedBank | null;
-  confidence: number;           // 0-100
-  matchedPatterns: string[];    // Which patterns matched
+  confidence: number; // 0-100
+  matchedPatterns: string[]; // Which patterns matched
   suggestedBank?: SupportedBank; // If confidence < 80, suggest for user confirmation
 }
 
@@ -675,15 +675,15 @@ export type CategoryConfidence = 'high' | 'medium' | 'low';
 export interface ParsedTransaction {
   id: string;
   date: Date;
-  description: string;          // Raw from CSV
-  normalizedMerchant: string;   // Cleaned merchant name
-  amount: number;               // Always positive for purchases
-  isCredit: boolean;            // true = payment/refund, false = purchase
+  description: string; // Raw from CSV
+  normalizedMerchant: string; // Cleaned merchant name
+  amount: number; // Always positive for purchases
+  isCredit: boolean; // true = payment/refund, false = purchase
   category: SpendingCategory;
   categoryConfidence: CategoryConfidence;
-  userCorrected: boolean;       // true if user manually changed category
+  userCorrected: boolean; // true if user manually changed category
   sourceBank: SupportedBank;
-  cardLast4?: string;           // If available from CSV
+  cardLast4?: string; // If available from CSV
 }
 
 /**
@@ -691,15 +691,15 @@ export interface ParsedTransaction {
  */
 export interface StatementUpload {
   id: string;
-  userId: string | null;        // null for anonymous/local-only
+  userId: string | null; // null for anonymous/local-only
   fileName: string;
   bank: SupportedBank;
   uploadDate: Date;
   periodStart: Date;
   periodEnd: Date;
   transactionCount: number;
-  totalSpend: number;           // Sum of non-credit transactions
-  totalCredits: number;         // Sum of credits/payments
+  totalSpend: number; // Sum of non-credit transactions
+  totalCredits: number; // Sum of credits/payments
 }
 
 /**
@@ -715,7 +715,7 @@ export interface StatementWithTransactions extends StatementUpload {
 export interface MerchantPattern {
   pattern: RegExp;
   category: SpendingCategory;
-  merchantName: string;         // Normalized display name
+  merchantName: string; // Normalized display name
   confidence: CategoryConfidence;
 }
 
@@ -725,7 +725,7 @@ export interface MerchantPattern {
 export interface UserMerchantMapping {
   id: string;
   userId: string;
-  pattern: string;              // Stored as string, converted to RegExp
+  pattern: string; // Stored as string, converted to RegExp
   category: SpendingCategory;
   merchantName: string;
   createdAt: Date;
@@ -782,11 +782,11 @@ export interface CategoryBreakdown {
   transactionCount: number;
   percentOfTotal: number;
   topMerchants: MerchantSummary[];
-  currentCard: Card | null;     // Which card they used (if known)
-  optimalCard: Card | null;     // Which card they SHOULD use
-  rewardsEarned: number;        // What they got (estimated)
-  rewardsPossible: number;      // What they could get with optimal
-  rewardsGap: number;           // Money left on the table
+  currentCard: Card | null; // Which card they used (if known)
+  optimalCard: Card | null; // Which card they SHOULD use
+  rewardsEarned: number; // What they got (estimated)
+  rewardsPossible: number; // What they could get with optimal
+  rewardsGap: number; // Money left on the table
 }
 
 /**
@@ -803,12 +803,12 @@ export interface MerchantSummary {
  * F25: Optimization score (0-100)
  */
 export interface OptimizationScore {
-  score: number;                // 0-100
-  label: string;                // "Rewards Master", "Good Optimizer", etc.
-  emoji: string;                // 🏆, 👍, 📊, 🎯
-  actualRewards: number;        // Total rewards earned
-  maxPossibleRewards: number;   // Max with optimal cards
-  rewardsGap: number;           // Difference
+  score: number; // 0-100
+  label: string; // "Rewards Master", "Good Optimizer", etc.
+  emoji: string; // 🏆, 👍, 📊, 🎯
+  actualRewards: number; // Total rewards earned
+  maxPossibleRewards: number; // Max with optimal cards
+  rewardsGap: number; // Difference
   improvementPotential: string; // Human-readable suggestion
 }
 
@@ -822,13 +822,13 @@ export interface SpendingTrend {
   changePercent: number;
   changeAmount: number;
   direction: 'up' | 'down' | 'stable';
-  alert?: SmartAlert;           // Alert if significant change
+  alert?: SmartAlert; // Alert if significant change
 }
 
 /**
  * F25: Smart alert types
  */
-export type SmartAlertType = 
+export type SmartAlertType =
   | 'spending_increase'
   | 'spending_decrease'
   | 'card_switch'
@@ -872,7 +872,7 @@ export interface SpendingInsights {
  * F25: Monthly summary for trend analysis
  */
 export interface MonthlySummary {
-  month: Date;                  // First day of month
+  month: Date; // First day of month
   totalSpend: number;
   byCategory: Record<SpendingCategory, number>;
   transactionCount: number;
@@ -929,7 +929,7 @@ export interface TransactionFilter {
 /**
  * Achievement category types
  */
-export type AchievementCategory = 
+export type AchievementCategory =
   | 'getting_started'
   | 'optimization'
   | 'data_insights'
@@ -940,13 +940,13 @@ export type AchievementCategory =
  * Achievement definition (static, never changes)
  */
 export interface AchievementDefinition {
-  id: string;                          // e.g., "GS1", "OP1"
-  name: string;                        // Display name
-  description: string;                 // What user did to earn it
+  id: string; // e.g., "GS1", "OP1"
+  name: string; // Display name
+  description: string; // What user did to earn it
   category: AchievementCategory;
-  icon: string;                        // Emoji
-  progressTarget?: number;             // For progressive achievements (e.g., 5 cards)
-  secret?: boolean;                    // Hidden until unlocked
+  icon: string; // Emoji
+  progressTarget?: number; // For progressive achievements (e.g., 5 cards)
+  secret?: boolean; // Hidden until unlocked
 }
 
 /**
@@ -954,31 +954,31 @@ export interface AchievementDefinition {
  */
 export interface AchievementProgress {
   achievementId: string;
-  unlockedAt?: Date;                   // null if locked
-  progress: number;                    // Current progress value
-  progressTarget: number;              // Target value (from definition)
+  unlockedAt?: Date; // null if locked
+  progress: number; // Current progress value
+  progressTarget: number; // Target value (from definition)
   isUnlocked: boolean;
-  percentComplete: number;             // 0-100
+  percentComplete: number; // 0-100
 }
 
 /**
  * User's complete achievement state
  */
 export interface UserAchievements {
-  userId: string | null;               // null for anonymous/local-only
+  userId: string | null; // null for anonymous/local-only
   achievements: Record<string, AchievementProgress>;
-  currentStreak: number;               // Consecutive days opened app
-  longestStreak: number;               // Best streak ever
-  lastVisitDate: string;               // YYYY-MM-DD format
-  rank: number;                        // 1-6
-  rankTitle: string;                   // "Beginner", "Card Curious", etc.
-  totalUnlocked: number;               // Count of unlocked achievements
-  totalAchievements: number;           // Total available achievements
-  screensVisited: string[];            // For "Explorer" achievement
-  cardBenefitsViewed: string[];        // Card IDs viewed for "Card Scholar"
-  sageChatsCount: number;              // For "Sage Seeker"
-  statementsUploaded: number;          // For "Statement Pro" / "Data Driven"
-  comparisonsCount: number;            // For "Comparer"
+  currentStreak: number; // Consecutive days opened app
+  longestStreak: number; // Best streak ever
+  lastVisitDate: string; // YYYY-MM-DD format
+  rank: number; // 1-6
+  rankTitle: string; // "Beginner", "Card Curious", etc.
+  totalUnlocked: number; // Count of unlocked achievements
+  totalAchievements: number; // Total available achievements
+  screensVisited: string[]; // For "Explorer" achievement
+  cardBenefitsViewed: string[]; // Card IDs viewed for "Card Scholar"
+  sageChatsCount: number; // For "Sage Seeker"
+  statementsUploaded: number; // For "Statement Pro" / "Data Driven"
+  comparisonsCount: number; // For "Comparer"
   updatedAt: Date;
 }
 
@@ -1056,13 +1056,13 @@ export type ApplicationStatus = 'approved' | 'pending' | 'denied';
  */
 export interface CardApplication {
   id: string;
-  cardId: string;                      // Reference to card in DB
-  cardName: string;                    // Denormalized for display
-  issuer: string;                      // Issuer name
+  cardId: string; // Reference to card in DB
+  cardName: string; // Denormalized for display
+  issuer: string; // Issuer name
   applicationDate: Date;
-  approvalDate?: Date;                 // May differ from application date
+  approvalDate?: Date; // May differ from application date
   status: ApplicationStatus;
-  fallOffDate: Date;                   // applicationDate + 24 months
+  fallOffDate: Date; // applicationDate + 24 months
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -1085,12 +1085,12 @@ export interface CardApplicationInput {
  */
 export interface IssuerRule {
   issuer: string;
-  cooldownDays: number;                // 0 = no cooldown
-  isStrict: boolean;                   // Strict = auto-denial, Soft = may flag review
+  cooldownDays: number; // 0 = no cooldown
+  isStrict: boolean; // Strict = auto-denial, Soft = may flag review
   description: string;
-  maxAppsPerPeriod?: number;           // e.g., 5/24 = 5 apps per 24 months
-  periodMonths?: number;               // For maxAppsPerPeriod
-  welcomeBonusRule?: string;           // "once per lifetime", etc.
+  maxAppsPerPeriod?: number; // e.g., 5/24 = 5 apps per 24 months
+  periodMonths?: number; // For maxAppsPerPeriod
+  welcomeBonusRule?: string; // "once per lifetime", etc.
 }
 
 /**
@@ -1101,9 +1101,9 @@ export interface IssuerCooldownStatus {
   isEligible: boolean;
   lastApplicationDate?: Date;
   nextEligibleDate?: Date;
-  daysUntilEligible: number;           // 0 if eligible now
+  daysUntilEligible: number; // 0 if eligible now
   rule: IssuerRule;
-  applicationCountInPeriod: number;    // How many apps to this issuer in period
+  applicationCountInPeriod: number; // How many apps to this issuer in period
 }
 
 /**
@@ -1114,12 +1114,12 @@ export interface CardEligibility {
   cardName: string;
   issuer: string;
   isEligible: boolean;
-  reasons: string[];                   // All reasons (may be multiple)
-  eligibleDate?: Date;                 // When they'll become eligible
+  reasons: string[]; // All reasons (may be multiple)
+  eligibleDate?: Date; // When they'll become eligible
   daysUntilEligible: number;
   cooldownStatus: IssuerCooldownStatus;
   previousApplications: CardApplication[]; // Past apps for this card
-  welcomeBonusEligible: boolean;       // Based on issuer rules
+  welcomeBonusEligible: boolean; // Based on issuer rules
 }
 
 /**
@@ -1142,12 +1142,12 @@ export interface StrategyAdvice {
   issuer: string;
   recommendation: 'apply_now' | 'wait' | 'caution' | 'not_recommended';
   reasons: string[];
-  suggestedDate?: Date;                // If "wait", when to apply
-  priority: number;                    // Lower = apply first
+  suggestedDate?: Date; // If "wait", when to apply
+  priority: number; // Lower = apply first
   impact: {
-    will524Increase: boolean;          // Will applying increase 5/24 count?
-    new524Count: number;               // What 5/24 count would be after
-    affectedIssuers: string[];         // Which issuer cooldowns would start
+    will524Increase: boolean; // Will applying increase 5/24 count?
+    new524Count: number; // What 5/24 count would be after
+    affectedIssuers: string[]; // Which issuer cooldowns would start
   };
 }
 
@@ -1157,11 +1157,11 @@ export interface StrategyAdvice {
 export interface ApplicationTracker {
   userId: string | null;
   applications: CardApplication[];
-  countLast24Months: number;           // The "X/24" number
-  countLast12Months: number;           // Additional tracking
+  countLast24Months: number; // The "X/24" number
+  countLast12Months: number; // Additional tracking
   issuerCooldowns: IssuerCooldownStatus[];
-  upcoming: ApplicationTimelineEvent[];// Future falloffs and eligibility dates
-  alerts: TrackerAlert[];              // Active alerts
+  upcoming: ApplicationTimelineEvent[]; // Future falloffs and eligibility dates
+  alerts: TrackerAlert[]; // Active alerts
   updatedAt: Date;
 }
 
@@ -1175,7 +1175,7 @@ export interface TrackerAlert {
   message: string;
   issuer?: string;
   cardId?: string;
-  date: Date;                          // When the event occurs
+  date: Date; // When the event occurs
   dismissed: boolean;
   createdAt: Date;
 }
@@ -1199,7 +1199,7 @@ export interface ApplicationStrategy {
   advice: StrategyAdvice[];
   timeline: ApplicationTimelineEvent[];
   warnings: string[];
-  summary: string;                     // Human-readable summary
+  summary: string; // Human-readable summary
 }
 
 // ----------------------------------------------------------------------------

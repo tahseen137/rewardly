@@ -10,7 +10,7 @@
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       line-height: 1.6;
@@ -19,45 +19,45 @@
       margin: 0 auto;
       padding: 40px 20px;
     }
-    
+
     h1 {
       font-size: 32px;
       margin-bottom: 8px;
       color: #1f2937;
     }
-    
+
     .last-updated {
       color: #6b7280;
       margin-bottom: 32px;
       font-size: 14px;
     }
-    
+
     h2 {
       font-size: 24px;
       margin-top: 32px;
       margin-bottom: 16px;
       color: #1f2937;
     }
-    
+
     p {
       margin-bottom: 16px;
       color: #4b5563;
     }
-    
+
     ul {
       margin-bottom: 16px;
       padding-left: 24px;
     }
-    
+
     li {
       margin-bottom: 8px;
       color: #4b5563;
     }
-    
+
     strong {
       color: #1f2937;
     }
-    
+
     .highlight-box {
       background: #f0f4ff;
       border-left: 4px solid #667eea;
@@ -65,20 +65,20 @@
       margin: 24px 0;
       border-radius: 4px;
     }
-    
+
     .highlight-box p {
       margin: 0;
     }
-    
+
     a {
       color: #667eea;
       text-decoration: none;
     }
-    
+
     a:hover {
       text-decoration: underline;
     }
-    
+
     footer {
       margin-top: 48px;
       padding-top: 24px;
@@ -91,62 +91,74 @@
 </head>
 <body>
   <h1>Privacy Policy</h1>
-  <p class="last-updated">Last updated: March 22, 2026</p>
-  
+  <p class="last-updated">Last updated: April 11, 2026</p>
+
   <div class="highlight-box">
-    <p><strong>TL;DR:</strong> Rewardly stores all your data locally on your device. We don't collect, sell, or share your personal information. We never see your bank credentials or purchase history. Your privacy is non-negotiable.</p>
+    <p><strong>TL;DR:</strong> Rewardly stores your card selections, loyalty memberships, and shopping activity (merchant, category, page URL, and the estimated reward value of each transaction) locally on your device. We never send any of this to our servers. We never see your bank credentials, card numbers, or your identity. Card selections and settings sync across your own Chrome browsers via Google's built-in Chrome Sync. Your privacy is non-negotiable.</p>
   </div>
-  
+
   <h2>What Data We Collect</h2>
-  <p>Rewardly collects minimal data to provide its core service:</p>
+  <p>Rewardly collects the minimum data needed to provide its core service. All of the following is stored on your own device (and, for items marked "synced," across your own Chrome browsers via Google's Chrome Sync):</p>
   <ul>
-    <li><strong>Credit cards you add:</strong> Card names and IDs (e.g., "Amex Cobalt") — stored locally in Chrome's sync storage</li>
-    <li><strong>Loyalty programs you select:</strong> Program IDs (e.g., "PC Optimum") — stored locally</li>
-    <li><strong>Shopping activity:</strong> Merchant names, categories, and estimated savings (e.g., "Loblaws, groceries, $4.20 saved") — stored locally</li>
-    <li><strong>Extension settings:</strong> Your preferences (e.g., blacklisted sites, popup settings) — stored locally</li>
+    <li><strong>Credit cards you own:</strong> Card identifiers only — e.g., <code>amex-cobalt</code> or <code>rbc-avion-visa-infinite</code>. We never ask for and never store card numbers, CVVs, expiry dates, or cardholder names. <em>Stored in <code>chrome.storage.sync</code> (synced across your Chrome browsers).</em></li>
+    <li><strong>Loyalty programs you belong to:</strong> Program identifiers only — e.g., <code>pc-optimum</code>, <code>scene-plus</code>. No membership numbers, points balances, or personal details. <em>Stored in <code>chrome.storage.sync</code>.</em></li>
+    <li><strong>Extension settings:</strong> Your preferences (blacklisted sites, popup settings, notification preferences). <em>Stored in <code>chrome.storage.sync</code>.</em></li>
+    <li><strong>Savings log:</strong> For each visit to a supported Canadian merchant, the extension records the merchant name, spend category, the card it recommended, an estimated reward value derived from the cart total shown on the page, a checkout flag, the page URL, and a timestamp. Example entry: <code>{ merchant: "Loblaws", category: "groceries", cardRecommended: "amex-cobalt", estimatedSavings: 4.20, url: "loblaws.ca/cart", timestamp: ... }</code>. <em>Stored in <code>chrome.storage.local</code> on this device only.</em></li>
+    <li><strong>Internal analytics log:</strong> Extension events (popup shown, card recommendation displayed, upgrade suggestion clicked, etc.) with timestamp, the URL of the page where the event occurred, and the user agent string of your browser. Used to power the in-extension savings dashboard. <em>Stored in <code>chrome.storage.local</code> on this device only.</em></li>
+    <li><strong>Cached card and merchant data:</strong> A daily refresh of the 393-card reward-rate database and 240-merchant list, fetched from our backend so you don't pay network costs on every checkout. This is application data, not your data. <em>Stored in <code>chrome.storage.local</code>.</em></li>
   </ul>
-  
+
   <h2>What We DON'T Collect</h2>
   <ul>
     <li>❌ Bank account credentials or passwords</li>
-    <li>❌ Credit card numbers or CVVs</li>
-    <li>❌ Purchase amounts or transaction details</li>
-    <li>❌ Personal identifying information (name, email, address)</li>
-    <li>❌ Browsing history outside of merchant detection</li>
-    <li>❌ Any data that leaves your device</li>
+    <li>❌ Credit card numbers, CVVs, expiry dates, or cardholder names</li>
+    <li>❌ Loyalty program membership numbers or points balances</li>
+    <li>❌ Your name, email address, phone number, postal address, or date of birth</li>
+    <li>❌ Your credit score, creditworthiness, or lending history</li>
+    <li>❌ Individual items in your shopping cart (product names, SKUs, descriptions)</li>
+    <li>❌ IP address, GPS location, or any geolocation data</li>
+    <li>❌ Cookies or cross-site tracking identifiers</li>
+    <li>❌ Any of the above via third-party analytics, ad networks, or tracking pixels</li>
   </ul>
-  
+
   <h2>Where Your Data is Stored</h2>
-  <p>All data is stored locally on your device using Chrome's built-in storage APIs:</p>
+  <p>Rewardly uses Chrome's built-in storage APIs. We do not operate any user database or server-side store of your personal data.</p>
   <ul>
-    <li><strong>chrome.storage.sync:</strong> Selected cards and loyalty programs (syncs across your Chrome browsers if you're signed in)</li>
-    <li><strong>chrome.storage.local:</strong> Savings log, analytics events, affiliate state (stays on this device only)</li>
+    <li><strong><code>chrome.storage.sync</code>:</strong> Your selected cards, loyalty programs, and settings. This data is encrypted and synced by Google across Chrome browsers where you are signed in to the same Google account. Google's handling of sync data is governed by the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</li>
+    <li><strong><code>chrome.storage.local</code>:</strong> Savings log, internal analytics log, affiliate-suggestion state, and the cached card/merchant database. This data stays on this device only and is never uploaded anywhere.</li>
   </ul>
-  <p>We do NOT have servers that collect or store your data. Everything stays on your computer.</p>
-  
+  <p>We do not operate any backend that stores user data. The only server-side component Rewardly talks to is a public, read-only card-database endpoint (described below).</p>
+
   <h2>What We Do With Your Data</h2>
   <p>Your data is used solely to provide Rewardly's core features:</p>
   <ul>
     <li>Show you the best credit card recommendation at checkout</li>
-    <li>Calculate your estimated savings over time</li>
-    <li>Suggest high-value credit card upgrades based on your shopping patterns</li>
+    <li>Calculate your estimated savings over time for the in-extension dashboard</li>
+    <li>Suggest a different card from your wallet when it would consistently earn you more (only when the estimated monthly gain is at least $10)</li>
     <li>Respect your blacklist and settings preferences</li>
   </ul>
   <p>We do NOT:</p>
   <ul>
     <li>Sell your data to third parties</li>
-    <li>Share your data with advertisers</li>
-    <li>Track you across the web</li>
+    <li>Share your data with advertisers or data brokers</li>
+    <li>Use your data for cross-site advertising or retargeting</li>
     <li>Build user profiles for marketing</li>
+    <li>Use or transfer your data to determine creditworthiness or for lending purposes</li>
   </ul>
-  
+
   <h2>Third-Party Services</h2>
-  <p>Rewardly fetches publicly available credit card earn rates and merchant data from our API (<code>rewardly.ca/api/*</code>) to keep card data up-to-date. These API requests do NOT include any personal data — only version checks.</p>
-  <p>If you click an affiliate link to apply for a recommended card, you'll be redirected to the card issuer's website (e.g., American Express, RBC). Those sites have their own privacy policies — we recommend reading them before applying.</p>
-  
+  <p>Rewardly makes anonymous, read-only HTTPS requests to a Supabase-hosted public database (<code>https://zdlozhpmqrtvvhdzbmrv.supabase.co</code>) to fetch the latest credit card reward rates, reward programs, and point valuations. These requests:</p>
+  <ul>
+    <li>Use a public anonymous API key — no user login</li>
+    <li>Contain no personal data of any kind in the request body, headers, or query string</li>
+    <li>Are issued roughly once per day by the background service worker for caching purposes</li>
+    <li>Return JSON data only — no remote code is ever loaded or executed</li>
+  </ul>
+  <p>If you click a "learn more" or card-application link, you will be redirected to the card issuer's website (e.g., American Express, RBC, Scotiabank). Those sites have their own privacy policies — we recommend reading them before applying. Rewardly may be compensated for successful applications through affiliate relationships with card issuers; this does not change the recommendation algorithm, which always shows the card in your own wallet that earns the most.</p>
+
   <h2>Cookies and Tracking</h2>
   <p>Rewardly does NOT use cookies or any tracking technologies. We don't integrate with Google Analytics, Facebook Pixel, or any third-party analytics services.</p>
-  
+
   <h2>Data Retention</h2>
   <p>Your data is stored locally until you:</p>
   <ul>
@@ -155,7 +167,7 @@
     <li>Remove specific cards or loyalty programs through the settings</li>
   </ul>
   <p>We do NOT have backups of your data because we never receive it in the first place.</p>
-  
+
   <h2>Your Rights</h2>
   <p>You have full control over your data:</p>
   <ul>
@@ -163,7 +175,7 @@
     <li><strong>Delete:</strong> Remove individual cards/programs or uninstall the extension entirely</li>
     <li><strong>Export:</strong> Chrome's sync storage can be accessed via Developer Tools (for power users)</li>
   </ul>
-  
+
   <h2>Security</h2>
   <p>Because all data is stored locally on your device, security is managed by Chrome's built-in protections. We recommend:</p>
   <ul>
@@ -171,18 +183,18 @@
     <li>Using a strong device password</li>
     <li>Enabling two-factor authentication on your Google account (if using Chrome sync)</li>
   </ul>
-  
+
   <h2>Children's Privacy</h2>
   <p>Rewardly is not intended for children under 18. We do not knowingly collect data from minors. If you're under 18, please do not use this extension.</p>
-  
+
   <h2>Changes to This Policy</h2>
   <p>We may update this privacy policy from time to time. Changes will be posted at <a href="https://rewardly.ca/privacy">rewardly.ca/privacy</a> with an updated "Last updated" date. Continued use of the extension after changes means you accept the new policy.</p>
-  
+
   <h2>Contact Us</h2>
   <p>Questions or concerns? Email us:</p>
   <p><strong>Email:</strong> <a href="mailto:support@rewardly.ca">support@rewardly.ca</a></p>
   <p><strong>Website:</strong> <a href="https://rewardly.ca">rewardly.ca</a></p>
-  
+
   <footer>
     <p>&copy; 2026 Rewardly. Built in Canada, for Canadians.</p>
   </footer>

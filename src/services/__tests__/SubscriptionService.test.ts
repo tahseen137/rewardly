@@ -1,12 +1,11 @@
 /**
  * SubscriptionService - Unit Tests
- * 
+ *
  * Tests tier logic, feature gating, card limits, and Sage usage tracking
  */
 
 import {
   SubscriptionTier,
-  Feature,
   CARD_LIMITS,
   SAGE_LIMITS,
   SUBSCRIPTION_TIERS,
@@ -78,7 +77,7 @@ describe('SubscriptionService - Tier Definitions', () => {
     });
 
     it('should have feature descriptions for each tier', () => {
-      Object.values(SUBSCRIPTION_TIERS).forEach(tier => {
+      Object.values(SUBSCRIPTION_TIERS).forEach((tier) => {
         expect(tier.featureDescriptions).toBeDefined();
         expect(Array.isArray(tier.featureDescriptions)).toBe(true);
         expect(tier.featureDescriptions.length).toBeGreaterThan(0);
@@ -89,7 +88,7 @@ describe('SubscriptionService - Tier Definitions', () => {
   describe('getTierConfig', () => {
     it('should return correct config for each tier', () => {
       const tiers: SubscriptionTier[] = ['free', 'pro', 'max', 'lifetime', 'admin'];
-      tiers.forEach(tier => {
+      tiers.forEach((tier) => {
         const config = getTierConfig(tier);
         expect(config).toBeDefined();
         expect(config.id).toBe(tier);
@@ -101,7 +100,7 @@ describe('SubscriptionService - Tier Definitions', () => {
     it('should return exactly 4 tiers (excludes admin)', () => {
       const configs = getAllTierConfigs();
       expect(configs.length).toBe(4);
-      expect(configs.map(c => c.id)).toEqual(['free', 'pro', 'max', 'lifetime']);
+      expect(configs.map((c) => c.id)).toEqual(['free', 'pro', 'max', 'lifetime']);
     });
   });
 });
@@ -130,12 +129,12 @@ describe('SubscriptionService - Feature Access', () => {
     it('should have Max tier with all features including Pro', () => {
       const maxFeatures = TIER_FEATURES.max;
       const proFeatures = TIER_FEATURES.pro;
-      
+
       // Max should include all Pro features
-      proFeatures.forEach(feature => {
+      proFeatures.forEach((feature) => {
         expect(maxFeatures).toContain(feature);
       });
-      
+
       // Max should also include exclusive features
       expect(maxFeatures).toContain('smartwallet');
       expect(maxFeatures).toContain('multi_country');
@@ -367,7 +366,7 @@ describe('SubscriptionService - Lifetime Tier', () => {
     it('should have all Max-level features', () => {
       const lifetimeFeatures = TIER_FEATURES.lifetime;
       const maxFeatures = TIER_FEATURES.max;
-      maxFeatures.forEach(feature => {
+      maxFeatures.forEach((feature) => {
         expect(lifetimeFeatures).toContain(feature);
       });
     });
@@ -402,7 +401,7 @@ describe('SubscriptionService - Lifetime Tier', () => {
 });
 
 // ============================================================================
-// Feature Description Tests  
+// Feature Description Tests
 // ============================================================================
 
 describe('SubscriptionService - Feature Descriptions', () => {

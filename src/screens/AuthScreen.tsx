@@ -14,7 +14,6 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -38,7 +37,7 @@ interface AuthScreenProps {
 
 export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
   const { t } = useTranslation();
-  
+
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgotPassword'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -54,19 +53,19 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       setError(t('auth.errors.emailRequired'));
       return;
     }
-    
+
     // Basic email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setError('Please enter a valid email address.');
       return;
     }
-    
+
     if (!password) {
       setError(t('auth.errors.passwordRequired'));
       return;
     }
-    
+
     if (mode === 'signup') {
       if (password.length < 6) {
         setError(t('auth.errors.passwordTooShort'));
@@ -83,7 +82,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
     try {
       let result: AuthResult;
-      
+
       if (mode === 'signup') {
         result = await signUp(email.trim(), password);
       } else {
@@ -92,7 +91,9 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
       if (result.success) {
         if (result.needsEmailConfirmation) {
-          setSuccessMessage(`Check your email ✉️ We've sent a confirmation link to ${email.trim()}. Please verify your email to complete sign up.`);
+          setSuccessMessage(
+            `Check your email ✉️ We've sent a confirmation link to ${email.trim()}. Please verify your email to complete sign up.`
+          );
           setMode('signin');
           setPassword('');
           setConfirmPassword('');
@@ -102,14 +103,14 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       } else {
         setError(result.error ?? t('auth.errors.unknown'));
       }
-    } catch (err) {
+    } catch {
       setError(t('auth.errors.unknown'));
     } finally {
       setIsLoading(false);
     }
   }, [email, password, confirmPassword, mode, onAuthSuccess, t]);
 
-  const handleGoogleSignIn = useCallback(async () => {
+  const _handleGoogleSignIn = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -120,14 +121,14 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       } else {
         setError(result.error ?? t('auth.errors.googleFailed'));
       }
-    } catch (err) {
+    } catch {
       setError(t('auth.errors.googleFailed'));
     } finally {
       setIsLoading(false);
     }
   }, [onAuthSuccess, t]);
 
-  const handleAppleSignIn = useCallback(async () => {
+  const _handleAppleSignIn = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -138,7 +139,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       } else {
         setError(result.error ?? t('auth.errors.appleFailed'));
       }
-    } catch (err) {
+    } catch {
       setError(t('auth.errors.appleFailed'));
     } finally {
       setIsLoading(false);
@@ -156,7 +157,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       } else {
         setError(result.error ?? t('auth.errors.guestFailed'));
       }
-    } catch (err) {
+    } catch {
       setError(t('auth.errors.guestFailed'));
     } finally {
       setIsLoading(false);
@@ -182,7 +183,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       setError(t('auth.errors.emailRequired') || 'Please enter your email address.');
       return;
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setError('Please enter a valid email address.');
@@ -195,7 +196,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       if (!supabase) {
         throw new Error('Supabase not configured');
       }
-      
+
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: 'rewardly://reset-password',
       });
@@ -231,7 +232,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
             {mode === 'forgotPassword' ? 'Reset Password' : t('auth.title')}
           </Text>
           <Text style={styles.subtitle}>
-            {mode === 'forgotPassword' 
+            {mode === 'forgotPassword'
               ? 'Enter your email to receive a reset link'
               : t('auth.subtitle')}
           </Text>
@@ -345,9 +346,11 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
                 <ActivityIndicator color={colors.background.primary} />
               ) : (
                 <Text style={styles.primaryButtonText}>
-                  {mode === 'forgotPassword' 
+                  {mode === 'forgotPassword'
                     ? 'Send Reset Link'
-                    : mode === 'signin' ? t('auth.signIn') : t('auth.signUp')}
+                    : mode === 'signin'
+                      ? t('auth.signIn')
+                      : t('auth.signUp')}
                 </Text>
               )}
             </LinearGradient>
@@ -355,9 +358,15 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
           {/* Toggle Mode / Back to Sign In */}
           <TouchableOpacity
-            onPress={mode === 'forgotPassword' 
-              ? () => { setMode('signin'); setError(null); setSuccessMessage(null); }
-              : toggleMode}
+            onPress={
+              mode === 'forgotPassword'
+                ? () => {
+                    setMode('signin');
+                    setError(null);
+                    setSuccessMessage(null);
+                  }
+                : toggleMode
+            }
             style={styles.toggleButton}
             disabled={isLoading}
           >
@@ -423,9 +432,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            {t('auth.termsNotice')}
-          </Text>
+          <Text style={styles.footerText}>{t('auth.termsNotice')}</Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

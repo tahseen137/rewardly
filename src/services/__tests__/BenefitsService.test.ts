@@ -1,6 +1,6 @@
 /**
  * BenefitsService - Unit Tests
- * 
+ *
  * Tests card benefits data, tier gating, and filtering
  */
 
@@ -16,7 +16,6 @@ import {
   sortBenefitsByPriority,
 } from '../BenefitsService';
 import { Benefit, BenefitCategory } from '../../types';
-import { SubscriptionTier } from '../SubscriptionService';
 
 // Mock dependencies
 jest.mock('../CardDataService', () => ({
@@ -89,7 +88,7 @@ describe('BenefitsService - getBenefitsForCard', () => {
       id: 'card-1',
       name: 'Test Card',
     } as any);
-    
+
     const benefits = getBenefitsForCard('card-1');
     expect(benefits).toEqual([]);
   });
@@ -108,7 +107,7 @@ describe('BenefitsService - getBenefitsForCard', () => {
 describe('BenefitsService - getBenefitsByCategory', () => {
   it('should group benefits by category correctly', () => {
     const grouped = getBenefitsByCategory(mockBenefits);
-    
+
     expect(grouped.travel).toHaveLength(1);
     expect(grouped.purchase).toHaveLength(2);
     expect(grouped.insurance).toHaveLength(1);
@@ -117,7 +116,7 @@ describe('BenefitsService - getBenefitsByCategory', () => {
 
   it('should handle empty benefits array', () => {
     const grouped = getBenefitsByCategory([]);
-    
+
     expect(grouped.travel).toEqual([]);
     expect(grouped.purchase).toEqual([]);
     expect(grouped.insurance).toEqual([]);
@@ -125,14 +124,16 @@ describe('BenefitsService - getBenefitsByCategory', () => {
   });
 
   it('should initialize all categories even if some are empty', () => {
-    const onlyTravel: Benefit[] = [{
-      name: 'Travel Insurance',
-      description: 'Coverage',
-      category: 'travel',
-    }];
-    
+    const onlyTravel: Benefit[] = [
+      {
+        name: 'Travel Insurance',
+        description: 'Coverage',
+        category: 'travel',
+      },
+    ];
+
     const grouped = getBenefitsByCategory(onlyTravel);
-    
+
     expect(grouped.travel).toHaveLength(1);
     expect(grouped.purchase).toEqual([]);
     expect(grouped.insurance).toEqual([]);
@@ -294,7 +295,7 @@ describe('BenefitsService - getBenefitCategoryName', () => {
 
   it('should return name for all valid categories', () => {
     const categories: BenefitCategory[] = ['travel', 'purchase', 'insurance', 'lifestyle'];
-    categories.forEach(cat => {
+    categories.forEach((cat) => {
       const name = getBenefitCategoryName(cat);
       expect(name).toBeTruthy();
       expect(typeof name).toBe('string');
@@ -350,7 +351,7 @@ describe('BenefitsService - getBenefitCategoryIcon', () => {
 
   it('should return valid icon name for all categories', () => {
     const categories: BenefitCategory[] = ['travel', 'purchase', 'insurance', 'lifestyle'];
-    categories.forEach(cat => {
+    categories.forEach((cat) => {
       const icon = getBenefitCategoryIcon(cat);
       expect(icon).toBeTruthy();
       expect(typeof icon).toBe('string');
@@ -365,7 +366,7 @@ describe('BenefitsService - getBenefitCategoryIcon', () => {
 describe('BenefitsService - sortBenefitsByPriority', () => {
   it('should sort benefits by priority (travel > insurance > purchase > lifestyle)', () => {
     const sorted = sortBenefitsByPriority(mockBenefits);
-    
+
     expect(sorted[0].category).toBe('travel');
     expect(sorted[sorted.length - 1].category).toBe('lifestyle');
   });
@@ -392,7 +393,7 @@ describe('BenefitsService - sortBenefitsByPriority', () => {
       mockBenefits[1], // Purchase Protection
       mockBenefits[4], // Extended Warranty
     ];
-    
+
     const sorted = sortBenefitsByPriority(twoPurchase);
     expect(sorted).toHaveLength(2);
     expect(sorted[0].category).toBe('purchase');

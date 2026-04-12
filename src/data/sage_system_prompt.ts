@@ -1,11 +1,11 @@
 /**
  * Sage System Prompt Generator
- * 
+ *
  * Generates context-aware system prompts for the AI assistant based on user data.
  * Includes card expertise, redemption knowledge, and travel planning capabilities.
  */
 
-import { Card, UserCard, UserPreferences, RewardType, SpendingCategory } from '../types';
+import { Card, UserPreferences, RewardType } from '../types';
 
 /**
  * User context for building the system prompt
@@ -42,11 +42,14 @@ function formatCardRewards(card: Card): string {
     card.baseRewardRate.unit,
     card.baseRewardRate.type
   );
-  
+
   const categoryBonuses = card.categoryRewards
-    .map(cr => `${cr.category}: ${formatRewardRate(cr.rewardRate.value, cr.rewardRate.unit, cr.rewardRate.type)}`)
+    .map(
+      (cr) =>
+        `${cr.category}: ${formatRewardRate(cr.rewardRate.value, cr.rewardRate.unit, cr.rewardRate.type)}`
+    )
     .join(', ');
-  
+
   return categoryBonuses ? `Base: ${baseRate}; Bonuses: ${categoryBonuses}` : `Base: ${baseRate}`;
 }
 
@@ -63,27 +66,42 @@ function formatValuation(card: Card): string {
  * Generate the system prompt for Sage AI assistant
  */
 export function generateSageSystemPrompt(context: SageUserContext): string {
-  const { cards, preferences, pointBalances, country = 'US', subscriptionTier = 'free' } = context;
-  
+  const {
+    cards,
+    preferences,
+    pointBalances,
+    country = 'US',
+    subscriptionTier: _subscriptionTier = 'free',
+  } = context;
+
   // Build card portfolio summary
-  const cardSummary = cards.length > 0
-    ? cards.map(card => {
-        const valuation = formatValuation(card);
-        return `• ${card.name} (${card.issuer}) - ${card.rewardProgram}${valuation}\n  Rewards: ${formatCardRewards(card)}`;
-      }).join('\n\n')
-    : 'User has not added any cards to their portfolio yet.';
-  
+  const cardSummary =
+    cards.length > 0
+      ? cards
+          .map((card) => {
+            const valuation = formatValuation(card);
+            return `• ${card.name} (${card.issuer}) - ${card.rewardProgram}${valuation}\n  Rewards: ${formatCardRewards(card)}`;
+          })
+          .join('\n\n')
+      : 'User has not added any cards to their portfolio yet.';
+
   // Build point balances summary
-  const balancesSummary = pointBalances && pointBalances.size > 0
-    ? Array.from(pointBalances.entries())
-        .map(([program, balance]) => `• ${program}: ${balance.toLocaleString()} points`)
-        .join('\n')
-    : 'Point balances not tracked.';
-  
+  const balancesSummary =
+    pointBalances && pointBalances.size > 0
+      ? Array.from(pointBalances.entries())
+          .map(([program, balance]) => `• ${program}: ${balance.toLocaleString()} points`)
+          .join('\n')
+      : 'Point balances not tracked.';
+
   // Format preferences
-  const preferredRewardType = preferences.rewardType === RewardType.CASHBACK ? 'cash back' :
-    preferences.rewardType === RewardType.AIRLINE_MILES ? 'airline miles' :
-    preferences.rewardType === RewardType.HOTEL_POINTS ? 'hotel points' : 'points';
+  const preferredRewardType =
+    preferences.rewardType === RewardType.CASHBACK
+      ? 'cash back'
+      : preferences.rewardType === RewardType.AIRLINE_MILES
+        ? 'airline miles'
+        : preferences.rewardType === RewardType.HOTEL_POINTS
+          ? 'hotel points'
+          : 'points';
 
   return `You are Sage, a friendly credit card rewards expert helping users in ${country === 'CA' ? 'Canada' : 'the United States'} maximize their rewards.
 
@@ -145,11 +163,12 @@ ${balancesSummary}
  */
 export function generateSageContextPrompt(context: SageUserContext): string {
   const { cards, preferences, country = 'US' } = context;
-  
-  const cardList = cards.length > 0
-    ? cards.map(c => `${c.name} (${c.rewardProgram})`).join(', ')
-    : 'No cards added';
-  
+
+  const cardList =
+    cards.length > 0
+      ? cards.map((c) => `${c.name} (${c.rewardProgram})`).join(', ')
+      : 'No cards added';
+
   return `User context: ${country} resident, prefers ${preferences.rewardType}, cards: ${cardList}`;
 }
 
@@ -159,98 +178,131 @@ export function generateSageContextPrompt(context: SageUserContext): string {
 export const SAGE_TOOLS = [
   {
     name: 'lookup_card',
-    description: 'Search the credit card database by name to get current details, reward rates, annual fees, and benefits. Use this when you need accurate information about a specific card.',
+    description:
+      'Search the credit card database by name to get current details, reward rates, annual fees, and benefits. Use this when you need accurate information about a specific card.',
     parameters: {
       type: 'object',
       properties: {
         cardName: {
           type: 'string',
-          description: 'The name of the card to look up (e.g., "Chase Sapphire Preferred", "Amex Gold")'
-        }
+          description:
+            'The name of the card to look up (e.g., "Chase Sapphire Preferred", "Amex Gold")',
+        },
       },
-      required: ['cardName']
-    }
+      required: ['cardName'],
+    },
   },
   {
     name: 'compare_cards',
-    description: 'Compare two credit cards to help the user decide which is better for their needs. Can compare overall or for a specific spending category.',
+    description:
+      'Compare two credit cards to help the user decide which is better for their needs. Can compare overall or for a specific spending category.',
     parameters: {
       type: 'object',
       properties: {
         card1: {
           type: 'string',
-          description: 'First card name to compare'
+          description: 'First card name to compare',
         },
         card2: {
           type: 'string',
-          description: 'Second card name to compare'
+          description: 'Second card name to compare',
         },
         category: {
           type: 'string',
-          enum: ['groceries', 'dining', 'gas', 'travel', 'online_shopping', 'entertainment', 'drugstores', 'home_improvement', 'other'],
-          description: 'Optional specific category to compare for'
-        }
+          enum: [
+            'groceries',
+            'dining',
+            'gas',
+            'travel',
+            'online_shopping',
+            'entertainment',
+            'drugstores',
+            'home_improvement',
+            'other',
+          ],
+          description: 'Optional specific category to compare for',
+        },
       },
-      required: ['card1', 'card2']
-    }
+      required: ['card1', 'card2'],
+    },
   },
   {
     name: 'best_card_for',
-    description: "Find the best card from the user's portfolio for a specific spending category. Returns ranked recommendations with reward rates.",
+    description:
+      "Find the best card from the user's portfolio for a specific spending category. Returns ranked recommendations with reward rates.",
     parameters: {
       type: 'object',
       properties: {
         category: {
           type: 'string',
-          enum: ['groceries', 'dining', 'gas', 'travel', 'online_shopping', 'entertainment', 'drugstores', 'home_improvement', 'other'],
-          description: 'The spending category to find the best card for'
+          enum: [
+            'groceries',
+            'dining',
+            'gas',
+            'travel',
+            'online_shopping',
+            'entertainment',
+            'drugstores',
+            'home_improvement',
+            'other',
+          ],
+          description: 'The spending category to find the best card for',
         },
         userCardIds: {
           type: 'array',
           items: { type: 'string' },
-          description: "Array of card IDs from user's portfolio"
-        }
+          description: "Array of card IDs from user's portfolio",
+        },
       },
-      required: ['category', 'userCardIds']
-    }
+      required: ['category', 'userCardIds'],
+    },
   },
   {
     name: 'calculate_redemption',
-    description: 'Calculate the value of points/miles for a specific redemption. Helps users understand the best way to use their rewards.',
+    description:
+      'Calculate the value of points/miles for a specific redemption. Helps users understand the best way to use their rewards.',
     parameters: {
       type: 'object',
       properties: {
         program: {
           type: 'string',
-          description: 'The rewards program (e.g., "Chase Ultimate Rewards", "Amex Membership Rewards", "Aeroplan")'
+          description:
+            'The rewards program (e.g., "Chase Ultimate Rewards", "Amex Membership Rewards", "Aeroplan")',
         },
         points: {
           type: 'number',
-          description: 'Number of points to redeem'
+          description: 'Number of points to redeem',
         },
         redemptionType: {
           type: 'string',
-          enum: ['travel_transfer', 'cash_back', 'statement_credit', 'gift_card', 'travel_portal', 'merchandise'],
-          description: 'Type of redemption to calculate'
+          enum: [
+            'travel_transfer',
+            'cash_back',
+            'statement_credit',
+            'gift_card',
+            'travel_portal',
+            'merchandise',
+          ],
+          description: 'Type of redemption to calculate',
         },
         destination: {
           type: 'string',
-          description: 'Optional destination for travel calculations (e.g., "Tokyo", "Paris")'
-        }
+          description: 'Optional destination for travel calculations (e.g., "Tokyo", "Paris")',
+        },
       },
-      required: ['program', 'points']
-    }
-  }
+      required: ['program', 'points'],
+    },
+  },
 ];
 
 /**
  * Convert tools to Anthropic format
  */
 export function getAnthropicTools() {
-  return SAGE_TOOLS.map(tool => ({
+  return SAGE_TOOLS.map((tool) => ({
     name: tool.name,
     description: tool.description,
-    input_schema: tool.parameters
+    input_schema: tool.parameters,
   }));
 }
 
@@ -258,13 +310,13 @@ export function getAnthropicTools() {
  * Convert tools to OpenAI format
  */
 export function getOpenAITools() {
-  return SAGE_TOOLS.map(tool => ({
+  return SAGE_TOOLS.map((tool) => ({
     type: 'function' as const,
     function: {
       name: tool.name,
       description: tool.description,
-      parameters: tool.parameters
-    }
+      parameters: tool.parameters,
+    },
   }));
 }
 

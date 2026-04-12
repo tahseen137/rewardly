@@ -1,6 +1,6 @@
 /**
  * Chat Components Index
- * 
+ *
  * Exports all chat-related components for the Sage AI assistant.
  */
 

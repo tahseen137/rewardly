@@ -42,14 +42,14 @@ export function ReferralDashboardScreen() {
 
   // Load user ID on mount
   useEffect(() => {
-    getCurrentUser().then(user => {
+    getCurrentUser().then((user) => {
       setUserId(user?.id ?? null);
     });
   }, []);
 
   const loadStats = useCallback(async () => {
     if (!userId) return;
-    
+
     try {
       const data = await ReferralService.getReferralStats(userId);
       setStats(data);
@@ -75,10 +75,10 @@ export function ReferralDashboardScreen() {
     if (!stats?.referralLink) return;
 
     try {
-      await Clipboard.setStringAsync(stats.referralLink);
+      Clipboard.setString(stats.referralLink);
       setCopiedTooltip(true);
       setTimeout(() => setCopiedTooltip(false), 2000);
-    } catch (err) {
+    } catch {
       Alert.alert('Error', 'Failed to copy link');
     }
   };
@@ -124,9 +124,7 @@ export function ReferralDashboardScreen() {
 
   const getCurrentReward = () => {
     if (!stats) return null;
-    const current = [...REWARD_TIERS]
-      .reverse()
-      .find((t) => t.threshold <= stats.claimedSignups);
+    const current = [...REWARD_TIERS].reverse().find((t) => t.threshold <= stats.claimedSignups);
     return current;
   };
 
@@ -236,13 +234,11 @@ export function ReferralDashboardScreen() {
       {/* Progress Card */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Reward Progress</Text>
-        
+
         {currentReward && (
           <View style={styles.currentRewardBadge}>
             <Text style={styles.currentRewardIcon}>{currentReward.icon}</Text>
-            <Text style={styles.currentRewardText}>
-              Current: {currentReward.reward}
-            </Text>
+            <Text style={styles.currentRewardText}>Current: {currentReward.reward}</Text>
           </View>
         )}
 
@@ -263,10 +259,7 @@ export function ReferralDashboardScreen() {
                 return (
                   <View
                     key={tier.threshold}
-                    style={[
-                      styles.tierItem,
-                      isUnlocked && styles.tierItemUnlocked,
-                    ]}
+                    style={[styles.tierItem, isUnlocked && styles.tierItemUnlocked]}
                   >
                     <Text style={styles.tierIcon}>{tier.icon}</Text>
                     <View style={styles.tierInfo}>
@@ -284,9 +277,7 @@ export function ReferralDashboardScreen() {
         ) : (
           <View style={styles.maxRewardContainer}>
             <Text style={styles.maxRewardIcon}>🏆</Text>
-            <Text style={styles.maxRewardText}>
-              Congratulations! You've unlocked Lifetime Pro!
-            </Text>
+            <Text style={styles.maxRewardText}>Congratulations! You've unlocked Lifetime Pro!</Text>
           </View>
         )}
       </View>

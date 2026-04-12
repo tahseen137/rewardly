@@ -1,6 +1,6 @@
 /**
  * PointsCalculatorScreen - Shows point valuations and calculates point values
- * 
+ *
  * Key Features:
  * - Browse all rewards programs (CA & US)
  * - Search/filter programs
@@ -20,10 +20,19 @@ import {
   Platform,
   ScrollView,
   Modal,
-  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Search, Calculator, ChevronRight, X, TrendingUp, DollarSign, Plane, Building, CreditCard } from 'lucide-react-native';
+import {
+  Search,
+  Calculator,
+  ChevronRight,
+  X,
+  TrendingUp,
+  DollarSign,
+  Plane,
+  Building,
+  CreditCard,
+} from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { colors } from '../theme/colors';
@@ -76,8 +85,8 @@ function getCategoryIcon(category: string) {
 }
 
 function getCategoryColor(category: string) {
-  if (category.includes('Airline')) return colors.accent.purple;
-  if (category.includes('Hotel')) return colors.secondary.blue;
+  if (category.includes('Airline')) return colors.accent.main;
+  if (category.includes('Hotel')) return colors.info.main;
   return colors.primary.main;
 }
 
@@ -90,7 +99,7 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-function formatNumber(num: number): string {
+function _formatNumber(num: number): string {
   return new Intl.NumberFormat('en-US').format(num);
 }
 
@@ -110,17 +119,15 @@ function ProgramCard({ program, onPress, index }: ProgramCardProps) {
 
   return (
     <Animated.View entering={FadeInDown.delay(index * 50).duration(300)}>
-      <TouchableOpacity
-        style={styles.programCard}
-        onPress={onPress}
-        activeOpacity={0.7}
-      >
+      <TouchableOpacity style={styles.programCard} onPress={onPress} activeOpacity={0.7}>
         <View style={styles.programCardLeft}>
           <View style={[styles.programIcon, { backgroundColor: categoryColor + '20' }]}>
             <IconComponent size={20} color={categoryColor} />
           </View>
           <View style={styles.programInfo}>
-            <Text style={styles.programName} numberOfLines={1}>{program.name}</Text>
+            <Text style={styles.programName} numberOfLines={1}>
+              {program.name}
+            </Text>
             <Text style={styles.programCategory}>{program.category}</Text>
           </View>
         </View>
@@ -155,11 +162,11 @@ function CalculatorModal({ visible, program, onClose }: CalculatorModalProps) {
     if (!program || !points) return 0;
     const pointsNum = parseInt(points.replace(/,/g, ''), 10);
     if (isNaN(pointsNum)) return 0;
-    
-    const centsPerPoint = selectedRedemption 
+
+    const centsPerPoint = selectedRedemption
       ? (selectedRedemption.cents_per_point ?? selectedRedemption.value ?? program.pointValuation)
       : program.pointValuation;
-    
+
     return pointsNum * (centsPerPoint / 100);
   }, [points, program, selectedRedemption]);
 
@@ -232,9 +239,7 @@ function CalculatorModal({ visible, program, onClose }: CalculatorModalProps) {
               </View>
               <View style={styles.resultBox}>
                 <DollarSign size={18} color={colors.primary.main} />
-                <Text style={styles.resultValue}>
-                  {formatCurrency(calculatedValue)}
-                </Text>
+                <Text style={styles.resultValue}>{formatCurrency(calculatedValue)}</Text>
               </View>
             </View>
             {selectedRedemption && (
@@ -252,7 +257,7 @@ function CalculatorModal({ visible, program, onClose }: CalculatorModalProps) {
                 const optionValue = option.cents_per_point ?? option.value ?? 0;
                 const optionType = option.redemption_type || option.type || 'Unknown';
                 const isSelected = selectedRedemption === option;
-                
+
                 return (
                   <TouchableOpacity
                     key={idx}
@@ -260,7 +265,9 @@ function CalculatorModal({ visible, program, onClose }: CalculatorModalProps) {
                     onPress={() => setSelectedRedemption(isSelected ? null : option)}
                   >
                     <View style={styles.redemptionLeft}>
-                      <Text style={[styles.redemptionType, isSelected && styles.redemptionTypeSelected]}>
+                      <Text
+                        style={[styles.redemptionType, isSelected && styles.redemptionTypeSelected]}
+                      >
                         {optionType}
                       </Text>
                       {option.notes && (
@@ -269,8 +276,15 @@ function CalculatorModal({ visible, program, onClose }: CalculatorModalProps) {
                         </Text>
                       )}
                     </View>
-                    <View style={[styles.redemptionValue, isSelected && styles.redemptionValueSelected]}>
-                      <Text style={[styles.redemptionValueText, isSelected && styles.redemptionValueTextSelected]}>
+                    <View
+                      style={[styles.redemptionValue, isSelected && styles.redemptionValueSelected]}
+                    >
+                      <Text
+                        style={[
+                          styles.redemptionValueText,
+                          isSelected && styles.redemptionValueTextSelected,
+                        ]}
+                      >
                         {optionValue.toFixed(2)}¢
                       </Text>
                     </View>
@@ -289,7 +303,7 @@ function CalculatorModal({ visible, program, onClose }: CalculatorModalProps) {
                   const partnerName = typeof partner === 'string' ? partner : partner.name;
                   const partnerType = typeof partner === 'string' ? 'airline' : partner.type;
                   const PartnerIcon = partnerType === 'hotel' ? Building : Plane;
-                  
+
                   return (
                     <View key={idx} style={styles.partnerChip}>
                       <PartnerIcon size={12} color={colors.text.secondary} />
@@ -301,9 +315,7 @@ function CalculatorModal({ visible, program, onClose }: CalculatorModalProps) {
                 })}
                 {transferPartners.length > 10 && (
                   <View style={styles.partnerChip}>
-                    <Text style={styles.partnerName}>
-                      +{transferPartners.length - 10} more
-                    </Text>
+                    <Text style={styles.partnerName}>+{transferPartners.length - 10} more</Text>
                   </View>
                 )}
               </View>
@@ -348,11 +360,11 @@ export default function PointsCalculatorScreen() {
 
   // Combine CA and US programs
   const allPrograms = useMemo(() => {
-    const caPrograms = (caRewardsPrograms.programs || []).map(p => ({
+    const caPrograms = (caRewardsPrograms.programs || []).map((p) => ({
       ...p,
       country: 'CA',
     }));
-    const usPrograms = (usRewardsPrograms.programs || []).map(p => ({
+    const usPrograms = (usRewardsPrograms.programs || []).map((p) => ({
       ...p,
       country: p.country || 'US',
     }));
@@ -361,15 +373,18 @@ export default function PointsCalculatorScreen() {
 
   // Filter programs based on search and country
   const filteredPrograms = useMemo(() => {
-    return allPrograms.filter(program => {
-      const matchesSearch = searchQuery === '' || 
-        program.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        program.category.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesCountry = selectedCountry === 'all' || program.country === selectedCountry;
-      
-      return matchesSearch && matchesCountry;
-    }).sort((a, b) => b.pointValuation - a.pointValuation);
+    return allPrograms
+      .filter((program) => {
+        const matchesSearch =
+          searchQuery === '' ||
+          program.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          program.category.toLowerCase().includes(searchQuery.toLowerCase());
+
+        const matchesCountry = selectedCountry === 'all' || program.country === selectedCountry;
+
+        return matchesSearch && matchesCountry;
+      })
+      .sort((a, b) => b.pointValuation - a.pointValuation);
   }, [allPrograms, searchQuery, selectedCountry]);
 
   const handleProgramPress = useCallback((program: RewardsProgram) => {
@@ -392,9 +407,7 @@ export default function PointsCalculatorScreen() {
           <GradientText style={styles.headerTitle} variant="primary">
             Points Valuator
           </GradientText>
-          <Text style={styles.headerSubtitle}>
-            Know what your points are worth
-          </Text>
+          <Text style={styles.headerSubtitle}>Know what your points are worth</Text>
         </View>
 
         {/* Search */}
@@ -421,24 +434,21 @@ export default function PointsCalculatorScreen() {
           {(['all', 'US', 'CA'] as const).map((country) => (
             <TouchableOpacity
               key={country}
-              style={[
-                styles.filterChip,
-                selectedCountry === country && styles.filterChipActive,
-              ]}
+              style={[styles.filterChip, selectedCountry === country && styles.filterChipActive]}
               onPress={() => setSelectedCountry(country)}
             >
-              <Text style={[
-                styles.filterChipText,
-                selectedCountry === country && styles.filterChipTextActive,
-              ]}>
+              <Text
+                style={[
+                  styles.filterChipText,
+                  selectedCountry === country && styles.filterChipTextActive,
+                ]}
+              >
                 {country === 'all' ? 'All' : country === 'US' ? '🇺🇸 US' : '🇨🇦 CA'}
               </Text>
             </TouchableOpacity>
           ))}
           <View style={styles.programCount}>
-            <Text style={styles.programCountText}>
-              {filteredPrograms.length} programs
-            </Text>
+            <Text style={styles.programCountText}>{filteredPrograms.length} programs</Text>
           </View>
         </View>
 
@@ -447,11 +457,7 @@ export default function PointsCalculatorScreen() {
           data={filteredPrograms}
           keyExtractor={(item) => item.id}
           renderItem={({ item, index }) => (
-            <ProgramCard
-              program={item}
-              onPress={() => handleProgramPress(item)}
-              index={index}
-            />
+            <ProgramCard program={item} onPress={() => handleProgramPress(item)} index={index} />
           )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}

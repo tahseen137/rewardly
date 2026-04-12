@@ -7,9 +7,14 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Card, SpendingCategory, RewardType, CategoryReward, SignupBonus } from '../types';
+import { Card, SpendingCategory, RewardType, CategoryReward } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
-import type { CardRow, CategoryRewardRow, SignupBonusRow, CardWithProgramDetails, RedemptionOption } from './supabase';
+import type {
+  CardRow,
+  CategoryRewardRow,
+  SignupBonusRow,
+  CardWithProgramDetails,
+} from './supabase';
 import { getCountry, Country } from './PreferenceManager';
 
 // ============================================================================
@@ -105,14 +110,16 @@ function transformCardWithProgramDetails(
     applicationUrl: (row as any).application_url || undefined,
     affiliateUrl: (row as any).affiliate_url || undefined,
     // Add program details if available
-    programDetails: row.program_name ? {
-      programName: row.program_name,
-      programCategory: row.program_category || undefined,
-      directRateCents: row.direct_rate_cents || undefined,
-      optimalRateCents: row.optimal_rate_cents || undefined,
-      optimalMethod: row.optimal_method || undefined,
-      redemptionOptions: row.redemption_options || undefined,
-    } : undefined,
+    programDetails: row.program_name
+      ? {
+          programName: row.program_name,
+          programCategory: row.program_category || undefined,
+          directRateCents: row.direct_rate_cents || undefined,
+          optimalRateCents: row.optimal_rate_cents || undefined,
+          optimalMethod: row.optimal_method || undefined,
+          redemptionOptions: row.redemption_options || undefined,
+        }
+      : undefined,
   };
 
   if (signupBonus) {
@@ -306,7 +313,10 @@ async function fetchCardsFromSupabase(country: Country): Promise<Card[]> {
       return cards;
     }
   } catch (error) {
-    console.warn('Failed to fetch from cards_with_program_details view, falling back to cards table:', error);
+    console.warn(
+      'Failed to fetch from cards_with_program_details view, falling back to cards table:',
+      error
+    );
   }
 
   // Fallback to regular cards table if view doesn't exist
@@ -362,7 +372,6 @@ async function fetchCardsFromSupabase(country: Country): Promise<Card[]> {
   return cards;
 }
 
-
 // ============================================================================
 // Public API
 // ============================================================================
@@ -373,7 +382,7 @@ async function fetchCardsFromSupabase(country: Country): Promise<Card[]> {
  */
 export async function getAllCards(): Promise<Card[]> {
   const country = getCountry();
-  
+
   // Check if Supabase is configured
   if (!isSupabaseConfigured()) {
     throw new Error('Database connection not configured. Please check your environment settings.');
@@ -535,11 +544,11 @@ export async function searchCards(query: string): Promise<Card[]> {
  */
 export async function refreshCards(): Promise<Card[]> {
   const country = getCountry();
-  
+
   // Clear memory cache
   memoryCache = null;
   memoryCacheCountry = null;
-  
+
   // Clear storage cache for current country
   try {
     await AsyncStorage.removeItem(getCacheKey(country));

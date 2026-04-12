@@ -20,7 +20,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { X, Check, Crown, Sparkles, Zap, Star } from 'lucide-react-native';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -29,7 +28,6 @@ import {
   BillingPeriod,
   SUBSCRIPTION_TIERS,
   TierConfig,
-  STRIPE_PRICE_IDS,
   getAnnualSavings,
   setTier,
   createCheckoutSession,
@@ -44,10 +42,10 @@ interface PaywallProps {
   defaultTier?: SubscriptionTier;
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
 // Stripe price IDs (live)
-const STRIPE_PRICES = {
+const _STRIPE_PRICES = {
   pro_monthly: 'price_1T0kbiAJmUBqj9CQPd8dhYEu',
   pro_annual: '', // Annual pricing not yet created
   max_monthly: 'price_1T0kcdAJmUBqj9CQeRMyl9h6',
@@ -73,7 +71,7 @@ function getTierIcon(tier: SubscriptionTier) {
 /**
  * Get tier gradient colors
  */
-function getTierGradient(tier: SubscriptionTier): string[] {
+function getTierGradient(tier: SubscriptionTier): [string, string] {
   switch (tier) {
     case 'pro':
       return [colors.primary.main, colors.primary.dark];
@@ -90,16 +88,19 @@ export default function Paywall({
   visible,
   onClose,
   onSubscribe,
-  highlightFeature,
+  highlightFeature: _highlightFeature,
   defaultTier = 'pro',
 }: PaywallProps) {
-  const { t } = useTranslation();
-  
+  const { t: _t } = useTranslation();
+
   // Default to monthly — annual price IDs not yet configured in Stripe
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly');
   const [selectedTier, setSelectedTier] = useState<SubscriptionTier>(defaultTier);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [inlineMessage, setInlineMessage] = useState<{type: 'error' | 'info', text: string} | null>(null);
+  const [inlineMessage, setInlineMessage] = useState<{
+    type: 'error' | 'info';
+    text: string;
+  } | null>(null);
 
   // Show Pro, Max, and Lifetime tiers
   const tiers = [SUBSCRIPTION_TIERS.pro, SUBSCRIPTION_TIERS.max];
@@ -117,31 +118,36 @@ export default function Paywall({
   const handleSubscribe = useCallback(async () => {
     setIsProcessing(true);
     setInlineMessage(null);
-    
+
     try {
       // In development, allow quick testing by setting tier directly
-      if (__DEV__ && false) { // Set to true only for local testing
+      // eslint-disable-next-line no-constant-condition
+      if (__DEV__ && false) {
+        // Set to true only for local testing
         await setTier(selectedTier, billingPeriod);
         onSubscribe?.(selectedTier, billingPeriod);
         onClose();
         return;
       }
-      
+
       // Call create-checkout edge function to get Stripe Checkout URL
       const result = await createCheckoutSession(
         selectedTier as 'pro' | 'max' | 'lifetime',
         billingPeriod === 'annual' ? 'year' : 'month'
       );
-      
+
       if ('error' in result) {
         if (result.error === 'Not authenticated') {
-          setInlineMessage({ type: 'info', text: '🔐 Please create an account or sign in to subscribe.' });
+          setInlineMessage({
+            type: 'info',
+            text: '🔐 Please create an account or sign in to subscribe.',
+          });
         } else {
           setInlineMessage({ type: 'error', text: result.error });
         }
         return;
       }
-      
+
       // Open Stripe Checkout in browser
       if (Platform.OS === 'web') {
         // On web, use window.open for reliable redirect (Linking.openURL can fail in modals)
@@ -160,8 +166,7 @@ export default function Paywall({
       }
     } catch (error) {
       console.error('Subscription error:', error);
-      showAlert('Subscription Error', 'Unable to start subscription. Please try again.'
-      );
+      showAlert('Subscription Error', 'Unable to start subscription. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -169,9 +174,10 @@ export default function Paywall({
 
   const renderTierCard = (tier: TierConfig) => {
     const isSelected = selectedTier === tier.id;
-    const price = billingPeriod === 'annual' 
-      ? (tier.annualPrice / 12).toFixed(2)
-      : tier.monthlyPrice.toFixed(2);
+    const price =
+      billingPeriod === 'annual'
+        ? (tier.annualPrice / 12).toFixed(2)
+        : tier.monthlyPrice.toFixed(2);
     const savings = getAnnualSavings(tier.id);
 
     return (
@@ -190,11 +196,9 @@ export default function Paywall({
             <Text style={styles.popularBadgeText}>MOST POPULAR</Text>
           </View>
         )}
-        
+
         <View style={styles.tierHeader}>
-          <View style={styles.tierIconContainer}>
-            {getTierIcon(tier.id)}
-          </View>
+          <View style={styles.tierIconContainer}>{getTierIcon(tier.id)}</View>
           <Text style={styles.tierName}>{tier.name}</Text>
         </View>
 
@@ -205,9 +209,7 @@ export default function Paywall({
 
         {billingPeriod === 'annual' && savings > 0 && (
           <View style={styles.savingsBadge}>
-            <Text style={styles.savingsText}>
-              Save ${savings.toFixed(0)}/year
-            </Text>
+            <Text style={styles.savingsText}>Save ${savings.toFixed(0)}/year</Text>
           </View>
         )}
 
@@ -269,25 +271,26 @@ export default function Paywall({
             ]}
             onPress={() => setBillingPeriod('monthly')}
           >
-            <Text style={[
-              styles.billingOptionText,
-              billingPeriod === 'monthly' && styles.billingOptionTextActive,
-            ]}>
+            <Text
+              style={[
+                styles.billingOptionText,
+                billingPeriod === 'monthly' && styles.billingOptionTextActive,
+              ]}
+            >
               Monthly
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              styles.billingOption,
-              billingPeriod === 'annual' && styles.billingOptionActive,
-            ]}
+            style={[styles.billingOption, billingPeriod === 'annual' && styles.billingOptionActive]}
             onPress={() => setBillingPeriod('annual')}
           >
-            <Text style={[
-              styles.billingOptionText,
-              billingPeriod === 'annual' && styles.billingOptionTextActive,
-            ]}>
+            <Text
+              style={[
+                styles.billingOptionText,
+                billingPeriod === 'annual' && styles.billingOptionTextActive,
+              ]}
+            >
               Annual
             </Text>
             <View style={styles.discountBadge}>
@@ -304,15 +307,12 @@ export default function Paywall({
         >
           {/* 🔥 Lifetime Deal Banner */}
           <TouchableOpacity
-            style={[
-              styles.lifetimeCard,
-              isLifetimeSelected && styles.lifetimeCardSelected,
-            ]}
+            style={[styles.lifetimeCard, isLifetimeSelected && styles.lifetimeCardSelected]}
             onPress={() => setSelectedTier('lifetime')}
             activeOpacity={0.7}
           >
             <LinearGradient
-              colors={['#FFD70015', '#FF8C0010']}
+              colors={['#FFD70015', '#FF8C0010'] as [string, string]}
               style={styles.lifetimeGradient}
             >
               <View style={styles.lifetimeBadgeRow}>
@@ -325,23 +325,23 @@ export default function Paywall({
                   </View>
                 )}
               </View>
-              
+
               <View style={styles.lifetimeHeader}>
                 <Star size={24} color="#FFD700" />
                 <Text style={styles.lifetimeName}>Lifetime Deal</Text>
               </View>
-              
+
               <View style={styles.lifetimePricing}>
                 <Text style={styles.lifetimePrice}>$49.99</Text>
                 <Text style={styles.lifetimeOnce}> once</Text>
               </View>
-              
+
               <View style={styles.lifetimeSavings}>
                 <Text style={styles.lifetimeSavingsText}>
                   💰 Saves $155+/year vs Premium monthly
                 </Text>
               </View>
-              
+
               <View style={styles.lifetimeFeatures}>
                 <View style={styles.featureRow}>
                   <Check size={16} color="#FFD700" />
@@ -360,9 +360,11 @@ export default function Paywall({
                   <Text style={styles.lifetimeFeatureText}>Pay once, never again</Text>
                 </View>
               </View>
-              
+
               <View style={styles.lifetimeUrgency}>
-                <Text style={styles.lifetimeUrgencyText}>⏳ Only available for first 100 users</Text>
+                <Text style={styles.lifetimeUrgencyText}>
+                  ⏳ Only available for first 100 users
+                </Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
@@ -373,23 +375,27 @@ export default function Paywall({
         {/* CTA */}
         <View style={styles.footer}>
           {inlineMessage && (
-            <View style={[
-              styles.inlineMessage,
-              inlineMessage.type === 'error' ? styles.inlineMessageError : styles.inlineMessageInfo,
-            ]}>
-              <Text style={[
-                styles.inlineMessageText,
-                inlineMessage.type === 'error' ? styles.inlineMessageTextError : styles.inlineMessageTextInfo,
-              ]}>
+            <View
+              style={[
+                styles.inlineMessage,
+                inlineMessage.type === 'error'
+                  ? styles.inlineMessageError
+                  : styles.inlineMessageInfo,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.inlineMessageText,
+                  inlineMessage.type === 'error'
+                    ? styles.inlineMessageTextError
+                    : styles.inlineMessageTextInfo,
+                ]}
+              >
                 {inlineMessage.text}
               </Text>
             </View>
           )}
-          <TouchableOpacity
-            onPress={handleSubscribe}
-            disabled={isProcessing}
-            activeOpacity={0.8}
-          >
+          <TouchableOpacity onPress={handleSubscribe} disabled={isProcessing} activeOpacity={0.8}>
             <LinearGradient
               colors={getTierGradient(selectedTier)}
               start={{ x: 0, y: 0 }}
@@ -397,21 +403,19 @@ export default function Paywall({
               style={styles.ctaButton}
             >
               <Text style={styles.ctaButtonText}>
-                {isProcessing 
-                  ? 'Processing...' 
-                  : isLifetimeSelected 
-                    ? 'Get Lifetime Access — $49.99' 
-                    : `Subscribe to ${SUBSCRIPTION_TIERS[selectedTier].name}`
-                }
+                {isProcessing
+                  ? 'Processing...'
+                  : isLifetimeSelected
+                    ? 'Get Lifetime Access — $49.99'
+                    : `Subscribe to ${SUBSCRIPTION_TIERS[selectedTier].name}`}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
 
           <Text style={styles.trialNote}>
-            {isLifetimeSelected 
-              ? 'One-time payment • Lifetime access • No recurring charges' 
-              : '7-day free trial • Cancel anytime'
-            }
+            {isLifetimeSelected
+              ? 'One-time payment • Lifetime access • No recurring charges'
+              : '7-day free trial • Cancel anytime'}
           </Text>
 
           <View style={styles.legalLinks}>
@@ -423,9 +427,14 @@ export default function Paywall({
               <Text style={styles.legalLink}>Privacy Policy</Text>
             </TouchableOpacity>
             <Text style={styles.legalSeparator}>•</Text>
-            <TouchableOpacity onPress={() => {
-              showAlert('Restore Purchases', 'Contact support@rewardly.app to restore your subscription.');
-            }}>
+            <TouchableOpacity
+              onPress={() => {
+                showAlert(
+                  'Restore Purchases',
+                  'Contact support@rewardly.app to restore your subscription.'
+                );
+              }}
+            >
               <Text style={styles.legalLink}>Restore Purchases</Text>
             </TouchableOpacity>
           </View>

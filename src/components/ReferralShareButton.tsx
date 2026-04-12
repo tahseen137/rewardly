@@ -9,14 +9,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  Share,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-} from 'react-native';
+import { Share, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { ReferralService } from '../services/ReferralService';
 
 interface Props {
@@ -49,7 +42,9 @@ export function ReferralShareButton({ userId, cardName, style }: Props) {
     if (!referralCode) return;
 
     const link = ReferralService.buildReferralLink(referralCode);
-    const cardContext = cardName ? ` I'm using the ${cardName} and saving money on every purchase.` : '';
+    const cardContext = cardName
+      ? ` I'm using the ${cardName} and saving money on every purchase.`
+      : '';
     const message = `Check out Rewardly!${cardContext} Sign up with my referral link and we both earn rewards: ${link}`;
 
     try {
@@ -93,7 +88,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#10b981',  // emerald-500
+    backgroundColor: '#10b981', // emerald-500
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 20,

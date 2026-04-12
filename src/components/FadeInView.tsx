@@ -2,7 +2,7 @@
  * FadeInView - Animated component that fades in and slides up
  * Used throughout the app for smooth entry animations
  * Supports delay prop for staggered animations
- * 
+ *
  * Uses standard RN Animated for web compatibility
  */
 
@@ -26,12 +26,7 @@ interface FadeInViewProps {
  * @param duration - Animation duration (default: 300)
  * @param style - Additional styles to apply
  */
-export function FadeInView({
-  children,
-  delay = 0,
-  duration = 300,
-  style,
-}: FadeInViewProps) {
+export function FadeInView({ children, delay = 0, duration = 300, style }: FadeInViewProps) {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(10)).current;
 

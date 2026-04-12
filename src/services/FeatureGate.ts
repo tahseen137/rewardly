@@ -3,7 +3,12 @@
  * Controls access to features based on subscription tier
  */
 
-import { SubscriptionTier, getCurrentTierSync, canAccessSync, hasExceededLimit, incrementUsage, showPaywall } from './SubscriptionService';
+import {
+  SubscriptionTier,
+  getCurrentTierSync,
+  canUseSage,
+  incrementSageUsage,
+} from './SubscriptionService';
 
 // ============================================================================
 // Types
@@ -63,14 +68,14 @@ export const FEATURE_CONFIGS: Record<Feature, FeatureConfig> = {
     id: 'location_recommendations',
     name: 'Location-Based Recommendations',
     description: 'Get card suggestions based on your location',
-    requiredTier: 'plus',
+    requiredTier: 'pro',
     hasUsageLimit: false,
   },
   expert_consultation: {
     id: 'expert_consultation',
     name: 'Expert Consultations',
     description: 'Book 1-on-1 calls with rewards experts',
-    requiredTier: 'elite',
+    requiredTier: 'max',
     hasUsageLimit: true,
     limitType: 'monthly',
   },
@@ -78,21 +83,21 @@ export const FEATURE_CONFIGS: Record<Feature, FeatureConfig> = {
     id: 'family_sharing',
     name: 'Family Sharing',
     description: 'Share your subscription with up to 5 family members',
-    requiredTier: 'elite',
+    requiredTier: 'max',
     hasUsageLimit: false,
   },
   unlimited_recommendations: {
     id: 'unlimited_recommendations',
     name: 'Unlimited Recommendations',
     description: 'Get unlimited card recommendations',
-    requiredTier: 'plus',
+    requiredTier: 'pro',
     hasUsageLimit: false,
   },
   unlimited_ai: {
     id: 'unlimited_ai',
     name: 'Unlimited AI Questions',
     description: 'Ask unlimited questions to Sage',
-    requiredTier: 'plus',
+    requiredTier: 'pro',
     hasUsageLimit: false,
   },
   benefits_tracking: {
@@ -113,7 +118,7 @@ export const FEATURE_CONFIGS: Record<Feature, FeatureConfig> = {
     id: 'point_valuations',
     name: 'Point Valuations',
     description: 'See real-time point and mile valuations',
-    requiredTier: 'plus',
+    requiredTier: 'pro',
     hasUsageLimit: false,
   },
   export_reports: {
@@ -127,7 +132,7 @@ export const FEATURE_CONFIGS: Record<Feature, FeatureConfig> = {
     id: 'concierge_service',
     name: 'Concierge Service',
     description: 'Get personalized booking assistance',
-    requiredTier: 'elite',
+    requiredTier: 'max',
     hasUsageLimit: false,
   },
 };
@@ -138,9 +143,10 @@ export const FEATURE_CONFIGS: Record<Feature, FeatureConfig> = {
 
 const TIER_HIERARCHY: Record<SubscriptionTier, number> = {
   free: 0,
-  plus: 1,
-  pro: 2,
-  elite: 3,
+  pro: 1,
+  max: 2,
+  lifetime: 3,
+  admin: 4,
 };
 
 // ============================================================================
@@ -154,14 +160,14 @@ const TIER_HIERARCHY: Record<SubscriptionTier, number> = {
 export function isFeatureEnabled(feature: Feature, userTier?: SubscriptionTier): boolean {
   const tier = userTier ?? getCurrentTierSync();
   const config = FEATURE_CONFIGS[feature];
-  
+
   if (!config) {
     return false;
   }
-  
+
   const userTierLevel = TIER_HIERARCHY[tier];
   const requiredTierLevel = TIER_HIERARCHY[config.requiredTier];
-  
+
   return userTierLevel >= requiredTierLevel;
 }
 
@@ -172,7 +178,7 @@ export function isFeatureEnabled(feature: Feature, userTier?: SubscriptionTier):
 export async function checkFeatureAccess(feature: Feature): Promise<FeatureCheckResult> {
   const tier = getCurrentTierSync();
   const config = FEATURE_CONFIGS[feature];
-  
+
   if (!config) {
     return {
       enabled: false,
@@ -180,11 +186,11 @@ export async function checkFeatureAccess(feature: Feature): Promise<FeatureCheck
       showPaywall: false,
     };
   }
-  
+
   // Check tier access
   const userTierLevel = TIER_HIERARCHY[tier];
   const requiredTierLevel = TIER_HIERARCHY[config.requiredTier];
-  
+
   if (userTierLevel < requiredTierLevel) {
     return {
       enabled: false,
@@ -193,13 +199,13 @@ export async function checkFeatureAccess(feature: Feature): Promise<FeatureCheck
       showPaywall: true,
     };
   }
-  
+
   // Check usage limits for applicable features
   if (config.hasUsageLimit) {
     const limitFeature = mapFeatureToUsageType(feature);
-    if (limitFeature) {
-      const exceeded = await hasExceededLimit(limitFeature);
-      if (exceeded) {
+    if (limitFeature === 'ai_questions') {
+      const sageResult = await canUseSage();
+      if (!sageResult.allowed) {
         return {
           enabled: false,
           reason: 'limit_exceeded',
@@ -208,7 +214,7 @@ export async function checkFeatureAccess(feature: Feature): Promise<FeatureCheck
       }
     }
   }
-  
+
   return {
     enabled: true,
     showPaywall: false,
@@ -234,8 +240,8 @@ function mapFeatureToUsageType(feature: Feature): 'recommendations' | 'ai_questi
  */
 export async function trackFeatureUsage(feature: Feature): Promise<void> {
   const usageType = mapFeatureToUsageType(feature);
-  if (usageType) {
-    await incrementUsage(usageType);
+  if (usageType === 'ai_questions') {
+    await incrementSageUsage();
   }
 }
 
@@ -262,11 +268,14 @@ export function getFeaturesForTier(tier: SubscriptionTier): Feature[] {
 /**
  * Get features that would be unlocked by upgrading to a tier
  */
-export function getNewFeaturesForTier(currentTier: SubscriptionTier, targetTier: SubscriptionTier): Feature[] {
+export function getNewFeaturesForTier(
+  currentTier: SubscriptionTier,
+  targetTier: SubscriptionTier
+): Feature[] {
   const currentFeatures = new Set(getFeaturesForTier(currentTier));
   const targetFeatures = getFeaturesForTier(targetTier);
-  
-  return targetFeatures.filter(feature => !currentFeatures.has(feature));
+
+  return targetFeatures.filter((feature) => !currentFeatures.has(feature));
 }
 
 /**
@@ -278,21 +287,15 @@ export async function withFeatureGate<T>(
   action: () => Promise<T>
 ): Promise<T | null> {
   const access = await checkFeatureAccess(feature);
-  
+
   if (!access.enabled) {
-    if (access.showPaywall) {
-      const subscribed = await showPaywall();
-      if (subscribed) {
-        // Retry after subscription
-        return action();
-      }
-    }
+    // Paywall should be shown by the calling UI component
     return null;
   }
-  
+
   // Track usage
   await trackFeatureUsage(feature);
-  
+
   return action();
 }
 
@@ -317,11 +320,12 @@ export function getUpgradeMessage(feature: Feature): string {
   const config = FEATURE_CONFIGS[feature];
   const tierNames: Record<SubscriptionTier, string> = {
     free: 'Free',
-    plus: 'Plus',
     pro: 'Pro',
-    elite: 'Elite',
+    max: 'Max',
+    lifetime: 'Lifetime',
+    admin: 'Admin',
   };
-  
+
   return `Upgrade to ${tierNames[config.requiredTier]} to unlock ${config.name}`;
 }
 
@@ -330,10 +334,10 @@ export function getUpgradeMessage(feature: Feature): string {
  */
 export function checkMultipleFeatures(features: Feature[]): Record<Feature, boolean> {
   const result: Partial<Record<Feature, boolean>> = {};
-  
+
   for (const feature of features) {
     result[feature] = isFeatureEnabled(feature);
   }
-  
+
   return result as Record<Feature, boolean>;
 }

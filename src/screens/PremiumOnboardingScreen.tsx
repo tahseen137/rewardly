@@ -1,6 +1,6 @@
 /**
  * PremiumOnboardingScreen - 5-step guided flow with emotional impact
- * 
+ *
  * Steps:
  * 1. Value Prop - "Stop leaving money on the table"
  * 2. Add Your Cards - Select from portfolio
@@ -9,7 +9,7 @@
  * 5. See Your Rewards IQ - Immediate gratification
  */
 
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,10 +17,8 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
-  FlatList,
   TextInput,
   Platform,
-  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
@@ -33,8 +31,6 @@ import Animated, {
   FadeIn,
   FadeInDown,
   FadeInUp,
-  SlideInRight,
-  SlideOutLeft,
 } from 'react-native-reanimated';
 import {
   ChevronRight,
@@ -51,26 +47,21 @@ import {
   Bell,
   Shield,
 } from 'lucide-react-native';
-import * as Location from 'expo-location';
+// Location module used via requestLocationPermission imported below
 import * as Haptics from 'expo-haptics';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
 import { Card, SpendingCategory } from '../types';
 import { RewardsIQScore } from '../types/rewards-iq';
-import {
-  setOnboardingComplete,
-  Country,
-  setCountry,
-  getCountry,
-} from '../services/PreferenceManager';
-import { onCountryChange, getAllCards } from '../services/CardDataService';
-import { addCard, getCards } from '../services/CardPortfolioManager';
+import { setOnboardingComplete } from '../services/PreferenceManager';
+import { getAllCards } from '../services/CardDataService';
+import { addCard } from '../services/CardPortfolioManager';
 import { saveSpendingProfile, calculateRewardsIQ } from '../services/RewardsIQService';
-import { 
-  requestLocationPermission, 
-  requestNotificationPermission, 
-  enableAutoPilot 
+import {
+  requestLocationPermission,
+  requestNotificationPermission,
+  enableAutoPilot,
 } from '../services/AutoPilotService';
 import { CATEGORY_INFO } from '../services/MockTransactionData';
 
@@ -78,7 +69,7 @@ interface PremiumOnboardingScreenProps {
   onComplete: () => void;
 }
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH, height: _SCREEN_HEIGHT } = Dimensions.get('window');
 const TOTAL_STEPS = 5;
 
 // ============================================================================
@@ -88,20 +79,20 @@ const TOTAL_STEPS = 5;
 function ValuePropStep({ onNext }: { onNext: () => void }) {
   const titleScale = useSharedValue(0.8);
   const badgeOpacity = useSharedValue(0);
-  
+
   useEffect(() => {
     titleScale.value = withSpring(1, { damping: 12 });
     badgeOpacity.value = withDelay(500, withTiming(1, { duration: 500 }));
   }, []);
-  
+
   const titleStyle = useAnimatedStyle(() => ({
     transform: [{ scale: titleScale.value }],
   }));
-  
+
   const badgeStyle = useAnimatedStyle(() => ({
     opacity: badgeOpacity.value,
   }));
-  
+
   return (
     <View style={styles.stepContainer}>
       <Animated.View entering={FadeIn.duration(500)}>
@@ -114,18 +105,18 @@ function ValuePropStep({ onNext }: { onNext: () => void }) {
           </LinearGradient>
         </View>
       </Animated.View>
-      
+
       <Animated.View style={[styles.titleContainer, titleStyle]}>
         <Text style={styles.heroTitle}>Stop Leaving Money{'\n'}On The Table</Text>
       </Animated.View>
-      
+
       <Animated.View entering={FadeInDown.delay(300).duration(500)}>
         <Text style={styles.heroSubtitle}>
-          The average Canadian leaves <Text style={styles.highlightText}>$500+/year</Text> in 
+          The average Canadian leaves <Text style={styles.highlightText}>$500+/year</Text> in
           unclaimed rewards by using the wrong credit card.
         </Text>
       </Animated.View>
-      
+
       <Animated.View style={badgeStyle}>
         <View style={styles.statsBadge}>
           <View style={styles.statItem}>
@@ -144,7 +135,7 @@ function ValuePropStep({ onNext }: { onNext: () => void }) {
           </View>
         </View>
       </Animated.View>
-      
+
       {/* Features */}
       <Animated.View entering={FadeInUp.delay(600).duration(500)} style={styles.featuresList}>
         <View style={styles.featureItem}>
@@ -156,7 +147,7 @@ function ValuePropStep({ onNext }: { onNext: () => void }) {
             <Text style={styles.featureDesc}>Know the best card for every purchase</Text>
           </View>
         </View>
-        
+
         <View style={styles.featureItem}>
           <View style={styles.featureIcon}>
             <Navigation size={20} color={colors.primary.main} />
@@ -166,7 +157,7 @@ function ValuePropStep({ onNext }: { onNext: () => void }) {
             <Text style={styles.featureDesc}>Get notified when you arrive at stores</Text>
           </View>
         </View>
-        
+
         <View style={styles.featureItem}>
           <View style={styles.featureIcon}>
             <TrendingUp size={20} color={colors.primary.main} />
@@ -177,7 +168,7 @@ function ValuePropStep({ onNext }: { onNext: () => void }) {
           </View>
         </View>
       </Animated.View>
-      
+
       <Animated.View entering={FadeInUp.delay(800).duration(500)} style={styles.ctaContainer}>
         <TouchableOpacity onPress={onNext} activeOpacity={0.9}>
           <LinearGradient
@@ -210,7 +201,7 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
   const [cards, setCards] = useState<Card[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     const loadCards = async () => {
       try {
@@ -224,15 +215,15 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
     };
     loadCards();
   }, []);
-  
+
   const filteredCards = useMemo(() => {
     if (!searchQuery.trim()) return cards.slice(0, 20);
     const query = searchQuery.toLowerCase();
-    return cards.filter(
-      c => c.name.toLowerCase().includes(query) || c.issuer.toLowerCase().includes(query)
-    ).slice(0, 20);
+    return cards
+      .filter((c) => c.name.toLowerCase().includes(query) || c.issuer.toLowerCase().includes(query))
+      .slice(0, 20);
   }, [cards, searchQuery]);
-  
+
   return (
     <View style={styles.stepContainer}>
       <Animated.View entering={FadeInDown.duration(400)}>
@@ -241,12 +232,10 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
             <CreditCard size={28} color={colors.primary.main} />
           </View>
           <Text style={styles.stepTitle}>Add Your Cards</Text>
-          <Text style={styles.stepSubtitle}>
-            Select the credit cards you currently have
-          </Text>
+          <Text style={styles.stepSubtitle}>Select the credit cards you currently have</Text>
         </View>
       </Animated.View>
-      
+
       {/* Search */}
       <View style={styles.searchContainer}>
         <Search size={20} color={colors.text.tertiary} />
@@ -258,9 +247,9 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
           onChangeText={setSearchQuery}
         />
       </View>
-      
+
       {/* Card List */}
-      <ScrollView 
+      <ScrollView
         style={styles.cardsList}
         contentContainerStyle={styles.cardsListContent}
         showsVerticalScrollIndicator={false}
@@ -275,15 +264,9 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
           </View>
         ) : null}
         {filteredCards.map((card, index) => (
-          <Animated.View
-            key={card.id}
-            entering={FadeInDown.delay(index * 50).duration(300)}
-          >
+          <Animated.View key={card.id} entering={FadeInDown.delay(index * 50).duration(300)}>
             <TouchableOpacity
-              style={[
-                styles.cardItem,
-                selectedCards.includes(card.id) && styles.cardItemSelected,
-              ]}
+              style={[styles.cardItem, selectedCards.includes(card.id) && styles.cardItemSelected]}
               onPress={() => {
                 if (Platform.OS !== 'web') {
                   Haptics.selectionAsync();
@@ -293,13 +276,17 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
               activeOpacity={0.7}
             >
               <View style={styles.cardItemInfo}>
-                <Text style={styles.cardItemName} numberOfLines={2}>{card.name}</Text>
+                <Text style={styles.cardItemName} numberOfLines={2}>
+                  {card.name}
+                </Text>
                 <Text style={styles.cardItemIssuer}>{card.issuer}</Text>
               </View>
-              <View style={[
-                styles.checkbox,
-                selectedCards.includes(card.id) && styles.checkboxSelected,
-              ]}>
+              <View
+                style={[
+                  styles.checkbox,
+                  selectedCards.includes(card.id) && styles.checkboxSelected,
+                ]}
+              >
                 {selectedCards.includes(card.id) && (
                   <Check size={16} color={colors.background.primary} />
                 )}
@@ -308,29 +295,30 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
           </Animated.View>
         ))}
       </ScrollView>
-      
+
       <View style={styles.selectedCount}>
         <Text style={styles.selectedCountText}>
           {selectedCards.length} card{selectedCards.length !== 1 ? 's' : ''} selected
         </Text>
       </View>
-      
+
       {/* Navigation */}
       <View style={styles.navigationButtons}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
           <ChevronLeft size={20} color={colors.text.secondary} />
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           onPress={onNext}
           activeOpacity={0.9}
           disabled={selectedCards.length === 0}
         >
           <LinearGradient
-            colors={selectedCards.length > 0 
-              ? [colors.primary.main, colors.primary.dark]
-              : [colors.text.disabled, colors.text.disabled]
+            colors={
+              selectedCards.length > 0
+                ? [colors.primary.main, colors.primary.dark]
+                : [colors.text.disabled, colors.text.disabled]
             }
             style={styles.nextButton}
           >
@@ -365,7 +353,7 @@ const SPENDING_CATEGORIES = [
 
 function SpendingStep({ spending, onUpdateSpending, onNext, onBack }: SpendingStepProps) {
   const totalMonthly = Array.from(spending.values()).reduce((sum, v) => sum + v, 0);
-  
+
   return (
     <View style={styles.stepContainer}>
       <Animated.View entering={FadeInDown.duration(400)}>
@@ -374,18 +362,16 @@ function SpendingStep({ spending, onUpdateSpending, onNext, onBack }: SpendingSt
             <DollarSign size={28} color={colors.primary.main} />
           </View>
           <Text style={styles.stepTitle}>Your Spending Habits</Text>
-          <Text style={styles.stepSubtitle}>
-            Estimate your monthly spending by category
-          </Text>
+          <Text style={styles.stepSubtitle}>Estimate your monthly spending by category</Text>
         </View>
       </Animated.View>
-      
+
       <View style={styles.totalMonthly}>
         <Text style={styles.totalLabel}>Total Monthly</Text>
         <Text style={styles.totalValue}>${totalMonthly.toLocaleString()}</Text>
       </View>
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.spendingList}
         contentContainerStyle={styles.spendingListContent}
         showsVerticalScrollIndicator={false}
@@ -393,7 +379,7 @@ function SpendingStep({ spending, onUpdateSpending, onNext, onBack }: SpendingSt
         {SPENDING_CATEGORIES.map((category, index) => {
           const info = CATEGORY_INFO[category];
           const amount = spending.get(category) || 0;
-          
+
           return (
             <Animated.View
               key={category}
@@ -420,22 +406,16 @@ function SpendingStep({ spending, onUpdateSpending, onNext, onBack }: SpendingSt
                   />
                 </View>
               </View>
-              
+
               {/* Quick preset buttons */}
               <View style={styles.presetRow}>
-                {[100, 300, 500, 800].map(preset => (
+                {[100, 300, 500, 800].map((preset) => (
                   <TouchableOpacity
                     key={preset}
-                    style={[
-                      styles.presetButton,
-                      amount === preset && styles.presetButtonActive,
-                    ]}
+                    style={[styles.presetButton, amount === preset && styles.presetButtonActive]}
                     onPress={() => onUpdateSpending(category, preset)}
                   >
-                    <Text style={[
-                      styles.presetText,
-                      amount === preset && styles.presetTextActive,
-                    ]}>
+                    <Text style={[styles.presetText, amount === preset && styles.presetTextActive]}>
                       ${preset}
                     </Text>
                   </TouchableOpacity>
@@ -445,14 +425,14 @@ function SpendingStep({ spending, onUpdateSpending, onNext, onBack }: SpendingSt
           );
         })}
       </ScrollView>
-      
+
       {/* Navigation */}
       <View style={styles.navigationButtons}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
           <ChevronLeft size={20} color={colors.text.secondary} />
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity onPress={onNext} activeOpacity={0.9}>
           <LinearGradient
             colors={[colors.primary.main, colors.primary.dark]}
@@ -479,7 +459,7 @@ interface SmartWalletStepProps {
 
 function SmartWalletStep({ onEnable, onSkip, onBack }: SmartWalletStepProps) {
   const [isEnabling, setIsEnabling] = useState(false);
-  
+
   const handleEnable = async () => {
     setIsEnabling(true);
     try {
@@ -488,7 +468,7 @@ function SmartWalletStep({ onEnable, onSkip, onBack }: SmartWalletStepProps) {
       setIsEnabling(false);
     }
   };
-  
+
   return (
     <View style={styles.stepContainer}>
       <Animated.View entering={FadeInDown.duration(400)}>
@@ -502,9 +482,12 @@ function SmartWalletStep({ onEnable, onSkip, onBack }: SmartWalletStepProps) {
           </Text>
         </View>
       </Animated.View>
-      
+
       {/* Features */}
-      <Animated.View entering={FadeInUp.delay(300).duration(500)} style={styles.smartWalletFeatures}>
+      <Animated.View
+        entering={FadeInUp.delay(300).duration(500)}
+        style={styles.smartWalletFeatures}
+      >
         <View style={styles.smartWalletFeature}>
           <MapPin size={24} color={colors.primary.main} />
           <View style={styles.smartWalletFeatureText}>
@@ -514,7 +497,7 @@ function SmartWalletStep({ onEnable, onSkip, onBack }: SmartWalletStepProps) {
             </Text>
           </View>
         </View>
-        
+
         <View style={styles.smartWalletFeature}>
           <Bell size={24} color={colors.primary.main} />
           <View style={styles.smartWalletFeatureText}>
@@ -524,25 +507,19 @@ function SmartWalletStep({ onEnable, onSkip, onBack }: SmartWalletStepProps) {
             </Text>
           </View>
         </View>
-        
+
         <View style={styles.smartWalletFeature}>
           <Shield size={24} color={colors.primary.main} />
           <View style={styles.smartWalletFeatureText}>
             <Text style={styles.smartWalletFeatureTitle}>Privacy First</Text>
-            <Text style={styles.smartWalletFeatureDesc}>
-              Location data stays on your device
-            </Text>
+            <Text style={styles.smartWalletFeatureDesc}>Location data stays on your device</Text>
           </View>
         </View>
       </Animated.View>
-      
+
       {/* Buttons */}
       <Animated.View entering={FadeInUp.delay(500).duration(500)} style={styles.smartWalletButtons}>
-        <TouchableOpacity
-          onPress={handleEnable}
-          activeOpacity={0.9}
-          disabled={isEnabling}
-        >
+        <TouchableOpacity onPress={handleEnable} activeOpacity={0.9} disabled={isEnabling}>
           <LinearGradient
             colors={[colors.primary.main, colors.primary.dark]}
             start={{ x: 0, y: 0 }}
@@ -555,12 +532,12 @@ function SmartWalletStep({ onEnable, onSkip, onBack }: SmartWalletStepProps) {
             </Text>
           </LinearGradient>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.skipButton} onPress={onSkip}>
           <Text style={styles.skipButtonText}>Maybe Later</Text>
         </TouchableOpacity>
       </Animated.View>
-      
+
       {/* Back */}
       <View style={styles.navigationButtons}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
@@ -585,42 +562,39 @@ interface RewardsIQStepProps {
 function RewardsIQStep({ score, onComplete }: RewardsIQStepProps) {
   const scoreScale = useSharedValue(0);
   const celebrationScale = useSharedValue(0);
-  
+
   useEffect(() => {
     scoreScale.value = withSpring(1, { damping: 12, stiffness: 100 });
     celebrationScale.value = withDelay(
       1000,
-      withSequence(
-        withSpring(1.2, { damping: 10 }),
-        withSpring(1, { damping: 12 })
-      )
+      withSequence(withSpring(1.2, { damping: 10 }), withSpring(1, { damping: 12 }))
     );
-    
+
     if (Platform.OS !== 'web') {
       setTimeout(() => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }, 500);
     }
   }, []);
-  
+
   const scoreStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scoreScale.value }],
     opacity: scoreScale.value,
   }));
-  
+
   const celebrationStyle = useAnimatedStyle(() => ({
     transform: [{ scale: celebrationScale.value }],
   }));
-  
+
   const getScoreColor = (s: number) => {
     if (s >= 80) return colors.primary.main;
     if (s >= 60) return colors.warning.main;
     return colors.error.main;
   };
-  
+
   return (
     <View style={styles.stepContainer}>
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.stepContainerContent}
       >
@@ -630,66 +604,56 @@ function RewardsIQStep({ score, onComplete }: RewardsIQStepProps) {
               <Text style={styles.confetti}>🎉</Text>
             </Animated.View>
             <Text style={styles.congratsTitle}>You're All Set!</Text>
-            <Text style={styles.stepSubtitle}>
-              Here's your initial Rewards IQ score
-            </Text>
+            <Text style={styles.stepSubtitle}>Here's your initial Rewards IQ score</Text>
           </View>
         </Animated.View>
-      
-      {/* Score Display */}
-      <Animated.View style={[styles.iqScoreContainer, scoreStyle]}>
-        {score && (
-          <LinearGradient
-            colors={[getScoreColor(score.overallScore), getScoreColor(score.overallScore) + 'CC']}
-            style={styles.iqScoreCircle}
-          >
-            <Text style={styles.iqScoreNumber}>{score.overallScore}</Text>
-            <Text style={styles.iqScoreLabel}>Rewards IQ</Text>
-          </LinearGradient>
-        )}
-        
-        {score && (
-          <View style={styles.percentileBadge}>
-            <Sparkles size={16} color={colors.warning.main} />
-            <Text style={styles.percentileText}>
-              Top {100 - score.percentile}% of users
-            </Text>
+
+        {/* Score Display */}
+        <Animated.View style={[styles.iqScoreContainer, scoreStyle]}>
+          {score && (
+            <LinearGradient
+              colors={[getScoreColor(score.overallScore), getScoreColor(score.overallScore) + 'CC']}
+              style={styles.iqScoreCircle}
+            >
+              <Text style={styles.iqScoreNumber}>{score.overallScore}</Text>
+              <Text style={styles.iqScoreLabel}>Rewards IQ</Text>
+            </LinearGradient>
+          )}
+
+          {score && (
+            <View style={styles.percentileBadge}>
+              <Sparkles size={16} color={colors.warning.main} />
+              <Text style={styles.percentileText}>Top {100 - score.percentile}% of users</Text>
+            </View>
+          )}
+        </Animated.View>
+
+        {/* What's Next */}
+        <Animated.View entering={FadeInUp.delay(500).duration(500)} style={styles.whatsNextSection}>
+          <Text style={styles.whatsNextTitle}>What's Next?</Text>
+
+          <View style={styles.whatsNextItem}>
+            <View style={styles.whatsNextIcon}>
+              <Target size={20} color={colors.primary.main} />
+            </View>
+            <Text style={styles.whatsNextText}>Check which card to use before each purchase</Text>
           </View>
-        )}
-      </Animated.View>
-      
-      {/* What's Next */}
-      <Animated.View entering={FadeInUp.delay(500).duration(500)} style={styles.whatsNextSection}>
-        <Text style={styles.whatsNextTitle}>What's Next?</Text>
-        
-        <View style={styles.whatsNextItem}>
-          <View style={styles.whatsNextIcon}>
-            <Target size={20} color={colors.primary.main} />
+
+          <View style={styles.whatsNextItem}>
+            <View style={styles.whatsNextIcon}>
+              <TrendingUp size={20} color={colors.primary.main} />
+            </View>
+            <Text style={styles.whatsNextText}>Track your missed rewards and optimize</Text>
           </View>
-          <Text style={styles.whatsNextText}>
-            Check which card to use before each purchase
-          </Text>
-        </View>
-        
-        <View style={styles.whatsNextItem}>
-          <View style={styles.whatsNextIcon}>
-            <TrendingUp size={20} color={colors.primary.main} />
+
+          <View style={styles.whatsNextItem}>
+            <View style={styles.whatsNextIcon}>
+              <Sparkles size={20} color={colors.primary.main} />
+            </View>
+            <Text style={styles.whatsNextText}>Improve your score over time</Text>
           </View>
-          <Text style={styles.whatsNextText}>
-            Track your missed rewards and optimize
-          </Text>
-        </View>
-        
-        <View style={styles.whatsNextItem}>
-          <View style={styles.whatsNextIcon}>
-            <Sparkles size={20} color={colors.primary.main} />
-          </View>
-          <Text style={styles.whatsNextText}>
-            Improve your score over time
-          </Text>
-        </View>
-      </Animated.View>
-      
+        </Animated.View>
+
         {/* Complete Button */}
         <Animated.View entering={FadeInUp.delay(700).duration(500)} style={styles.ctaContainer}>
           <TouchableOpacity onPress={onComplete} activeOpacity={0.9}>
@@ -727,28 +691,28 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
     return map;
   });
   const [rewardsIQ, setRewardsIQ] = useState<RewardsIQScore | null>(null);
-  
+
   const handleToggleCard = useCallback((cardId: string) => {
-    setSelectedCards(prev => {
+    setSelectedCards((prev) => {
       if (prev.includes(cardId)) {
-        return prev.filter(id => id !== cardId);
+        return prev.filter((id) => id !== cardId);
       }
       return [...prev, cardId];
     });
   }, []);
-  
+
   const handleUpdateSpending = useCallback((category: SpendingCategory, amount: number) => {
-    setSpending(prev => {
+    setSpending((prev) => {
       const newMap = new Map(prev);
       newMap.set(category, amount);
       return newMap;
     });
   }, []);
-  
+
   const handleEnableSmartWallet = useCallback(async () => {
     try {
       const locationGranted = await requestLocationPermission();
-      const notificationGranted = await requestNotificationPermission();
+      const _notificationGranted = await requestNotificationPermission();
       if (locationGranted) {
         await enableAutoPilot();
       }
@@ -758,31 +722,31 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
       setCurrentStep(4);
     }
   }, []);
-  
+
   const handleSkipSmartWallet = useCallback(() => {
     setCurrentStep(4);
   }, []);
-  
+
   const handleComplete = useCallback(async () => {
     try {
       // Save cards
       for (const cardId of selectedCards) {
         await addCard(cardId);
       }
-      
+
       // Save spending profile
       await saveSpendingProfile(spending);
-      
+
       // Mark onboarding complete
       await setOnboardingComplete(true);
-      
+
       onComplete();
     } catch (e) {
       console.error('Failed to complete onboarding:', e);
       onComplete();
     }
   }, [selectedCards, spending, onComplete]);
-  
+
   // Calculate Rewards IQ when reaching final step
   useEffect(() => {
     if (currentStep === 4) {
@@ -799,7 +763,7 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
       calculateScore();
     }
   }, [currentStep, spending]);
-  
+
   // Progress dots
   const renderProgressDots = () => (
     <View style={styles.progressContainer}>
@@ -815,12 +779,12 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
       ))}
     </View>
   );
-  
+
   const handleSkipAll = useCallback(async () => {
     try {
       await setOnboardingComplete(true);
       onComplete();
-    } catch (e) {
+    } catch {
       onComplete();
     }
   }, [onComplete]);
@@ -837,12 +801,10 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
           </TouchableOpacity>
         </View>
       </View>
-      
+
       {/* Steps */}
-      {currentStep === 0 && (
-        <ValuePropStep onNext={() => setCurrentStep(1)} />
-      )}
-      
+      {currentStep === 0 && <ValuePropStep onNext={() => setCurrentStep(1)} />}
+
       {currentStep === 1 && (
         <AddCardsStep
           selectedCards={selectedCards}
@@ -851,7 +813,7 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
           onBack={() => setCurrentStep(0)}
         />
       )}
-      
+
       {currentStep === 2 && (
         <SpendingStep
           spending={spending}
@@ -860,7 +822,7 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
           onBack={() => setCurrentStep(1)}
         />
       )}
-      
+
       {currentStep === 3 && (
         <SmartWalletStep
           onEnable={handleEnableSmartWallet}
@@ -868,13 +830,8 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
           onBack={() => setCurrentStep(2)}
         />
       )}
-      
-      {currentStep === 4 && (
-        <RewardsIQStep
-          score={rewardsIQ}
-          onComplete={handleComplete}
-        />
-      )}
+
+      {currentStep === 4 && <RewardsIQStep score={rewardsIQ} onComplete={handleComplete} />}
     </View>
   );
 }
@@ -938,7 +895,7 @@ const styles = StyleSheet.create({
   stepContainerContent: {
     paddingBottom: 24,
   },
-  
+
   // Step Header
   stepHeader: {
     alignItems: 'center',
@@ -976,7 +933,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     paddingHorizontal: 20,
   },
-  
+
   // Value Prop Step
   iconHero: {
     alignItems: 'center',
@@ -1087,7 +1044,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.background.primary,
   },
-  
+
   // Cards Step
   searchContainer: {
     flexDirection: 'row',
@@ -1201,7 +1158,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.background.primary,
   },
-  
+
   // Spending Step
   totalMonthly: {
     alignItems: 'center',
@@ -1299,7 +1256,7 @@ const styles = StyleSheet.create({
   presetTextActive: {
     color: colors.primary.main,
   },
-  
+
   // Smart Wallet Step
   smartWalletFeatures: {
     gap: 20,
@@ -1349,7 +1306,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text.secondary,
   },
-  
+
   // Rewards IQ Step
   confettiContainer: {
     alignItems: 'center',

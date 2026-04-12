@@ -1,12 +1,12 @@
 /**
  * SmartWalletScreen - Main Smart Wallet management screen
- * 
+ *
  * Includes:
  * - Smart Wallet toggle
  * - Merchant search and pinning
  * - Active geofences list
  * - Privacy dashboard
- * 
+ *
  * Note: Requires Max subscription (free/pro users see paywall)
  */
 
@@ -41,15 +41,18 @@ import {
   Pill,
   MoreHorizontal,
 } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import { SpendingCategory } from '../types';
-import { canAccessFeatureSync, getCurrentTierSync, refreshSubscription, SubscriptionTier } from '../services/SubscriptionService';
+import {
+  canAccessFeatureSync,
+  getCurrentTierSync,
+  refreshSubscription,
+  SubscriptionTier,
+} from '../services/SubscriptionService';
 import { LockedFeature } from '../components';
 import {
   initializeAutoPilot,
-  isAutoPilotEnabled,
   enableAutoPilot,
   disableAutoPilot,
   getGeofences,
@@ -87,7 +90,7 @@ export default function SmartWalletScreen() {
   const [showMerchantPicker, setShowMerchantPicker] = useState(false);
   const [merchantsWithCards, setMerchantsWithCards] = useState<MerchantWithBestCard[]>([]);
   const [hasAccess, setHasAccess] = useState(true);
-  const [currentTier, setCurrentTier] = useState<SubscriptionTier>('free');
+  const [, setCurrentTier] = useState<SubscriptionTier>('free');
 
   // Check subscription access on focus
   useFocusEffect(
@@ -112,10 +115,10 @@ export default function SmartWalletScreen() {
       await initializeAutoPilot();
       const currentStatus = await getAutoPilotStatus();
       const currentGeofences = getGeofences();
-      
+
       setStatus(currentStatus);
       setGeofences(currentGeofences);
-      
+
       // Load best card info for each seed merchant
       const merchantCards = await Promise.all(
         SEED_MERCHANTS.map(async (merchant) => {
@@ -156,7 +159,7 @@ export default function SmartWalletScreen() {
       } else {
         await disableAutoPilot();
       }
-      
+
       const currentStatus = await getAutoPilotStatus();
       setStatus(currentStatus);
     } catch (error) {
@@ -168,18 +171,13 @@ export default function SmartWalletScreen() {
     try {
       // Use the first location from the seed data
       const location = merchant.locations[0];
-      
-      await addGeofence(
-        merchant.name,
-        merchant.category,
-        location.lat,
-        location.lng
-      );
-      
+
+      await addGeofence(merchant.name, merchant.category, location.lat, location.lng);
+
       setGeofences(getGeofences());
       setShowMerchantPicker(false);
       setSearchQuery('');
-      
+
       // Update status
       const currentStatus = await getAutoPilotStatus();
       setStatus(currentStatus);
@@ -190,24 +188,20 @@ export default function SmartWalletScreen() {
   };
 
   const handleRemoveGeofence = async (geofenceId: string) => {
-    Alert.alert(
-      'Remove Store',
-      'Are you sure you want to stop monitoring this store?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            await removeGeofence(geofenceId);
-            setGeofences(getGeofences());
-            
-            const currentStatus = await getAutoPilotStatus();
-            setStatus(currentStatus);
-          },
+    Alert.alert('Remove Store', 'Are you sure you want to stop monitoring this store?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: async () => {
+          await removeGeofence(geofenceId);
+          setGeofences(getGeofences());
+
+          const currentStatus = await getAutoPilotStatus();
+          setStatus(currentStatus);
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleToggleGeofence = async (geofenceId: string, enabled: boolean) => {
@@ -223,17 +217,18 @@ export default function SmartWalletScreen() {
   // Filter merchants based on search
   const filteredMerchants = useMemo(() => {
     if (!searchQuery) return merchantsWithCards;
-    
+
     const query = searchQuery.toLowerCase();
-    return merchantsWithCards.filter(m => 
-      m.name.toLowerCase().includes(query)
-    );
+    return merchantsWithCards.filter((m) => m.name.toLowerCase().includes(query));
   }, [merchantsWithCards, searchQuery]);
 
   // Check if a merchant is already added
-  const isMerchantAdded = useCallback((merchantName: string) => {
-    return geofences.some(g => g.merchantName === merchantName);
-  }, [geofences]);
+  const isMerchantAdded = useCallback(
+    (merchantName: string) => {
+      return geofences.some((g) => g.merchantName === merchantName);
+    },
+    [geofences]
+  );
 
   if (isLoading) {
     return (
@@ -242,7 +237,7 @@ export default function SmartWalletScreen() {
       </View>
     );
   }
-  
+
   // Show paywall for non-Max users
   if (!hasAccess) {
     return (
@@ -266,9 +261,7 @@ export default function SmartWalletScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -367,7 +360,7 @@ export default function SmartWalletScreen() {
           {/* Active Geofences */}
           {geofences.length > 0 ? (
             <View style={styles.geofenceList}>
-              {geofences.map(geofence => (
+              {geofences.map((geofence) => (
                 <GeofenceCard
                   key={geofence.id}
                   geofence={geofence}
@@ -396,28 +389,33 @@ export default function SmartWalletScreen() {
           <View style={styles.privacyCard}>
             <View style={styles.privacyRow}>
               <Shield size={20} color={colors.success.main} />
-              <Text style={styles.privacyText}>
-                Location processed on-device only
-              </Text>
+              <Text style={styles.privacyText}>Location processed on-device only</Text>
             </View>
             <View style={styles.privacyRow}>
               <Shield size={20} color={colors.success.main} />
-              <Text style={styles.privacyText}>
-                Only stores YOU choose are monitored
-              </Text>
+              <Text style={styles.privacyText}>Only stores YOU choose are monitored</Text>
             </View>
             <View style={styles.privacyRow}>
               <Shield size={20} color={colors.success.main} />
-              <Text style={styles.privacyText}>
-                Disable anytime in Settings
-              </Text>
+              <Text style={styles.privacyText}>Disable anytime in Settings</Text>
             </View>
           </View>
 
           <TouchableOpacity
             style={styles.privacyLink}
-            onPress={() => {
-              // BUG FIX: Show Alert directly since rewardly.app/privacy doesn't exist yet
+            onPress={async () => {
+              // Prefer the hosted privacy policy (public/privacy-policy.html),
+              // fall back to an in-app alert if the URL can't be opened.
+              const privacyUrl = 'https://rewardly.ca/privacy-policy';
+              try {
+                const supported = await Linking.canOpenURL(privacyUrl);
+                if (supported) {
+                  await Linking.openURL(privacyUrl);
+                  return;
+                }
+              } catch {
+                // fall through to alert
+              }
               Alert.alert(
                 'Privacy Details',
                 'Smart Wallet uses geofencing technology to detect when you enter a monitored store. Your exact location is never stored or transmitted. All processing happens on your device.\n\nYou control which stores are monitored. You can disable Smart Wallet or remove individual stores at any time.\n\nWe do not sell your data to third parties.',
@@ -432,10 +430,7 @@ export default function SmartWalletScreen() {
 
         {/* Test Button (for development) */}
         {__DEV__ && (
-          <TouchableOpacity
-            style={styles.testButton}
-            onPress={handleTestNotification}
-          >
+          <TouchableOpacity style={styles.testButton} onPress={handleTestNotification}>
             <Bell size={20} color={colors.primary.main} />
             <Text style={styles.testButtonText}>Send Test Notification</Text>
           </TouchableOpacity>
@@ -463,9 +458,7 @@ function GeofenceCard({ geofence, onToggle, onRemove }: GeofenceCardProps) {
       </View>
       <View style={styles.geofenceContent}>
         <Text style={styles.geofenceName}>{geofence.merchantName}</Text>
-        <Text style={styles.geofenceCategory}>
-          {formatCategory(geofence.category)}
-        </Text>
+        <Text style={styles.geofenceCategory}>{formatCategory(geofence.category)}</Text>
       </View>
       <View style={styles.geofenceActions}>
         <Switch
@@ -477,10 +470,7 @@ function GeofenceCard({ geofence, onToggle, onRemove }: GeofenceCardProps) {
           }}
           thumbColor={geofence.enabled ? colors.primary.main : '#f4f3f4'}
         />
-        <TouchableOpacity
-          style={styles.removeButton}
-          onPress={onRemove}
-        >
+        <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
           <Trash2 size={18} color={colors.error.main} />
         </TouchableOpacity>
       </View>
@@ -490,7 +480,7 @@ function GeofenceCard({ geofence, onToggle, onRemove }: GeofenceCardProps) {
 
 function CategoryIcon({ category }: { category: SpendingCategory }) {
   const iconProps = { size: 20, color: colors.text.primary };
-  
+
   switch (category) {
     case SpendingCategory.GROCERIES:
       return <ShoppingCart {...iconProps} />;

@@ -14,17 +14,15 @@ import {
   Dimensions,
   SafeAreaView,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   FadeInDown,
   FadeInUp,
-  useAnimatedStyle,
   useSharedValue,
   withTiming,
   withDelay,
   Easing,
 } from 'react-native-reanimated';
-import Svg, { Circle, G, Path, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 import {
   TrendingUp,
   TrendingDown,
@@ -33,7 +31,6 @@ import {
   ChevronLeft,
   PieChart,
   BarChart2,
-  Calendar,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -67,38 +64,38 @@ interface PieChartProps {
   onSlicePress?: (slice: PieSlice) => void;
 }
 
-function AnimatedPieChart({ slices, totalSpending, onSlicePress }: PieChartProps) {
+function AnimatedPieChart({ slices, totalSpending, onSlicePress: _onSlicePress }: PieChartProps) {
   const animationProgress = useSharedValue(0);
-  
+
   useEffect(() => {
     animationProgress.value = withDelay(
       300,
       withTiming(1, { duration: 1500, easing: Easing.out(Easing.cubic) })
     );
   }, []);
-  
+
   const centerX = PIE_SIZE / 2;
   const centerY = PIE_SIZE / 2;
-  
+
   // Create SVG paths for each slice
   const createSlicePath = (startAngle: number, endAngle: number, radius: number) => {
     const startRad = (startAngle - 90) * (Math.PI / 180);
     const endRad = (endAngle - 90) * (Math.PI / 180);
-    
+
     const x1 = centerX + radius * Math.cos(startRad);
     const y1 = centerY + radius * Math.sin(startRad);
     const x2 = centerX + radius * Math.cos(endRad);
     const y2 = centerY + radius * Math.sin(endRad);
-    
+
     const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0;
-    
+
     return `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
   };
-  
+
   return (
     <View style={styles.pieContainer}>
       <Svg width={PIE_SIZE} height={PIE_SIZE}>
-        {slices.map((slice, index) => (
+        {slices.map((slice, _index) => (
           <Path
             key={slice.category}
             d={createSlicePath(slice.startAngle, slice.endAngle, PIE_RADIUS)}
@@ -106,22 +103,15 @@ function AnimatedPieChart({ slices, totalSpending, onSlicePress }: PieChartProps
             opacity={0.9}
           />
         ))}
-        
+
         {/* Center hole for donut effect */}
-        <Circle
-          cx={centerX}
-          cy={centerY}
-          r={PIE_RADIUS * 0.5}
-          fill={colors.background.primary}
-        />
+        <Circle cx={centerX} cy={centerY} r={PIE_RADIUS * 0.5} fill={colors.background.primary} />
       </Svg>
-      
+
       {/* Center text */}
       <View style={styles.pieCenter}>
         <Text style={styles.pieTotalLabel}>Total Monthly</Text>
-        <Text style={styles.pieTotalValue}>
-          ${totalSpending.toLocaleString()}
-        </Text>
+        <Text style={styles.pieTotalValue}>${totalSpending.toLocaleString()}</Text>
       </View>
     </View>
   );
@@ -140,7 +130,7 @@ interface LegendItemProps {
 
 function LegendItem({ slice, index, isSelected, onPress }: LegendItemProps) {
   const info = CATEGORY_INFO[slice.category];
-  
+
   return (
     <Animated.View entering={FadeInDown.delay(500 + index * 80).duration(300)}>
       <TouchableOpacity
@@ -176,7 +166,15 @@ interface InsightCardProps {
   delay: number;
 }
 
-function InsightCard({ icon, title, description, action, color, onPress, delay }: InsightCardProps) {
+function InsightCard({
+  icon,
+  title,
+  description,
+  action,
+  color,
+  onPress,
+  delay,
+}: InsightCardProps) {
   return (
     <Animated.View entering={FadeInUp.delay(delay).duration(400)}>
       <TouchableOpacity
@@ -184,9 +182,7 @@ function InsightCard({ icon, title, description, action, color, onPress, delay }
         onPress={onPress}
         activeOpacity={0.8}
       >
-        <View style={[styles.insightIcon, { backgroundColor: color + '15' }]}>
-          {icon}
-        </View>
+        <View style={[styles.insightIcon, { backgroundColor: color + '15' }]}>{icon}</View>
         <View style={styles.insightContent}>
           <Text style={styles.insightTitle}>{title}</Text>
           <Text style={styles.insightDescription}>{description}</Text>
@@ -216,13 +212,11 @@ interface TrendCardProps {
 function TrendCard({ category, currentAmount, previousAmount, index }: TrendCardProps) {
   const info = CATEGORY_INFO[category];
   const change = currentAmount - previousAmount;
-  const changePercent = previousAmount > 0 
-    ? Math.round((change / previousAmount) * 100) 
-    : 0;
+  const changePercent = previousAmount > 0 ? Math.round((change / previousAmount) * 100) : 0;
   const isUp = change > 0;
-  
+
   return (
-    <Animated.View 
+    <Animated.View
       entering={FadeInDown.delay(800 + index * 100).duration(300)}
       style={styles.trendCard}
     >
@@ -233,20 +227,22 @@ function TrendCard({ category, currentAmount, previousAmount, index }: TrendCard
         <Text style={styles.trendLabel}>{info.label}</Text>
         <Text style={styles.trendAmount}>${currentAmount.toLocaleString()}</Text>
       </View>
-      <View style={[
-        styles.trendBadge,
-        { backgroundColor: isUp ? colors.error.main + '15' : colors.primary.main + '15' }
-      ]}>
+      <View
+        style={[
+          styles.trendBadge,
+          { backgroundColor: isUp ? colors.error.main + '15' : colors.primary.main + '15' },
+        ]}
+      >
         {isUp ? (
           <TrendingUp size={14} color={colors.error.main} />
         ) : (
           <TrendingDown size={14} color={colors.primary.main} />
         )}
-        <Text style={[
-          styles.trendChange,
-          { color: isUp ? colors.error.main : colors.primary.main }
-        ]}>
-          {changePercent > 0 ? '+' : ''}{changePercent}%
+        <Text
+          style={[styles.trendChange, { color: isUp ? colors.error.main : colors.primary.main }]}
+        >
+          {changePercent > 0 ? '+' : ''}
+          {changePercent}%
         </Text>
       </View>
     </Animated.View>
@@ -264,7 +260,7 @@ export default function SpendingInsightsScreen() {
   const [selectedCategory, setSelectedCategory] = useState<SpendingCategory | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+
   const loadData = useCallback(async () => {
     try {
       const [spendingData, missedData] = await Promise.all([
@@ -280,21 +276,21 @@ export default function SpendingInsightsScreen() {
       setIsRefreshing(false);
     }
   }, []);
-  
+
   useEffect(() => {
     loadData();
   }, [loadData]);
-  
+
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
     loadData();
   }, [loadData]);
-  
+
   // Calculate pie chart data
   const { slices, totalSpending } = useMemo(() => {
     const entries = Array.from(spending.entries()).filter(([_, amount]) => amount > 0);
     const total = entries.reduce((sum, [_, amount]) => sum + amount, 0);
-    
+
     let currentAngle = 0;
     const sliceData: PieSlice[] = entries.map(([category, amount]) => {
       const percentage = (amount / total) * 100;
@@ -310,13 +306,13 @@ export default function SpendingInsightsScreen() {
       currentAngle += angle;
       return slice;
     });
-    
+
     // Sort by amount descending
     sliceData.sort((a, b) => b.amount - a.amount);
-    
+
     return { slices: sliceData, totalSpending: total };
   }, [spending]);
-  
+
   // Generate insights
   const insights = useMemo(() => {
     const result: Array<{
@@ -326,7 +322,7 @@ export default function SpendingInsightsScreen() {
       action?: string;
       color: string;
     }> = [];
-    
+
     if (slices.length > 0) {
       const topCategory = slices[0];
       const info = CATEGORY_INFO[topCategory.category];
@@ -338,7 +334,7 @@ export default function SpendingInsightsScreen() {
         color: colors.warning.main,
       });
     }
-    
+
     if (missedRewards && missedRewards.totalMissed > 5) {
       result.push({
         icon: <TrendingUp size={20} color={colors.primary.main} />,
@@ -348,19 +344,19 @@ export default function SpendingInsightsScreen() {
         color: colors.primary.main,
       });
     }
-    
+
     return result;
   }, [slices, missedRewards]);
-  
+
   // Generate mock trend data (showing 10% variance from current)
   const trends = useMemo(() => {
-    return slices.slice(0, 4).map(slice => ({
+    return slices.slice(0, 4).map((slice) => ({
       category: slice.category,
       currentAmount: slice.amount,
       previousAmount: Math.round(slice.amount * (0.9 + Math.random() * 0.2)), // ±10%
     }));
   }, [slices]);
-  
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -369,7 +365,7 @@ export default function SpendingInsightsScreen() {
       </View>
     );
   }
-  
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Back Button Header */}
@@ -384,7 +380,7 @@ export default function SpendingInsightsScreen() {
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
       </View>
-      
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -397,82 +393,77 @@ export default function SpendingInsightsScreen() {
         }
       >
         {/* Header */}
-        <Animated.View 
-          entering={FadeInDown.duration(400)}
-          style={styles.header}
-        >
+        <Animated.View entering={FadeInDown.duration(400)} style={styles.header}>
           <Text style={styles.headerTitle}>Spending Insights</Text>
-          <Text style={styles.headerSubtitle}>
-            Understand your spending patterns
-          </Text>
+          <Text style={styles.headerSubtitle}>Understand your spending patterns</Text>
         </Animated.View>
-      
-      {/* Pie Chart */}
-      <Animated.View entering={FadeInDown.delay(100).duration(500)}>
-        <AnimatedPieChart
-          slices={slices}
-          totalSpending={totalSpending}
-          onSlicePress={(slice) => setSelectedCategory(slice.category)}
-        />
-      </Animated.View>
-      
-      {/* Legend */}
-      <View style={styles.legendSection}>
-        {slices.map((slice, index) => (
-          <LegendItem
-            key={slice.category}
-            slice={slice}
-            index={index}
-            isSelected={selectedCategory === slice.category}
-            onPress={() => setSelectedCategory(
-              selectedCategory === slice.category ? null : slice.category
-            )}
+
+        {/* Pie Chart */}
+        <Animated.View entering={FadeInDown.delay(100).duration(500)}>
+          <AnimatedPieChart
+            slices={slices}
+            totalSpending={totalSpending}
+            onSlicePress={(slice) => setSelectedCategory(slice.category)}
           />
-        ))}
-      </View>
-      
-      {/* Insights */}
-      {insights.length > 0 && (
+        </Animated.View>
+
+        {/* Legend */}
+        <View style={styles.legendSection}>
+          {slices.map((slice, index) => (
+            <LegendItem
+              key={slice.category}
+              slice={slice}
+              index={index}
+              isSelected={selectedCategory === slice.category}
+              onPress={() =>
+                setSelectedCategory(selectedCategory === slice.category ? null : slice.category)
+              }
+            />
+          ))}
+        </View>
+
+        {/* Insights */}
+        {insights.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Lightbulb size={18} color={colors.warning.main} />
+              <Text style={styles.sectionTitle}>Smart Insights</Text>
+            </View>
+
+            {insights.map((insight, index) => (
+              <InsightCard
+                key={index}
+                icon={insight.icon}
+                title={insight.title}
+                description={insight.description}
+                action={insight.action}
+                color={insight.color}
+                delay={600 + index * 100}
+              />
+            ))}
+          </View>
+        )}
+
+        {/* Monthly Trends */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Lightbulb size={18} color={colors.warning.main} />
-            <Text style={styles.sectionTitle}>Smart Insights</Text>
+            <BarChart2 size={18} color={colors.accent.main} />
+            <Text style={styles.sectionTitle}>Monthly Trends</Text>
           </View>
-          
-          {insights.map((insight, index) => (
-            <InsightCard
-              key={index}
-              icon={insight.icon}
-              title={insight.title}
-              description={insight.description}
-              action={insight.action}
-              color={insight.color}
-              delay={600 + index * 100}
-            />
-          ))}
+
+          <View style={styles.trendsGrid}>
+            {trends.map((trend, index) => (
+              <TrendCard
+                key={trend.category}
+                category={trend.category}
+                currentAmount={trend.currentAmount}
+                previousAmount={trend.previousAmount}
+                index={index}
+              />
+            ))}
+          </View>
         </View>
-      )}
-      
-      {/* Monthly Trends */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <BarChart2 size={18} color={colors.accent.main} />
-          <Text style={styles.sectionTitle}>Monthly Trends</Text>
-        </View>
-        
-        <View style={styles.trendsGrid}>
-          {trends.map((trend, index) => (
-            <TrendCard
-              key={trend.category}
-              category={trend.category}
-              currentAmount={trend.currentAmount}
-              previousAmount={trend.previousAmount}
-              index={index}
-            />
-          ))}
-        </View>
-      </View>
-      
+
         {/* Bottom padding */}
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -522,7 +513,7 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     fontSize: 16,
   },
-  
+
   // Header
   header: {
     alignItems: 'center',
@@ -538,7 +529,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text.secondary,
   },
-  
+
   // Pie Chart
   pieContainer: {
     alignItems: 'center',
@@ -559,7 +550,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text.primary,
   },
-  
+
   // Legend
   legendSection: {
     gap: 8,
@@ -608,7 +599,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text.secondary,
   },
-  
+
   // Section
   section: {
     marginBottom: 24,
@@ -624,7 +615,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text.primary,
   },
-  
+
   // Insight Card
   insightCard: {
     flexDirection: 'row',
@@ -669,7 +660,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
-  
+
   // Trends
   trendsGrid: {
     gap: 8,

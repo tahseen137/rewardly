@@ -1,6 +1,6 @@
 /**
  * Cross-platform alert utilities that work on web, iOS, and Android.
- * 
+ *
  * On web, Alert.alert() callbacks don't fire and Alert.prompt() doesn't exist.
  * These utilities use window.alert/confirm on web, Alert on native.
  */

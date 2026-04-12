@@ -22,8 +22,7 @@ export const GradientText: React.FC<GradientTextProps> = ({
   style,
   ...textProps
 }) => {
-  const gradientColors =
-    variant === 'primary' ? colors.gradients.primary : colors.gradients.accent;
+  const gradientColors = variant === 'primary' ? colors.gradients.primary : colors.gradients.accent;
 
   // Web fallback using inline styles
   if (Platform.OS === 'web') {

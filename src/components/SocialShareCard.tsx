@@ -3,7 +3,7 @@
  * Creates a visually appealing card to share on Twitter, Instagram, etc.
  */
 
-import React, { useRef, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -31,7 +31,7 @@ import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
 import { ShareableStats } from '../types/rewards-iq';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
 interface SocialShareCardProps {
   stats: ShareableStats;
@@ -56,16 +56,10 @@ function ShareButton({ icon, label, color, onPress }: ShareButtonProps) {
     }
     onPress();
   };
-  
+
   return (
-    <TouchableOpacity
-      style={styles.shareButton}
-      onPress={handlePress}
-      activeOpacity={0.7}
-    >
-      <View style={[styles.shareButtonIcon, { backgroundColor: color + '15' }]}>
-        {icon}
-      </View>
+    <TouchableOpacity style={styles.shareButton} onPress={handlePress} activeOpacity={0.7}>
+      <View style={[styles.shareButtonIcon, { backgroundColor: color + '15' }]}>{icon}</View>
       <Text style={styles.shareButtonLabel}>{label}</Text>
     </TouchableOpacity>
   );
@@ -81,14 +75,14 @@ export default function SocialShareCard({ stats, onShare }: SocialShareCardProps
     if (score >= 60) return colors.warning.main;
     return colors.error.main;
   };
-  
+
   const scoreColor = getScoreColor(stats.rewardsIQ);
-  
+
   const handleShareNative = useCallback(async () => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-    
+
     try {
       await Share.share({
         message: stats.shareText + '\n' + stats.shareUrl,
@@ -100,17 +94,20 @@ export default function SocialShareCard({ stats, onShare }: SocialShareCardProps
       console.error('Share failed:', error);
     }
   }, [stats, onShare]);
-  
-  const handlePlatformShare = useCallback(async (platform: 'twitter' | 'instagram' | 'facebook') => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    
-    // For now, use native share. In production, would use deep links
-    await handleShareNative();
-    onShare?.(platform);
-  }, [handleShareNative, onShare]);
-  
+
+  const handlePlatformShare = useCallback(
+    async (platform: 'twitter' | 'instagram' | 'facebook') => {
+      if (Platform.OS !== 'web') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+
+      // For now, use native share. In production, would use deep links
+      await handleShareNative();
+      onShare?.(platform);
+    },
+    [handleShareNative, onShare]
+  );
+
   return (
     <Animated.View entering={FadeIn.duration(500)} style={styles.container}>
       {/* Preview Card */}
@@ -126,21 +123,18 @@ export default function SocialShareCard({ stats, onShare }: SocialShareCardProps
               <Text style={styles.logoText}>Rewardly</Text>
             </View>
           </View>
-          
+
           {/* Score Display */}
           <View style={styles.scoreSection}>
             <View style={styles.scoreCircle}>
-              <LinearGradient
-                colors={[scoreColor, scoreColor + 'CC']}
-                style={styles.scoreGradient}
-              >
+              <LinearGradient colors={[scoreColor, scoreColor + 'CC']} style={styles.scoreGradient}>
                 <Text style={styles.scoreNumber}>{stats.rewardsIQ}</Text>
               </LinearGradient>
             </View>
-            
+
             <Text style={styles.scoreLabel}>Rewards IQ</Text>
           </View>
-          
+
           {/* Stats Row */}
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
@@ -150,12 +144,10 @@ export default function SocialShareCard({ stats, onShare }: SocialShareCardProps
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Target size={16} color={colors.primary.main} />
-              <Text style={styles.statText}>
-                ${stats.annualOptimization.toLocaleString()}/yr
-              </Text>
+              <Text style={styles.statText}>${stats.annualOptimization.toLocaleString()}/yr</Text>
             </View>
           </View>
-          
+
           {/* CTA */}
           <View style={styles.ctaRow}>
             <Text style={styles.ctaText}>Get your Rewards IQ →</Text>
@@ -163,11 +155,11 @@ export default function SocialShareCard({ stats, onShare }: SocialShareCardProps
           </View>
         </LinearGradient>
       </View>
-      
+
       {/* Share Buttons */}
       <Animated.View entering={FadeInDown.delay(200).duration(400)}>
         <Text style={styles.shareTitle}>Share to</Text>
-        
+
         <View style={styles.shareButtonsRow}>
           <ShareButton
             icon={<Twitter size={20} color="#1DA1F2" />}
@@ -195,7 +187,7 @@ export default function SocialShareCard({ stats, onShare }: SocialShareCardProps
           />
         </View>
       </Animated.View>
-      
+
       {/* Main Share Button */}
       <Animated.View entering={FadeInDown.delay(400).duration(400)}>
         <TouchableOpacity onPress={handleShareNative} activeOpacity={0.9}>
@@ -209,10 +201,8 @@ export default function SocialShareCard({ stats, onShare }: SocialShareCardProps
             <Text style={styles.mainShareText}>Share My Score</Text>
           </LinearGradient>
         </TouchableOpacity>
-        
-        <Text style={styles.shareHint}>
-          Show off your rewards optimization skills 🎯
-        </Text>
+
+        <Text style={styles.shareHint}>Show off your rewards optimization skills 🎯</Text>
       </Animated.View>
     </Animated.View>
   );
@@ -226,7 +216,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
   },
-  
+
   // Preview Card
   previewCard: {
     borderRadius: borderRadius.xl,
@@ -259,7 +249,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text.primary,
   },
-  
+
   // Score Section
   scoreSection: {
     alignItems: 'center',
@@ -285,7 +275,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text.primary,
   },
-  
+
   // Stats Row
   statsRow: {
     flexDirection: 'row',
@@ -313,7 +303,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.text.secondary,
   },
-  
+
   // CTA
   ctaRow: {
     alignItems: 'center',
@@ -331,7 +321,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.text.tertiary,
   },
-  
+
   // Share Section
   shareTitle: {
     fontSize: 14,
@@ -361,7 +351,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: colors.text.tertiary,
   },
-  
+
   // Main Share Button
   mainShareButton: {
     flexDirection: 'row',

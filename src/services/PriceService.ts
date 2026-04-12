@@ -5,7 +5,6 @@
  * Requirements: 6.1, 6.2
  */
 
-import { Result, success, failure, RecommendationError } from '../types';
 import pricesData from '../data/prices.json';
 
 // ============================================================================

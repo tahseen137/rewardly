@@ -9,7 +9,12 @@ import { Card } from './Card';
 import { Badge } from './Badge';
 import { useTheme } from '../theme';
 import { RewardCalculationResult } from '../services/RewardsCalculatorService';
-import { formatRewardEarned, formatAnnualFee, REWARD_TYPE_ICONS, formatCategoryName } from '../utils/rewardFormatUtils';
+import {
+  formatRewardEarned,
+  formatAnnualFee,
+  REWARD_TYPE_ICONS,
+  formatCategoryName,
+} from '../utils/rewardFormatUtils';
 import { Card as CardType, SpendingCategory } from '../types';
 
 interface CardRewardItemProps {
@@ -22,7 +27,14 @@ interface CardRewardItemProps {
   category?: SpendingCategory;
 }
 
-export function CardRewardItem({ result, isBestValue, onPress, onViewOptions, card, category }: CardRewardItemProps) {
+export function CardRewardItem({
+  result,
+  isBestValue,
+  onPress,
+  onViewOptions,
+  card,
+  category,
+}: CardRewardItemProps) {
   const theme = useTheme();
 
   const rewardIcon = REWARD_TYPE_ICONS[result.rewardCurrency];
@@ -59,21 +71,14 @@ export function CardRewardItem({ result, isBestValue, onPress, onViewOptions, ca
           </Text>
         </View>
         {isBestValue && (
-          <Badge
-            label="Best Value"
-            variant="success"
-            size="small"
-            style={styles.bestValueBadge}
-          />
+          <Badge label="Best Value" variant="success" size="small" style={styles.bestValueBadge} />
         )}
       </View>
 
       {/* Price breakdown: Original → Reward → Effective */}
       <View style={styles.priceBreakdown}>
         <View style={styles.priceRow}>
-          <Text style={[styles.priceLabel, { color: theme.colors.text.secondary }]}>
-            Original:
-          </Text>
+          <Text style={[styles.priceLabel, { color: theme.colors.text.secondary }]}>Original:</Text>
           <Text style={[styles.priceValue, { color: theme.colors.text.primary }]}>
             ${result.originalPrice.toFixed(2)}
           </Text>
@@ -104,13 +109,16 @@ export function CardRewardItem({ result, isBestValue, onPress, onViewOptions, ca
         {result.isBaseRate ? (
           <View style={[styles.rateBadge, styles.rateBadgeBase]}>
             <Text style={[styles.rateBadgeText, { color: theme.colors.text.tertiary }]}>
-              {result.multiplierUsed}{result.isCashback ? '%' : 'x'} Base Rate
+              {result.multiplierUsed}
+              {result.isCashback ? '%' : 'x'} Base Rate
             </Text>
           </View>
         ) : (
           <View style={[styles.rateBadge, styles.rateBadgeBonus]}>
             <Text style={[styles.rateBadgeText, { color: theme.colors.success.main }]}>
-              ✨ {result.multiplierUsed}{result.isCashback ? '%' : 'x'}{category ? ` ${formatCategoryName(category)}` : ''} Bonus
+              ✨ {result.multiplierUsed}
+              {result.isCashback ? '%' : 'x'}
+              {category ? ` ${formatCategoryName(category)}` : ''} Bonus
             </Text>
           </View>
         )}

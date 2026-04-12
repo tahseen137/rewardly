@@ -1,7 +1,7 @@
 /**
  * Haptics Utilities - Centralized haptic feedback management
  * Provides consistent tactile feedback across the app
- * 
+ *
  * NOTE: This module uses the platform wrapper for web safety.
  * All haptic calls are no-ops on web.
  */
@@ -67,9 +67,9 @@ export async function errorNotification(): Promise<void> {
  */
 export async function celebration(): Promise<void> {
   if (!isNative) return;
-  
+
   await haptic('heavy');
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, 100));
   await haptic('medium');
 }
 
@@ -78,10 +78,10 @@ export async function celebration(): Promise<void> {
  */
 export async function moneyPattern(): Promise<void> {
   if (!isNative) return;
-  
+
   await haptic('light');
-  await new Promise(resolve => setTimeout(resolve, 50));
+  await new Promise((resolve) => setTimeout(resolve, 50));
   await haptic('light');
-  await new Promise(resolve => setTimeout(resolve, 50));
+  await new Promise((resolve) => setTimeout(resolve, 50));
   await haptic('medium');
 }

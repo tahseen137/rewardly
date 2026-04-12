@@ -1,9 +1,9 @@
 /**
  * AutoPilotService - Proactive credit card optimizer
- * 
+ *
  * Privacy-first geofencing service that alerts users when they enter
  * a monitored merchant location with the best card recommendation.
- * 
+ *
  * Key Features:
  * - User-controlled geofences (only monitors stores user explicitly pins)
  * - On-device processing (no raw location data sent to server)
@@ -15,15 +15,10 @@ import * as Notifications from 'expo-notifications';
 import * as TaskManager from 'expo-task-manager';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
-import { supabase, isSupabaseConfigured } from './supabase';
-import { getAllCardsSync, getCardByIdSync } from './CardDataService';
-import { getCards } from './CardPortfolioManager';
 import { SpendingCategory, Card } from '../types';
 import {
-  getBestCardForCategory as getBestCardForCategoryV2,
+  getBestCardForCategory as _getBestCardForCategoryV2,
   getAllCardRecommendations,
-  formatNotificationMessage,
-  CardRecommendation,
 } from './BestCardRecommendationService';
 
 // ============================================================================
@@ -188,23 +183,23 @@ export async function requestLocationPermission(): Promise<boolean> {
   try {
     // First request foreground permission
     const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
-    
+
     if (foregroundStatus !== 'granted') {
       console.log('[AutoPilot] Foreground location permission denied');
       return false;
     }
-    
+
     // Then request background permission (needed for geofencing)
     if (Platform.OS !== 'web') {
       const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
-      
+
       if (backgroundStatus !== 'granted') {
         console.log('[AutoPilot] Background location permission denied');
         // Can still work with foreground only, but geofencing won't work when app is backgrounded
         return true; // Return true since foreground was granted
       }
     }
-    
+
     console.log('[AutoPilot] Location permissions granted');
     return true;
   } catch (error) {
@@ -219,19 +214,19 @@ export async function requestLocationPermission(): Promise<boolean> {
 export async function requestNotificationPermission(): Promise<boolean> {
   try {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    
+
     let finalStatus = existingStatus;
-    
+
     if (existingStatus !== 'granted') {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
-    
+
     if (finalStatus !== 'granted') {
       console.log('[AutoPilot] Notification permission denied');
       return false;
     }
-    
+
     // Configure notification handler
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
@@ -242,7 +237,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
         shouldShowList: true,
       }),
     });
-    
+
     console.log('[AutoPilot] Notification permission granted');
     return true;
   } catch (error) {
@@ -264,13 +259,13 @@ export async function checkPermissions(): Promise<{
       Location.getForegroundPermissionsAsync(),
       Notifications.getPermissionsAsync(),
     ]);
-    
+
     let backgroundLocation = false;
     if (Platform.OS !== 'web') {
       const bgStatus = await Location.getBackgroundPermissionsAsync();
       backgroundLocation = bgStatus.status === 'granted';
     }
-    
+
     return {
       location: locationStatus.status === 'granted',
       backgroundLocation,
@@ -291,22 +286,22 @@ export async function checkPermissions(): Promise<{
  */
 export async function initializeAutoPilot(): Promise<void> {
   if (isInitialized) return;
-  
+
   try {
     // Load saved state
     const [enabledStr, geofencesStr] = await Promise.all([
       AsyncStorage.getItem(STORAGE_KEY_ENABLED),
       AsyncStorage.getItem(STORAGE_KEY_GEOFENCES),
     ]);
-    
+
     cachedEnabled = enabledStr === 'true';
     cachedGeofences = geofencesStr ? JSON.parse(geofencesStr) : [];
-    
+
     // Register background task if enabled
     if (cachedEnabled && Platform.OS !== 'web') {
       await registerGeofenceTask();
     }
-    
+
     isInitialized = true;
     console.log('[AutoPilot] Initialized with', cachedGeofences.length, 'geofences');
   } catch (error) {
@@ -322,26 +317,26 @@ export async function enableAutoPilot(): Promise<boolean> {
   try {
     // Check permissions first
     const permissions = await checkPermissions();
-    
+
     if (!permissions.location) {
       const granted = await requestLocationPermission();
       if (!granted) return false;
     }
-    
+
     if (!permissions.notifications) {
       const granted = await requestNotificationPermission();
       if (!granted) return false;
     }
-    
+
     // Save enabled state
     cachedEnabled = true;
     await AsyncStorage.setItem(STORAGE_KEY_ENABLED, 'true');
-    
+
     // Start geofencing if we have any geofences
-    if (cachedGeofences.filter(g => g.enabled).length > 0) {
+    if (cachedGeofences.filter((g) => g.enabled).length > 0) {
       await startGeofencing();
     }
-    
+
     console.log('[AutoPilot] Enabled');
     return true;
   } catch (error) {
@@ -398,15 +393,15 @@ export async function addGeofence(
     enabled: true,
     createdAt: new Date(),
   };
-  
+
   cachedGeofences.push(geofence);
   await saveGeofences();
-  
+
   // Restart geofencing with new fence
   if (cachedEnabled) {
     await startGeofencing();
   }
-  
+
   console.log('[AutoPilot] Added geofence for', merchantName);
   return geofence;
 }
@@ -415,13 +410,13 @@ export async function addGeofence(
  * Remove a geofence
  */
 export async function removeGeofence(geofenceId: string): Promise<void> {
-  cachedGeofences = cachedGeofences.filter(g => g.id !== geofenceId);
+  cachedGeofences = cachedGeofences.filter((g) => g.id !== geofenceId);
   await saveGeofences();
-  
+
   if (cachedEnabled) {
     await startGeofencing();
   }
-  
+
   console.log('[AutoPilot] Removed geofence', geofenceId);
 }
 
@@ -429,11 +424,11 @@ export async function removeGeofence(geofenceId: string): Promise<void> {
  * Toggle a geofence on/off
  */
 export async function toggleGeofence(geofenceId: string, enabled: boolean): Promise<void> {
-  const geofence = cachedGeofences.find(g => g.id === geofenceId);
+  const geofence = cachedGeofences.find((g) => g.id === geofenceId);
   if (geofence) {
     geofence.enabled = enabled;
     await saveGeofences();
-    
+
     if (cachedEnabled) {
       await startGeofencing();
     }
@@ -456,22 +451,31 @@ async function saveGeofences(): Promise<void> {
  */
 async function registerGeofenceTask(): Promise<void> {
   if (Platform.OS === 'web') return;
-  
+
   const isRegistered = await TaskManager.isTaskRegisteredAsync(GEOFENCE_TASK_NAME);
-  
+
   if (!isRegistered) {
-    TaskManager.defineTask(GEOFENCE_TASK_NAME, ({ data, error }: TaskManager.TaskManagerTaskBody<{ eventType: Location.GeofencingEventType; region: Location.LocationRegion }>) => {
-      if (error) {
-        console.error('[AutoPilot] Geofence task error:', error);
-        return;
+    TaskManager.defineTask(
+      GEOFENCE_TASK_NAME,
+      async ({
+        data,
+        error,
+      }: TaskManager.TaskManagerTaskBody<{
+        eventType: Location.GeofencingEventType;
+        region: Location.LocationRegion;
+      }>) => {
+        if (error) {
+          console.error('[AutoPilot] Geofence task error:', error);
+          return;
+        }
+
+        if (data) {
+          const { eventType, region } = data;
+          await handleGeofenceEvent(eventType, region);
+        }
       }
-      
-      if (data) {
-        const { eventType, region } = data;
-        handleGeofenceEvent(eventType, region);
-      }
-    });
-    
+    );
+
     console.log('[AutoPilot] Geofence task registered');
   }
 }
@@ -484,21 +488,21 @@ async function startGeofencing(): Promise<void> {
     console.log('[AutoPilot] Geofencing not available on web');
     return;
   }
-  
+
   try {
     // Stop existing geofencing first
     await stopGeofencing();
-    
+
     // Get enabled geofences
-    const enabledGeofences = cachedGeofences.filter(g => g.enabled);
-    
+    const enabledGeofences = cachedGeofences.filter((g) => g.enabled);
+
     if (enabledGeofences.length === 0) {
       console.log('[AutoPilot] No enabled geofences');
       return;
     }
-    
+
     // Convert to Expo Location regions
-    const regions: Location.LocationRegion[] = enabledGeofences.map(g => ({
+    const regions: Location.LocationRegion[] = enabledGeofences.map((g) => ({
       identifier: g.id,
       latitude: g.latitude,
       longitude: g.longitude,
@@ -506,10 +510,10 @@ async function startGeofencing(): Promise<void> {
       notifyOnEnter: true,
       notifyOnExit: false,
     }));
-    
+
     // Start geofencing
     await Location.startGeofencingAsync(GEOFENCE_TASK_NAME, regions);
-    
+
     console.log('[AutoPilot] Started geofencing with', regions.length, 'regions');
   } catch (error) {
     console.error('[AutoPilot] Failed to start geofencing:', error);
@@ -521,14 +525,14 @@ async function startGeofencing(): Promise<void> {
  */
 async function stopGeofencing(): Promise<void> {
   if (Platform.OS === 'web') return;
-  
+
   try {
     const isRunning = await Location.hasStartedGeofencingAsync(GEOFENCE_TASK_NAME);
     if (isRunning) {
       await Location.stopGeofencingAsync(GEOFENCE_TASK_NAME);
       console.log('[AutoPilot] Stopped geofencing');
     }
-  } catch (error) {
+  } catch {
     // Ignore errors when stopping (might not have been started)
   }
 }
@@ -543,24 +547,24 @@ async function handleGeofenceEvent(
   if (eventType !== Location.GeofencingEventType.Enter) {
     return; // Only care about entering
   }
-  
-  const geofenceId = region.identifier;
-  const geofence = cachedGeofences.find(g => g.id === geofenceId);
-  
+
+  const geofenceId = region.identifier ?? '';
+  const geofence = cachedGeofences.find((g) => g.id === geofenceId);
+
   if (!geofence) {
     console.log('[AutoPilot] Unknown geofence:', geofenceId);
     return;
   }
-  
+
   // Check cooldown
   if (await isOnCooldown(geofenceId)) {
     console.log('[AutoPilot] Geofence on cooldown:', geofence.merchantName);
     return;
   }
-  
+
   // Get best card recommendation
   const recommendation = await getBestCardForCategory(geofence.category);
-  
+
   if (recommendation) {
     await sendNotification(geofence, recommendation);
     await updateLastNotified(geofenceId);
@@ -574,12 +578,12 @@ async function isOnCooldown(geofenceId: string): Promise<boolean> {
   try {
     const lastNotifiedStr = await AsyncStorage.getItem(STORAGE_KEY_LAST_NOTIFIED);
     if (!lastNotifiedStr) return false;
-    
+
     const lastNotified: Record<string, number> = JSON.parse(lastNotifiedStr);
     const lastTime = lastNotified[geofenceId];
-    
+
     if (!lastTime) return false;
-    
+
     return Date.now() - lastTime < NOTIFICATION_COOLDOWN_MS;
   } catch {
     return false;
@@ -593,9 +597,9 @@ async function updateLastNotified(geofenceId: string): Promise<void> {
   try {
     const lastNotifiedStr = await AsyncStorage.getItem(STORAGE_KEY_LAST_NOTIFIED);
     const lastNotified: Record<string, number> = lastNotifiedStr ? JSON.parse(lastNotifiedStr) : {};
-    
+
     lastNotified[geofenceId] = Date.now();
-    
+
     await AsyncStorage.setItem(STORAGE_KEY_LAST_NOTIFIED, JSON.stringify(lastNotified));
   } catch (error) {
     console.error('[AutoPilot] Failed to update last notified:', error);
@@ -616,15 +620,15 @@ export async function getBestCardForCategory(
   try {
     // Use the enhanced recommendation service
     const recommendations = await getAllCardRecommendations(category);
-    
+
     if (recommendations.length === 0) {
       console.log('[AutoPilot] No cards in portfolio');
       return null;
     }
-    
+
     const best = recommendations[0];
     const second = recommendations.length > 1 ? recommendations[1] : undefined;
-    
+
     return {
       card: best.card,
       rewardRate: best.rewardRate,
@@ -652,13 +656,13 @@ async function sendNotification(
 ): Promise<void> {
   try {
     const title = `🎯 Best Card for ${geofence.merchantName}`;
-    
+
     let body = `Use ${recommendation.card.name} for ${recommendation.rewardRate}% back`;
-    
+
     if (recommendation.comparisonCard && recommendation.comparisonRate) {
       body += ` (vs ${recommendation.comparisonRate}% on ${recommendation.comparisonCard.name})`;
     }
-    
+
     await Notifications.scheduleNotificationAsync({
       content: {
         title,
@@ -675,7 +679,7 @@ async function sendNotification(
       },
       trigger: null, // Send immediately
     });
-    
+
     console.log('[AutoPilot] Sent notification for', geofence.merchantName);
   } catch (error) {
     console.error('[AutoPilot] Failed to send notification:', error);
@@ -690,7 +694,7 @@ export async function sendTestNotification(
   category: SpendingCategory = SpendingCategory.GROCERIES
 ): Promise<void> {
   const recommendation = await getBestCardForCategory(category);
-  
+
   if (!recommendation) {
     // Send fallback notification
     await Notifications.scheduleNotificationAsync({
@@ -704,7 +708,7 @@ export async function sendTestNotification(
     });
     return;
   }
-  
+
   await Notifications.scheduleNotificationAsync({
     content: {
       title: `🎯 Best Card for ${merchantName}`,
@@ -730,12 +734,12 @@ export async function sendTestNotification(
  */
 export async function getAutoPilotStatus(): Promise<AutoPilotStatus> {
   const permissions = await checkPermissions();
-  
+
   return {
     enabled: cachedEnabled,
     hasLocationPermission: permissions.location,
     hasNotificationPermission: permissions.notifications,
-    activeGeofences: cachedGeofences.filter(g => g.enabled).length,
+    activeGeofences: cachedGeofences.filter((g) => g.enabled).length,
   };
 }
 
@@ -746,7 +750,7 @@ export async function getCurrentLocation(): Promise<Location.LocationObject | nu
   try {
     const permissions = await checkPermissions();
     if (!permissions.location) return null;
-    
+
     return await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Balanced,
     });
@@ -760,12 +764,12 @@ export async function getCurrentLocation(): Promise<Location.LocationObject | nu
  * Manually trigger a geofence check (for testing)
  */
 export async function simulateGeofenceEntry(geofenceId: string): Promise<void> {
-  const geofence = cachedGeofences.find(g => g.id === geofenceId);
+  const geofence = cachedGeofences.find((g) => g.id === geofenceId);
   if (!geofence) {
     console.log('[AutoPilot] Geofence not found:', geofenceId);
     return;
   }
-  
+
   const recommendation = await getBestCardForCategory(geofence.category);
   if (recommendation) {
     await sendNotification(geofence, recommendation);

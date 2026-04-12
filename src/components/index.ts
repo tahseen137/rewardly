@@ -61,7 +61,13 @@ export { FadeInView } from './FadeInView';
 
 // Chat Components (Sage AI Assistant)
 export { ChatBubble, ChatInput, QuickActions, CardRecommendationCard } from './chat';
-export type { ChatBubbleProps, ChatInputProps, QuickActionsProps, QuickAction, CardRecommendationCardProps } from './chat';
+export type {
+  ChatBubbleProps,
+  ChatInputProps,
+  QuickActionsProps,
+  QuickAction,
+  CardRecommendationCardProps,
+} from './chat';
 
 // Subscription Components
 export { default as Paywall } from './Paywall';
@@ -83,7 +89,12 @@ export { default as SignupBonusCard } from './SignupBonusCard';
 export { default as SocialShareCard } from './SocialShareCard';
 
 // Tier 3 - Polish & Animations
-export { default as AnimatedNumber, AnimatedCurrency, AnimatedPoints, AnimatedPercent } from './AnimatedNumber';
+export {
+  default as AnimatedNumber,
+  AnimatedCurrency,
+  AnimatedPoints,
+  AnimatedPercent,
+} from './AnimatedNumber';
 export { default as ConfettiAnimation } from './ConfettiAnimation';
 
 // Cycle 4 - CSV Statement Upload Components

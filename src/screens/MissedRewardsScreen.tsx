@@ -4,7 +4,7 @@
  * Creates URGENCY through concrete dollar amounts
  */
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -19,23 +19,20 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useAnimatedStyle,
-  withSpring,
   useSharedValue,
   withTiming,
   withSequence,
-  withDelay,
   FadeInDown,
   FadeInUp,
 } from 'react-native-reanimated';
-import { AlertTriangle, TrendingDown, ArrowRight, DollarSign, ChevronRight } from 'lucide-react-native';
+import { AlertTriangle, TrendingDown, DollarSign, ChevronRight } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
-import { GradientText, ApplyNowButton } from '../components';
+import { ApplyNowButton } from '../components';
 import { MissedRewardsAnalysis, CategoryMissedRewards, MissedReward } from '../types/rewards-iq';
 import { analyzeMissedRewards } from '../services/RewardsIQService';
 import { CATEGORY_INFO } from '../services/MockTransactionData';
-import { SpendingCategory } from '../types';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
 
 type NavigationProp = NativeStackNavigationProp<InsightsStackParamList>;
@@ -52,9 +49,15 @@ interface AnimatedCounterProps {
   duration?: number;
 }
 
-function AnimatedCounter({ value, prefix = '$', suffix = '', style, duration = 1500 }: AnimatedCounterProps) {
+function AnimatedCounter({
+  value,
+  prefix = '$',
+  suffix = '',
+  style,
+  duration = 1500,
+}: AnimatedCounterProps) {
   const [displayValue, setDisplayValue] = useState(0);
-  
+
   useEffect(() => {
     const startTime = Date.now();
     const interval = setInterval(() => {
@@ -63,19 +66,21 @@ function AnimatedCounter({ value, prefix = '$', suffix = '', style, duration = 1
       // Easing function for smooth animation
       const eased = 1 - Math.pow(1 - progress, 3);
       setDisplayValue(Math.round(value * eased * 100) / 100);
-      
+
       if (progress >= 1) {
         clearInterval(interval);
         setDisplayValue(value);
       }
     }, 16);
-    
+
     return () => clearInterval(interval);
   }, [value, duration]);
-  
+
   return (
     <Text style={style}>
-      {prefix}{displayValue.toFixed(2)}{suffix}
+      {prefix}
+      {displayValue.toFixed(2)}
+      {suffix}
     </Text>
   );
 }
@@ -92,19 +97,12 @@ interface CategoryCardProps {
 
 function CategoryCard({ category, index, onPress }: CategoryCardProps) {
   const info = CATEGORY_INFO[category.category];
-  const percentage = category.totalSpend > 0 
-    ? (category.totalMissed / category.totalSpend) * 100 
-    : 0;
-  
+  const percentage =
+    category.totalSpend > 0 ? (category.totalMissed / category.totalSpend) * 100 : 0;
+
   return (
-    <Animated.View
-      entering={FadeInDown.delay(index * 100).duration(400)}
-    >
-      <TouchableOpacity
-        style={styles.categoryCard}
-        onPress={onPress}
-        activeOpacity={0.7}
-      >
+    <Animated.View entering={FadeInDown.delay(index * 100).duration(400)}>
+      <TouchableOpacity style={styles.categoryCard} onPress={onPress} activeOpacity={0.7}>
         <View style={styles.categoryHeader}>
           <View style={[styles.categoryIcon, { backgroundColor: info.color + '20' }]}>
             <Text style={styles.categoryEmoji}>{info.icon}</Text>
@@ -117,23 +115,21 @@ function CategoryCard({ category, index, onPress }: CategoryCardProps) {
           </View>
           <View style={styles.categoryAmount}>
             <Text style={styles.missedAmount}>-${category.totalMissed.toFixed(2)}</Text>
-            <Text style={styles.missedPercent}>
-              {percentage.toFixed(1)}% lost
-            </Text>
+            <Text style={styles.missedPercent}>{percentage.toFixed(1)}% lost</Text>
           </View>
         </View>
-        
+
         {/* Progress bar showing missed vs optimal */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View 
+            <View
               style={[
-                styles.progressFill, 
-                { 
+                styles.progressFill,
+                {
                   width: `${100 - Math.min(percentage * 2, 100)}%`,
                   backgroundColor: info.color,
-                }
-              ]} 
+                },
+              ]}
             />
           </View>
         </View>
@@ -157,7 +153,7 @@ function MissedTransactionItem({ missed, index }: MissedTransactionProps) {
     month: 'short',
     day: 'numeric',
   });
-  
+
   return (
     <Animated.View
       entering={FadeInUp.delay(300 + index * 80).duration(300)}
@@ -174,9 +170,7 @@ function MissedTransactionItem({ missed, index }: MissedTransactionProps) {
       </View>
       <View style={styles.transactionRight}>
         <Text style={styles.transactionMissed}>-${missed.missedCad.toFixed(2)}</Text>
-        <Text style={styles.transactionShouldUse}>
-          Use {missed.optimalCard.name.split(' ')[0]}
-        </Text>
+        <Text style={styles.transactionShouldUse}>Use {missed.optimalCard.name.split(' ')[0]}</Text>
       </View>
     </Animated.View>
   );
@@ -192,21 +186,21 @@ export default function MissedRewardsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const shakeValue = useSharedValue(0);
-  
+
   const loadData = useCallback(async () => {
     try {
       const data = await analyzeMissedRewards();
       setAnalysis(data);
       setError(null);
-      
+
       // Trigger attention-grabbing animation
       shakeValue.value = withSequence(
         withTiming(1, { duration: 100 }),
         withTiming(-1, { duration: 100 }),
         withTiming(0.5, { duration: 100 }),
-        withTiming(0, { duration: 100 }),
+        withTiming(0, { duration: 100 })
       );
     } catch (e) {
       setError('Failed to analyze rewards. Please try again.');
@@ -216,20 +210,20 @@ export default function MissedRewardsScreen() {
       setIsRefreshing(false);
     }
   }, []);
-  
+
   useEffect(() => {
     loadData();
   }, [loadData]);
-  
+
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
     loadData();
   }, [loadData]);
-  
+
   const shakeStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: shakeValue.value * 5 }],
   }));
-  
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -238,7 +232,7 @@ export default function MissedRewardsScreen() {
       </View>
     );
   }
-  
+
   if (error || !analysis) {
     return (
       <View style={styles.errorContainer}>
@@ -250,7 +244,7 @@ export default function MissedRewardsScreen() {
       </View>
     );
   }
-  
+
   return (
     <ScrollView
       style={styles.container}
@@ -272,9 +266,9 @@ export default function MissedRewardsScreen() {
           <View style={styles.heroIconContainer}>
             <TrendingDown size={32} color={colors.error.main} />
           </View>
-          
+
           <Text style={styles.heroLabel}>You're leaving money on the table</Text>
-          
+
           <View style={styles.heroAmountContainer}>
             <AnimatedCounter
               value={analysis.totalMissed}
@@ -283,22 +277,23 @@ export default function MissedRewardsScreen() {
             />
             <Text style={styles.heroPeriod}>this month</Text>
           </View>
-          
+
           {/* Projected yearly */}
           <View style={styles.projectionContainer}>
             <DollarSign size={16} color={colors.warning.main} />
             <Text style={styles.projectionText}>
-              That's <Text style={styles.projectionAmount}>${analysis.projectedYearlyMissed.toLocaleString()}</Text> per year!
+              That's{' '}
+              <Text style={styles.projectionAmount}>
+                ${analysis.projectedYearlyMissed.toLocaleString()}
+              </Text>{' '}
+              per year!
             </Text>
           </View>
         </LinearGradient>
       </Animated.View>
-      
+
       {/* Quick Stats */}
-      <Animated.View 
-        entering={FadeInDown.delay(200).duration(500)}
-        style={styles.statsRow}
-      >
+      <Animated.View entering={FadeInDown.delay(200).duration(500)} style={styles.statsRow}>
         <View style={styles.statBox}>
           <Text style={styles.statValue}>${analysis.totalSpend.toFixed(0)}</Text>
           <Text style={styles.statLabel}>Total Spent</Text>
@@ -314,14 +309,12 @@ export default function MissedRewardsScreen() {
           <Text style={styles.statLabel}>Could've Earned</Text>
         </View>
       </Animated.View>
-      
+
       {/* Category Breakdown */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Where you're missing out</Text>
-        <Text style={styles.sectionSubtitle}>
-          Tap to see which card to use
-        </Text>
-        
+        <Text style={styles.sectionSubtitle}>Tap to see which card to use</Text>
+
         {analysis.byCategory.slice(0, 5).map((cat, index) => (
           <CategoryCard
             key={cat.category}
@@ -331,52 +324,45 @@ export default function MissedRewardsScreen() {
           />
         ))}
       </View>
-      
+
       {/* Top Missed Transactions */}
       {analysis.topMissedTransactions.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Biggest misses</Text>
-          <Text style={styles.sectionSubtitle}>
-            These transactions cost you the most
-          </Text>
-          
+          <Text style={styles.sectionSubtitle}>These transactions cost you the most</Text>
+
           <View style={styles.transactionsList}>
             {analysis.topMissedTransactions.map((missed, index) => (
-              <MissedTransactionItem
-                key={missed.transaction.id}
-                missed={missed}
-                index={index}
-              />
+              <MissedTransactionItem key={missed.transaction.id} missed={missed} index={index} />
             ))}
           </View>
         </View>
       )}
-      
+
       {/* Top Missed Card Apply CTA */}
-      {analysis.topMissedTransactions.length > 0 && analysis.topMissedTransactions[0].optimalCard && (
-        <Animated.View 
-          entering={FadeInUp.delay(500).duration(500)}
-          style={styles.applyCtaContainer}
-        >
-          <Text style={styles.applyCtaTitle}>
-            💡 Stop missing rewards — get the right card
-          </Text>
-          <ApplyNowButton
-            card={analysis.topMissedTransactions[0].optimalCard}
-            sourceScreen="MissedRewards"
-            variant="outline"
-            label={`Apply for ${analysis.topMissedTransactions[0].optimalCard.name}`}
-            showDisclosure
-          />
-        </Animated.View>
-      )}
+      {analysis.topMissedTransactions.length > 0 &&
+        analysis.topMissedTransactions[0].optimalCard && (
+          <Animated.View
+            entering={FadeInUp.delay(500).duration(500)}
+            style={styles.applyCtaContainer}
+          >
+            <Text style={styles.applyCtaTitle}>💡 Stop missing rewards — get the right card</Text>
+            <ApplyNowButton
+              card={analysis.topMissedTransactions[0].optimalCard}
+              sourceScreen="MissedRewards"
+              variant="outline"
+              label={`Apply for ${analysis.topMissedTransactions[0].optimalCard.name}`}
+              showDisclosure
+            />
+          </Animated.View>
+        )}
 
       {/* CTA Button */}
-      <Animated.View 
-        entering={FadeInUp.delay(600).duration(500)}
-        style={styles.ctaContainer}
-      >
-        <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate('PortfolioOptimizer')}>
+      <Animated.View entering={FadeInUp.delay(600).duration(500)} style={styles.ctaContainer}>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={() => navigation.navigate('PortfolioOptimizer')}
+        >
           <LinearGradient
             colors={[colors.primary.main, colors.primary.dark]}
             start={{ x: 0, y: 0 }}
@@ -387,12 +373,12 @@ export default function MissedRewardsScreen() {
             <ChevronRight size={24} color={colors.background.primary} />
           </LinearGradient>
         </TouchableOpacity>
-        
+
         <Text style={styles.ctaHint}>
           See how to earn ${analysis.projectedYearlyMissed.toFixed(0)} more per year
         </Text>
       </Animated.View>
-      
+
       {/* Bottom padding */}
       <View style={{ height: 100 }} />
     </ScrollView>
@@ -445,7 +431,7 @@ const styles = StyleSheet.create({
     color: colors.background.primary,
     fontWeight: '600',
   },
-  
+
   // Hero Section
   heroSection: {
     marginHorizontal: 16,
@@ -502,7 +488,7 @@ const styles = StyleSheet.create({
   projectionAmount: {
     fontWeight: '700',
   },
-  
+
   // Stats Row
   statsRow: {
     flexDirection: 'row',
@@ -531,7 +517,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.text.tertiary,
   },
-  
+
   // Section
   section: {
     marginHorizontal: 16,
@@ -548,7 +534,7 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     marginBottom: 16,
   },
-  
+
   // Category Cards
   categoryCard: {
     backgroundColor: colors.background.secondary,
@@ -611,7 +597,7 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 2,
   },
-  
+
   // Transactions List
   transactionsList: {
     backgroundColor: colors.background.secondary,
@@ -660,7 +646,7 @@ const styles = StyleSheet.create({
     color: colors.primary.main,
     marginTop: 2,
   },
-  
+
   // CTA
   ctaContainer: {
     marginHorizontal: 16,

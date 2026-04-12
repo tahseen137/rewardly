@@ -1,6 +1,6 @@
 /**
  * SpendingProfileService - Manages user spending profiles
- * 
+ *
  * Features:
  * - Local storage (AsyncStorage) for offline support
  * - Optional Supabase sync for authenticated users
@@ -100,7 +100,7 @@ export function getSpendForCategory(
 
   const key = categoryMap[category];
   if (!key) return 0;
-  
+
   return profile[key] ?? 0;
 }
 
@@ -111,7 +111,7 @@ export function validateSpendingProfile(
   input: SpendingProfileInput
 ): Result<SpendingProfileInput, SpendingProfileError> {
   const categories = Object.entries(input) as [keyof SpendingProfileInput, number][];
-  
+
   for (const [category, value] of categories) {
     if (typeof value !== 'number' || value < 0 || !isFinite(value)) {
       return failure({
@@ -121,7 +121,7 @@ export function validateSpendingProfile(
       });
     }
   }
-  
+
   return success(input);
 }
 
@@ -155,7 +155,7 @@ export function aggregateSpendingEntries(
   }
 
   // Find date range
-  const dates = entries.map(e => e.transactionDate.getTime());
+  const dates = entries.map((e) => e.transactionDate.getTime());
   const minDate = Math.min(...dates);
   const maxDate = Math.max(...dates);
   const daySpan = Math.max(1, (maxDate - minDate) / (1000 * 60 * 60 * 24));
@@ -296,10 +296,7 @@ export async function getFromSpendingLog(): Promise<SpendingProfileInput | null>
   try {
     // Get last 90 days of spending entries
     const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
-    const entries = await getSpendingEntries(
-      { startDate: ninetyDaysAgo },
-      Infinity
-    );
+    const entries = await getSpendingEntries({ startDate: ninetyDaysAgo }, Infinity);
 
     if (entries.length < 5) {
       // Not enough data to calculate meaningful averages
@@ -338,10 +335,7 @@ export async function deleteSpendingProfile(): Promise<void> {
   if (isSupabaseConfigured() && supabase) {
     const user = await getCurrentUser();
     if (user) {
-      await supabase
-        .from('spending_profiles')
-        .delete()
-        .eq('user_id', user.id);
+      await supabase.from('spending_profiles').delete().eq('user_id', user.id);
     }
   }
 }
@@ -359,13 +353,18 @@ export function resetSpendingProfileCache(): void {
  * Auto-calculates monthly averages from real transaction data
  */
 export async function updateFromParsedTransactions(
-  transactions: Array<{ amount: number; category: import('../types').SpendingCategory; transactionDate: Date; isCredit: boolean }>
+  transactions: Array<{
+    amount: number;
+    category: import('../types').SpendingCategory;
+    transactionDate: Date;
+    isCredit: boolean;
+  }>
 ): Promise<Result<SpendingProfile, SpendingProfileError>> {
   if (!isInitialized) await initializeSpendingProfile();
 
   // Filter to purchases only
-  const purchases = transactions.filter(t => !t.isCredit);
-  
+  const purchases = transactions.filter((t) => !t.isCredit);
+
   if (purchases.length === 0) {
     return failure({
       type: 'STORAGE_ERROR',
@@ -407,7 +406,7 @@ function transformFromStorage(data: any): SpendingProfile {
 
 async function syncFromSupabase(): Promise<void> {
   if (!supabase) return;
-  
+
   const user = await getCurrentUser();
   if (!user) return;
 
@@ -463,9 +462,7 @@ async function syncToSupabase(profile: SpendingProfile): Promise<void> {
     updated_at: new Date().toISOString(),
   };
 
-  await supabase
-    .from('spending_profiles')
-    .upsert(row as any, { onConflict: 'user_id' });
+  await supabase.from('spending_profiles').upsert(row as any, { onConflict: 'user_id' });
 }
 
 // ============================================================================

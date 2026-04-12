@@ -4,14 +4,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  FlatList,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Search, X } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -74,11 +67,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
     <View style={styles.container}>
       {/* Search Input */}
       <View style={styles.searchContainer}>
-        <Search
-          size={16}
-          color={colors.text.secondary}
-          style={styles.searchIcon}
-        />
+        <Search size={16} color={colors.text.secondary} style={styles.searchIcon} />
         <TextInput
           placeholder="Search stores (optional)"
           placeholderTextColor={colors.text.tertiary}

@@ -1,6 +1,6 @@
 /**
  * FeeBreakevenService - F23: Annual Fee Breakeven Calculator
- * 
+ *
  * Proves whether premium cards pay for themselves with user's spending.
  */
 
@@ -18,7 +18,11 @@ import {
   failure,
 } from '../types';
 import { getAllCardsSync, getCardByIdSync } from './CardDataService';
-import { getSpendingProfileSync, getSpendForCategory, calculateTotalMonthlySpend } from './SpendingProfileService';
+import {
+  getSpendingProfileSync,
+  getSpendForCategory,
+  calculateTotalMonthlySpend,
+} from './SpendingProfileService';
 import { getApplicableMultiplier } from './RewardsCalculatorService';
 
 // ============================================================================
@@ -53,7 +57,7 @@ export function calculateCategoryRewards(
 ): number {
   const rate = getApplicableMultiplier(card, category);
   const annualSpend = monthlySpend * 12;
-  
+
   // For cashback cards, rate is percentage (e.g., 4 for 4%)
   // For points cards, rate is multiplier (e.g., 5 for 5x)
   if (card.baseRewardRate.type === 'cashback') {
@@ -135,10 +139,8 @@ export function calculateCategoryBreakdown(
 
     const annualRewards = calculateCategoryRewards(card, category, monthlySpend);
     const rewardRate = getApplicableMultiplier(card, category);
-    
-    const percentOfFeeRecovered = annualFee > 0 
-      ? (annualRewards / annualFee) * 100 
-      : 0;
+
+    const percentOfFeeRecovered = annualFee > 0 ? (annualRewards / annualFee) * 100 : 0;
 
     breakdown.push({
       category,
@@ -156,14 +158,12 @@ export function calculateCategoryBreakdown(
 /**
  * Find best no-fee card for comparison
  */
-export function findBestNoFeeCard(
-  spendingProfile: SpendingProfileInput
-): Card | null {
+export function findBestNoFeeCard(spendingProfile: SpendingProfileInput): Card | null {
   const allCards = getAllCardsSync();
-  
+
   // Filter to no-fee cards
-  const noFeeCards = allCards.filter(c => !c.annualFee || c.annualFee === 0);
-  
+  const noFeeCards = allCards.filter((c) => !c.annualFee || c.annualFee === 0);
+
   if (noFeeCards.length === 0) return null;
 
   // Find the one with highest rewards for this profile
@@ -287,17 +287,17 @@ export function calculateFeeBreakeven(
   const netValue = annualRewardsEarned - annualFee;
   const userMonthlySpend = calculateTotalMonthlySpend(profile);
   const userAnnualSpend = userMonthlySpend * 12;
-  
+
   const effectiveRewardRate = calculateEffectiveRewardRate(card, profile);
   const breakEvenMonthlySpend = calculateBreakEvenMonthlySpend(annualFee, effectiveRewardRate);
-  
+
   const exceedsBreakeven = userMonthlySpend >= breakEvenMonthlySpend;
   const surplusOverBreakeven = (userMonthlySpend - breakEvenMonthlySpend) * 12;
   const multiplierOverFee = annualFee > 0 ? annualRewardsEarned / annualFee : 0;
-  
+
   const categoryBreakdown = calculateCategoryBreakdown(card, profile, annualFee);
   const noFeeComparison = compareToNoFeeCard(card, annualRewardsEarned, profile);
-  
+
   const { verdict, reason } = determineFeeVerdict(netValue, annualFee);
 
   return success({
@@ -347,13 +347,13 @@ export function findBestFeeCards(
   limit: number = 5
 ): FeeBreakevenResult[] {
   const allCards = getAllCardsSync();
-  
+
   // Filter to cards with annual fees
-  const cardsWithFees = allCards.filter(c => c.annualFee && c.annualFee > 0);
-  
+  const cardsWithFees = allCards.filter((c) => c.annualFee && c.annualFee > 0);
+
   // Calculate fee breakeven for each
   return compareFeeBreakeven(
-    cardsWithFees.map(c => c.id),
+    cardsWithFees.map((c) => c.id),
     spendingProfile
   ).slice(0, limit);
 }

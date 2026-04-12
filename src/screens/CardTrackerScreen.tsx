@@ -10,7 +10,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  RefreshControl,
   Alert,
   TextInput,
   Modal,
@@ -19,33 +18,26 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   FadeInDown,
   FadeInUp,
-  useAnimatedStyle,
   useSharedValue,
   withTiming,
-  withSpring,
-  withSequence,
   Easing,
 } from 'react-native-reanimated';
 import {
   CreditCard,
   Clock,
-  Target,
   Plus,
-  ChevronRight,
   AlertTriangle,
   CheckCircle,
   Trophy,
   X,
-  Calendar,
   DollarSign,
 } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
-import { Card, SignupBonus } from '../types';
+import { Card } from '../types';
 import { getAllCardsSync, getCardByIdSync } from '../services/CardDataService';
-import { getCards } from '../services/CardPortfolioManager';
 
 // ============================================================================
 // Types
@@ -80,19 +72,19 @@ interface ProgressCircleProps {
   color: string;
 }
 
-function ProgressCircle({ progress, size, strokeWidth, color }: ProgressCircleProps) {
+function _ProgressCircle({ progress, size, strokeWidth, color }: ProgressCircleProps) {
   const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  
+  const _circumference = 2 * Math.PI * radius;
+
   const animatedProgress = useSharedValue(0);
-  
+
   useEffect(() => {
     animatedProgress.value = withTiming(progress, {
       duration: 1000,
       easing: Easing.out(Easing.cubic),
     });
   }, [progress]);
-  
+
   return (
     <View style={{ width: size, height: size }}>
       {/* Background circle */}
@@ -143,22 +135,22 @@ interface TrackedCardItemProps {
   index: number;
 }
 
-function TrackedCardItem({ 
-  tracked, 
-  card, 
-  onUpdateSpend, 
-  onMarkComplete, 
+function TrackedCardItem({
+  tracked,
+  card,
+  onUpdateSpend,
+  onMarkComplete,
   onRemove,
-  index 
+  index,
 }: TrackedCardItemProps) {
   const [showEditSpend, setShowEditSpend] = useState(false);
   const [newSpend, setNewSpend] = useState(String(tracked.currentSpend));
-  
+
   if (!card) return null;
-  
+
   const progress = Math.min(tracked.currentSpend / tracked.targetSpend, 1);
   const remaining = Math.max(tracked.targetSpend - tracked.currentSpend, 0);
-  
+
   // Calculate days remaining
   const appDate = new Date(tracked.applicationDate);
   const deadlineDate = new Date(appDate);
@@ -168,30 +160,32 @@ function TrackedCardItem({
     Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
     0
   );
-  
+
   const isUrgent = daysRemaining <= 30 && !tracked.isCompleted;
   const isExpiringSoon = daysRemaining <= 14 && !tracked.isCompleted;
-  
+
   const getStatusColor = () => {
     if (tracked.isCompleted) return colors.primary.main;
     if (isExpiringSoon) return colors.error.main;
     if (isUrgent) return colors.warning.main;
     return colors.accent.main;
   };
-  
+
   const handleSaveSpend = () => {
     const amount = parseFloat(newSpend) || 0;
     onUpdateSpend(tracked.cardId, amount);
     setShowEditSpend(false);
   };
-  
+
   return (
     <Animated.View entering={FadeInDown.delay(index * 100).duration(400)}>
-      <View style={[
-        styles.trackedCard,
-        tracked.isCompleted && styles.trackedCardCompleted,
-        isExpiringSoon && !tracked.isCompleted && styles.trackedCardUrgent,
-      ]}>
+      <View
+        style={[
+          styles.trackedCard,
+          tracked.isCompleted && styles.trackedCardCompleted,
+          isExpiringSoon && !tracked.isCompleted && styles.trackedCardUrgent,
+        ]}
+      >
         {/* Header */}
         <View style={styles.trackedHeader}>
           <View style={styles.trackedInfo}>
@@ -200,15 +194,12 @@ function TrackedCardItem({
             </Text>
             <Text style={styles.trackedIssuer}>{card.issuer}</Text>
           </View>
-          
-          <TouchableOpacity
-            style={styles.removeButton}
-            onPress={() => onRemove(tracked.cardId)}
-          >
+
+          <TouchableOpacity style={styles.removeButton} onPress={() => onRemove(tracked.cardId)}>
             <X size={18} color={colors.text.tertiary} />
           </TouchableOpacity>
         </View>
-        
+
         {/* Progress Section */}
         <View style={styles.progressSection}>
           {/* Progress Info */}
@@ -219,50 +210,38 @@ function TrackedCardItem({
                 {Math.round(progress * 100)}%
               </Text>
             </View>
-            
+
             <View style={styles.progressBar}>
-              <View 
+              <View
                 style={[
                   styles.progressFill,
                   { width: `${progress * 100}%`, backgroundColor: getStatusColor() },
                 ]}
               />
             </View>
-            
+
             <View style={styles.spendingRow}>
-              <Text style={styles.spendingCurrent}>
-                ${tracked.currentSpend.toLocaleString()}
-              </Text>
-              <Text style={styles.spendingTarget}>
-                of ${tracked.targetSpend.toLocaleString()}
-              </Text>
+              <Text style={styles.spendingCurrent}>${tracked.currentSpend.toLocaleString()}</Text>
+              <Text style={styles.spendingTarget}>of ${tracked.targetSpend.toLocaleString()}</Text>
             </View>
           </View>
         </View>
-        
+
         {/* Bonus & Deadline */}
         <View style={styles.detailsRow}>
           <View style={styles.detailItem}>
             <Trophy size={16} color={colors.warning.main} />
-            <Text style={styles.detailText}>
-              {tracked.bonusPoints.toLocaleString()} points
-            </Text>
+            <Text style={styles.detailText}>{tracked.bonusPoints.toLocaleString()} points</Text>
           </View>
-          
+
           <View style={styles.detailItem}>
             <Clock size={16} color={isExpiringSoon ? colors.error.main : colors.text.tertiary} />
-            <Text style={[
-              styles.detailText,
-              isExpiringSoon && styles.detailTextUrgent,
-            ]}>
-              {tracked.isCompleted 
-                ? 'Completed!' 
-                : `${daysRemaining} days left`
-              }
+            <Text style={[styles.detailText, isExpiringSoon && styles.detailTextUrgent]}>
+              {tracked.isCompleted ? 'Completed!' : `${daysRemaining} days left`}
             </Text>
           </View>
         </View>
-        
+
         {/* Actions */}
         {!tracked.isCompleted && (
           <View style={styles.actionsRow}>
@@ -273,7 +252,7 @@ function TrackedCardItem({
               <DollarSign size={16} color={colors.accent.main} />
               <Text style={styles.updateSpendText}>Update Spend</Text>
             </TouchableOpacity>
-            
+
             {progress >= 1 && (
               <TouchableOpacity
                 style={styles.completeButton}
@@ -285,7 +264,7 @@ function TrackedCardItem({
             )}
           </View>
         )}
-        
+
         {/* Urgent Warning */}
         {isExpiringSoon && !tracked.isCompleted && (
           <View style={styles.urgentBanner}>
@@ -295,13 +274,13 @@ function TrackedCardItem({
             </Text>
           </View>
         )}
-        
+
         {/* Edit Spend Modal */}
         <Modal visible={showEditSpend} transparent animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Update Spending</Text>
-              
+
               <View style={styles.modalInputContainer}>
                 <Text style={styles.modalInputPrefix}>$</Text>
                 <TextInput
@@ -312,7 +291,7 @@ function TrackedCardItem({
                   autoFocus
                 />
               </View>
-              
+
               <View style={styles.modalButtons}>
                 <TouchableOpacity
                   style={styles.modalCancelButton}
@@ -320,11 +299,8 @@ function TrackedCardItem({
                 >
                   <Text style={styles.modalCancelText}>Cancel</Text>
                 </TouchableOpacity>
-                
-                <TouchableOpacity
-                  style={styles.modalSaveButton}
-                  onPress={handleSaveSpend}
-                >
+
+                <TouchableOpacity style={styles.modalSaveButton} onPress={handleSaveSpend}>
                   <LinearGradient
                     colors={[colors.primary.main, colors.primary.dark]}
                     style={styles.modalSaveGradient}
@@ -357,10 +333,10 @@ function AddCardModal({ visible, onClose, onAdd, availableCards }: AddCardModalP
   const [targetSpend, setTargetSpend] = useState('1000');
   const [bonusPoints, setBonusPoints] = useState('50000');
   const [deadlineDays, setDeadlineDays] = useState('90');
-  
+
   const handleAdd = () => {
     if (!selectedCard) return;
-    
+
     onAdd({
       cardId: selectedCard.id,
       applicationDate: new Date(),
@@ -370,14 +346,14 @@ function AddCardModal({ visible, onClose, onAdd, availableCards }: AddCardModalP
       deadlineDays: parseInt(deadlineDays) || 90,
       isCompleted: false,
     });
-    
+
     setSelectedCard(null);
     setTargetSpend('1000');
     setBonusPoints('50000');
     setDeadlineDays('90');
     onClose();
   };
-  
+
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
       <View style={styles.addModalContainer}>
@@ -387,15 +363,11 @@ function AddCardModal({ visible, onClose, onAdd, availableCards }: AddCardModalP
             <X size={24} color={colors.text.primary} />
           </TouchableOpacity>
         </View>
-        
+
         <ScrollView style={styles.addModalContent}>
           <Text style={styles.addModalLabel}>Select Card</Text>
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            style={styles.cardPicker}
-          >
-            {availableCards.map(card => (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.cardPicker}>
+            {availableCards.map((card) => (
               <TouchableOpacity
                 key={card.id}
                 style={[
@@ -404,20 +376,23 @@ function AddCardModal({ visible, onClose, onAdd, availableCards }: AddCardModalP
                 ]}
                 onPress={() => setSelectedCard(card)}
               >
-                <CreditCard 
-                  size={20} 
+                <CreditCard
+                  size={20}
                   color={selectedCard?.id === card.id ? colors.primary.main : colors.text.secondary}
                 />
-                <Text style={[
-                  styles.cardPickerName,
-                  selectedCard?.id === card.id && styles.cardPickerNameSelected,
-                ]} numberOfLines={2}>
+                <Text
+                  style={[
+                    styles.cardPickerName,
+                    selectedCard?.id === card.id && styles.cardPickerNameSelected,
+                  ]}
+                  numberOfLines={2}
+                >
                   {card.name}
                 </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
-          
+
           <Text style={styles.addModalLabel}>Spending Requirement ($)</Text>
           <View style={styles.addModalInputRow}>
             <TextInput
@@ -429,7 +404,7 @@ function AddCardModal({ visible, onClose, onAdd, availableCards }: AddCardModalP
               placeholderTextColor={colors.text.tertiary}
             />
           </View>
-          
+
           <Text style={styles.addModalLabel}>Bonus Points</Text>
           <View style={styles.addModalInputRow}>
             <TextInput
@@ -441,7 +416,7 @@ function AddCardModal({ visible, onClose, onAdd, availableCards }: AddCardModalP
               placeholderTextColor={colors.text.tertiary}
             />
           </View>
-          
+
           <Text style={styles.addModalLabel}>Time Limit (Days)</Text>
           <View style={styles.addModalInputRow}>
             <TextInput
@@ -454,17 +429,14 @@ function AddCardModal({ visible, onClose, onAdd, availableCards }: AddCardModalP
             />
           </View>
         </ScrollView>
-        
+
         <View style={styles.addModalFooter}>
-          <TouchableOpacity
-            onPress={handleAdd}
-            disabled={!selectedCard}
-            activeOpacity={0.9}
-          >
+          <TouchableOpacity onPress={handleAdd} disabled={!selectedCard} activeOpacity={0.9}>
             <LinearGradient
-              colors={selectedCard 
-                ? [colors.primary.main, colors.primary.dark]
-                : [colors.text.disabled, colors.text.disabled]
+              colors={
+                selectedCard
+                  ? [colors.primary.main, colors.primary.dark]
+                  : [colors.text.disabled, colors.text.disabled]
               }
               style={styles.addButton}
             >
@@ -487,22 +459,24 @@ export default function CardTrackerScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const allCards = getAllCardsSync();
-  
+
   // Load tracked cards
   useEffect(() => {
     loadTrackerState();
   }, []);
-  
+
   const loadTrackerState = async () => {
     try {
       const saved = await AsyncStorage.getItem(TRACKER_STORAGE_KEY);
       if (saved) {
         const state: TrackerState = JSON.parse(saved);
-        setTrackedCards(state.trackedCards.map(tc => ({
-          ...tc,
-          applicationDate: new Date(tc.applicationDate),
-          completedDate: tc.completedDate ? new Date(tc.completedDate) : undefined,
-        })));
+        setTrackedCards(
+          state.trackedCards.map((tc) => ({
+            ...tc,
+            applicationDate: new Date(tc.applicationDate),
+            completedDate: tc.completedDate ? new Date(tc.completedDate) : undefined,
+          }))
+        );
       }
     } catch (e) {
       console.error('Failed to load tracker state:', e);
@@ -510,7 +484,7 @@ export default function CardTrackerScreen() {
       setIsLoading(false);
     }
   };
-  
+
   const saveTrackerState = async (cards: TrackedCard[]) => {
     try {
       const state: TrackerState = {
@@ -522,98 +496,93 @@ export default function CardTrackerScreen() {
       console.error('Failed to save tracker state:', e);
     }
   };
-  
-  const handleAddCard = useCallback((tracked: TrackedCard) => {
-    const updated = [...trackedCards, tracked];
-    setTrackedCards(updated);
-    saveTrackerState(updated);
-  }, [trackedCards]);
-  
-  const handleUpdateSpend = useCallback((cardId: string, amount: number) => {
-    const updated = trackedCards.map(tc =>
-      tc.cardId === cardId ? { ...tc, currentSpend: amount } : tc
-    );
-    setTrackedCards(updated);
-    saveTrackerState(updated);
-  }, [trackedCards]);
-  
-  const handleMarkComplete = useCallback((cardId: string) => {
-    const updated = trackedCards.map(tc =>
-      tc.cardId === cardId 
-        ? { ...tc, isCompleted: true, completedDate: new Date() } 
-        : tc
-    );
-    setTrackedCards(updated);
-    saveTrackerState(updated);
-  }, [trackedCards]);
-  
-  const handleRemove = useCallback((cardId: string) => {
-    Alert.alert(
-      'Remove Card',
-      'Are you sure you want to stop tracking this card?',
-      [
+
+  const handleAddCard = useCallback(
+    (tracked: TrackedCard) => {
+      const updated = [...trackedCards, tracked];
+      setTrackedCards(updated);
+      saveTrackerState(updated);
+    },
+    [trackedCards]
+  );
+
+  const handleUpdateSpend = useCallback(
+    (cardId: string, amount: number) => {
+      const updated = trackedCards.map((tc) =>
+        tc.cardId === cardId ? { ...tc, currentSpend: amount } : tc
+      );
+      setTrackedCards(updated);
+      saveTrackerState(updated);
+    },
+    [trackedCards]
+  );
+
+  const handleMarkComplete = useCallback(
+    (cardId: string) => {
+      const updated = trackedCards.map((tc) =>
+        tc.cardId === cardId ? { ...tc, isCompleted: true, completedDate: new Date() } : tc
+      );
+      setTrackedCards(updated);
+      saveTrackerState(updated);
+    },
+    [trackedCards]
+  );
+
+  const handleRemove = useCallback(
+    (cardId: string) => {
+      Alert.alert('Remove Card', 'Are you sure you want to stop tracking this card?', [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Remove',
           style: 'destructive',
           onPress: () => {
-            const updated = trackedCards.filter(tc => tc.cardId !== cardId);
+            const updated = trackedCards.filter((tc) => tc.cardId !== cardId);
             setTrackedCards(updated);
             saveTrackerState(updated);
           },
         },
-      ]
-    );
-  }, [trackedCards]);
-  
+      ]);
+    },
+    [trackedCards]
+  );
+
   // Get cards available to track (not already tracked)
   const availableCards = useMemo(() => {
-    const trackedIds = new Set(trackedCards.map(tc => tc.cardId));
-    return allCards.filter(c => !trackedIds.has(c.id));
+    const trackedIds = new Set(trackedCards.map((tc) => tc.cardId));
+    return allCards.filter((c) => !trackedIds.has(c.id));
   }, [allCards, trackedCards]);
-  
+
   // Separate active and completed
   const { activeCards, completedCards } = useMemo(() => {
-    const active = trackedCards.filter(tc => !tc.isCompleted);
-    const completed = trackedCards.filter(tc => tc.isCompleted);
+    const active = trackedCards.filter((tc) => !tc.isCompleted);
+    const completed = trackedCards.filter((tc) => tc.isCompleted);
     return { activeCards: active, completedCards: completed };
   }, [trackedCards]);
-  
+
   // Calculate stats
   const stats = useMemo(() => {
     const totalBonuses = trackedCards.reduce((sum, tc) => sum + tc.bonusPoints, 0);
     const earnedBonuses = completedCards.reduce((sum, tc) => sum + tc.bonusPoints, 0);
-    const urgentCount = activeCards.filter(tc => {
+    const urgentCount = activeCards.filter((tc) => {
       const deadline = new Date(tc.applicationDate);
       deadline.setDate(deadline.getDate() + tc.deadlineDays);
       const daysLeft = Math.ceil((deadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
       return daysLeft <= 30;
     }).length;
-    
+
     return { totalBonuses, earnedBonuses, urgentCount, activeCount: activeCards.length };
   }, [trackedCards, activeCards, completedCards]);
-  
+
   return (
-    <ScrollView 
-      style={styles.container}
-      contentContainerStyle={styles.content}
-    >
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Header */}
-      <Animated.View 
-        entering={FadeInDown.duration(400)}
-        style={styles.header}
-      >
+      <Animated.View entering={FadeInDown.duration(400)} style={styles.header}>
         <Text style={styles.headerTitle}>Card Tracker</Text>
-        <Text style={styles.headerSubtitle}>
-          Track your signup bonuses & spending requirements
-        </Text>
+        <Text style={styles.headerSubtitle}>Track your signup bonuses & spending requirements</Text>
       </Animated.View>
-      
+
       {/* Stats */}
-      <Animated.View 
-        entering={FadeInDown.delay(100).duration(400)}
-        style={styles.statsRow}
-      >
+      <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.statsRow}>
         <View style={styles.statBox}>
           <Text style={styles.statValue}>{stats.activeCount}</Text>
           <Text style={styles.statLabel}>Active</Text>
@@ -631,18 +600,15 @@ export default function CardTrackerScreen() {
           <Text style={styles.statLabel}>Earned</Text>
         </View>
       </Animated.View>
-      
+
       {/* Add Card Button */}
       <Animated.View entering={FadeInDown.delay(200).duration(400)}>
-        <TouchableOpacity
-          style={styles.addCardButton}
-          onPress={() => setShowAddModal(true)}
-        >
+        <TouchableOpacity style={styles.addCardButton} onPress={() => setShowAddModal(true)}>
           <Plus size={20} color={colors.primary.main} />
           <Text style={styles.addCardText}>Track New Card</Text>
         </TouchableOpacity>
       </Animated.View>
-      
+
       {/* Active Cards */}
       {activeCards.length > 0 && (
         <View style={styles.section}>
@@ -660,7 +626,7 @@ export default function CardTrackerScreen() {
           ))}
         </View>
       )}
-      
+
       {/* Completed Cards */}
       {completedCards.length > 0 && (
         <View style={styles.section}>
@@ -678,13 +644,10 @@ export default function CardTrackerScreen() {
           ))}
         </View>
       )}
-      
+
       {/* Empty State */}
       {trackedCards.length === 0 && !isLoading && (
-        <Animated.View 
-          entering={FadeInUp.delay(300).duration(500)}
-          style={styles.emptyState}
-        >
+        <Animated.View entering={FadeInUp.delay(300).duration(500)} style={styles.emptyState}>
           <View style={styles.emptyIcon}>
             <CreditCard size={48} color={colors.text.tertiary} />
           </View>
@@ -694,7 +657,7 @@ export default function CardTrackerScreen() {
           </Text>
         </Animated.View>
       )}
-      
+
       {/* Add Modal */}
       <AddCardModal
         visible={showAddModal}
@@ -702,7 +665,7 @@ export default function CardTrackerScreen() {
         onAdd={handleAddCard}
         availableCards={availableCards}
       />
-      
+
       {/* Bottom padding */}
       <View style={{ height: 100 }} />
     </ScrollView>
@@ -722,7 +685,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 16,
   },
-  
+
   // Header
   header: {
     alignItems: 'center',
@@ -739,7 +702,7 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     textAlign: 'center',
   },
-  
+
   // Stats
   statsRow: {
     flexDirection: 'row',
@@ -769,7 +732,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.text.tertiary,
   },
-  
+
   // Add Card Button
   addCardButton: {
     flexDirection: 'row',
@@ -789,7 +752,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.primary.main,
   },
-  
+
   // Section
   section: {
     marginBottom: 24,
@@ -800,7 +763,7 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     marginBottom: 12,
   },
-  
+
   // Tracked Card
   trackedCard: {
     backgroundColor: colors.background.secondary,
@@ -839,7 +802,7 @@ const styles = StyleSheet.create({
   removeButton: {
     padding: 4,
   },
-  
+
   // Progress
   progressSection: {
     marginBottom: 12,
@@ -883,7 +846,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.text.tertiary,
   },
-  
+
   // Details
   detailsRow: {
     flexDirection: 'row',
@@ -903,7 +866,7 @@ const styles = StyleSheet.create({
     color: colors.error.main,
     fontWeight: '600',
   },
-  
+
   // Actions
   actionsRow: {
     flexDirection: 'row',
@@ -937,7 +900,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.primary.main,
   },
-  
+
   // Urgent Banner
   urgentBanner: {
     flexDirection: 'row',
@@ -953,7 +916,7 @@ const styles = StyleSheet.create({
     color: colors.error.main,
     fontWeight: '500',
   },
-  
+
   // Progress Circle
   progressCircleBg: {
     position: 'absolute',
@@ -961,7 +924,7 @@ const styles = StyleSheet.create({
   progressCircleFill: {
     position: 'absolute',
   },
-  
+
   // Modal
   modalOverlay: {
     flex: 1,
@@ -1035,7 +998,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.background.primary,
   },
-  
+
   // Add Modal
   addModalContainer: {
     flex: 1,
@@ -1125,7 +1088,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.background.primary,
   },
-  
+
   // Empty State
   emptyState: {
     alignItems: 'center',

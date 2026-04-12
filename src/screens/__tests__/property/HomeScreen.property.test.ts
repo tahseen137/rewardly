@@ -77,14 +77,11 @@ describe('HomeScreen Property Tests', () => {
 
     it('should handle special characters gracefully', () => {
       fc.assert(
-        fc.property(
-          fc.string({ minLength: 2, maxLength: 20 }),
-          (query) => {
-            const results = searchStores(query);
-            // Should not throw and should return an array
-            expect(Array.isArray(results)).toBe(true);
-          }
-        ),
+        fc.property(fc.string({ minLength: 2, maxLength: 20 }), (query) => {
+          const results = searchStores(query);
+          // Should not throw and should return an array
+          expect(Array.isArray(results)).toBe(true);
+        }),
         { numRuns: 50 }
       );
     });
@@ -163,20 +160,17 @@ describe('HomeScreen Property Tests', () => {
 
     it('should maintain category selection through state updates', () => {
       fc.assert(
-        fc.property(
-          fc.constantFrom(...Object.values(SpendingCategory)),
-          (selectedCategory) => {
-            // Simulate state update
-            const state = {
-              selectedCategory,
-              mode: 'manual' as const,
-            };
+        fc.property(fc.constantFrom(...Object.values(SpendingCategory)), (selectedCategory) => {
+          // Simulate state update
+          const state = {
+            selectedCategory,
+            mode: 'manual' as const,
+          };
 
-            // Category should remain unchanged
-            expect(state.selectedCategory).toBe(selectedCategory);
-            expect(state.mode).toBe('manual');
-          }
-        ),
+          // Category should remain unchanged
+          expect(state.selectedCategory).toBe(selectedCategory);
+          expect(state.mode).toBe('manual');
+        }),
         { numRuns: 50 }
       );
     });

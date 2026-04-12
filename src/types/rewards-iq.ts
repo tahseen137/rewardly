@@ -3,7 +3,7 @@
  * For the mega build session - Feb 12-13, 2026
  */
 
-import { SpendingCategory, Card, RewardType } from './index';
+import { SpendingCategory, Card } from './index';
 
 // ============================================================================
 // Transaction Types (for missed rewards calculation)
@@ -70,15 +70,15 @@ export interface MissedRewardsAnalysis {
  */
 export interface RewardsIQScore {
   overallScore: number; // 0-100
-  
+
   // Component scores (each 0-100)
   optimalCardUsageScore: number; // 60% weight
   portfolioOptimizationScore: number; // 25% weight
   autoPilotScore: number; // 15% weight
-  
+
   // Percentile ranking
   percentile: number; // e.g., 88 = top 12%
-  
+
   // Trend
   previousScore?: number;
   trend: 'up' | 'down' | 'stable';

@@ -1,6 +1,6 @@
 /**
  * FeeBreakevenService - Unit Tests
- * 
+ *
  * Tests fee breakeven calculations, category breakdown, and no-fee comparisons
  */
 
@@ -33,7 +33,9 @@ jest.mock('../SpendingProfileService', () => {
 
 const mockGetAllCardsSync = getAllCardsSync as jest.MockedFunction<typeof getAllCardsSync>;
 const mockGetCardByIdSync = getCardByIdSync as jest.MockedFunction<typeof getCardByIdSync>;
-const mockGetSpendingProfileSync = getSpendingProfileSync as jest.MockedFunction<typeof getSpendingProfileSync>;
+const mockGetSpendingProfileSync = getSpendingProfileSync as jest.MockedFunction<
+  typeof getSpendingProfileSync
+>;
 
 // ============================================================================
 // Test Data
@@ -59,8 +61,14 @@ const mockPremiumCard: Card = {
   rewardProgram: 'Points Plus',
   baseRewardRate: { value: 1, type: RewardType.POINTS, unit: 'multiplier' },
   categoryRewards: [
-    { category: SpendingCategory.GROCERIES, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
-    { category: SpendingCategory.TRAVEL, rewardRate: { value: 3, type: RewardType.POINTS, unit: 'multiplier' } },
+    {
+      category: SpendingCategory.GROCERIES,
+      rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' },
+    },
+    {
+      category: SpendingCategory.TRAVEL,
+      rewardRate: { value: 3, type: RewardType.POINTS, unit: 'multiplier' },
+    },
   ],
   annualFee: 120,
   pointValuation: 1, // 1 cent per point
@@ -73,7 +81,10 @@ const mockNoFeeCard: Card = {
   rewardProgram: 'Cashback',
   baseRewardRate: { value: 1, type: RewardType.CASHBACK, unit: 'percent' },
   categoryRewards: [
-    { category: SpendingCategory.GROCERIES, rewardRate: { value: 2, type: RewardType.CASHBACK, unit: 'percent' } },
+    {
+      category: SpendingCategory.GROCERIES,
+      rewardRate: { value: 2, type: RewardType.CASHBACK, unit: 'percent' },
+    },
   ],
   annualFee: 0,
 };
@@ -85,8 +96,14 @@ const mockHighFeeCard: Card = {
   rewardProgram: 'Elite Points',
   baseRewardRate: { value: 2, type: RewardType.POINTS, unit: 'multiplier' },
   categoryRewards: [
-    { category: SpendingCategory.DINING, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
-    { category: SpendingCategory.TRAVEL, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
+    {
+      category: SpendingCategory.DINING,
+      rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' },
+    },
+    {
+      category: SpendingCategory.TRAVEL,
+      rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' },
+    },
   ],
   annualFee: 500,
   programDetails: {
@@ -101,7 +118,7 @@ const mockHighFeeCard: Card = {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  
+
   mockGetAllCardsSync.mockReturnValue([mockPremiumCard, mockNoFeeCard, mockHighFeeCard]);
   mockGetCardByIdSync.mockImplementation((id: string) => {
     if (id === 'premium-card') return mockPremiumCard;
@@ -156,7 +173,7 @@ describe('calculateCategoryRewards', () => {
 describe('calculateTotalAnnualRewards', () => {
   it('should sum rewards across all categories', () => {
     const total = calculateTotalAnnualRewards(mockPremiumCard, mockSpendingProfile);
-    
+
     // Groceries: 800 × 12 × 5 × 0.01 = 480
     // Travel: 100 × 12 × 3 × 0.01 = 36
     // Other categories: (1875 - 800 - 100) × 12 × 1 × 0.01 = 141
@@ -178,7 +195,7 @@ describe('calculateTotalAnnualRewards', () => {
       transit: 0,
       other: 0,
     };
-    
+
     const total = calculateTotalAnnualRewards(mockPremiumCard, emptyProfile);
     expect(total).toBe(0);
   });
@@ -211,7 +228,7 @@ describe('calculateBreakEvenMonthlySpend', () => {
 describe('calculateEffectiveRewardRate', () => {
   it('should calculate weighted average reward rate', () => {
     const rate = calculateEffectiveRewardRate(mockPremiumCard, mockSpendingProfile);
-    
+
     // Should be between base rate (1%) and max rate (5%)
     expect(rate).toBeGreaterThan(1);
     expect(rate).toBeLessThan(5);
@@ -230,7 +247,7 @@ describe('calculateEffectiveRewardRate', () => {
       transit: 0,
       other: 0,
     };
-    
+
     const rate = calculateEffectiveRewardRate(mockPremiumCard, emptyProfile);
     expect(rate).toBe(0);
   });
@@ -244,10 +261,10 @@ describe('calculateEffectiveRewardRate', () => {
 describe('calculateCategoryBreakdown', () => {
   it('should return breakdown sorted by annual rewards', () => {
     const breakdown = calculateCategoryBreakdown(mockPremiumCard, mockSpendingProfile, 120);
-    
+
     expect(breakdown.length).toBeGreaterThan(0);
     expect(breakdown[0].category).toBe(SpendingCategory.GROCERIES); // Highest spend + bonus
-    
+
     // Verify descending order
     for (let i = 1; i < breakdown.length; i++) {
       expect(breakdown[i - 1].annualRewards).toBeGreaterThanOrEqual(breakdown[i].annualRewards);
@@ -256,8 +273,8 @@ describe('calculateCategoryBreakdown', () => {
 
   it('should calculate percent of fee recovered', () => {
     const breakdown = calculateCategoryBreakdown(mockPremiumCard, mockSpendingProfile, 120);
-    
-    const groceries = breakdown.find(b => b.category === SpendingCategory.GROCERIES);
+
+    const groceries = breakdown.find((b) => b.category === SpendingCategory.GROCERIES);
     expect(groceries).toBeDefined();
     if (groceries) {
       // $480 rewards / $120 fee = 400%
@@ -278,7 +295,7 @@ describe('calculateCategoryBreakdown', () => {
       transit: 0,
       other: 0,
     };
-    
+
     const breakdown = calculateCategoryBreakdown(mockPremiumCard, sparseProfile, 120);
     expect(breakdown.length).toBe(1);
     expect(breakdown[0].category).toBe(SpendingCategory.GROCERIES);
@@ -288,14 +305,14 @@ describe('calculateCategoryBreakdown', () => {
 describe('findBestNoFeeCard', () => {
   it('should find best no-fee card for spending profile', () => {
     const bestCard = findBestNoFeeCard(mockSpendingProfile);
-    
+
     expect(bestCard).not.toBeNull();
     expect(bestCard?.id).toBe('no-fee-card');
   });
 
   it('should return null when no no-fee cards exist', () => {
     mockGetAllCardsSync.mockReturnValue([mockPremiumCard, mockHighFeeCard]);
-    
+
     const bestCard = findBestNoFeeCard(mockSpendingProfile);
     expect(bestCard).toBeNull();
   });
@@ -305,7 +322,7 @@ describe('compareToNoFeeCard', () => {
   it('should compare fee card to best no-fee alternative', () => {
     const feeCardRewards = calculateTotalAnnualRewards(mockPremiumCard, mockSpendingProfile);
     const comparison = compareToNoFeeCard(mockPremiumCard, feeCardRewards, mockSpendingProfile);
-    
+
     expect(comparison).toBeDefined();
     expect(comparison?.bestNoFeeCard.id).toBe('no-fee-card');
     expect(comparison?.verdict).toContain('Premium Rewards Card');
@@ -314,7 +331,7 @@ describe('compareToNoFeeCard', () => {
   it('should return positive advantage when fee card is better', () => {
     const feeCardRewards = calculateTotalAnnualRewards(mockPremiumCard, mockSpendingProfile);
     const comparison = compareToNoFeeCard(mockPremiumCard, feeCardRewards, mockSpendingProfile);
-    
+
     expect(comparison).toBeDefined();
     if (comparison) {
       // Premium card should have positive advantage over no-fee
@@ -324,10 +341,10 @@ describe('compareToNoFeeCard', () => {
 
   it('should return undefined when no no-fee cards exist', () => {
     mockGetAllCardsSync.mockReturnValue([mockPremiumCard, mockHighFeeCard]);
-    
+
     const feeCardRewards = calculateTotalAnnualRewards(mockPremiumCard, mockSpendingProfile);
     const comparison = compareToNoFeeCard(mockPremiumCard, feeCardRewards, mockSpendingProfile);
-    
+
     expect(comparison).toBeUndefined();
   });
 });
@@ -364,7 +381,7 @@ describe('determineFeeVerdict', () => {
 describe('calculateFeeBreakeven', () => {
   it('should calculate complete fee breakeven result', () => {
     const result = calculateFeeBreakeven('premium-card', mockSpendingProfile);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.card.id).toBe('premium-card');
@@ -377,7 +394,7 @@ describe('calculateFeeBreakeven', () => {
 
   it('should fail for non-existent card', () => {
     const result = calculateFeeBreakeven('non-existent', mockSpendingProfile);
-    
+
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.type).toBe('CARD_NOT_FOUND');
@@ -386,7 +403,7 @@ describe('calculateFeeBreakeven', () => {
 
   it('should fail for card with no annual fee', () => {
     const result = calculateFeeBreakeven('no-fee-card', mockSpendingProfile);
-    
+
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.type).toBe('NO_ANNUAL_FEE');
@@ -395,9 +412,9 @@ describe('calculateFeeBreakeven', () => {
 
   it('should fail when no spending profile exists', () => {
     mockGetSpendingProfileSync.mockReturnValue(null);
-    
+
     const result = calculateFeeBreakeven('premium-card');
-    
+
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.type).toBe('SPENDING_PROFILE_REQUIRED');
@@ -406,7 +423,7 @@ describe('calculateFeeBreakeven', () => {
 
   it('should calculate correct net value', () => {
     const result = calculateFeeBreakeven('premium-card', mockSpendingProfile);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       const { annualRewardsEarned, annualFee, netValue } = result.value;
@@ -416,7 +433,7 @@ describe('calculateFeeBreakeven', () => {
 
   it('should include no-fee comparison', () => {
     const result = calculateFeeBreakeven('premium-card', mockSpendingProfile);
-    
+
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.value.noFeeComparison).toBeDefined();
@@ -427,11 +444,8 @@ describe('calculateFeeBreakeven', () => {
 
 describe('compareFeeBreakeven', () => {
   it('should compare multiple cards and sort by net value', () => {
-    const results = compareFeeBreakeven(
-      ['premium-card', 'high-fee-card'],
-      mockSpendingProfile
-    );
-    
+    const results = compareFeeBreakeven(['premium-card', 'high-fee-card'], mockSpendingProfile);
+
     expect(results.length).toBe(2);
     // Verify descending order by net value
     expect(results[0].netValue).toBeGreaterThanOrEqual(results[1].netValue);
@@ -442,7 +456,7 @@ describe('compareFeeBreakeven', () => {
       ['premium-card', 'non-existent', 'high-fee-card'],
       mockSpendingProfile
     );
-    
+
     expect(results.length).toBe(2);
   });
 
@@ -455,7 +469,7 @@ describe('compareFeeBreakeven', () => {
 describe('findBestFeeCards', () => {
   it('should find best fee cards for spending profile', () => {
     const results = findBestFeeCards(mockSpendingProfile, 2);
-    
+
     expect(results.length).toBeLessThanOrEqual(2);
     expect(results[0].card.annualFee).toBeGreaterThan(0);
   });
@@ -483,9 +497,9 @@ describe('edge cases', () => {
       id: 'very-high-fee',
       annualFee: 5000,
     };
-    
+
     mockGetCardByIdSync.mockReturnValue(veryHighFeeCard);
-    
+
     const result = calculateFeeBreakeven('very-high-fee', mockSpendingProfile);
     expect(result.success).toBe(true);
     if (result.success) {
@@ -506,7 +520,7 @@ describe('edge cases', () => {
       transit: 0,
       other: 0,
     };
-    
+
     const result = calculateFeeBreakeven('premium-card', minimalProfile);
     expect(result.success).toBe(true);
     if (result.success) {
@@ -524,9 +538,9 @@ describe('edge cases', () => {
       categoryRewards: [],
       annualFee: 50,
     };
-    
+
     mockGetCardByIdSync.mockReturnValue(baseRateCard);
-    
+
     const result = calculateFeeBreakeven('base-rate', mockSpendingProfile);
     expect(result.success).toBe(true);
     if (result.success) {

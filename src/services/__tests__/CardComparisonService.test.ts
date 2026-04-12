@@ -1,6 +1,6 @@
 /**
  * CardComparisonService - Unit Tests
- * 
+ *
  * Tests card comparison logic, tier gating, and scoring
  */
 
@@ -54,10 +54,18 @@ const mockCard1: Card = {
   rewardProgram: 'Points',
   baseRewardRate: { value: 1, type: RewardType.POINTS, unit: 'multiplier' },
   categoryRewards: [
-    { category: SpendingCategory.GROCERIES, rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' } },
+    {
+      category: SpendingCategory.GROCERIES,
+      rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' },
+    },
   ],
   annualFee: 120,
-  signupBonus: { amount: 50000, currency: RewardType.POINTS, spendRequirement: 3000, timeframeDays: 90 },
+  signupBonus: {
+    amount: 50000,
+    currency: RewardType.POINTS,
+    spendRequirement: 3000,
+    timeframeDays: 90,
+  },
 };
 
 const mockCard2: Card = {
@@ -67,10 +75,18 @@ const mockCard2: Card = {
   rewardProgram: 'Cashback',
   baseRewardRate: { value: 1, type: RewardType.CASHBACK, unit: 'percent' },
   categoryRewards: [
-    { category: SpendingCategory.DINING, rewardRate: { value: 4, type: RewardType.CASHBACK, unit: 'percent' } },
+    {
+      category: SpendingCategory.DINING,
+      rewardRate: { value: 4, type: RewardType.CASHBACK, unit: 'percent' },
+    },
   ],
   annualFee: 0,
-  signupBonus: { amount: 20000, currency: RewardType.CASHBACK, spendRequirement: 1000, timeframeDays: 90 },
+  signupBonus: {
+    amount: 20000,
+    currency: RewardType.CASHBACK,
+    spendRequirement: 1000,
+    timeframeDays: 90,
+  },
 };
 
 const mockCard3: Card = {
@@ -80,10 +96,18 @@ const mockCard3: Card = {
   rewardProgram: 'Airline Miles',
   baseRewardRate: { value: 1, type: RewardType.AIRLINE_MILES, unit: 'multiplier' },
   categoryRewards: [
-    { category: SpendingCategory.TRAVEL, rewardRate: { value: 3, type: RewardType.AIRLINE_MILES, unit: 'multiplier' } },
+    {
+      category: SpendingCategory.TRAVEL,
+      rewardRate: { value: 3, type: RewardType.AIRLINE_MILES, unit: 'multiplier' },
+    },
   ],
   annualFee: 200,
-  signupBonus: { amount: 75000, currency: RewardType.AIRLINE_MILES, spendRequirement: 5000, timeframeDays: 90 },
+  signupBonus: {
+    amount: 75000,
+    currency: RewardType.AIRLINE_MILES,
+    spendRequirement: 5000,
+    timeframeDays: 90,
+  },
 };
 
 // ============================================================================
@@ -92,14 +116,14 @@ const mockCard3: Card = {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  
+
   mockGetCardByIdSync.mockImplementation((id: string) => {
     if (id === 'card-1') return mockCard1;
     if (id === 'card-2') return mockCard2;
     if (id === 'card-3') return mockCard3;
     return null;
   });
-  
+
   mockGetBenefitsForCard.mockReturnValue([]);
 });
 
@@ -141,7 +165,7 @@ describe('CardComparisonService - Tier Limits', () => {
 describe('CardComparisonService - compareCards', () => {
   it('should compare two cards successfully', () => {
     const result = compareCards(['card-1', 'card-2']);
-    
+
     expect(result.cards).toHaveLength(2);
     expect(result.categoryComparisons.length).toBeGreaterThan(0);
     expect(result.overallScores).toHaveLength(2);
@@ -150,14 +174,14 @@ describe('CardComparisonService - compareCards', () => {
 
   it('should compare three cards successfully', () => {
     const result = compareCards(['card-1', 'card-2', 'card-3']);
-    
+
     expect(result.cards).toHaveLength(3);
     expect(result.overallScores).toHaveLength(3);
   });
 
   it('should handle empty card array', () => {
     const result = compareCards([]);
-    
+
     expect(result.cards).toEqual([]);
     expect(result.categoryComparisons).toEqual([]);
     expect(result.overallScores).toEqual([]);
@@ -166,7 +190,7 @@ describe('CardComparisonService - compareCards', () => {
 
   it('should filter out invalid card IDs', () => {
     const result = compareCards(['card-1', 'invalid', 'card-2']);
-    
+
     expect(result.cards).toHaveLength(2);
   });
 
@@ -176,18 +200,18 @@ describe('CardComparisonService - compareCards', () => {
       if (id === 'card-3') return Array(10).fill({ name: 'Benefit', category: 'travel' });
       return [];
     });
-    
+
     const result = compareCards(['card-1', 'card-2', 'card-3']);
-    
+
     expect(result.winner).toBeTruthy();
-    const winnerScore = result.overallScores.find(s => s.cardId === result.winner);
+    const winnerScore = result.overallScores.find((s) => s.cardId === result.winner);
     expect(winnerScore).toBeTruthy();
   });
 
   it('should compare all standard categories', () => {
     const result = compareCards(['card-1', 'card-2']);
-    
-    const categories = result.categoryComparisons.map(c => c.category);
+
+    const categories = result.categoryComparisons.map((c) => c.category);
     expect(categories).toContain(SpendingCategory.GROCERIES);
     expect(categories).toContain(SpendingCategory.DINING);
     expect(categories).toContain('annual_fee');
@@ -196,12 +220,12 @@ describe('CardComparisonService - compareCards', () => {
 
   it('should mark winners in each category', () => {
     const result = compareCards(['card-1', 'card-2']);
-    
+
     // Check annual fee comparison - card-2 has no fee, should win
-    const feeComparison = result.categoryComparisons.find(c => c.category === 'annual_fee');
+    const feeComparison = result.categoryComparisons.find((c) => c.category === 'annual_fee');
     expect(feeComparison).toBeTruthy();
-    
-    const card2FeeValue = feeComparison?.values.find(v => v.cardId === 'card-2');
+
+    const card2FeeValue = feeComparison?.values.find((v) => v.cardId === 'card-2');
     expect(card2FeeValue?.isWinner).toBe(true);
   });
 });
@@ -220,31 +244,31 @@ describe('CardComparisonService - calculateOverallScore', () => {
   it('should penalize cards with high annual fees', () => {
     const highFeeCard = { ...mockCard1, annualFee: 500 };
     const noFeeCard = { ...mockCard1, annualFee: 0 };
-    
+
     const highFeeScore = calculateOverallScore(highFeeCard);
     const noFeeScore = calculateOverallScore(noFeeCard);
-    
+
     expect(noFeeScore).toBeGreaterThan(highFeeScore);
   });
 
   it('should reward cards with sign-up bonuses', () => {
     const withBonus = mockCard1;
     const withoutBonus = { ...mockCard1, signupBonus: undefined };
-    
+
     const bonusScore = calculateOverallScore(withBonus);
     const noBonus = calculateOverallScore(withoutBonus);
-    
+
     expect(bonusScore).toBeGreaterThan(noBonus);
   });
 
   it('should reward cards with benefits', () => {
     mockGetBenefitsForCard.mockReturnValue(Array(5).fill({ name: 'Benefit', category: 'travel' }));
-    
+
     const score1 = calculateOverallScore(mockCard1);
-    
+
     mockGetBenefitsForCard.mockReturnValue([]);
     const score2 = calculateOverallScore(mockCard1);
-    
+
     expect(score1).toBeGreaterThan(score2);
   });
 
@@ -256,7 +280,7 @@ describe('CardComparisonService - calculateOverallScore', () => {
       annualFee: 1000,
       signupBonus: undefined,
     };
-    
+
     const score = calculateOverallScore(terribleCard);
     expect(score).toBeGreaterThanOrEqual(0);
   });
@@ -266,15 +290,26 @@ describe('CardComparisonService - calculateOverallScore', () => {
       ...mockCard1,
       baseRewardRate: { value: 10, type: RewardType.POINTS, unit: 'multiplier' },
       categoryRewards: [
-        { category: SpendingCategory.GROCERIES, rewardRate: { value: 20, type: RewardType.POINTS, unit: 'multiplier' } },
-        { category: SpendingCategory.DINING, rewardRate: { value: 20, type: RewardType.POINTS, unit: 'multiplier' } },
+        {
+          category: SpendingCategory.GROCERIES,
+          rewardRate: { value: 20, type: RewardType.POINTS, unit: 'multiplier' },
+        },
+        {
+          category: SpendingCategory.DINING,
+          rewardRate: { value: 20, type: RewardType.POINTS, unit: 'multiplier' },
+        },
       ],
-      signupBonus: { amount: 1000000, currency: RewardType.POINTS, spendRequirement: 1, timeframeDays: 365 },
+      signupBonus: {
+        amount: 1000000,
+        currency: RewardType.POINTS,
+        spendRequirement: 1,
+        timeframeDays: 365,
+      },
       annualFee: 0,
     };
-    
+
     mockGetBenefitsForCard.mockReturnValue(Array(50).fill({ name: 'Benefit', category: 'travel' }));
-    
+
     const score = calculateOverallScore(amazingCard);
     expect(score).toBeLessThanOrEqual(100);
   });
@@ -330,8 +365,8 @@ describe('CardComparisonService - getCategoryDisplayName', () => {
 
   it('should handle all valid categories', () => {
     const categories = getComparisonCategories();
-    
-    categories.forEach(cat => {
+
+    categories.forEach((cat) => {
       const displayName = getCategoryDisplayName(cat as any);
       expect(displayName).toBeTruthy();
       expect(typeof displayName).toBe('string');
@@ -349,9 +384,9 @@ describe('CardComparisonService - Edge Cases', () => {
       ...mockCard1,
       categoryRewards: [],
     };
-    
+
     mockGetCardByIdSync.mockReturnValue(noCategories);
-    
+
     const score = calculateOverallScore(noCategories);
     expect(score).toBeGreaterThanOrEqual(0);
   });
@@ -367,23 +402,23 @@ describe('CardComparisonService - Edge Cases', () => {
       annualFee: undefined,
       signupBonus: undefined,
     };
-    
+
     mockGetCardByIdSync.mockReturnValue(incompleteCard);
-    
+
     const score = calculateOverallScore(incompleteCard);
     expect(score).toBeGreaterThanOrEqual(0);
   });
 
   it('should handle comparison with single card', () => {
     const result = compareCards(['card-1']);
-    
+
     expect(result.cards).toHaveLength(1);
     expect(result.winner).toBe('card-1');
   });
 
   it('should handle comparison with duplicate card IDs', () => {
     const result = compareCards(['card-1', 'card-1']);
-    
+
     expect(result.cards.length).toBeGreaterThan(0);
   });
 
@@ -397,9 +432,9 @@ describe('CardComparisonService - Edge Cases', () => {
       categoryRewards: [],
       annualFee: 0,
     };
-    
+
     mockGetCardByIdSync.mockReturnValue(zeroCard);
-    
+
     const score = calculateOverallScore(zeroCard);
     expect(score).toBeGreaterThanOrEqual(0);
   });
@@ -412,19 +447,19 @@ describe('CardComparisonService - Edge Cases', () => {
 describe('CardComparisonService - Category Comparisons', () => {
   it('should correctly identify winner for annual fee (lower is better)', () => {
     const result = compareCards(['card-1', 'card-2']);
-    
-    const feeComparison = result.categoryComparisons.find(c => c.category === 'annual_fee');
-    const card2Value = feeComparison?.values.find(v => v.cardId === 'card-2');
-    
+
+    const feeComparison = result.categoryComparisons.find((c) => c.category === 'annual_fee');
+    const card2Value = feeComparison?.values.find((v) => v.cardId === 'card-2');
+
     expect(card2Value?.isWinner).toBe(true); // card-2 has $0 fee
   });
 
   it('should correctly identify winner for signup bonus (higher is better)', () => {
     const result = compareCards(['card-1', 'card-3']);
-    
-    const bonusComparison = result.categoryComparisons.find(c => c.category === 'signup_bonus');
-    const card3Value = bonusComparison?.values.find(v => v.cardId === 'card-3');
-    
+
+    const bonusComparison = result.categoryComparisons.find((c) => c.category === 'signup_bonus');
+    const card3Value = bonusComparison?.values.find((v) => v.cardId === 'card-3');
+
     expect(card3Value?.isWinner).toBe(true); // card-3 has 75,000 bonus
   });
 
@@ -433,25 +468,25 @@ describe('CardComparisonService - Category Comparisons', () => {
       { ...mockCard1, annualFee: 100 },
       { ...mockCard2, annualFee: 100 },
     ];
-    
+
     mockGetCardByIdSync.mockImplementation((id: string) => {
       if (id === 'card-1') return tiedCards[0];
       if (id === 'card-2') return tiedCards[1];
       return null;
     });
-    
+
     const result = compareCards(['card-1', 'card-2']);
-    const feeComparison = result.categoryComparisons.find(c => c.category === 'annual_fee');
-    
-    const winnersCount = feeComparison?.values.filter(v => v.isWinner).length || 0;
+    const feeComparison = result.categoryComparisons.find((c) => c.category === 'annual_fee');
+
+    const winnersCount = feeComparison?.values.filter((v) => v.isWinner).length || 0;
     expect(winnersCount).toBeGreaterThan(0); // Both should be marked as winners in a tie
   });
 
   it('should compare all spending categories', () => {
     const result = compareCards(['card-1', 'card-2', 'card-3']);
-    
-    const categories = result.categoryComparisons.map(c => c.category);
-    
+
+    const categories = result.categoryComparisons.map((c) => c.category);
+
     expect(categories).toContain(SpendingCategory.GROCERIES);
     expect(categories).toContain(SpendingCategory.DINING);
     expect(categories).toContain(SpendingCategory.GAS);
@@ -486,7 +521,7 @@ describe('CardComparisonService - getComparisonCategories', () => {
   it('should return new array (immutable)', () => {
     const cat1 = getComparisonCategories();
     const cat2 = getComparisonCategories();
-    
+
     expect(cat1).not.toBe(cat2);
     expect(cat1).toEqual(cat2);
   });

@@ -3,11 +3,7 @@
  */
 
 // Amount validation and formatting
-export {
-  validateAmount,
-  formatCurrency,
-  formatCadValue,
-} from './amountUtils';
+export { validateAmount, formatCurrency, formatCadValue } from './amountUtils';
 export type { AmountValidationResult } from './amountUtils';
 
 // Reward formatting
@@ -49,7 +45,12 @@ export {
 export type { LocationCoords, LocationResult } from './platform';
 
 // Lazy screen loading with error boundaries
-export { lazyScreen, withScreenErrorBoundary, LoadingFallback, ScreenErrorFallback } from './lazyScreen';
+export {
+  lazyScreen,
+  withScreenErrorBoundary,
+  LoadingFallback,
+  ScreenErrorFallback,
+} from './lazyScreen';
 
 // Haptics (re-export for backward compatibility, uses platform.ts internally)
 export * from './haptics';

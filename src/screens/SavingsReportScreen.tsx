@@ -41,9 +41,7 @@ interface CategoryBreakdownCardProps {
 }
 
 function CategoryBreakdownCard({ breakdown, index }: CategoryBreakdownCardProps) {
-  const missedPercent = breakdown.spend > 0
-    ? (breakdown.missed / breakdown.spend) * 100
-    : 0;
+  const missedPercent = breakdown.spend > 0 ? (breakdown.missed / breakdown.spend) * 100 : 0;
 
   return (
     <Animated.View
@@ -51,20 +49,20 @@ function CategoryBreakdownCard({ breakdown, index }: CategoryBreakdownCardProps)
       style={styles.categoryCard}
     >
       <Text style={styles.categoryName}>{breakdown.category}</Text>
-      
+
       <View style={styles.categoryStats}>
         <View style={styles.categoryStat}>
           <Text style={styles.categoryStatLabel}>Spent</Text>
           <Text style={styles.categoryStatValue}>${breakdown.spend.toFixed(2)}</Text>
         </View>
-        
+
         <View style={styles.categoryStat}>
           <Text style={styles.categoryStatLabel}>Earned</Text>
           <Text style={[styles.categoryStatValue, { color: colors.success.main }]}>
             ${breakdown.earned.toFixed(2)}
           </Text>
         </View>
-        
+
         <View style={styles.categoryStat}>
           <Text style={styles.categoryStatLabel}>Missed</Text>
           <Text style={[styles.categoryStatValue, { color: colors.error.main }]}>
@@ -74,12 +72,7 @@ function CategoryBreakdownCard({ breakdown, index }: CategoryBreakdownCardProps)
       </View>
 
       <View style={styles.progressBar}>
-        <View
-          style={[
-            styles.progressFill,
-            { width: `${Math.min(100 - missedPercent, 100)}%` },
-          ]}
-        />
+        <View style={[styles.progressFill, { width: `${Math.min(100 - missedPercent, 100)}%` }]} />
       </View>
     </Animated.View>
   );
@@ -132,7 +125,8 @@ export default function SavingsReportScreen({ route }: Props) {
     if (!report) return;
 
     const shareData = formatReportForSharing(report);
-    const message = `📊 My ${shareData.month} Rewards Report\n\n` +
+    const message =
+      `📊 My ${shareData.month} Rewards Report\n\n` +
       `✅ Earned: ${shareData.totalEarned}\n` +
       `❌ Missed: ${shareData.totalMissed}\n` +
       `📈 Optimization Score: ${shareData.optimizationScore}%\n\n` +
@@ -196,7 +190,7 @@ export default function SavingsReportScreen({ route }: Props) {
             <Text style={styles.title}>{monthName}</Text>
             <Text style={styles.subtitle}>Savings Report</Text>
           </View>
-          
+
           <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
             <Share2 size={24} color={colors.primary.main} />
           </TouchableOpacity>
@@ -211,9 +205,13 @@ export default function SavingsReportScreen({ route }: Props) {
           <Text style={styles.scoreLabel}>Optimization Score</Text>
           <Text style={styles.scoreValue}>{report.optimizationScore}%</Text>
           <Text style={styles.scoreDescription}>
-            {report.optimizationScore >= 80 ? 'Excellent!' :
-             report.optimizationScore >= 60 ? 'Good!' :
-             report.optimizationScore >= 40 ? 'Needs Work' : 'Lots of room to improve'}
+            {report.optimizationScore >= 80
+              ? 'Excellent!'
+              : report.optimizationScore >= 60
+                ? 'Good!'
+                : report.optimizationScore >= 40
+                  ? 'Needs Work'
+                  : 'Lots of room to improve'}
           </Text>
         </LinearGradient>
 
@@ -283,7 +281,10 @@ export default function SavingsReportScreen({ route }: Props) {
                     onPress={() => setReport(r)}
                   >
                     <Text style={styles.recentReportMonth}>
-                      {r.reportMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      {r.reportMonth.toLocaleDateString('en-US', {
+                        month: 'short',
+                        year: 'numeric',
+                      })}
                     </Text>
                     <Text style={styles.recentReportScore}>{r.optimizationScore}%</Text>
                   </TouchableOpacity>

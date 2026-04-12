@@ -1,6 +1,6 @@
 /**
  * RecurringService - Manages recurring charges optimization
- * 
+ *
  * Tier: Pro+
  * Helps users optimize subscription payments for max rewards
  */
@@ -95,8 +95,8 @@ export async function initializeRecurring(): Promise<void> {
 export async function getRecurringCharges(): Promise<RecurringCharge[]> {
   if (!isInitialized) await initializeRecurring();
   if (!recurringCache) return [];
-  
-  return recurringCache.filter(charge => charge.isActive);
+
+  return recurringCache.filter((charge) => charge.isActive);
 }
 
 /**
@@ -107,7 +107,7 @@ export function getRecurringSummary(charges: RecurringCharge[]): RecurringSummar
   const totalCurrentRewards = charges.reduce((sum, c) => sum + c.currentRewards, 0);
   const totalOptimalRewards = charges.reduce((sum, c) => sum + c.optimalRewards, 0);
   const totalMonthlySavings = charges.reduce((sum, c) => sum + c.monthlySavings, 0);
-  const optimizedCount = charges.filter(c => c.currentCard !== c.optimalCard).length;
+  const optimizedCount = charges.filter((c) => c.currentCard !== c.optimalCard).length;
 
   return {
     totalMonthlyCharges,
@@ -126,7 +126,18 @@ export function getRecurringSummary(charges: RecurringCharge[]): RecurringSummar
  * Add recurring charge
  */
 export async function addRecurringCharge(
-  charge: Omit<RecurringCharge, 'id' | 'userId' | 'optimalCard' | 'currentRewards' | 'optimalRewards' | 'monthlySavings' | 'isActive' | 'createdAt' | 'updatedAt'>
+  charge: Omit<
+    RecurringCharge,
+    | 'id'
+    | 'userId'
+    | 'optimalCard'
+    | 'currentRewards'
+    | 'optimalRewards'
+    | 'monthlySavings'
+    | 'isActive'
+    | 'createdAt'
+    | 'updatedAt'
+  >
 ): Promise<RecurringCharge> {
   if (!isInitialized) await initializeRecurring();
 
@@ -181,14 +192,18 @@ export async function updateRecurringCharge(
   if (!isInitialized) await initializeRecurring();
   if (!recurringCache) throw new Error('Recurring cache not initialized');
 
-  const index = recurringCache.findIndex(c => c.id === id);
+  const index = recurringCache.findIndex((c) => c.id === id);
   if (index === -1) throw new Error(`Charge ${id} not found`);
 
   // Recalculate if needed
   let recalculated = {};
-  if (updates.amount !== undefined || updates.category !== undefined || updates.currentCard !== undefined) {
+  if (
+    updates.amount !== undefined ||
+    updates.category !== undefined ||
+    updates.currentCard !== undefined
+  ) {
     const charge = { ...recurringCache[index], ...updates };
-    
+
     const optimalCardData = await getBestCardForCategory(charge.category);
     const optimalCard = optimalCardData?.card.id;
 
@@ -235,7 +250,7 @@ export async function deleteRecurringCharge(id: string): Promise<void> {
   if (!isInitialized) await initializeRecurring();
   if (!recurringCache) return;
 
-  const index = recurringCache.findIndex(c => c.id === id);
+  const index = recurringCache.findIndex((c) => c.id === id);
   if (index === -1) return;
 
   // Soft delete by setting isActive to false
@@ -259,9 +274,9 @@ export async function recalculateOptimizations(): Promise<void> {
   if (!isInitialized) await initializeRecurring();
   if (!recurringCache) return;
 
-  const updates = recurringCache.map(async charge => {
+  const updates = recurringCache.map(async (charge) => {
     if (!charge.isActive) return;
-    
+
     const optimalCardData = await getBestCardForCategory(charge.category);
     const optimalCard = optimalCardData?.card.id;
 
@@ -287,7 +302,7 @@ export async function recalculateOptimizations(): Promise<void> {
     };
   });
 
-  recurringCache = await Promise.all(updates.filter(Boolean)) as RecurringCharge[];
+  recurringCache = (await Promise.all(updates.filter(Boolean))) as RecurringCharge[];
   await persistToStorage();
 
   if (isSupabaseConfigured()) {
@@ -301,9 +316,9 @@ export async function recalculateOptimizations(): Promise<void> {
 
 async function persistToStorage(): Promise<void> {
   if (!recurringCache) return;
-  
+
   const serialized = JSON.stringify(
-    recurringCache.map(charge => ({
+    recurringCache.map((charge) => ({
       ...charge,
       createdAt: charge.createdAt.toISOString(),
       updatedAt: charge.updatedAt.toISOString(),
@@ -381,9 +396,7 @@ async function syncToSupabase(charge: RecurringCharge): Promise<void> {
     is_active: charge.isActive,
   };
 
-  const { error } = await supabase
-    .from('recurring_charges')
-    .upsert(row as any);
+  const { error } = await supabase.from('recurring_charges').upsert(row as any);
 
   if (error) {
     console.error('[RecurringService] Sync to Supabase error:', error);

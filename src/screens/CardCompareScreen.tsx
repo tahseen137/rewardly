@@ -1,18 +1,11 @@
 /**
  * CardCompareScreen - Side-by-side card comparison
- * 
+ *
  * Tier: Free (2 cards), Pro+ (3 cards)
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { Plus, X, TrendingUp } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
@@ -28,7 +21,7 @@ import {
 import { getCards } from '../services/CardPortfolioManager';
 import { getCardByIdSync } from '../services/CardDataService';
 import { getCurrentTierSync } from '../services/SubscriptionService';
-import { LockedFeature, ApplyNowButton } from '../components';
+import { ApplyNowButton } from '../components';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -48,7 +41,9 @@ export default function CardCompareScreen() {
   }, [selectedCardIds]);
 
   const portfolioCards = useMemo(() => {
-    return getCards().map(uc => getCardByIdSync(uc.cardId)).filter(Boolean) as Card[];
+    return getCards()
+      .map((uc) => getCardByIdSync(uc.cardId))
+      .filter(Boolean) as Card[];
   }, []);
 
   const handleAddCard = (cardId: string) => {
@@ -59,7 +54,7 @@ export default function CardCompareScreen() {
   };
 
   const handleRemoveCard = (cardId: string) => {
-    setSelectedCardIds(selectedCardIds.filter(id => id !== cardId));
+    setSelectedCardIds(selectedCardIds.filter((id) => id !== cardId));
   };
 
   const renderCardPicker = () => {
@@ -76,8 +71,8 @@ export default function CardCompareScreen() {
           </View>
           <ScrollView style={styles.pickerList}>
             {portfolioCards
-              .filter(card => !selectedCardIds.includes(card.id))
-              .map(card => (
+              .filter((card) => !selectedCardIds.includes(card.id))
+              .map((card) => (
                 <TouchableOpacity
                   key={card.id}
                   style={styles.pickerItem}
@@ -103,10 +98,7 @@ export default function CardCompareScreen() {
       <Text style={styles.emptyDescription}>
         Select up to {maxCards} cards to see how they stack up
       </Text>
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => setShowCardPicker(true)}
-      >
+      <TouchableOpacity style={styles.addButton} onPress={() => setShowCardPicker(true)}>
         <Plus size={20} color={colors.background.primary} />
         <Text style={styles.addButtonText}>Add Card</Text>
       </TouchableOpacity>
@@ -124,7 +116,7 @@ export default function CardCompareScreen() {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Comparing {selectedCardIds.length} Cards</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.cardChips}>
-            {selectedCardIds.map(cardId => {
+            {selectedCardIds.map((cardId) => {
               const card = getCardByIdSync(cardId);
               if (!card) return null;
               return (
@@ -139,10 +131,7 @@ export default function CardCompareScreen() {
               );
             })}
             {selectedCardIds.length < maxCards && (
-              <TouchableOpacity
-                style={styles.addChip}
-                onPress={() => setShowCardPicker(true)}
-              >
+              <TouchableOpacity style={styles.addChip} onPress={() => setShowCardPicker(true)}>
                 <Plus size={16} color={colors.primary.main} />
               </TouchableOpacity>
             )}
@@ -158,27 +147,17 @@ export default function CardCompareScreen() {
               style={styles.comparisonRow}
             >
               <View style={styles.categoryCell}>
-                <Text style={styles.categoryLabel}>
-                  {getCategoryDisplayName(catComp.category)}
-                </Text>
+                <Text style={styles.categoryLabel}>{getCategoryDisplayName(catComp.category)}</Text>
               </View>
               <View style={styles.valuesRow}>
-                {catComp.values.map(val => {
-                  const card = getCardByIdSync(val.cardId);
+                {catComp.values.map((val) => {
+                  const _card = getCardByIdSync(val.cardId);
                   return (
                     <View
                       key={val.cardId}
-                      style={[
-                        styles.valueCell,
-                        val.isWinner && styles.winnerCell,
-                      ]}
+                      style={[styles.valueCell, val.isWinner && styles.winnerCell]}
                     >
-                      <Text
-                        style={[
-                          styles.valueText,
-                          val.isWinner && styles.winnerText,
-                        ]}
-                      >
+                      <Text style={[styles.valueText, val.isWinner && styles.winnerText]}>
                         {formatComparisonValue(val.value, catComp.category)}
                       </Text>
                     </View>
@@ -219,23 +198,22 @@ export default function CardCompareScreen() {
         </View>
 
         {/* Apply Now CTA for the winner */}
-        {comparison.winner && (() => {
-          const winnerCard = getCardByIdSync(comparison.winner);
-          if (!winnerCard) return null;
-          return (
-            <View style={styles.applySection}>
-              <Text style={styles.applyLabel}>
-                🏆 {winnerCard.name} wins! Interested?
-              </Text>
-              <ApplyNowButton
-                card={winnerCard}
-                sourceScreen="CardCompare"
-                variant="primary"
-                showDisclosure
-              />
-            </View>
-          );
-        })()}
+        {comparison.winner &&
+          (() => {
+            const winnerCard = getCardByIdSync(comparison.winner);
+            if (!winnerCard) return null;
+            return (
+              <View style={styles.applySection}>
+                <Text style={styles.applyLabel}>🏆 {winnerCard.name} wins! Interested?</Text>
+                <ApplyNowButton
+                  card={winnerCard}
+                  sourceScreen="CardCompare"
+                  variant="primary"
+                  showDisclosure
+                />
+              </View>
+            );
+          })()}
 
         <View style={{ height: 40 }} />
       </ScrollView>

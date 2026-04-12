@@ -15,7 +15,6 @@ import {
   TextInput,
   Alert,
   RefreshControl,
-  ScrollView,
   Platform,
 } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
@@ -25,11 +24,10 @@ import Animated, {
   withSpring,
   runOnJS,
 } from 'react-native-reanimated';
-import { Plus, Search, Trash2, ChevronRight, X, Wallet, TrendingUp, Edit3 } from 'lucide-react-native';
+import { Plus, Search, Trash2, ChevronRight, Wallet, TrendingUp, Edit3 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useTheme, Theme } from '../theme';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
 import { Card, UserCard, RewardType } from '../types';
@@ -46,7 +44,11 @@ import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { formatUpToRate, formatBestForCategories } from '../utils/rewardFormatUtils';
 
-function formatRewardRate(value: number, type: RewardType, unit: 'percent' | 'multiplier'): string {
+function _formatRewardRate(
+  value: number,
+  type: RewardType,
+  unit: 'percent' | 'multiplier'
+): string {
   if (unit === 'percent') {
     return `${value}% ${type === RewardType.CASHBACK ? 'cash back' : type.replace('_', ' ')}`;
   }
@@ -68,14 +70,14 @@ function formatCurrency(amount: number): string {
 // Portfolio Summary Component
 function PortfolioSummary({ portfolio }: { portfolio: UserCard[] }) {
   const totalPoints = portfolio.reduce((sum, uc) => sum + (uc.pointBalance || 0), 0);
-  
+
   // Calculate estimated value (rough estimate using 1.5 cents average)
   const estimatedValue = totalPoints * 0.015;
-  
-  const cardsWithBalance = portfolio.filter(uc => uc.pointBalance && uc.pointBalance > 0).length;
-  
+
+  const cardsWithBalance = portfolio.filter((uc) => uc.pointBalance && uc.pointBalance > 0).length;
+
   if (totalPoints === 0) return null;
-  
+
   return (
     <View style={summaryStyles.container}>
       <LinearGradient
@@ -228,9 +230,7 @@ function CardItem({
         end={{ x: 1, y: 1 }}
         style={styles.issuerBadge}
       >
-        <Text style={styles.issuerText}>
-          {card.issuer.slice(0, 2).toUpperCase()}
-        </Text>
+        <Text style={styles.issuerText}>{card.issuer.slice(0, 2).toUpperCase()}</Text>
       </LinearGradient>
 
       {/* Card Info - Tappable */}
@@ -247,9 +247,7 @@ function CardItem({
         {userCard.pointBalance !== undefined && userCard.pointBalance > 0 ? (
           <View style={styles.balanceRow}>
             <Wallet size={12} color={colors.primary.main} />
-            <Text style={styles.balanceText}>
-              {formatNumber(userCard.pointBalance)} pts
-            </Text>
+            <Text style={styles.balanceText}>{formatNumber(userCard.pointBalance)} pts</Text>
           </View>
         ) : null}
       </TouchableOpacity>
@@ -282,15 +280,19 @@ function CardItem({
   // On native, wrap with gesture handler for swipe-to-delete
   // On web, skip gesture handler to avoid React hook errors
   if (Platform.OS === 'web') {
-    return (
-      <View style={styles.cardItemContainer}>
-        {cardContent}
-      </View>
-    );
+    return <View style={styles.cardItemContainer}>{cardContent}</View>;
   }
 
   // Native implementation with gesture handler
-  return <CardItemWithGesture userCard={userCard} onRemove={onRemove} onViewDetails={onViewDetails} onUpdateBalance={onUpdateBalance} card={card} />;
+  return (
+    <CardItemWithGesture
+      userCard={userCard}
+      onRemove={onRemove}
+      onViewDetails={onViewDetails}
+      onUpdateBalance={onUpdateBalance}
+      card={card}
+    />
+  );
 }
 
 // Native-only component with gesture handler
@@ -344,9 +346,7 @@ function CardItemWithGesture({
             end={{ x: 1, y: 1 }}
             style={styles.issuerBadge}
           >
-            <Text style={styles.issuerText}>
-              {card.issuer.slice(0, 2).toUpperCase()}
-            </Text>
+            <Text style={styles.issuerText}>{card.issuer.slice(0, 2).toUpperCase()}</Text>
           </LinearGradient>
 
           {/* Card Info - Tappable */}
@@ -363,9 +363,7 @@ function CardItemWithGesture({
             {userCard.pointBalance !== undefined && userCard.pointBalance > 0 ? (
               <View style={styles.balanceRow}>
                 <Wallet size={12} color={colors.primary.main} />
-                <Text style={styles.balanceText}>
-                  {formatNumber(userCard.pointBalance)} pts
-                </Text>
+                <Text style={styles.balanceText}>{formatNumber(userCard.pointBalance)} pts</Text>
               </View>
             ) : null}
           </TouchableOpacity>
@@ -407,7 +405,6 @@ function CardPickerItem({
   isOwned: boolean;
   onSelect: (cardId: string) => void;
 }) {
-
   const formatAnnualFee = (fee?: number) => {
     if (fee === undefined || fee === 0) return 'No annual fee';
     return `$${fee}/year`;
@@ -459,9 +456,12 @@ export default function MyCardsScreen() {
   const [availableCards, setAvailableCards] = useState<Card[]>([]);
   const [isLoadingCards, setIsLoadingCards] = useState(false);
   // Navigate to CardDetail when a card is tapped
-  const handleViewDetails = useCallback((card: Card) => {
-    navigation.navigate('CardDetail' as never, { cardId: card.id } as never);
-  }, [navigation]);
+  const handleViewDetails = useCallback(
+    (card: Card) => {
+      (navigation as any).navigate('CardDetail', { cardId: card.id });
+    },
+    [navigation]
+  );
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const loadPortfolio = useCallback(async () => {
@@ -493,10 +493,7 @@ export default function MyCardsScreen() {
     return portfolio.filter((userCard) => {
       const card = getCardByIdSync(userCard.cardId);
       if (!card) return false;
-      return (
-        card.name.toLowerCase().includes(query) ||
-        card.issuer.toLowerCase().includes(query)
-      );
+      return card.name.toLowerCase().includes(query) || card.issuer.toLowerCase().includes(query);
     });
   }, [portfolio, portfolioSearchQuery]);
 
@@ -533,25 +530,25 @@ export default function MyCardsScreen() {
       if (result.error.type === 'LIMIT_REACHED') {
         // Show upgrade prompt for card limit reached
         if (Platform.OS === 'web') {
-          if (window.confirm(`Card Limit Reached\n\n${result.error.message}\n\nWould you like to upgrade to Pro?`)) {
+          if (
+            window.confirm(
+              `Card Limit Reached\n\n${result.error.message}\n\nWould you like to upgrade to Pro?`
+            )
+          ) {
             setIsModalVisible(false);
             navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards' });
           }
         } else {
-          Alert.alert(
-            'Card Limit Reached',
-            result.error.message,
-            [
-              { text: 'Maybe Later', style: 'cancel' },
-              { 
-                text: 'Upgrade to Pro', 
-                onPress: () => {
-                  setIsModalVisible(false);
-                  navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards' });
-                }
+          Alert.alert('Card Limit Reached', result.error.message, [
+            { text: 'Maybe Later', style: 'cancel' },
+            {
+              text: 'Upgrade to Pro',
+              onPress: () => {
+                setIsModalVisible(false);
+                navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards' });
               },
-            ]
-          );
+            },
+          ]);
         }
       } else if (result.error.type === 'DUPLICATE_CARD') {
         if (Platform.OS === 'web') {
@@ -646,7 +643,8 @@ export default function MyCardsScreen() {
           {
             text: 'Save',
             onPress: (value?: string) => {
-              const newBalance = value?.trim() === '' ? undefined : parseInt(value?.replace(/,/g, '') || '0', 10);
+              const newBalance =
+                value?.trim() === '' ? undefined : parseInt(value?.replace(/,/g, '') || '0', 10);
               if (newBalance === undefined || (!isNaN(newBalance) && newBalance >= 0)) {
                 updatePointBalance(cardId, newBalance).then((result) => {
                   if (result.success) setPortfolio(getCards());
@@ -686,14 +684,18 @@ export default function MyCardsScreen() {
           <Text style={styles.title}>My Cards</Text>
           <View style={styles.subtitleRow}>
             <Text style={styles.subtitle}>
-              {showLimit 
+              {showLimit
                 ? `${portfolio.length} of ${limit} slots used`
-                : `${portfolio.length} card${portfolio.length !== 1 ? 's' : ''}`
-              }
+                : `${portfolio.length} card${portfolio.length !== 1 ? 's' : ''}`}
             </Text>
             {atLimit && (
-              <TouchableOpacity 
-                onPress={() => navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards_header' })}
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('Upgrade', {
+                    feature: 'unlimited_cards',
+                    source: 'my_cards_header',
+                  })
+                }
                 hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
               >
                 <Text style={styles.upgradeLink}>Upgrade for unlimited</Text>

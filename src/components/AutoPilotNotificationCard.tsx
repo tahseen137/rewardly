@@ -1,17 +1,11 @@
 /**
  * AutoPilotNotificationCard - Card recommendation display for in-app alerts
- * 
+ *
  * Shows the recommended card when user enters a monitored store
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MapPin, CreditCard, X, ChevronRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
@@ -78,7 +72,7 @@ export default function AutoPilotNotificationCard({
         {/* Main Content */}
         <View style={styles.content}>
           <Text style={styles.title}>🎯 Best Card to Use</Text>
-          
+
           <View style={styles.cardRecommendation}>
             <View style={styles.cardIcon}>
               <CreditCard size={24} color={colors.primary.main} />

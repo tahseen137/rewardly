@@ -1,8 +1,8 @@
 /**
  * SubscriptionService - Manages subscription tiers and feature access
- * 
+ *
  * Tiers: Free, Pro ($5.99/mo), Max ($12.99/mo), Admin (internal)
- * 
+ *
  * Features by tier:
  * - Free: 3 cards max, no Sage, no Insights, no AutoPilot
  * - Pro: Unlimited cards, Insights, 10 Sage chats/month
@@ -22,7 +22,7 @@ export type SubscriptionTier = 'free' | 'pro' | 'max' | 'lifetime' | 'admin';
 
 export type BillingPeriod = 'monthly' | 'annual';
 
-export type Feature = 
+export type Feature =
   | 'unlimited_cards'
   | 'insights'
   | 'points_valuator'
@@ -31,7 +31,10 @@ export type Feature =
   | 'smartwallet'
   | 'multi_country'
   | 'export'
-  | 'family_sharing';
+  | 'family_sharing'
+  | 'benefits_tracking'
+  | 'wallet_optimizer'
+  | 'concierge_service';
 
 export interface TierConfig {
   id: SubscriptionTier;
@@ -98,9 +101,39 @@ export const STRIPE_PRICE_IDS = {
 export const TIER_FEATURES: Record<SubscriptionTier, Feature[]> = {
   free: ['sage_ai'],
   pro: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai'],
-  max: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
-  lifetime: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
-  admin: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
+  max: [
+    'unlimited_cards',
+    'insights',
+    'points_valuator',
+    'balance_tracking',
+    'sage_ai',
+    'smartwallet',
+    'multi_country',
+    'export',
+    'family_sharing',
+  ],
+  lifetime: [
+    'unlimited_cards',
+    'insights',
+    'points_valuator',
+    'balance_tracking',
+    'sage_ai',
+    'smartwallet',
+    'multi_country',
+    'export',
+    'family_sharing',
+  ],
+  admin: [
+    'unlimited_cards',
+    'insights',
+    'points_valuator',
+    'balance_tracking',
+    'sage_ai',
+    'smartwallet',
+    'multi_country',
+    'export',
+    'family_sharing',
+  ],
 };
 
 /**
@@ -172,7 +205,17 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     name: 'Max',
     monthlyPrice: 12.99,
     annualPrice: 99.99,
-    features: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
+    features: [
+      'unlimited_cards',
+      'insights',
+      'points_valuator',
+      'balance_tracking',
+      'sage_ai',
+      'smartwallet',
+      'multi_country',
+      'export',
+      'family_sharing',
+    ],
     featureDescriptions: [
       'Everything in Pro',
       'Sage AI (Unlimited)',
@@ -192,7 +235,17 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     name: 'Lifetime',
     monthlyPrice: 0,
     annualPrice: 0,
-    features: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
+    features: [
+      'unlimited_cards',
+      'insights',
+      'points_valuator',
+      'balance_tracking',
+      'sage_ai',
+      'smartwallet',
+      'multi_country',
+      'export',
+      'family_sharing',
+    ],
     featureDescriptions: [
       'Everything in Max — forever',
       'Sage AI (Unlimited)',
@@ -213,7 +266,17 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     name: 'Admin',
     monthlyPrice: 0,
     annualPrice: 0,
-    features: ['unlimited_cards', 'insights', 'points_valuator', 'balance_tracking', 'sage_ai', 'smartwallet', 'multi_country', 'export', 'family_sharing'],
+    features: [
+      'unlimited_cards',
+      'insights',
+      'points_valuator',
+      'balance_tracking',
+      'sage_ai',
+      'smartwallet',
+      'multi_country',
+      'export',
+      'family_sharing',
+    ],
     featureDescriptions: ['All features unlocked', 'Internal use only'],
     limits: {
       cardsInPortfolio: Infinity,
@@ -279,9 +342,9 @@ async function loadSubscription(): Promise<SubscriptionState> {
       if (user && !user.isAnonymous) {
         // Check if user is admin
         const isAdmin = ADMIN_EMAILS.some(
-          email => email.toLowerCase() === user.email?.toLowerCase()
+          (email) => email.toLowerCase() === user.email?.toLowerCase()
         );
-        
+
         if (isAdmin) {
           return {
             tier: 'admin',
@@ -293,14 +356,14 @@ async function loadSubscription(): Promise<SubscriptionState> {
             stripeSubscriptionId: null,
           };
         }
-        
+
         // Fetch profile with tier
         const { data: profile } = await supabase
           .from('profiles')
           .select('tier, is_admin, stripe_customer_id')
           .eq('user_id', user.id)
           .single();
-        
+
         if (profile) {
           // Fetch active subscription details
           const { data: subscription } = await supabase
@@ -309,27 +372,35 @@ async function loadSubscription(): Promise<SubscriptionState> {
             .eq('user_id', user.id)
             .in('status', ['active', 'trialing', 'lifetime'])
             .single();
-          
+
           const profileData = profile as any;
           const subscriptionData = subscription as any;
-          const resolvedTier = (profileData.is_admin ? 'admin' : profileData.tier || 'free') as SubscriptionTier;
+          const resolvedTier = (
+            profileData.is_admin ? 'admin' : profileData.tier || 'free'
+          ) as SubscriptionTier;
           const isLifetime = resolvedTier === 'lifetime' || subscriptionData?.status === 'lifetime';
-          
+
           return {
             tier: resolvedTier,
             isAdmin: profileData.is_admin || false,
-            billingPeriod: isLifetime ? null : (subscriptionData?.current_period_end 
-              ? (new Date(subscriptionData.current_period_end).getTime() - new Date(subscriptionData.current_period_start).getTime() > 45 * 24 * 60 * 60 * 1000 ? 'annual' : 'monthly')
-              : null),
-            expiresAt: isLifetime ? null : (subscriptionData?.current_period_end || null),
-            cancelAtPeriodEnd: isLifetime ? false : (subscriptionData?.cancel_at_period_end || false),
+            billingPeriod: isLifetime
+              ? null
+              : subscriptionData?.current_period_end
+                ? new Date(subscriptionData.current_period_end).getTime() -
+                    new Date(subscriptionData.current_period_start).getTime() >
+                  45 * 24 * 60 * 60 * 1000
+                  ? 'annual'
+                  : 'monthly'
+                : null,
+            expiresAt: isLifetime ? null : subscriptionData?.current_period_end || null,
+            cancelAtPeriodEnd: isLifetime ? false : subscriptionData?.cancel_at_period_end || false,
             stripeCustomerId: profileData.stripe_customer_id || null,
             stripeSubscriptionId: subscriptionData?.stripe_subscription_id || null,
           };
         }
       }
     }
-    
+
     // Fall back to local storage
     const stored = await AsyncStorage.getItem(SUBSCRIPTION_STORAGE_KEY);
     if (stored) {
@@ -338,7 +409,7 @@ async function loadSubscription(): Promise<SubscriptionState> {
   } catch (error) {
     console.error('Error loading subscription:', error);
   }
-  
+
   return getDefaultSubscription();
 }
 
@@ -358,7 +429,7 @@ async function saveSubscription(subscription: SubscriptionState): Promise<void> 
  */
 async function loadSageUsage(): Promise<SageUsage> {
   const currentMonth = getCurrentMonth();
-  
+
   try {
     // Try to load from Supabase first if configured
     if (isSupabaseConfigured() && supabase) {
@@ -370,7 +441,7 @@ async function loadSageUsage(): Promise<SageUsage> {
           .eq('user_id', user.id)
           .eq('month', currentMonth)
           .maybeSingle();
-        
+
         if (usage) {
           const usageData = usage as any;
           const tier = subscriptionCache?.tier || 'free';
@@ -384,7 +455,7 @@ async function loadSageUsage(): Promise<SageUsage> {
         }
       }
     }
-    
+
     // Fall back to local storage
     const stored = await AsyncStorage.getItem(SAGE_USAGE_STORAGE_KEY);
     if (stored) {
@@ -398,7 +469,7 @@ async function loadSageUsage(): Promise<SageUsage> {
   } catch (error) {
     console.error('Error loading sage usage:', error);
   }
-  
+
   return getDefaultSageUsage();
 }
 
@@ -423,12 +494,13 @@ async function saveSageUsage(usage: SageUsage): Promise<void> {
 export async function initializeSubscription(): Promise<void> {
   subscriptionCache = await loadSubscription();
   sageUsageCache = await loadSageUsage();
-  
+
   // Update sage usage limits based on current tier
   if (sageUsageCache && subscriptionCache) {
     const limit = SAGE_LIMITS[subscriptionCache.tier];
     sageUsageCache.limit = limit;
-    sageUsageCache.remaining = limit === null ? null : Math.max(0, limit - sageUsageCache.chatCount);
+    sageUsageCache.remaining =
+      limit === null ? null : Math.max(0, limit - sageUsageCache.chatCount);
   }
 }
 
@@ -487,7 +559,12 @@ export function getTierConfig(tier: SubscriptionTier): TierConfig {
  * Get all tier configurations (excluding admin)
  */
 export function getAllTierConfigs(): TierConfig[] {
-  return [SUBSCRIPTION_TIERS.free, SUBSCRIPTION_TIERS.pro, SUBSCRIPTION_TIERS.max, SUBSCRIPTION_TIERS.lifetime];
+  return [
+    SUBSCRIPTION_TIERS.free,
+    SUBSCRIPTION_TIERS.pro,
+    SUBSCRIPTION_TIERS.max,
+    SUBSCRIPTION_TIERS.lifetime,
+  ];
 }
 
 /**
@@ -551,7 +628,11 @@ export async function getSageUsage(): Promise<SageUsage> {
 /**
  * Check if user can use Sage AI
  */
-export async function canUseSage(): Promise<{allowed: boolean; remaining: number | null; reason?: string}> {
+export async function canUseSage(): Promise<{
+  allowed: boolean;
+  remaining: number | null;
+  reason?: string;
+}> {
   // Demo mode: unlimited access
   if (typeof window !== 'undefined' && typeof window.location !== 'undefined') {
     const urlParams = new URLSearchParams(window.location.search);
@@ -560,32 +641,32 @@ export async function canUseSage(): Promise<{allowed: boolean; remaining: number
       return { allowed: true, remaining: null };
     }
   }
-  
+
   const tier = await getCurrentTier();
-  
+
   // Free users get limited access (3 chats/month)
   // Falls through to the Pro limit check below
-  
+
   // Max, Lifetime, and Admin have unlimited access
   if (tier === 'max' || tier === 'lifetime' || tier === 'admin') {
     return { allowed: true, remaining: null };
   }
-  
+
   // Pro users have limited access
   const usage = await getSageUsage();
   const limit = SAGE_LIMITS[tier];
-  
+
   if (limit !== null && usage.chatCount >= limit) {
-    return { 
-      allowed: false, 
-      remaining: 0, 
-      reason: 'Monthly Sage limit reached. Upgrade to Max for unlimited access.' 
+    return {
+      allowed: false,
+      remaining: 0,
+      reason: 'Monthly Sage limit reached. Upgrade to Max for unlimited access.',
     };
   }
-  
-  return { 
-    allowed: true, 
-    remaining: limit === null ? null : limit - usage.chatCount 
+
+  return {
+    allowed: true,
+    remaining: limit === null ? null : limit - usage.chatCount,
   };
 }
 
@@ -597,35 +678,36 @@ export async function incrementSageUsage(): Promise<SageUsage> {
   if (!sageUsageCache || sageUsageCache.month !== getCurrentMonth()) {
     sageUsageCache = await loadSageUsage();
   }
-  
+
   const tier = await getCurrentTier();
   const limit = SAGE_LIMITS[tier];
-  
+
   sageUsageCache.chatCount++;
   sageUsageCache.limit = limit;
   sageUsageCache.remaining = limit === null ? null : Math.max(0, limit - sageUsageCache.chatCount);
-  
+
   await saveSageUsage(sageUsageCache);
-  
+
   // Also update in Supabase if configured
   if (isSupabaseConfigured() && supabase) {
     const user = await getCurrentUser();
     if (user && !user.isAnonymous) {
       const currentMonth = getCurrentMonth();
-      
+
       // Upsert sage usage
-      await supabase
-        .from('sage_usage')
-        .upsert({
+      await supabase.from('sage_usage').upsert(
+        {
           user_id: user.id,
           month: currentMonth,
           chat_count: sageUsageCache.chatCount,
-        } as any, {
+        } as any,
+        {
           onConflict: 'user_id,month',
-        });
+        }
+      );
     }
   }
-  
+
   return sageUsageCache;
 }
 
@@ -650,7 +732,12 @@ export function getRequiredTierForFeature(feature: Feature): SubscriptionTier {
  */
 export function getFeatureUnlockTier(feature: Feature): SubscriptionTier {
   // Smart Wallet and multi-country require Max
-  if (feature === 'smartwallet' || feature === 'multi_country' || feature === 'export' || feature === 'family_sharing') {
+  if (
+    feature === 'smartwallet' ||
+    feature === 'multi_country' ||
+    feature === 'export' ||
+    feature === 'family_sharing'
+  ) {
     return 'max';
   }
   // All other premium features require Pro
@@ -664,7 +751,7 @@ export function getFeatureUnlockTier(feature: Feature): SubscriptionTier {
  * Set subscription tier (for testing/development or after webhook processing)
  */
 export async function setTier(
-  tier: SubscriptionTier, 
+  tier: SubscriptionTier,
   billingPeriod?: BillingPeriod,
   options?: {
     stripeCustomerId?: string;
@@ -675,24 +762,29 @@ export async function setTier(
 ): Promise<void> {
   const isAdminTier = tier === 'admin';
   const isLifetimeTier = tier === 'lifetime';
-  
+
   subscriptionCache = {
     tier,
     isAdmin: isAdminTier,
     billingPeriod: billingPeriod ?? (tier === 'free' || isLifetimeTier ? null : 'monthly'),
-    expiresAt: options?.expiresAt ?? (tier === 'free' || isLifetimeTier ? null : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()),
+    expiresAt:
+      options?.expiresAt ??
+      (tier === 'free' || isLifetimeTier
+        ? null
+        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()),
     cancelAtPeriodEnd: options?.cancelAtPeriodEnd ?? false,
     stripeCustomerId: options?.stripeCustomerId ?? null,
     stripeSubscriptionId: options?.stripeSubscriptionId ?? null,
   };
-  
+
   await saveSubscription(subscriptionCache);
-  
+
   // Update sage usage limits
   if (sageUsageCache) {
     const limit = SAGE_LIMITS[tier];
     sageUsageCache.limit = limit;
-    sageUsageCache.remaining = limit === null ? null : Math.max(0, limit - sageUsageCache.chatCount);
+    sageUsageCache.remaining =
+      limit === null ? null : Math.max(0, limit - sageUsageCache.chatCount);
   }
 }
 
@@ -710,12 +802,12 @@ export function getPriceDisplay(tier: SubscriptionTier, period: BillingPeriod): 
   const config = SUBSCRIPTION_TIERS[tier];
   if (tier === 'free' || tier === 'admin') return 'Free';
   if (tier === 'lifetime') return '$49.99';
-  
+
   if (period === 'annual') {
     const monthlyEquivalent = config.annualPrice / 12;
     return `$${monthlyEquivalent.toFixed(2)}/mo`;
   }
-  
+
   return `$${config.monthlyPrice.toFixed(2)}/mo`;
 }
 
@@ -834,15 +926,15 @@ export function subscribeToSubscriptionChanges(
       (payload: any) => {
         console.log('Subscription change detected:', payload);
         const newTier = payload.new?.tier || 'free';
-        
+
         // Update cache
         if (subscriptionCache) {
-          subscriptionCache = { 
-            ...subscriptionCache, 
-            tier: newTier as SubscriptionTier 
+          subscriptionCache = {
+            ...subscriptionCache,
+            tier: newTier as SubscriptionTier,
           };
         }
-        
+
         // Notify callback
         callback(newTier as SubscriptionTier);
       }
@@ -860,9 +952,7 @@ export function subscribeToSubscriptionChanges(
  */
 export function isAdminEmail(email: string | null | undefined): boolean {
   if (!email) return false;
-  return ADMIN_EMAILS.some(
-    adminEmail => adminEmail.toLowerCase() === email.toLowerCase()
-  );
+  return ADMIN_EMAILS.some((adminEmail) => adminEmail.toLowerCase() === email.toLowerCase());
 }
 
 /**

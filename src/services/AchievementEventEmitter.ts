@@ -1,9 +1,9 @@
 /**
  * AchievementEventEmitter - Typed event emitter for achievement tracking
- * 
+ *
  * Pattern: Services call emit() when actions occur.
  * AchievementService listens and checks for unlocks.
- * 
+ *
  * Benefits:
  * - Decoupled: Services don't need to know about achievements
  * - Lightweight: emit() is fire-and-forget
@@ -43,7 +43,8 @@ class AchievementEventEmitterClass {
 
     // Emit asynchronously to not block caller
     // Use setTimeout as setImmediate is not available on web
-    const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: () => void) => setTimeout(fn, 0);
+    const defer =
+      typeof setImmediate !== 'undefined' ? setImmediate : (fn: () => void) => setTimeout(fn, 0);
     defer(() => {
       // Call each callback and catch errors individually
       for (const callback of this.callbacks) {
@@ -70,7 +71,7 @@ class AchievementEventEmitterClass {
    * Unsubscribe from achievement events
    */
   offEvent(callback: EventCallback): void {
-    this.callbacks = this.callbacks.filter(cb => cb !== callback);
+    this.callbacks = this.callbacks.filter((cb) => cb !== callback);
   }
 
   /**

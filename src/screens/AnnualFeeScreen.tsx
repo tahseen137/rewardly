@@ -16,13 +16,11 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { 
-  DollarSign, 
-  TrendingUp, 
-  TrendingDown, 
-  Calendar, 
+import {
+  DollarSign,
+  TrendingUp,
+  Calendar,
   AlertCircle,
   CheckCircle,
   XCircle,
@@ -52,7 +50,7 @@ interface WorthBadgeProps {
   reason?: string;
 }
 
-function WorthBadge({ worth, reason }: WorthBadgeProps) {
+function WorthBadge({ worth, reason: _reason }: WorthBadgeProps) {
   const config = {
     yes: {
       icon: CheckCircle,
@@ -124,18 +122,21 @@ function FeeCard({ analysis, onSetOpenDate }: FeeCardProps) {
         <View style={styles.feeCardStat}>
           <TrendingUp size={16} color={colors.success.main} />
           <Text style={styles.feeCardStatLabel}>Rewards Earned</Text>
-          <Text style={styles.feeCardStatValue}>
-            ${analysis.estimatedRewardsEarned.toFixed(2)}
-          </Text>
+          <Text style={styles.feeCardStatValue}>${analysis.estimatedRewardsEarned.toFixed(2)}</Text>
         </View>
 
         <View style={styles.feeCardStat}>
-          <DollarSign size={16} color={analysis.netValue >= 0 ? colors.success.main : colors.error.main} />
+          <DollarSign
+            size={16}
+            color={analysis.netValue >= 0 ? colors.success.main : colors.error.main}
+          />
           <Text style={styles.feeCardStatLabel}>Net Value</Text>
-          <Text style={[
-            styles.feeCardStatValue,
-            { color: analysis.netValue >= 0 ? colors.success.main : colors.error.main }
-          ]}>
+          <Text
+            style={[
+              styles.feeCardStatValue,
+              { color: analysis.netValue >= 0 ? colors.success.main : colors.error.main },
+            ]}
+          >
             ${Math.abs(analysis.netValue).toFixed(2)}
           </Text>
         </View>
@@ -144,9 +145,7 @@ function FeeCard({ analysis, onSetOpenDate }: FeeCardProps) {
       {analysis.daysUntilRenewal !== null && (
         <View style={styles.feeCardRenewal}>
           <Calendar size={14} color={colors.text.secondary} />
-          <Text style={styles.feeCardRenewalText}>
-            Renews in {analysis.daysUntilRenewal} days
-          </Text>
+          <Text style={styles.feeCardRenewalText}>Renews in {analysis.daysUntilRenewal} days</Text>
         </View>
       )}
 
@@ -179,10 +178,7 @@ export default function AnnualFeeScreen() {
   const loadData = useCallback(async () => {
     try {
       await initializeAnnualFee();
-      const [feeAnalyses, feeSummary] = await Promise.all([
-        analyzeCardFees(),
-        getFeeSummary(),
-      ]);
+      const [feeAnalyses, feeSummary] = await Promise.all([analyzeCardFees(), getFeeSummary()]);
       setAnalyses(feeAnalyses);
       setSummary(feeSummary);
     } catch (error) {
@@ -209,15 +205,16 @@ export default function AnnualFeeScreen() {
 
   const handleSaveDate = useCallback(async () => {
     if (!selectedCardId) return;
-    
+
     await setCardOpenDate(selectedCardId, selectedDate);
     setShowDateModal(false);
     await loadData();
   }, [selectedCardId, selectedDate, loadData]);
 
-  const upcomingRenewals = useMemo(() => 
-    analyses.filter(a => a.daysUntilRenewal !== null && a.daysUntilRenewal <= 30)
-  , [analyses]);
+  const upcomingRenewals = useMemo(
+    () => analyses.filter((a) => a.daysUntilRenewal !== null && a.daysUntilRenewal <= 30),
+    [analyses]
+  );
 
   const allFeesAnalyses = useMemo(() => analyses, [analyses]);
 
@@ -246,9 +243,7 @@ export default function AnnualFeeScreen() {
     <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
       >
         <View style={styles.header}>
           <Text style={styles.title}>Annual Fees</Text>
@@ -273,10 +268,12 @@ export default function AnnualFeeScreen() {
             <View style={styles.summaryRow}>
               <View style={styles.summaryStat}>
                 <Text style={styles.summaryLabel}>Net Value</Text>
-                <Text style={[
-                  styles.summaryValue,
-                  { color: summary.netValue >= 0 ? colors.success.main : colors.error.main }
-                ]}>
+                <Text
+                  style={[
+                    styles.summaryValue,
+                    { color: summary.netValue >= 0 ? colors.success.main : colors.error.main },
+                  ]}
+                >
                   ${Math.abs(summary.netValue).toFixed(2)}
                 </Text>
               </View>
@@ -293,7 +290,7 @@ export default function AnnualFeeScreen() {
         {upcomingRenewals.length > 0 && (
           <>
             <Text style={styles.sectionTitle}>Upcoming Renewals</Text>
-            {upcomingRenewals.map(analysis => (
+            {upcomingRenewals.map((analysis) => (
               <FeeCard
                 key={analysis.cardId}
                 analysis={analysis}
@@ -305,7 +302,7 @@ export default function AnnualFeeScreen() {
 
         <Text style={styles.sectionTitle}>All Cards with Fees</Text>
         {allFeesAnalyses.length > 0 ? (
-          allFeesAnalyses.map(analysis => (
+          allFeesAnalyses.map((analysis) => (
             <FeeCard
               key={analysis.cardId}
               analysis={analysis}
@@ -332,7 +329,7 @@ export default function AnnualFeeScreen() {
             <Text style={styles.modalDescription}>
               When did you open this card? This helps calculate your renewal date.
             </Text>
-            
+
             {/* Simple date input - in production would use DateTimePicker */}
             <TextInput
               style={styles.dateInput}

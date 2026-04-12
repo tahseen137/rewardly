@@ -105,26 +105,17 @@ describe('InsightsService', () => {
     });
 
     it('should find card with highest rate for category', () => {
-      const result = findOptimalCardForCategory(
-        SpendingCategory.GROCERIES,
-        [mockCard1, mockCard2]
-      );
+      const result = findOptimalCardForCategory(SpendingCategory.GROCERIES, [mockCard1, mockCard2]);
       expect(result?.id).toBe('card1');
     });
 
     it('should find dining card for dining category', () => {
-      const result = findOptimalCardForCategory(
-        SpendingCategory.DINING,
-        [mockCard1, mockCard2]
-      );
+      const result = findOptimalCardForCategory(SpendingCategory.DINING, [mockCard1, mockCard2]);
       expect(result?.id).toBe('card2');
     });
 
     it('should handle single card', () => {
-      const result = findOptimalCardForCategory(
-        SpendingCategory.GROCERIES,
-        [mockCard1]
-      );
+      const result = findOptimalCardForCategory(SpendingCategory.GROCERIES, [mockCard1]);
       expect(result?.id).toBe('card1');
     });
   });
@@ -135,12 +126,7 @@ describe('InsightsService', () => {
 
   describe('estimateCategoryRewards', () => {
     it('should return zeros for no cards', () => {
-      const result = estimateCategoryRewards(
-        1000,
-        SpendingCategory.GROCERIES,
-        [],
-        null
-      );
+      const result = estimateCategoryRewards(1000, SpendingCategory.GROCERIES, [], null);
       expect(result.rewardsEarned).toBe(0);
       expect(result.rewardsPossible).toBe(0);
     });
@@ -152,7 +138,7 @@ describe('InsightsService', () => {
         [mockCard1],
         mockCard1
       );
-      
+
       expect(result.rewardsEarned).toBeGreaterThan(0);
       expect(result.rewardsPossible).toBeGreaterThan(0);
     });
@@ -164,7 +150,7 @@ describe('InsightsService', () => {
         [mockCard1, mockCard2],
         mockCard2
       );
-      
+
       // Possible should be higher than earned (using average)
       expect(result.rewardsPossible).toBeGreaterThan(result.rewardsEarned);
     });
@@ -179,28 +165,34 @@ describe('InsightsService', () => {
       createMockTransaction(100, SpendingCategory.GROCERIES, new Date('2024-01-15'), 'Loblaws'),
       createMockTransaction(50, SpendingCategory.GROCERIES, new Date('2024-01-16'), 'Metro'),
       createMockTransaction(30, SpendingCategory.DINING, new Date('2024-01-17'), 'Starbucks'),
-      createMockTransaction(500, SpendingCategory.GROCERIES, new Date('2024-01-18'), 'Payment', true), // Credit
+      createMockTransaction(
+        500,
+        SpendingCategory.GROCERIES,
+        new Date('2024-01-18'),
+        'Payment',
+        true
+      ), // Credit
     ];
 
     it('should calculate breakdown correctly', () => {
       const breakdown = calculateCategoryBreakdown(mockTransactions, [mockCard1]);
-      
+
       expect(breakdown.length).toBe(2); // Groceries + Dining
     });
 
     it('should exclude credits from calculations', () => {
       const breakdown = calculateCategoryBreakdown(mockTransactions, [mockCard1]);
-      
-      const groceries = breakdown.find(b => b.category === SpendingCategory.GROCERIES);
+
+      const groceries = breakdown.find((b) => b.category === SpendingCategory.GROCERIES);
       expect(groceries?.totalSpend).toBe(150); // 100 + 50, no 500 credit
     });
 
     it('should calculate percentages correctly', () => {
       const breakdown = calculateCategoryBreakdown(mockTransactions, [mockCard1]);
-      
-      const groceries = breakdown.find(b => b.category === SpendingCategory.GROCERIES);
-      const dining = breakdown.find(b => b.category === SpendingCategory.DINING);
-      
+
+      const groceries = breakdown.find((b) => b.category === SpendingCategory.GROCERIES);
+      const dining = breakdown.find((b) => b.category === SpendingCategory.DINING);
+
       // 150 groceries + 30 dining = 180 total
       expect(groceries?.percentOfTotal).toBeCloseTo(83.33, 1);
       expect(dining?.percentOfTotal).toBeCloseTo(16.67, 1);
@@ -208,26 +200,26 @@ describe('InsightsService', () => {
 
     it('should sort by total spend (highest first)', () => {
       const breakdown = calculateCategoryBreakdown(mockTransactions, [mockCard1]);
-      
+
       expect(breakdown[0].category).toBe(SpendingCategory.GROCERIES);
       expect(breakdown[1].category).toBe(SpendingCategory.DINING);
     });
 
     it('should include top merchants', () => {
       const breakdown = calculateCategoryBreakdown(mockTransactions, [mockCard1]);
-      
-      const groceries = breakdown.find(b => b.category === SpendingCategory.GROCERIES);
+
+      const groceries = breakdown.find((b) => b.category === SpendingCategory.GROCERIES);
       expect(groceries?.topMerchants.length).toBe(2);
       expect(groceries?.topMerchants[0].name).toBe('Loblaws');
     });
 
     it('should set optimal card', () => {
       const breakdown = calculateCategoryBreakdown(mockTransactions, [mockCard1, mockCard2]);
-      
-      const groceries = breakdown.find(b => b.category === SpendingCategory.GROCERIES);
+
+      const groceries = breakdown.find((b) => b.category === SpendingCategory.GROCERIES);
       expect(groceries?.optimalCard?.id).toBe('card1');
-      
-      const dining = breakdown.find(b => b.category === SpendingCategory.DINING);
+
+      const dining = breakdown.find((b) => b.category === SpendingCategory.DINING);
       expect(dining?.optimalCard?.id).toBe('card2');
     });
   });
@@ -240,7 +232,7 @@ describe('InsightsService', () => {
     it('should return 0 score for no possible rewards', () => {
       const breakdown: CategoryBreakdown[] = [];
       const score = calculateOptimizationScore(breakdown);
-      
+
       expect(score.score).toBe(0);
       expect(score.label).toBe('Add Cards to Start');
     });
@@ -260,9 +252,9 @@ describe('InsightsService', () => {
           rewardsGap: 10,
         },
       ];
-      
+
       const score = calculateOptimizationScore(breakdown);
-      
+
       expect(score.score).toBe(90);
       expect(score.label).toBe('Rewards Master');
       expect(score.emoji).toBe('🏆');
@@ -283,9 +275,9 @@ describe('InsightsService', () => {
           rewardsGap: 25,
         },
       ];
-      
+
       const score = calculateOptimizationScore(breakdown);
-      
+
       expect(score.score).toBe(75);
       expect(score.label).toBe('Good Optimizer');
       expect(score.emoji).toBe('👍');
@@ -306,9 +298,9 @@ describe('InsightsService', () => {
           rewardsGap: 40,
         },
       ];
-      
+
       const score = calculateOptimizationScore(breakdown);
-      
+
       expect(score.score).toBe(60);
       expect(score.label).toBe('Average User');
     });
@@ -328,9 +320,9 @@ describe('InsightsService', () => {
           rewardsGap: 70,
         },
       ];
-      
+
       const score = calculateOptimizationScore(breakdown);
-      
+
       expect(score.score).toBe(30);
       expect(score.label).toBe('Needs Help');
       expect(score.emoji).toBe('🎯');
@@ -348,9 +340,9 @@ describe('InsightsService', () => {
         createMockTransaction(50, SpendingCategory.DINING, new Date('2024-01-20')),
         createMockTransaction(200, SpendingCategory.GROCERIES, new Date('2024-02-15')),
       ];
-      
+
       const monthly = groupByMonth(transactions);
-      
+
       expect(monthly.length).toBe(2);
       expect(monthly[0].totalSpend).toBe(150);
       expect(monthly[1].totalSpend).toBe(200);
@@ -359,11 +351,17 @@ describe('InsightsService', () => {
     it('should exclude credits', () => {
       const transactions = [
         createMockTransaction(100, SpendingCategory.GROCERIES, new Date('2024-01-15')),
-        createMockTransaction(500, SpendingCategory.GROCERIES, new Date('2024-01-16'), 'Payment', true),
+        createMockTransaction(
+          500,
+          SpendingCategory.GROCERIES,
+          new Date('2024-01-16'),
+          'Payment',
+          true
+        ),
       ];
-      
+
       const monthly = groupByMonth(transactions);
-      
+
       expect(monthly[0].totalSpend).toBe(100);
     });
 
@@ -372,9 +370,9 @@ describe('InsightsService', () => {
         createMockTransaction(100, SpendingCategory.GROCERIES, new Date('2024-02-15')),
         createMockTransaction(50, SpendingCategory.DINING, new Date('2024-01-15')),
       ];
-      
+
       const monthly = groupByMonth(transactions);
-      
+
       expect(monthly[0].month.getMonth()).toBe(0); // January
       expect(monthly[1].month.getMonth()).toBe(1); // February
     });
@@ -384,9 +382,9 @@ describe('InsightsService', () => {
         createMockTransaction(100, SpendingCategory.GROCERIES, new Date('2024-01-15')),
         createMockTransaction(50, SpendingCategory.DINING, new Date('2024-01-20')),
       ];
-      
+
       const monthly = groupByMonth(transactions);
-      
+
       expect(monthly[0].byCategory[SpendingCategory.GROCERIES]).toBe(100);
       expect(monthly[0].byCategory[SpendingCategory.DINING]).toBe(50);
     });
@@ -433,8 +431,8 @@ describe('InsightsService', () => {
 
     it('should detect upward trend', () => {
       const trends = calculateSpendingTrends(currentMonth, previousMonth);
-      
-      const groceriesTrend = trends.find(t => t.category === SpendingCategory.GROCERIES);
+
+      const groceriesTrend = trends.find((t) => t.category === SpendingCategory.GROCERIES);
       expect(groceriesTrend?.direction).toBe('up');
       expect(groceriesTrend?.changePercent).toBe(20);
     });
@@ -447,25 +445,25 @@ describe('InsightsService', () => {
           [SpendingCategory.GROCERIES]: 300, // Down from 500
         },
       };
-      
+
       const trends = calculateSpendingTrends(modified, previousMonth);
-      
-      const groceriesTrend = trends.find(t => t.category === SpendingCategory.GROCERIES);
+
+      const groceriesTrend = trends.find((t) => t.category === SpendingCategory.GROCERIES);
       expect(groceriesTrend?.direction).toBe('down');
     });
 
     it('should detect stable trend', () => {
       const trends = calculateSpendingTrends(currentMonth, previousMonth);
-      
-      const gasTrend = trends.find(t => t.category === SpendingCategory.GAS);
+
+      const gasTrend = trends.find((t) => t.category === SpendingCategory.GAS);
       expect(gasTrend?.direction).toBe('stable');
       expect(gasTrend?.changePercent).toBe(0);
     });
 
     it('should generate alerts for significant changes', () => {
       const trends = calculateSpendingTrends(currentMonth, previousMonth);
-      
-      const groceriesTrend = trends.find(t => t.category === SpendingCategory.GROCERIES);
+
+      const groceriesTrend = trends.find((t) => t.category === SpendingCategory.GROCERIES);
       expect(groceriesTrend?.alert).toBeDefined();
       expect(groceriesTrend?.alert?.type).toBe('spending_increase');
     });
@@ -491,9 +489,9 @@ describe('InsightsService', () => {
           rewardsGap: 150,
         },
       ];
-      
+
       const alerts = generateSmartAlerts(breakdown, []);
-      
+
       expect(alerts.length).toBeGreaterThan(0);
       expect(alerts[0].type).toBe('card_switch');
       expect(alerts[0].potentialSavings).toBe(150);
@@ -526,9 +524,9 @@ describe('InsightsService', () => {
           rewardsGap: 130,
         },
       ];
-      
+
       const alerts = generateSmartAlerts(breakdown, []);
-      
+
       expect(alerts[0].potentialSavings).toBeGreaterThan(alerts[1].potentialSavings!);
     });
   });
@@ -565,7 +563,7 @@ describe('InsightsService', () => {
           rewardsGap: 80,
         },
       ];
-      
+
       const total = calculateMoneyLeftOnTable(breakdown);
       expect(total).toBe(130);
     });
@@ -585,7 +583,7 @@ describe('InsightsService', () => {
 
     it('should return top merchants by amount', () => {
       const top = getTopMerchants(transactions, 3);
-      
+
       expect(top.length).toBe(3);
       expect(top[0].name).toBe('Loblaws');
       expect(top[0].amount).toBe(150);
@@ -601,9 +599,9 @@ describe('InsightsService', () => {
         ...transactions,
         createMockTransaction(500, SpendingCategory.GROCERIES, new Date(), 'Payment', true),
       ];
-      
+
       const top = getTopMerchants(txWithCredit, 10);
-      expect(top.find(m => m.name === 'Payment')).toBeUndefined();
+      expect(top.find((m) => m.name === 'Payment')).toBeUndefined();
     });
   });
 
@@ -614,7 +612,7 @@ describe('InsightsService', () => {
   describe('generateSpendingInsights', () => {
     it('should return error for insufficient transactions', () => {
       const result = generateSpendingInsights([], [mockCard1]);
-      
+
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.type).toBe('INSUFFICIENT_DATA');
@@ -623,15 +621,11 @@ describe('InsightsService', () => {
 
     it('should generate complete insights', () => {
       const transactions = Array.from({ length: 20 }, (_, i) =>
-        createMockTransaction(
-          50,
-          SpendingCategory.GROCERIES,
-          new Date(`2024-01-${(i % 28) + 1}`)
-        )
+        createMockTransaction(50, SpendingCategory.GROCERIES, new Date(`2024-01-${(i % 28) + 1}`))
       );
-      
+
       const result = generateSpendingInsights(transactions, [mockCard1]);
-      
+
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.value.categoryBreakdown.length).toBeGreaterThan(0);

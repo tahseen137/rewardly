@@ -122,8 +122,7 @@ export class ReferralService {
     for (let attempt = 0; attempt < 3; attempt++) {
       const code = buildCode();
 
-      const { data, error } = await supabase
-        .from('referral_codes')
+      const { data, error } = await (supabase.from('referral_codes') as any)
         .insert({ user_id: userId, code })
         .select()
         .single();
@@ -203,7 +202,7 @@ export class ReferralService {
       const refData = await ReferralService.lookupCode(code);
       if (!refData) return;
 
-      await supabase.from('referral_clicks').insert({
+      await (supabase.from('referral_clicks') as any).insert({
         referral_code_id: refData.id,
         user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
         converted: false,
@@ -246,7 +245,7 @@ export class ReferralService {
         REFERRER_REWARDS.find((t) => nextCount >= t.threshold)?.reward ?? 'Advocate badge';
 
       // Insert signup record
-      const { error } = await supabase.from('referral_signups').insert({
+      const { error } = await (supabase.from('referral_signups') as any).insert({
         referral_code_id: refData.id,
         referrer_user_id: refData.user_id,
         referee_user_id: newUserId,
@@ -262,12 +261,11 @@ export class ReferralService {
       }
 
       // Atomically increment usage count (deactivates code if max_uses reached)
-      await supabase.rpc('increment_referral_usage', { code_id: refData.id });
+      await (supabase as any).rpc('increment_referral_usage', { code_id: refData.id });
 
       // Mark click as converted
       if (supabase) {
-        await supabase
-          .from('referral_clicks')
+        await (supabase.from('referral_clicks') as any)
           .update({ converted: true })
           .eq('referral_code_id', refData.id)
           .eq('converted', false)
@@ -306,8 +304,7 @@ export class ReferralService {
       if (!refCode) return empty;
 
       // Get signups
-      const { data: signups, error } = await supabase
-        .from('referral_signups')
+      const { data: signups, error } = await (supabase.from('referral_signups') as any)
         .select('status')
         .eq('referrer_user_id', userId);
 
@@ -320,7 +317,7 @@ export class ReferralService {
         };
       }
 
-      const list = signups ?? [];
+      const list: Array<{ status: string }> = signups ?? [];
       return {
         totalSignups: list.length,
         pendingSignups: list.filter((s) => s.status === 'pending').length,

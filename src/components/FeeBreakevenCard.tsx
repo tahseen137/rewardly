@@ -44,7 +44,12 @@ export function FeeBreakevenCard({ result }: FeeBreakevenCardProps) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Annual Fee Analysis</Text>
-        <View style={[styles.verdictBadge, { backgroundColor: verdictColor + '20', borderColor: verdictColor }]}>
+        <View
+          style={[
+            styles.verdictBadge,
+            { backgroundColor: verdictColor + '20', borderColor: verdictColor },
+          ]}
+        >
           <VerdictIcon size={16} color={verdictColor} />
           <Text style={[styles.verdictText, { color: verdictColor }]}>
             {verdict.replace(/_/g, ' ').toUpperCase()}
@@ -59,11 +64,15 @@ export function FeeBreakevenCard({ result }: FeeBreakevenCardProps) {
         </View>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>Rewards Earned</Text>
-          <Text style={[styles.summaryValue, styles.positive]}>+${annualRewardsEarned.toFixed(0)}</Text>
+          <Text style={[styles.summaryValue, styles.positive]}>
+            +${annualRewardsEarned.toFixed(0)}
+          </Text>
         </View>
         <View style={[styles.summaryRow, styles.summaryRowTotal]}>
           <Text style={styles.summaryLabelTotal}>Net Value</Text>
-          <Text style={[styles.summaryValueTotal, netValue >= 0 ? styles.positive : styles.negative]}>
+          <Text
+            style={[styles.summaryValueTotal, netValue >= 0 ? styles.positive : styles.negative]}
+          >
             {netValue >= 0 ? '+' : ''}${netValue.toFixed(0)}
           </Text>
         </View>
@@ -91,13 +100,9 @@ export function FeeBreakevenCard({ result }: FeeBreakevenCardProps) {
           <Text style={styles.breakdownTitle}>Category Breakdown</Text>
           {categoryBreakdown.slice(0, 3).map((item, index) => (
             <View key={index} style={styles.breakdownRow}>
-              <Text style={styles.breakdownCategory}>
-                {item.category.replace(/_/g, ' ')}
-              </Text>
+              <Text style={styles.breakdownCategory}>{item.category.replace(/_/g, ' ')}</Text>
               <View style={styles.breakdownRight}>
-                <Text style={styles.breakdownRewards}>
-                  ${item.annualRewards.toFixed(0)}
-                </Text>
+                <Text style={styles.breakdownRewards}>${item.annualRewards.toFixed(0)}</Text>
                 <Text style={styles.breakdownPercent}>
                   {item.percentOfFeeRecovered.toFixed(0)}% of fee
                 </Text>

@@ -5,7 +5,7 @@
  * Requirements: 5.1, 3.4
  */
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,20 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
-import { Bell, Globe, RefreshCw, Info, MapPin, LogOut, LogIn, User, Crown, Navigation, ChevronRight, Gift } from 'lucide-react-native';
+import {
+  Bell,
+  Globe,
+  RefreshCw,
+  Info,
+  MapPin,
+  LogOut,
+  LogIn,
+  User,
+  Crown,
+  Navigation,
+  ChevronRight,
+  Gift,
+} from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -39,26 +52,28 @@ import {
   Language,
   Country,
 } from '../services/PreferenceManager';
-import { refreshCards, getLastSyncTime, getAllCards, onCountryChange, getTotalCardCount } from '../services/CardDataService';
+import {
+  refreshCards,
+  getLastSyncTime,
+  onCountryChange,
+  getTotalCardCount,
+} from '../services/CardDataService';
 import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
 import { isSupabaseConfigured } from '../services/supabase';
 import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
-import { 
-  getCurrentTier, 
-  SUBSCRIPTION_TIERS, 
+import {
+  getCurrentTier,
+  SUBSCRIPTION_TIERS,
   SubscriptionTier,
   getSageUsage,
   SageUsage,
-  isAdminSync,
   getSubscriptionState,
   SubscriptionState,
-  SAGE_LIMITS,
   refreshSubscription,
   openCustomerPortal,
 } from '../services/SubscriptionService';
 import Paywall from '../components/Paywall';
 import {
-  isAutoPilotEnabled,
   enableAutoPilot,
   disableAutoPilot,
   getAutoPilotStatus,
@@ -69,7 +84,7 @@ import {
 /**
  * Language options
  */
-const LANGUAGE_OPTIONS: Array<{ code: Language; labelKey: string; icon: string }> = [
+const _LANGUAGE_OPTIONS: Array<{ code: Language; labelKey: string; icon: string }> = [
   { code: 'en', labelKey: 'languages.en', icon: '🇬🇧' },
   { code: 'fr', labelKey: 'languages.fr', icon: '🇫🇷' },
 ];
@@ -167,10 +182,10 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
     await refreshSubscription();
     const tier = await getCurrentTier();
     setSubscriptionTier(tier);
-    
+
     const subState = await getSubscriptionState();
     setSubscriptionState(subState);
-    
+
     // Load Sage usage if user has access
     if (tier === 'pro') {
       const usage = await getSageUsage();
@@ -217,7 +232,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
     setCurrentCountry(country);
     await setCountry(country);
     await onCountryChange();
-    
+
     // Reload cards for new country
     try {
       const cardStats = await getTotalCardCount();
@@ -227,22 +242,22 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
       setCardCount(0);
       setCardCountDetail('');
     }
-    
+
     // Notify other screens (HomeScreen) that country has changed
     CountryChangeEmitter.emit();
-    
+
     setIsLoading(false);
   };
 
   const handleCountryChange = async (country: Country) => {
     if (country === currentCountry) return;
-    
+
     // On web, Alert.alert callbacks don't work reliably — switch directly
     if (Platform.OS === 'web') {
       await performCountrySwitch(country);
       return;
     }
-    
+
     // On native, show confirmation dialog
     Alert.alert(
       t('settings.changeCountryTitle'),
@@ -267,7 +282,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
 
     setIsRefreshing(true);
     try {
-      const cards = await refreshCards();
+      await refreshCards();
       const cardStats = await getTotalCardCount();
       setCardCount(cardStats.total);
       setCardCountDetail(`${cardStats.us} US + ${cardStats.ca} CA`);
@@ -279,7 +294,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
         t('settings.refreshSuccessMessage', { count: cardStats.total }),
         [{ text: t('common.ok') }]
       );
-    } catch (error) {
+    } catch {
       Alert.alert(t('settings.refreshError'), t('settings.refreshErrorMessage'), [
         { text: t('common.ok') },
       ]);
@@ -296,21 +311,17 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
       return;
     }
 
-    Alert.alert(
-      t('settings.signOutTitle'),
-      t('settings.signOutMessage'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('settings.signOut'),
-          style: 'destructive',
-          onPress: async () => {
-            await signOut();
-            onSignOut?.();
-          },
+    Alert.alert(t('settings.signOutTitle'), t('settings.signOutMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('settings.signOut'),
+        style: 'destructive',
+        onPress: async () => {
+          await signOut();
+          onSignOut?.();
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleUpgrade = () => {
@@ -323,7 +334,8 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
       if (!success) {
         Alert.alert(
           t('settings.smartWalletPermissionTitle') || 'Permission Required',
-          t('settings.smartWalletPermissionMessage') || 'Smart Wallet needs location and notification permissions to work. Please enable them in your device settings.',
+          t('settings.smartWalletPermissionMessage') ||
+            'Smart Wallet needs location and notification permissions to work. Please enable them in your device settings.',
           [{ text: t('common.ok') || 'OK' }]
         );
         return;
@@ -366,7 +378,9 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
               <SettingsRow
                 icon={<User size={20} color={colors.text.secondary} />}
                 title={user.displayName || user.email || t('settings.guest')}
-                description={user.isAnonymous ? t('settings.signInPrompt') : user.email || undefined}
+                description={
+                  user.isAnonymous ? t('settings.signInPrompt') : user.email || undefined
+                }
                 isLast={false}
               >
                 {!user.isAnonymous ? (
@@ -382,9 +396,32 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
               </SettingsRow>
 
               <SettingsRow
-                icon={<Crown size={20} color={subscriptionTier === 'lifetime' ? '#FFD700' : subscriptionState?.isAdmin ? colors.warning.main : tierConfig.id === 'free' ? colors.text.secondary : colors.primary.main} />}
-                title={subscriptionTier === 'lifetime' ? 'Lifetime Member ✨' : t('settings.subscription')}
-                description={subscriptionTier === 'lifetime' ? 'All Premium features — forever' : subscriptionState?.isAdmin ? 'Admin Access' : tierConfig.name}
+                icon={
+                  <Crown
+                    size={20}
+                    color={
+                      subscriptionTier === 'lifetime'
+                        ? '#FFD700'
+                        : subscriptionState?.isAdmin
+                          ? colors.warning.main
+                          : tierConfig.id === 'free'
+                            ? colors.text.secondary
+                            : colors.primary.main
+                    }
+                  />
+                }
+                title={
+                  subscriptionTier === 'lifetime'
+                    ? 'Lifetime Member ✨'
+                    : t('settings.subscription')
+                }
+                description={
+                  subscriptionTier === 'lifetime'
+                    ? 'All Premium features — forever'
+                    : subscriptionState?.isAdmin
+                      ? 'Admin Access'
+                      : tierConfig.name
+                }
                 isLast={subscriptionTier !== 'pro'}
                 onPress={subscriptionTier === 'free' ? handleUpgrade : undefined}
               >
@@ -401,37 +438,37 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
                     <Text style={styles.adminBadgeText}>ADMIN</Text>
                   </View>
                 )}
-                {/* TODO: Re-enable when manage-subscription edge function is deployed to Supabase
-                     The function exists in supabase/functions/manage-subscription/ but needs deployment:
-                     cd ~/Projects/rewardly && supabase functions deploy manage-subscription */}
-                {false && (subscriptionTier === 'pro' || subscriptionTier === 'max') && !subscriptionState?.isAdmin && (
-                  <TouchableOpacity 
-                    style={styles.manageButton}
-                    onPress={async () => {
-                      try {
-                        const result = await openCustomerPortal();
-                        if ('error' in result) {
-                          Alert.alert('Error', result.error);
-                        } else if (result.url) {
-                          const supported = await Linking.canOpenURL(result.url);
-                          if (supported) {
-                            await Linking.openURL(result.url);
-                          } else {
-                            Alert.alert('Error', 'Unable to open settings page');
+                {/* Subscription management — requires the manage-subscription edge function
+                    to be deployed: `supabase functions deploy manage-subscription`. */}
+                {(subscriptionTier === 'pro' || subscriptionTier === 'max') &&
+                  !subscriptionState?.isAdmin && (
+                    <TouchableOpacity
+                      style={styles.manageButton}
+                      onPress={async () => {
+                        try {
+                          const result = await openCustomerPortal();
+                          if ('error' in result) {
+                            Alert.alert('Error', result.error);
+                          } else if (result.url) {
+                            const supported = await Linking.canOpenURL(result.url);
+                            if (supported) {
+                              await Linking.openURL(result.url);
+                            } else {
+                              Alert.alert('Error', 'Unable to open settings page');
+                            }
                           }
+                        } catch (error) {
+                          console.error('Portal error:', error);
+                          Alert.alert('Error', 'Failed to open subscription management');
                         }
-                      } catch (error) {
-                        console.error('Portal error:', error);
-                        Alert.alert('Error', 'Failed to open subscription management');
-                      }
-                    }}
-                  >
-                    <Text style={styles.manageButtonText}>Manage</Text>
-                    <ChevronRight size={14} color={colors.primary.main} />
-                  </TouchableOpacity>
-                )}
+                      }}
+                    >
+                      <Text style={styles.manageButtonText}>Manage</Text>
+                      <ChevronRight size={14} color={colors.primary.main} />
+                    </TouchableOpacity>
+                  )}
               </SettingsRow>
-              
+
               {/* Sage usage for Pro users */}
               {subscriptionTier === 'pro' && sageUsage && sageUsage.limit !== null && (
                 <SettingsRow
@@ -440,11 +477,17 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
                   description={`${sageUsage.chatCount} of ${sageUsage.limit} chats used this month`}
                   isLast={false}
                 >
-                  <Text style={[
-                    styles.usageText,
-                    sageUsage.remaining !== null && sageUsage.remaining <= 2 && styles.usageTextWarning,
-                    sageUsage.remaining !== null && sageUsage.remaining === 0 && styles.usageTextDanger,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.usageText,
+                      sageUsage.remaining !== null &&
+                        sageUsage.remaining <= 2 &&
+                        styles.usageTextWarning,
+                      sageUsage.remaining !== null &&
+                        sageUsage.remaining === 0 &&
+                        styles.usageTextDanger,
+                    ]}
+                  >
                     {sageUsage.remaining ?? 0} left
                   </Text>
                 </SettingsRow>
@@ -528,11 +571,18 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
         <SectionHeader title={t('settings.smartWallet') || 'Smart Wallet'} />
         <View style={styles.section}>
           <SettingsRow
-            icon={<Navigation size={20} color={autoPilotStatus?.enabled ? colors.primary.main : colors.text.secondary} />}
+            icon={
+              <Navigation
+                size={20}
+                color={autoPilotStatus?.enabled ? colors.primary.main : colors.text.secondary}
+              />
+            }
             title={t('settings.smartWalletEnabled') || 'Enable Smart Wallet'}
             description={
               autoPilotStatus?.enabled
-                ? t('settings.smartWalletActiveDescription', { count: autoPilotStatus.activeGeofences })
+                ? t('settings.smartWalletActiveDescription', {
+                    count: autoPilotStatus.activeGeofences,
+                  })
                 : t('settings.smartWalletDescription')
             }
             isLast={true}
@@ -591,8 +641,8 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
               cardCountDetail
                 ? `${cardCountDetail}${lastSync ? ` • ${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}` : ''}`
                 : lastSync
-                ? `${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}`
-                : undefined
+                  ? `${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}`
+                  : undefined
             }
             isLast={true}
           >

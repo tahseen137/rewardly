@@ -44,26 +44,26 @@ describe('AchievementEventEmitter', () => {
     it('should emit events asynchronously (fire-and-forget)', () => {
       const mockCallback = jest.fn();
       AchievementEventEmitter.onEvent(mockCallback);
-      
+
       AchievementEventEmitter.track('card_added', { cardCount: 1 });
-      
+
       // Should not have been called yet (setImmediate)
       expect(mockCallback).not.toHaveBeenCalled();
     });
 
     it('should emit multiple events in sequence', (done) => {
       const events: AchievementEventType[] = [];
-      
+
       const mockCallback = jest.fn((event: AchievementEvent) => {
         events.push(event.type);
       });
 
       AchievementEventEmitter.onEvent(mockCallback);
-      
+
       AchievementEventEmitter.track('card_added');
       AchievementEventEmitter.track('spending_profile_saved');
       AchievementEventEmitter.track('sage_chat');
-      
+
       // Wait for all events to be processed
       setTimeout(() => {
         expect(events).toEqual(['card_added', 'spending_profile_saved', 'sage_chat']);
@@ -101,12 +101,12 @@ describe('AchievementEventEmitter', () => {
   describe('Event Subscription', () => {
     it('should allow multiple subscribers', (done) => {
       let callCount = 0;
-      
+
       const callback1 = jest.fn(() => {
         callCount++;
         if (callCount === 2) done();
       });
-      
+
       const callback2 = jest.fn(() => {
         callCount++;
         if (callCount === 2) done();
@@ -114,7 +114,7 @@ describe('AchievementEventEmitter', () => {
 
       AchievementEventEmitter.onEvent(callback1);
       AchievementEventEmitter.onEvent(callback2);
-      
+
       AchievementEventEmitter.track('card_added');
     });
 
@@ -123,9 +123,9 @@ describe('AchievementEventEmitter', () => {
 
       AchievementEventEmitter.onEvent(callback);
       AchievementEventEmitter.offEvent(callback);
-      
+
       AchievementEventEmitter.track('card_added');
-      
+
       // Wait for async event processing
       setImmediate(() => {
         expect(callback).not.toHaveBeenCalled();
@@ -137,7 +137,7 @@ describe('AchievementEventEmitter', () => {
       const callback = jest.fn();
       AchievementEventEmitter.onEvent(callback);
       AchievementEventEmitter.offEvent(callback);
-      
+
       // Should not throw
       expect(() => {
         AchievementEventEmitter.track('card_added');
@@ -172,10 +172,10 @@ describe('AchievementEventEmitter', () => {
     it('should remove all listeners', () => {
       const callback = jest.fn();
       AchievementEventEmitter.onEvent(callback);
-      
+
       AchievementEventEmitter.reset();
       AchievementEventEmitter.track('card_added');
-      
+
       setImmediate(() => {
         expect(callback).not.toHaveBeenCalled();
       });
@@ -183,12 +183,12 @@ describe('AchievementEventEmitter', () => {
 
     it('should allow re-subscribing after reset', (done) => {
       AchievementEventEmitter.reset();
-      
+
       const callback = jest.fn((event: AchievementEvent) => {
         expect(event.type).toBe('card_added');
         done();
       });
-      
+
       AchievementEventEmitter.onEvent(callback);
       AchievementEventEmitter.track('card_added');
     });
@@ -217,17 +217,17 @@ describe('AchievementEventEmitter', () => {
 
     it('should handle all achievement event types', (done) => {
       const receivedTypes: AchievementEventType[] = [];
-      
+
       const callback = jest.fn((event: AchievementEvent) => {
         receivedTypes.push(event.type);
       });
 
       AchievementEventEmitter.onEvent(callback);
-      
-      allEventTypes.forEach(type => {
+
+      allEventTypes.forEach((type) => {
         AchievementEventEmitter.track(type);
       });
-      
+
       // Wait for all events to be processed
       setTimeout(() => {
         expect(receivedTypes).toEqual(allEventTypes);
@@ -244,7 +244,7 @@ describe('AchievementEventEmitter', () => {
       });
 
       AchievementEventEmitter.onEvent(badCallback);
-      
+
       // Should not throw - event emission is fire-and-forget
       expect(() => {
         AchievementEventEmitter.track('card_added');
@@ -255,7 +255,7 @@ describe('AchievementEventEmitter', () => {
       const badCallback = jest.fn(() => {
         throw new Error('Bad callback');
       });
-      
+
       const goodCallback = jest.fn((event: AchievementEvent) => {
         expect(event.type).toBe('card_added');
         done();
@@ -263,7 +263,7 @@ describe('AchievementEventEmitter', () => {
 
       AchievementEventEmitter.onEvent(badCallback);
       AchievementEventEmitter.onEvent(goodCallback);
-      
+
       AchievementEventEmitter.track('card_added');
     });
   });

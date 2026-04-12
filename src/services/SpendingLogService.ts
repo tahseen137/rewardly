@@ -1,6 +1,6 @@
 /**
  * SpendingLogService - Manual purchase logging with rewards tracking
- * 
+ *
  * Tier: Free (last 10 entries), Pro+ (unlimited)
  * Syncs with Supabase, calculates optimal cards and missed rewards
  */
@@ -84,28 +84,28 @@ export async function getSpendingEntries(
   // Apply filters
   if (filter) {
     if (filter.cardId) {
-      filtered = filtered.filter(e => e.cardUsed === filter.cardId);
+      filtered = filtered.filter((e) => e.cardUsed === filter.cardId);
     }
     if (filter.category) {
-      filtered = filtered.filter(e => e.category === filter.category);
+      filtered = filtered.filter((e) => e.category === filter.category);
     }
     if (filter.startDate) {
-      filtered = filtered.filter(e => new Date(e.transactionDate) >= filter.startDate!);
+      filtered = filtered.filter((e) => new Date(e.transactionDate) >= filter.startDate!);
     }
     if (filter.endDate) {
-      filtered = filtered.filter(e => new Date(e.transactionDate) <= filter.endDate!);
+      filtered = filtered.filter((e) => new Date(e.transactionDate) <= filter.endDate!);
     }
   }
 
   // Sort by date descending
-  filtered.sort((a, b) => 
-    new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
+  filtered.sort(
+    (a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
   );
 
   // Apply tier limit
   const tier = getCurrentTierSync();
   const maxEntries = limit || getEntryLimitForTier(tier);
-  
+
   if (maxEntries !== Infinity) {
     filtered = filtered.slice(0, maxEntries);
   }
@@ -142,7 +142,10 @@ export async function getSpendingSummary(filter?: SpendingFilter): Promise<Spend
  * Add a spending entry
  */
 export async function addSpendingEntry(
-  entry: Omit<SpendingEntry, 'id' | 'userId' | 'optimalCard' | 'rewardsEarned' | 'rewardsMissed' | 'createdAt' | 'updatedAt'>
+  entry: Omit<
+    SpendingEntry,
+    'id' | 'userId' | 'optimalCard' | 'rewardsEarned' | 'rewardsMissed' | 'createdAt' | 'updatedAt'
+  >
 ): Promise<SpendingEntry> {
   if (!isInitialized) await initializeSpendingLog();
 
@@ -151,9 +154,7 @@ export async function addSpendingEntry(
   const optimalCard = optimalCardData?.card.id;
 
   const usedCard = getCardByIdSync(entry.cardUsed);
-  const rewardsEarned = usedCard 
-    ? calculateReward(usedCard, entry.category, entry.amount)
-    : 0;
+  const rewardsEarned = usedCard ? calculateReward(usedCard, entry.category, entry.amount) : 0;
 
   const optimalCardObj = optimalCard ? getCardByIdSync(optimalCard) : null;
   const optimalRewards = optimalCardObj
@@ -195,21 +196,19 @@ export async function updateSpendingEntry(
   if (!isInitialized) await initializeSpendingLog();
   if (!spendingCache) throw new Error('Spending cache not initialized');
 
-  const index = spendingCache.findIndex(e => e.id === id);
+  const index = spendingCache.findIndex((e) => e.id === id);
   if (index === -1) throw new Error(`Entry ${id} not found`);
 
   // Recalculate rewards if amount, category, or card changed
   let recalculated = {};
   if (updates.amount || updates.category || updates.cardUsed) {
     const entry = { ...spendingCache[index], ...updates };
-    
+
     const optimalCardData = await getBestCardForCategory(entry.category);
     const optimalCard = optimalCardData?.card.id;
 
     const usedCard = getCardByIdSync(entry.cardUsed);
-    const rewardsEarned = usedCard 
-      ? calculateReward(usedCard, entry.category, entry.amount)
-      : 0;
+    const rewardsEarned = usedCard ? calculateReward(usedCard, entry.category, entry.amount) : 0;
 
     const optimalCardObj = optimalCard ? getCardByIdSync(optimalCard) : null;
     const optimalRewards = optimalCardObj
@@ -248,7 +247,7 @@ export async function deleteSpendingEntry(id: string): Promise<void> {
   if (!isInitialized) await initializeSpendingLog();
   if (!spendingCache) return;
 
-  const index = spendingCache.findIndex(e => e.id === id);
+  const index = spendingCache.findIndex((e) => e.id === id);
   if (index === -1) return;
 
   spendingCache.splice(index, 1);
@@ -269,7 +268,10 @@ export async function deleteSpendingEntry(id: string): Promise<void> {
 /**
  * Calculate optimal card for a purchase
  */
-export async function calculateOptimalCard(amount: number, category: SpendingCategory): Promise<string | undefined> {
+export async function calculateOptimalCard(
+  amount: number,
+  category: SpendingCategory
+): Promise<string | undefined> {
   const best = await getBestCardForCategory(category);
   return best?.card.id;
 }
@@ -277,7 +279,11 @@ export async function calculateOptimalCard(amount: number, category: SpendingCat
 /**
  * Calculate rewards for a specific card and category
  */
-export function calculateRewards(amount: number, cardId: string, category: SpendingCategory): number {
+export function calculateRewards(
+  amount: number,
+  cardId: string,
+  category: SpendingCategory
+): number {
   const card = getCardByIdSync(cardId);
   if (!card) return 0;
   return calculateReward(card, category, amount);
@@ -289,9 +295,9 @@ export function calculateRewards(amount: number, cardId: string, category: Spend
 
 async function persistToStorage(): Promise<void> {
   if (!spendingCache) return;
-  
+
   const serialized = JSON.stringify(
-    spendingCache.map(entry => ({
+    spendingCache.map((entry) => ({
       ...entry,
       transactionDate: entry.transactionDate.toISOString(),
       createdAt: entry.createdAt.toISOString(),
@@ -369,9 +375,7 @@ async function syncToSupabase(entry: SpendingEntry): Promise<void> {
     notes: entry.notes,
   };
 
-  const { error } = await supabase
-    .from('spending_log')
-    .upsert(row as any);
+  const { error } = await supabase.from('spending_log').upsert(row as any);
 
   if (error) {
     console.error('[SpendingLogService] Sync to Supabase error:', error);
