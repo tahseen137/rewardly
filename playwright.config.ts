@@ -13,12 +13,26 @@ export default defineConfig({
     trace: 'on-first-retry',
     // Give SPA time to render
     actionTimeout: 15_000,
+
+    // Visual regression defaults — lenient enough for anti-aliasing + sub-pixel
+    // differences across platforms while still catching real layout breaks.
+    screenshot: 'only-on-failure',
+    toHaveScreenshot: {
+      // Up to 3% of pixels may differ (covers font-hinting, GPU rasterization)
+      maxDiffPixelRatio: 0.03,
+      // Per-pixel colour tolerance (0–1); 0.15 covers minor gamma differences
+      threshold: 0.15,
+      animations: 'disabled',
+    },
   },
 
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
     },
   ],
 });
