@@ -106,7 +106,9 @@ export default function Paywall({
 
   // Fetch live lifetime spots count
   useEffect(() => {
-    getLifetimeSpotsRemaining().then(setLifetimeSpotsRemaining).catch(() => {});
+    getLifetimeSpotsRemaining()
+      .then(setLifetimeSpotsRemaining)
+      .catch(() => {});
   }, []);
 
   // Show Pro, Max, and Lifetime tiers
