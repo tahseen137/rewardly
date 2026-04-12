@@ -1,8 +1,8 @@
 # Rewardly 🇨🇦
 
-**Maximize your credit card rewards with smart, real-time recommendations.**
+**Find the best card for every purchase.**
 
-Rewardly helps Canadians earn more rewards by instantly showing which card to use at any store. Built with React Native and Expo for iOS, Android, and Web.
+Rewardly helps Canadians earn more rewards with smart recommendations for 410+ credit cards. Built with React Native and Expo for iOS, Android, and Web.
 
 ---
 
