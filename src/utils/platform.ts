@@ -1,16 +1,16 @@
 /**
  * Platform Utilities - Web-Safe Native Module Wrappers
- * 
+ *
  * This module provides graceful fallbacks for native-only features on web.
  * Import from here instead of directly from native modules to ensure
  * web compatibility.
- * 
+ *
  * NEVER import directly from:
  * - expo-haptics
- * - expo-location  
+ * - expo-location
  * - react-native-reanimated (for layout animations)
  * - expo-notifications (for push tokens)
- * 
+ *
  * Instead, use the safe wrappers exported from this module.
  */
 
@@ -67,11 +67,11 @@ type HapticStyle = 'light' | 'medium' | 'heavy' | 'selection' | 'success' | 'war
  */
 export async function haptic(style: HapticStyle = 'light'): Promise<void> {
   if (isWeb) return;
-  
+
   try {
     // Dynamic import to avoid bundling on web
     const Haptics = await import('expo-haptics');
-    
+
     switch (style) {
       case 'light':
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -131,7 +131,7 @@ export async function requestLocationPermission(): Promise<boolean> {
       return false;
     }
   }
-  
+
   try {
     const Location = await import('expo-location');
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -153,7 +153,7 @@ export async function getCurrentLocation(): Promise<LocationResult> {
         resolve({ success: false, error: 'Geolocation not supported' });
         return;
       }
-      
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
           resolve({
@@ -172,7 +172,7 @@ export async function getCurrentLocation(): Promise<LocationResult> {
       );
     });
   }
-  
+
   try {
     const Location = await import('expo-location');
     const location = await Location.getCurrentPositionAsync({
@@ -183,7 +183,7 @@ export async function getCurrentLocation(): Promise<LocationResult> {
       coords: {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
-        accuracy: location.coords.accuracy,
+        accuracy: location.coords.accuracy ?? undefined,
       },
     };
   } catch (e) {
@@ -235,7 +235,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
     const result = await Notification.requestPermission();
     return result === 'granted';
   }
-  
+
   try {
     const Notifications = await import('expo-notifications');
     const { status } = await Notifications.requestPermissionsAsync();
@@ -258,7 +258,7 @@ export const features = {
   biometrics: isNative,
   nfc: isNative && isAndroid,
   layoutAnimations: isNative,
-  
+
   // Web has these
   geolocation: true, // Both native and web support this
   localStorage: isWeb,
