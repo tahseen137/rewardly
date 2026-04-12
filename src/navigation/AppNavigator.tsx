@@ -538,11 +538,11 @@ export default function AppNavigator() {
         if (!onboardingDone && isSupabaseConfigured() && supabase && !authUser.isAnonymous) {
           try {
             const { data: profile } = await supabase
-              .from('user_profiles')
+              .from('user_profiles' as any)
               .select('onboarding_complete')
               .eq('id', authUser.id)
               .single();
-            if (profile?.onboarding_complete) {
+            if ((profile as any)?.onboarding_complete) {
               onboardingDone = true;
               await setOnboardingComplete(true);
             }
@@ -567,11 +567,11 @@ export default function AppNavigator() {
     if (!onboardingDone && currentUser && !currentUser.isAnonymous && isSupabaseConfigured() && supabase) {
       try {
         const { data: profile } = await supabase
-          .from('user_profiles')
+          .from('user_profiles' as any)
           .select('onboarding_complete')
           .eq('id', currentUser.id)
           .single();
-        if (profile?.onboarding_complete) {
+        if ((profile as any)?.onboarding_complete) {
           onboardingDone = true;
           await setOnboardingComplete(true);
         }
@@ -587,8 +587,8 @@ export default function AppNavigator() {
     if (isSupabaseConfigured() && supabase && user && !user.isAnonymous) {
       try {
         await supabase
-          .from('user_profiles')
-          .upsert({ id: user.id, onboarding_complete: true, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+          .from('user_profiles' as any)
+          .upsert({ id: user.id, onboarding_complete: true, updated_at: new Date().toISOString() } as any, { onConflict: 'id' });
       } catch (e) {
         console.warn('Failed to sync onboarding to Supabase:', e);
       }
@@ -673,7 +673,7 @@ function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignI
       </RootStack.Screen>
       <RootStack.Screen
         name="Upgrade"
-        component={UpgradeScreen}
+        component={UpgradeScreen as any}
         options={{
           presentation: 'modal',
           animation: 'slide_from_bottom',

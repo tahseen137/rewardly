@@ -35,14 +35,13 @@ import {
   ISSUER_RULES,
 } from '../services/ApplicationTrackerService';
 import { getAllCardsSync } from '../services/CardDataService';
-import { canAccessFeatureSync, getCurrentTierSync } from '../services/SubscriptionService';
+import { canAccessFeatureSync, getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
 import {
   ApplicationTracker,
   CardApplication,
   ApplicationStatus,
   IssuerCooldownStatus,
   ApplicationTimelineEvent,
-  SubscriptionTier,
 } from '../types';
 
 type ViewMode = 'overview' | 'add';
@@ -343,7 +342,7 @@ export default function ApplicationTrackerScreen() {
             </View>
             <TouchableOpacity 
               style={styles.tierGateButton}
-              onPress={() => navigation.navigate('Upgrade' as never, { feature: 'application_tracker' } as never)}
+              onPress={() => (navigation as any).navigate('Upgrade', { feature: 'application_tracker' })}
             >
               <Text style={styles.tierGateButtonText}>Upgrade</Text>
             </TouchableOpacity>
@@ -448,7 +447,7 @@ export default function ApplicationTrackerScreen() {
             </View>
             <TouchableOpacity 
               style={styles.tierGateButton}
-              onPress={() => navigation.navigate('Upgrade' as never, { feature: 'strategy_advisor' } as never)}
+              onPress={() => (navigation as any).navigate('Upgrade', { feature: 'strategy_advisor' })}
             >
               <Text style={styles.tierGateButtonText}>Upgrade</Text>
             </TouchableOpacity>
@@ -607,7 +606,7 @@ const createStyles = (theme: Theme) =>
       gap: 12,
     },
     cooldownCard: {
-      width: Platform.OS === 'web' ? 'calc(50% - 6px)' : '48%',
+      width: Platform.OS === 'web' ? ('calc(50% - 6px)' as any) : '48%',
       backgroundColor: colors.background.secondary,
       borderRadius: 12,
       padding: 16,
@@ -703,7 +702,7 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: 12,
       paddingVertical: 4,
       borderRadius: 8,
-      backgroundColor: colors.error.bg20,
+      backgroundColor: colors.error.background,
     },
     deleteButtonText: {
       fontSize: 12,
@@ -767,7 +766,7 @@ const createStyles = (theme: Theme) =>
       gap: 12,
     },
     alertCard: {
-      backgroundColor: colors.warning.bg20,
+      backgroundColor: colors.warning.background,
       borderRadius: 12,
       padding: 16,
       flexDirection: 'row',

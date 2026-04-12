@@ -75,7 +75,7 @@ export function ReferralDashboardScreen() {
     if (!stats?.referralLink) return;
 
     try {
-      await Clipboard.setStringAsync(stats.referralLink);
+      Clipboard.setString(stats.referralLink);
       setCopiedTooltip(true);
       setTimeout(() => setCopiedTooltip(false), 2000);
     } catch (err) {

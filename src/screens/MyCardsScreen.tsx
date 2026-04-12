@@ -460,7 +460,7 @@ export default function MyCardsScreen() {
   const [isLoadingCards, setIsLoadingCards] = useState(false);
   // Navigate to CardDetail when a card is tapped
   const handleViewDetails = useCallback((card: Card) => {
-    navigation.navigate('CardDetail' as never, { cardId: card.id } as never);
+    (navigation as any).navigate('CardDetail', { cardId: card.id });
   }, [navigation]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 

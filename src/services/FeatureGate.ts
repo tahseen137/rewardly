@@ -3,7 +3,7 @@
  * Controls access to features based on subscription tier
  */
 
-import { SubscriptionTier, getCurrentTierSync, canAccessSync, hasExceededLimit, incrementUsage, showPaywall } from './SubscriptionService';
+import { SubscriptionTier, getCurrentTierSync, canUseSage, incrementSageUsage } from './SubscriptionService';
 
 // ============================================================================
 // Types
@@ -63,14 +63,14 @@ export const FEATURE_CONFIGS: Record<Feature, FeatureConfig> = {
     id: 'location_recommendations',
     name: 'Location-Based Recommendations',
     description: 'Get card suggestions based on your location',
-    requiredTier: 'plus',
+    requiredTier: 'pro',
     hasUsageLimit: false,
   },
   expert_consultation: {
     id: 'expert_consultation',
     name: 'Expert Consultations',
     description: 'Book 1-on-1 calls with rewards experts',
-    requiredTier: 'elite',
+    requiredTier: 'max',
     hasUsageLimit: true,
     limitType: 'monthly',
   },
@@ -78,21 +78,21 @@ export const FEATURE_CONFIGS: Record<Feature, FeatureConfig> = {
     id: 'family_sharing',
     name: 'Family Sharing',
     description: 'Share your subscription with up to 5 family members',
-    requiredTier: 'elite',
+    requiredTier: 'max',
     hasUsageLimit: false,
   },
   unlimited_recommendations: {
     id: 'unlimited_recommendations',
     name: 'Unlimited Recommendations',
     description: 'Get unlimited card recommendations',
-    requiredTier: 'plus',
+    requiredTier: 'pro',
     hasUsageLimit: false,
   },
   unlimited_ai: {
     id: 'unlimited_ai',
     name: 'Unlimited AI Questions',
     description: 'Ask unlimited questions to Sage',
-    requiredTier: 'plus',
+    requiredTier: 'pro',
     hasUsageLimit: false,
   },
   benefits_tracking: {
@@ -113,7 +113,7 @@ export const FEATURE_CONFIGS: Record<Feature, FeatureConfig> = {
     id: 'point_valuations',
     name: 'Point Valuations',
     description: 'See real-time point and mile valuations',
-    requiredTier: 'plus',
+    requiredTier: 'pro',
     hasUsageLimit: false,
   },
   export_reports: {
@@ -127,7 +127,7 @@ export const FEATURE_CONFIGS: Record<Feature, FeatureConfig> = {
     id: 'concierge_service',
     name: 'Concierge Service',
     description: 'Get personalized booking assistance',
-    requiredTier: 'elite',
+    requiredTier: 'max',
     hasUsageLimit: false,
   },
 };
@@ -138,9 +138,10 @@ export const FEATURE_CONFIGS: Record<Feature, FeatureConfig> = {
 
 const TIER_HIERARCHY: Record<SubscriptionTier, number> = {
   free: 0,
-  plus: 1,
-  pro: 2,
-  elite: 3,
+  pro: 1,
+  max: 2,
+  lifetime: 3,
+  admin: 4,
 };
 
 // ============================================================================
@@ -197,9 +198,9 @@ export async function checkFeatureAccess(feature: Feature): Promise<FeatureCheck
   // Check usage limits for applicable features
   if (config.hasUsageLimit) {
     const limitFeature = mapFeatureToUsageType(feature);
-    if (limitFeature) {
-      const exceeded = await hasExceededLimit(limitFeature);
-      if (exceeded) {
+    if (limitFeature === 'ai_questions') {
+      const sageResult = await canUseSage();
+      if (!sageResult.allowed) {
         return {
           enabled: false,
           reason: 'limit_exceeded',
@@ -234,8 +235,8 @@ function mapFeatureToUsageType(feature: Feature): 'recommendations' | 'ai_questi
  */
 export async function trackFeatureUsage(feature: Feature): Promise<void> {
   const usageType = mapFeatureToUsageType(feature);
-  if (usageType) {
-    await incrementUsage(usageType);
+  if (usageType === 'ai_questions') {
+    await incrementSageUsage();
   }
 }
 
@@ -280,13 +281,7 @@ export async function withFeatureGate<T>(
   const access = await checkFeatureAccess(feature);
   
   if (!access.enabled) {
-    if (access.showPaywall) {
-      const subscribed = await showPaywall();
-      if (subscribed) {
-        // Retry after subscription
-        return action();
-      }
-    }
+    // Paywall should be shown by the calling UI component
     return null;
   }
   
@@ -317,9 +312,10 @@ export function getUpgradeMessage(feature: Feature): string {
   const config = FEATURE_CONFIGS[feature];
   const tierNames: Record<SubscriptionTier, string> = {
     free: 'Free',
-    plus: 'Plus',
     pro: 'Pro',
-    elite: 'Elite',
+    max: 'Max',
+    lifetime: 'Lifetime',
+    admin: 'Admin',
   };
   
   return `Upgrade to ${tierNames[config.requiredTier]} to unlock ${config.name}`;

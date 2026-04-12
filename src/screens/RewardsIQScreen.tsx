@@ -80,7 +80,7 @@ function ScoreGauge({ score, size = 220 }: ScoreGaugeProps) {
     const strokeDashoffset = circumference * (1 - progress.value);
     return {
       strokeDashoffset,
-    };
+    } as any;
   });
   
   // Determine color based on score
@@ -141,7 +141,7 @@ function ScoreGauge({ score, size = 220 }: ScoreGaugeProps) {
           strokeDasharray={circumference}
           strokeLinecap="round"
           transform={`rotate(-90, ${size / 2}, ${size / 2})`}
-          style={animatedStrokeStyle}
+          {...{ style: animatedStrokeStyle } as any}
         />
       </Svg>
       

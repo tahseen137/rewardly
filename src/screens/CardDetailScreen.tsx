@@ -172,25 +172,27 @@ export default function CardDetailScreen() {
 
   // Get all reward rates sorted by value
   const rewardRates = useMemo(() => {
-    if (!card?.rewardRates) return [];
-    
+    if (!card) return [];
+
     const rates: { category: string; rate: number; isBase: boolean }[] = [];
-    
-    // Add category-specific rates
-    Object.entries(card.rewardRates).forEach(([category, rate]) => {
-      if (category !== 'base' && rate > 0) {
-        rates.push({ category, rate, isBase: false });
-      }
-    });
-    
+
+    // Add category-specific rates from categoryRewards
+    if (card.categoryRewards) {
+      card.categoryRewards.forEach((cr) => {
+        if (cr.rewardRate.value > 0) {
+          rates.push({ category: cr.category, rate: cr.rewardRate.value, isBase: false });
+        }
+      });
+    }
+
     // Sort by rate descending
     rates.sort((a, b) => b.rate - a.rate);
-    
+
     // Add base rate at the end
-    if (card.rewardRates.base) {
-      rates.push({ category: 'base', rate: card.rewardRates.base, isBase: true });
+    if (card.baseRewardRate) {
+      rates.push({ category: 'base', rate: card.baseRewardRate.value, isBase: true });
     }
-    
+
     return rates;
   }, [card]);
 
@@ -202,10 +204,10 @@ export default function CardDetailScreen() {
 
   const handleViewAllBenefits = useCallback(() => {
     // Navigate to CardBenefits in Insights stack for full benefits view
-    navigation.navigate('Insights' as never, { 
-      screen: 'CardBenefits', 
-      params: { cardId } 
-    } as never);
+    (navigation as any).navigate('Insights', {
+      screen: 'CardBenefits',
+      params: { cardId }
+    });
   }, [navigation, cardId]);
 
   if (!card) {
@@ -246,8 +248,8 @@ export default function CardDetailScreen() {
           </View>
           <Text style={styles.cardName}>{card.name}</Text>
           <Text style={styles.cardIssuer}>{card.issuer}</Text>
-          {card.network && (
-            <Text style={styles.cardNetwork}>{card.network}</Text>
+          {card.rewardProgram && (
+            <Text style={styles.cardNetwork}>{card.rewardProgram}</Text>
           )}
         </View>
 
@@ -353,9 +355,9 @@ export default function CardDetailScreen() {
               </Text>
               <TouchableOpacity
                 style={styles.ctaButton}
-                onPress={() => navigation.navigate('Insights' as never, { 
-                  screen: 'WalletOptimizer' 
-                } as never)}
+                onPress={() => (navigation as any).navigate('Insights', {
+                  screen: 'WalletOptimizer'
+                })}
               >
                 <Text style={styles.ctaButtonText}>Set Up Profile</Text>
               </TouchableOpacity>

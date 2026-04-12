@@ -76,8 +76,8 @@ function getCategoryIcon(category: string) {
 }
 
 function getCategoryColor(category: string) {
-  if (category.includes('Airline')) return colors.accent.purple;
-  if (category.includes('Hotel')) return colors.secondary.blue;
+  if (category.includes('Airline')) return colors.accent.main;
+  if (category.includes('Hotel')) return colors.info.main;
   return colors.primary.main;
 }
 

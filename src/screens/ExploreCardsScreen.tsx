@@ -446,7 +446,7 @@ const CardItem: React.FC<CardItemProps> = ({ card, onApply, onPress }) => {
         <View style={cardStyles.detailRow}>
           <Text style={cardStyles.detailLabel}>Annual Fee</Text>
           <Text style={cardStyles.detailValue}>
-            {card.annualFee > 0 ? `$${card.annualFee}` : 'No fee'}
+            {(card.annualFee ?? 0) > 0 ? `$${card.annualFee}` : 'No fee'}
           </Text>
         </View>
 
@@ -673,16 +673,16 @@ export default function ExploreCardsScreen() {
     // Annual fee filter
     switch (filters.annualFeeRange) {
       case 'free':
-        result = result.filter((card) => card.annualFee === 0);
+        result = result.filter((card) => (card.annualFee ?? 0) === 0);
         break;
       case 'low':
-        result = result.filter((card) => card.annualFee > 0 && card.annualFee < 100);
+        result = result.filter((card) => (card.annualFee ?? 0) > 0 && (card.annualFee ?? 0) < 100);
         break;
       case 'medium':
-        result = result.filter((card) => card.annualFee >= 100 && card.annualFee < 300);
+        result = result.filter((card) => (card.annualFee ?? 0) >= 100 && (card.annualFee ?? 0) < 300);
         break;
       case 'premium':
-        result = result.filter((card) => card.annualFee >= 300);
+        result = result.filter((card) => (card.annualFee ?? 0) >= 300);
         break;
     }
 
@@ -692,7 +692,7 @@ export default function ExploreCardsScreen() {
         result.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'fee':
-        result.sort((a, b) => a.annualFee - b.annualFee);
+        result.sort((a, b) => (a.annualFee ?? 0) - (b.annualFee ?? 0));
         break;
       case 'signup_bonus':
         result.sort((a, b) => {
@@ -721,7 +721,7 @@ export default function ExploreCardsScreen() {
 
   // Handle card press — navigate to detail
   const handleCardPress = useCallback((card: Card) => {
-    navigation.navigate('CardDetail' as never, { cardId: card.id } as never);
+    (navigation as any).navigate('CardDetail', { cardId: card.id });
   }, [navigation]);
 
   // Handle apply button

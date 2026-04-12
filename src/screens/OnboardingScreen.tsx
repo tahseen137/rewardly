@@ -124,7 +124,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       cards = cards.filter(card => 
         popularCardIds.some(popId => 
           card.id.toLowerCase().includes(popId.toLowerCase()) ||
-          card.cardId?.toLowerCase().includes(popId.toLowerCase())
+          card.name.toLowerCase().includes(popId.toLowerCase())
         )
       );
     } else if (cardViewMode === 'search' || searchQuery.trim()) {

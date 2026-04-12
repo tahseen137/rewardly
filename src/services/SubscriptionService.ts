@@ -22,7 +22,7 @@ export type SubscriptionTier = 'free' | 'pro' | 'max' | 'lifetime' | 'admin';
 
 export type BillingPeriod = 'monthly' | 'annual';
 
-export type Feature = 
+export type Feature =
   | 'unlimited_cards'
   | 'insights'
   | 'points_valuator'
@@ -31,7 +31,10 @@ export type Feature =
   | 'smartwallet'
   | 'multi_country'
   | 'export'
-  | 'family_sharing';
+  | 'family_sharing'
+  | 'benefits_tracking'
+  | 'wallet_optimizer'
+  | 'concierge_service';
 
 export interface TierConfig {
   id: SubscriptionTier;

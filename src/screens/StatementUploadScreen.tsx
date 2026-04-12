@@ -66,10 +66,11 @@ export default function StatementUploadScreen() {
           copyToCacheDirectory: true,
         });
 
-        if (result.type === 'success') {
-          const response = await fetch(result.uri);
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+          const asset = result.assets[0];
+          const response = await fetch(asset.uri);
           const text = await response.text();
-          parseCSVContent(text, result.name);
+          parseCSVContent(text, asset.name);
         }
       }
     } catch (error) {

@@ -439,10 +439,8 @@ export default function HomeScreen() {
               t('home.noCardsMessage') ||
               'Add your credit cards to see personalized recommendations and maximize your rewards'
             }
-            action={{
-              label: t('home.addCards') || 'Add Cards',
-              onPress: () => navigation.navigate('MyCards' as never),
-            }}
+            actionLabel={t('home.addCards') || 'Add Cards'}
+            onAction={() => (navigation as any).navigate('MyCards')}
           />
         ) : state.results ? (
           <View>
@@ -458,7 +456,7 @@ export default function HomeScreen() {
               cards={getAllCardsSync()}
               category={state.selectedCategory || undefined}
               onCardPress={(result) =>
-                navigation.navigate('CardDetail' as never, { cardId: result.cardId } as never)
+                (navigation as any).navigate('CardDetail', { cardId: result.cardId })
               }
             />
           </View>
@@ -492,7 +490,7 @@ export default function HomeScreen() {
               </View>
               <TouchableOpacity
                 style={styles.seeAllButton}
-                onPress={() => navigation.navigate('Insights', { screen: 'ExploreCards' } as never)}
+                onPress={() => (navigation as any).navigate('Insights', { screen: 'ExploreCards' })}
                 accessibilityRole="button"
                 accessibilityLabel="Explore all cards"
               >
@@ -515,7 +513,7 @@ export default function HomeScreen() {
                       key={rec.card.id}
                       style={styles.recommendationItem}
                       onPress={() =>
-                        navigation.navigate('CardDetail' as never, { cardId: rec.card.id } as never)
+                        (navigation as any).navigate('CardDetail', { cardId: rec.card.id })
                       }
                       accessibilityRole="button"
                       accessibilityLabel={`View ${rec.card.name} details`}

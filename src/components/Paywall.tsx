@@ -73,7 +73,7 @@ function getTierIcon(tier: SubscriptionTier) {
 /**
  * Get tier gradient colors
  */
-function getTierGradient(tier: SubscriptionTier): string[] {
+function getTierGradient(tier: SubscriptionTier): [string, string] {
   switch (tier) {
     case 'pro':
       return [colors.primary.main, colors.primary.dark];
@@ -312,7 +312,7 @@ export default function Paywall({
             activeOpacity={0.7}
           >
             <LinearGradient
-              colors={['#FFD70015', '#FF8C0010']}
+              colors={['#FFD70015', '#FF8C0010'] as [string, string]}
               style={styles.lifetimeGradient}
             >
               <View style={styles.lifetimeBadgeRow}>

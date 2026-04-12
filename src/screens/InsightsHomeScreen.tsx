@@ -173,11 +173,11 @@ export default function InsightsHomeScreen() {
   const scoreStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scoreScale.value }],
     opacity: scoreScale.value,
-  }));
-  
+  } as any));
+
   const pulseStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pulseScale.value }],
-  }));
+  } as any));
   
   const getScoreColor = (score: number) => {
     if (score >= 80) return colors.primary.main;
@@ -248,7 +248,7 @@ export default function InsightsHomeScreen() {
               style={scoreStyle}
             >
               <LinearGradient
-                colors={[colors.background.secondary, colors.background.tertiary]}
+                colors={[colors.background.secondary, colors.background.tertiary] as [string, string]}
                 style={styles.heroCard}
               >
                 {/* Score Circle */}
@@ -261,7 +261,7 @@ export default function InsightsHomeScreen() {
                       colors={[
                         getScoreColor(rewardsIQ.overallScore),
                         getScoreColor(rewardsIQ.overallScore) + 'CC'
-                      ]}
+                      ] as [string, string]}
                       style={styles.scoreGradient}
                     >
                       <Text style={styles.scoreNumber}>{rewardsIQ.overallScore}</Text>

@@ -152,7 +152,7 @@ export default function NotificationsScreen() {
 
     // Navigate if actionUrl exists
     if (notification.actionUrl) {
-      navigation.navigate(notification.actionUrl as any, notification.actionData);
+      (navigation as any).navigate(notification.actionUrl, notification.actionData);
     }
   }, [navigation, loadNotifications]);
 

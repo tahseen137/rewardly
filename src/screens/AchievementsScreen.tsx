@@ -445,7 +445,7 @@ const createStyles = (theme: Theme) =>
       gap: 12,
     },
     achievementCard: {
-      width: Platform.OS === 'web' ? 'calc(50% - 6px)' : '48%',
+      width: Platform.OS === 'web' ? ('calc(50% - 6px)' as any) : '48%',
       backgroundColor: colors.background.secondary,
       borderRadius: 12,
       padding: 16,

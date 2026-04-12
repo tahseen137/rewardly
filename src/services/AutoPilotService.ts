@@ -460,15 +460,15 @@ async function registerGeofenceTask(): Promise<void> {
   const isRegistered = await TaskManager.isTaskRegisteredAsync(GEOFENCE_TASK_NAME);
   
   if (!isRegistered) {
-    TaskManager.defineTask(GEOFENCE_TASK_NAME, ({ data, error }: TaskManager.TaskManagerTaskBody<{ eventType: Location.GeofencingEventType; region: Location.LocationRegion }>) => {
+    TaskManager.defineTask(GEOFENCE_TASK_NAME, async ({ data, error }: TaskManager.TaskManagerTaskBody<{ eventType: Location.GeofencingEventType; region: Location.LocationRegion }>) => {
       if (error) {
         console.error('[AutoPilot] Geofence task error:', error);
         return;
       }
-      
+
       if (data) {
         const { eventType, region } = data;
-        handleGeofenceEvent(eventType, region);
+        await handleGeofenceEvent(eventType, region);
       }
     });
     
@@ -544,23 +544,23 @@ async function handleGeofenceEvent(
     return; // Only care about entering
   }
   
-  const geofenceId = region.identifier;
+  const geofenceId = region.identifier ?? '';
   const geofence = cachedGeofences.find(g => g.id === geofenceId);
-  
+
   if (!geofence) {
     console.log('[AutoPilot] Unknown geofence:', geofenceId);
     return;
   }
-  
+
   // Check cooldown
   if (await isOnCooldown(geofenceId)) {
     console.log('[AutoPilot] Geofence on cooldown:', geofence.merchantName);
     return;
   }
-  
+
   // Get best card recommendation
   const recommendation = await getBestCardForCategory(geofence.category);
-  
+
   if (recommendation) {
     await sendNotification(geofence, recommendation);
     await updateLastNotified(geofenceId);

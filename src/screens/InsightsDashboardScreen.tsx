@@ -86,7 +86,7 @@ export default function InsightsDashboardScreen() {
       const result = generateSpendingInsights(transactions, cardObjects);
       
       if (!result.success) {
-        setError(result.error.message);
+        setError('message' in result.error ? result.error.message : `Insufficient data: ${result.error.transactionCount} transactions (need ${result.error.minimumRequired})`);
         setLoading(false);
         return;
       }

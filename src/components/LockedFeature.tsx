@@ -63,7 +63,7 @@ function getTierIcon(tier: SubscriptionTier, size: number = 24) {
 /**
  * Get tier gradient colors
  */
-function getTierGradient(tier: SubscriptionTier): string[] {
+function getTierGradient(tier: SubscriptionTier): [string, string] {
   switch (tier) {
     case 'pro':
       return [colors.primary.main, colors.primary.dark];

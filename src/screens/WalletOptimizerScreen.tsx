@@ -35,7 +35,7 @@ import {
 import { SpendingProfileForm } from '../components/SpendingProfileForm';
 import { optimizeWallet } from '../services/WalletOptimizerService';
 import { getSpendingProfileSync, saveSpendingProfile } from '../services/SpendingProfileService';
-import { getCurrentTierSync, SubscriptionTier } from '../services/SubscriptionService';
+import { getCurrentTierSync } from '../services/SubscriptionService';
 import { getCards } from '../services/CardPortfolioManager';
 import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { LockedFeature, ApplyNowButton } from '../components';
@@ -290,7 +290,7 @@ export default function WalletOptimizerScreen() {
     if (!result) return null;
 
     const userCards = getCards();
-    const isFree = tier === SubscriptionTier.FREE;
+    const isFree = tier === 'free';
     const visibleResults = isFree ? result.recommendations.slice(0, 1) : result.recommendations.slice(0, 3);
 
     return (

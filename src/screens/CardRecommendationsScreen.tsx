@@ -128,7 +128,7 @@ export default function CardRecommendationsScreen() {
   const showAffiliateLinks = tier === 'max';
 
   const handleCardPress = useCallback((cardId: string) => {
-    navigation.navigate('CardDetail' as never, { cardId } as never);
+    (navigation as any).navigate('CardDetail', { cardId });
   }, [navigation]);
 
   const loadRecommendations = useCallback(async () => {

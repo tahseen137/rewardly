@@ -216,7 +216,7 @@ export const SageScreen: React.FC = () => {
       const userCards = getCards();
       const userPrefs = await getPreferences();
       setPortfolio(userCards);
-      setPreferences(userPrefs);
+      setPreferences(userPrefs as unknown as UserPreferences);
     };
     loadUserData();
   }, []);
