@@ -84,3 +84,7 @@ supabase/.temp/
 check_data.sql
 .vercel
 coverage/
+
+# Playwright
+playwright-report/
+test-results/
