@@ -20,6 +20,7 @@ import {
   Dimensions,
   Platform,
   Animated,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -759,7 +760,12 @@ function Footer() {
           </View>
           <View style={styles.footerLinkColumn}>
             <Text style={styles.footerLinkHeader}>Legal</Text>
-            <Text style={styles.footerLink}>Privacy Policy</Text>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('/privacy-policy')}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.footerLink, styles.footerLinkClickable]}>Privacy Policy</Text>
+            </TouchableOpacity>
             <Text style={styles.footerLink}>Terms of Service</Text>
           </View>
           <View style={styles.footerLinkColumn}>
@@ -1429,6 +1435,9 @@ const styles = StyleSheet.create({
   footerLink: {
     fontSize: 14,
     color: colors.text.secondary,
+  },
+  footerLinkClickable: {
+    textDecorationLine: 'underline',
   },
   footerDivider: {
     height: 1,
