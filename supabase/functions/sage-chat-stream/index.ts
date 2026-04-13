@@ -367,6 +367,36 @@ function toGeminiMessages(systemPrompt: string, history: Message[], currentMessa
 }
 
 // ============================================================================
+// Convert messages to Ollama format
+// ============================================================================
+
+function toOllamaMessages(systemPrompt: string, history: Message[], currentMessage: string, model: string) {
+  const messages: Array<{ role: string; content: string }> = [
+    { role: "system", content: systemPrompt },
+  ];
+
+  for (const msg of history) {
+    messages.push({
+      role: msg.role === "user" ? "user" : "assistant",
+      content: msg.content,
+    });
+  }
+
+  messages.push({ role: "user", content: currentMessage });
+
+  return {
+    model,
+    messages,
+    stream: true,
+    think: false,
+    options: {
+      temperature: 0.7,
+      num_predict: 1024,
+    },
+  };
+}
+
+// ============================================================================
 // Fallback Responses
 // ============================================================================
 
@@ -417,15 +447,18 @@ serve(async (req) => {
     // Parse request
     const { message, history, userContext, conversationId } = await req.json();
     
-    // Try Google API key first, fall back to Anthropic
+    // Provider keys: Ollama (primary) → Gemini → Anthropic
+    const ollamaUrl = Deno.env.get("OLLAMA_API_URL");
+    const ollamaApiKey = Deno.env.get("OLLAMA_API_KEY");
+    const ollamaModel = Deno.env.get("OLLAMA_MODEL") || "gemma4:e4b";
     const googleApiKey = Deno.env.get("GOOGLE_API_KEY");
     const anthropicApiKey = Deno.env.get("ANTHROPIC_API_KEY");
 
     if (!message) {
       throw new Error("Missing message");
     }
-    
-    if (!googleApiKey && !anthropicApiKey) {
+
+    if (!ollamaUrl && !googleApiKey && !anthropicApiKey) {
       throw new Error("No API key configured");
     }
 
@@ -453,10 +486,134 @@ serve(async (req) => {
       messages.push(...trimmedHistory);
     }
 
-    console.log(`[Sage] TTFB: ${Date.now() - startTime}ms | History: ${messages.length} msgs | Engine: ${googleApiKey ? 'Gemini' : 'Anthropic'}`);
+    const engine = ollamaUrl ? `Ollama (${ollamaModel})` : googleApiKey ? 'Gemini' : 'Anthropic';
+    console.log(`[Sage] TTFB: ${Date.now() - startTime}ms | History: ${messages.length} msgs | Engine: ${engine}`);
 
     // ========================================================================
-    // Gemini Flash API (preferred)
+    // Ollama Self-Hosted (primary — Gemma 4 on Mac Mini)
+    // ========================================================================
+    if (ollamaUrl) {
+      const ollamaBody = toOllamaMessages(systemPrompt, messages, message, ollamaModel);
+
+      const ollamaController = new AbortController();
+      const ollamaTimeoutId = setTimeout(() => ollamaController.abort(), 30000); // 30s for local inference
+
+      let ollamaResponse: Response | null = null;
+      try {
+        ollamaResponse = await fetch(`${ollamaUrl}/api/chat`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${ollamaApiKey || ""}`,
+          },
+          body: JSON.stringify(ollamaBody),
+          signal: ollamaController.signal,
+        });
+      } catch (err) {
+        clearTimeout(ollamaTimeoutId);
+        console.error(`[Sage] Ollama connection failed: ${err.name === "AbortError" ? "timeout" : err.message}`);
+        ollamaResponse = null;
+      }
+      clearTimeout(ollamaTimeoutId);
+
+      if (ollamaResponse?.ok) {
+        console.log(`[Sage] Using Ollama model: ${ollamaModel}`);
+
+        // Stream Ollama NDJSON response, convert to SSE for client
+        const stream = new ReadableStream({
+          async start(controller) {
+            const reader = ollamaResponse!.body?.getReader();
+            if (!reader) { controller.close(); return; }
+
+            const decoder = new TextDecoder();
+            const encoder = new TextEncoder();
+            let buffer = "";
+            let doneSent = false;
+
+            try {
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split("\n");
+                buffer = lines.pop() || "";
+
+                for (const line of lines) {
+                  if (!line.trim()) continue;
+                  try {
+                    const parsed = JSON.parse(line);
+
+                    // Stream content tokens to client
+                    if (parsed.message?.content) {
+                      const chunk = JSON.stringify({ text: parsed.message.content });
+                      controller.enqueue(encoder.encode(`event: text\ndata: ${chunk}\n\n`));
+                    }
+
+                    // Completion
+                    if (parsed.done) {
+                      const totalTime = Date.now() - startTime;
+                      const doneData = JSON.stringify({
+                        conversationId: conversationId || `conv_${Date.now()}`,
+                        status: "complete",
+                        metrics: {
+                          totalMs: totalTime,
+                          historyLength: messages.length,
+                          provider: "ollama",
+                          model: ollamaModel,
+                          evalCount: parsed.eval_count || 0,
+                        },
+                      });
+                      controller.enqueue(encoder.encode(`event: done\ndata: ${doneData}\n\n`));
+                      doneSent = true;
+                      console.log(`[Sage] Complete: ${totalTime}ms (Ollama ${ollamaModel}, ${parsed.eval_count || "?"} tokens)`);
+                    }
+                  } catch (_e) {
+                    // Partial JSON line, skip
+                  }
+                }
+              }
+
+              // Safety: send done if not already sent
+              if (!doneSent) {
+                const totalTime = Date.now() - startTime;
+                const doneData = JSON.stringify({
+                  conversationId: conversationId || `conv_${Date.now()}`,
+                  status: "complete",
+                  metrics: { totalMs: totalTime, historyLength: messages.length, provider: "ollama" },
+                });
+                controller.enqueue(encoder.encode(`event: done\ndata: ${doneData}\n\n`));
+              }
+            } catch (err) {
+              console.error("[Sage] Ollama stream error:", err);
+              const errorData = JSON.stringify({ error: "Stream interrupted" });
+              controller.enqueue(encoder.encode(`event: error\ndata: ${errorData}\n\n`));
+            } finally {
+              controller.close();
+              reader.releaseLock();
+            }
+          },
+        });
+
+        return new Response(stream, {
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+          },
+        });
+      }
+
+      // Ollama failed — fall through to Gemini/Anthropic
+      if (ollamaResponse) {
+        const errText = await ollamaResponse.text().catch(() => "unknown");
+        console.warn(`[Sage] Ollama failed (${ollamaResponse.status}): ${errText.substring(0, 100)}. Falling back...`);
+      }
+    }
+
+    // ========================================================================
+    // Gemini Flash API (fallback)
     // ========================================================================
     if (googleApiKey) {
       const geminiBody = toGeminiMessages(systemPrompt, messages, message);
