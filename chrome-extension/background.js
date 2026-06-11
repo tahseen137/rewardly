@@ -1,91 +1,172 @@
 // Rewardly Chrome Extension — Background Service Worker
+// Recommends the best Canadian credit card for the merchant the user is visiting.
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(async () => {
   console.log("[Rewardly] Extension installed.");
+  // On first install, open the wallet setup page
+  const wallet = await chrome.storage.local.get({ wallet: null });
+  if (!wallet.wallet) {
+    chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
+  }
 });
 
-function findMerchant(hostname, merchants) {
-  const clean = hostname.replace(/^www\./, "");
-  return merchants.find((m) =>
-    m.urlPatterns.some(
-      (pattern) =>
-        clean === pattern ||
-        clean.endsWith("." + pattern) ||
-        clean.includes(pattern)
-    )
-  );
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function findMerchantByDomain(hostname, domainIndex, merchants) {
+  const clean = hostname.replace(/^www\./, "").toLowerCase();
+  // Direct match
+  if (domainIndex[clean]) {
+    return merchants.find(m => m.id === domainIndex[clean]);
+  }
+  // Subdomain match (e.g. ca.hotels.com → hotels.com)
+  const parts = clean.split(".");
+  for (let i = 1; i < parts.length - 1; i++) {
+    const candidate = parts.slice(i).join(".");
+    if (domainIndex[candidate]) {
+      return merchants.find(m => m.id === domainIndex[candidate]);
+    }
+  }
+  return null;
 }
 
-async function handlePageVisit(hostname) {
-  console.log("[Rewardly] PAGE_VISIT:", hostname);
+function effectiveRate(card, cardCategory) {
+  const catReward = card.categoryRewards?.find(cr => cr.category === cardCategory);
+  const rate = catReward ? catReward.rewardRate : card.baseRewardRate;
+  const val = rate.value;
+  const type = rate.type;
 
-  // Check user settings
-  const prefs = await chrome.storage.local.get({ showNotifications: true, minRate: 0 });
-  if (!prefs.showNotifications) {
-    console.log("[Rewardly] Notifications disabled in settings, skipping.");
-    return;
+  if (type === "cashback") {
+    return {
+      percent: val,
+      label: `${val}% cash back`,
+      raw: val,
+      rawLabel: `${val}%`,
+      type: "cashback",
+    };
+  } else {
+    // points, airline_miles, hotel_points — all use pointValuation
+    const pct = parseFloat(((val * card.pointValuation) / 100).toFixed(2));
+    const program = card.rewardProgram || "Points";
+    const unit = type === "airline_miles" ? "miles" : "pts";
+    return {
+      percent: pct,
+      label: `${val}x ${program} (≈${pct.toFixed(1)}% value)`,
+      raw: val,
+      rawLabel: `${val}x`,
+      type,
+    };
+  }
+}
+
+function getBestCard(wallet, cardCategory) {
+  // wallet = array of card IDs
+  // returns sorted array of { card, rate }
+  return wallet
+    .map(card => ({ card, rate: effectiveRate(card, cardCategory) }))
+    .sort((a, b) => b.rate.percent - a.rate.percent);
+}
+
+// ─── Message handler ─────────────────────────────────────────────────────────
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.type === "PAGE_VISIT") {
+    handlePageVisit(message.hostname).catch(err =>
+      console.error("[Rewardly] handlePageVisit error:", err)
+    );
+    sendResponse({ ok: true });
   }
 
-  // Deduplicate per session
+  if (message.type === "GET_RECOMMENDATION") {
+    getRecommendation(message.hostname)
+      .then(rec => sendResponse({ ok: true, ...rec }))
+      .catch(err => sendResponse({ ok: false, error: err.message }));
+    return true; // keep channel open for async
+  }
+
+  return true;
+});
+
+// ─── Page visit: auto-notification ──────────────────────────────────────────
+
+async function handlePageVisit(hostname) {
+  const prefs = await chrome.storage.local.get({
+    showNotifications: true,
+    minRate: 0,
+    walletIds: [],
+  });
+
+  if (!prefs.showNotifications) return;
+  if (!prefs.walletIds?.length) return;
+
   const notifKey = `notified-${hostname}`;
   const session = await chrome.storage.session.get([notifKey]);
-  if (session[notifKey]) {
-    console.log("[Rewardly] Already notified for", hostname, "this session.");
-    return;
-  }
+  if (session[notifKey]) return;
 
-  // Load merchant database
-  const response = await fetch(chrome.runtime.getURL("data/merchants.json"));
-  const data = await response.json();
-  const merchant = findMerchant(hostname, data.merchants);
+  const rec = await getRecommendation(hostname);
+  if (!rec.merchant || !rec.ranked?.length) return;
 
-  if (!merchant) {
-    console.log("[Rewardly] No merchant match for", hostname);
-    return;
-  }
-
-  const sorted = [...merchant.rates].sort((a, b) => b.rate - a.rate);
-  const best = sorted[0];
-
-  if (best.rate < prefs.minRate) {
-    console.log(`[Rewardly] Best rate ${best.rate}% is below minRate ${prefs.minRate}%, skipping.`);
-    return;
-  }
-
-  const programLabels = {
-    Rakuten: "Rakuten Canada",
-    GCR: "Great Canadian Rebates",
-    TopCashback: "TopCashback",
-    Honey: "PayPal Honey",
-  };
-  const bestProgramLabel = programLabels[best.program] || best.program;
-
-  console.log(`[Rewardly] Showing notification for ${merchant.name}: ${best.rate}% via ${bestProgramLabel}`);
+  const best = rec.ranked[0];
+  if (best.rate.percent < prefs.minRate) return;
 
   chrome.notifications.create(`rewardly-${Date.now()}`, {
     type: "basic",
     iconUrl: "icons/icon128.png",
-    title: `💰 ${best.rate}% cashback at ${merchant.name}`,
-    message: `Best rate: ${best.rate}% via ${bestProgramLabel}. Click the Rewardly icon to activate.`,
+    title: `💳 Use your ${best.card.name.split(" ").slice(-2).join(" ")} at ${rec.merchant.name}`,
+    message: `Earn ${best.rate.label}. Open Rewardly to see all your cards.`,
     priority: 2,
   });
 
   await chrome.storage.session.set({ [notifKey]: true });
 }
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === "PAGE_VISIT") {
-    handlePageVisit(message.hostname)
-      .catch((err) => console.error("[Rewardly] handlePageVisit error:", err));
-    sendResponse({ ok: true });
-  }
-  return true;
-});
+// ─── Recommendation engine ───────────────────────────────────────────────────
 
-chrome.notifications.onClicked.addListener((notifId) => {
+async function getRecommendation(hostname) {
+  const [merchantData, cardData, prefs] = await Promise.all([
+    fetch(chrome.runtime.getURL("data/merchants.json")).then(r => r.json()),
+    fetch(chrome.runtime.getURL("data/cards.json")).then(r => r.json()),
+    chrome.storage.local.get({ walletIds: [] }),
+  ]);
+
+  const merchant = findMerchantByDomain(
+    hostname,
+    merchantData.domainIndex,
+    merchantData.merchants
+  );
+
+  if (!merchant) return { merchant: null, ranked: [] };
+
+  const walletCards = prefs.walletIds
+    .map(id => cardData.cards.find(c => c.id === id))
+    .filter(Boolean);
+
+  const ranked = getBestCard(walletCards, merchant.cardCategory);
+
+  // Track this visit for savings
+  await recordVisit(merchant);
+
+  return { merchant, ranked };
+}
+
+// ─── Savings tracking ────────────────────────────────────────────────────────
+
+async function recordVisit(merchant) {
+  const data = await chrome.storage.local.get({ visits: [] });
+  const visits = data.visits || [];
+  visits.push({
+    merchantId: merchant.id,
+    category: merchant.cardCategory,
+    ts: Date.now(),
+  });
+  // Keep last 500 visits
+  if (visits.length > 500) visits.splice(0, visits.length - 500);
+  await chrome.storage.local.set({ visits });
+}
+
+// ─── Notification click → open popup ────────────────────────────────────────
+
+chrome.notifications.onClicked.addListener(notifId => {
   if (notifId.startsWith("rewardly-")) {
-    chrome.action.openPopup().catch(() => {
-      // openPopup() requires user gesture on some platforms — silently ignore
-    });
+    chrome.action.openPopup().catch(() => {});
   }
 });
