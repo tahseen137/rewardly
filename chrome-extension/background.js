@@ -17,21 +17,6 @@ function findMerchant(hostname, merchants) {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === "SHOW_CASHBACK_NOTIFICATION") {
-    const { merchantName, bestRate, program } = message;
-    const notifId = `rewardly-${merchantName}`;
-
-    chrome.notifications.create(notifId, {
-      type: "basic",
-      iconUrl: "icons/icon128.png",
-      title: `💰 ${bestRate}% cashback available`,
-      message: `Earn ${bestRate}% back at ${merchantName} via ${program}. Click the Rewardly icon to activate.`,
-      priority: 1,
-    });
-
-    sendResponse({ ok: true });
-  }
-
   if (message.type === "PAGE_VISIT") {
     const { hostname } = message;
     const notifKey = `notified-${hostname}`;
