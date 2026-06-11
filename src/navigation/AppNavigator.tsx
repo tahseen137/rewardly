@@ -67,6 +67,9 @@ import { supabase, isSupabaseConfigured } from '../services/supabase';
 import { initializeSubscription, refreshSubscription } from '../services/SubscriptionService';
 import { initializeAutoPilot } from '../services/AutoPilotService';
 import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('AppNavigator');
 
 // Stack navigator for Insights screens
 export type InsightsStackParamList = {
@@ -494,9 +497,9 @@ export default function AppNavigator() {
     const initializeApp = async () => {
       try {
         // Initialize each service independently — one failure shouldn't block the app
-        await initializePreferences().catch((e) => console.warn('Preferences init failed:', e));
-        await initializeSubscription().catch((e) => console.warn('Subscription init failed:', e));
-        await initializeAutoPilot().catch((e) => console.warn('AutoPilot init failed:', e));
+        await initializePreferences().catch((e) => log.warn('Preferences init failed:', { error: e }));
+        await initializeSubscription().catch((e) => log.warn('Subscription init failed:', { error: e }));
+        await initializeAutoPilot().catch((e) => log.warn('AutoPilot init failed:', { error: e }));
 
         // Track app open (non-blocking)
         try {
@@ -531,7 +534,7 @@ export default function AppNavigator() {
           setAppState(Platform.OS === 'web' ? 'landing' : 'auth');
         }
       } catch (error) {
-        console.error('Failed to initialize app:', error);
+        log.error('Failed to initialize app:', error);
         // Default to landing page on web, auth on mobile
         setAppState(Platform.OS === 'web' ? 'landing' : 'auth');
       }
@@ -549,7 +552,7 @@ export default function AppNavigator() {
         try {
           await refreshSubscription();
         } catch (e) {
-          console.warn('Failed to refresh subscription on sign-in:', e);
+          log.warn('Failed to refresh subscription on sign-in:', { error: e });
         }
         // Check onboarding: local first, then Supabase profile as fallback
         let onboardingDone = isOnboardingComplete();
@@ -565,7 +568,7 @@ export default function AppNavigator() {
               await setOnboardingComplete(true);
             }
           } catch (e) {
-            console.warn('Failed to check onboarding from Supabase:', e);
+            log.warn('Failed to check onboarding from Supabase:', { error: e });
           }
         }
         setAppState(onboardingDone ? 'main' : 'onboarding');
@@ -600,7 +603,7 @@ export default function AppNavigator() {
           await setOnboardingComplete(true);
         }
       } catch (e) {
-        console.warn('Failed to check onboarding from Supabase:', e);
+        log.warn('Failed to check onboarding from Supabase:', { error: e });
       }
     }
     setAppState(onboardingDone ? 'main' : 'onboarding');
@@ -617,7 +620,7 @@ export default function AppNavigator() {
             { onConflict: 'id' }
           );
       } catch (e) {
-        console.warn('Failed to sync onboarding to Supabase:', e);
+        log.warn('Failed to sync onboarding to Supabase:', { error: e });
       }
     }
     setAppState('main');

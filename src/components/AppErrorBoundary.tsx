@@ -18,6 +18,10 @@ import {
   Linking,
 } from 'react-native';
 import { colors } from '../theme/colors';
+import { reportError } from '../utils/errorReporting';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('AppErrorBoundary');
 
 // ============================================================================
 // Types
@@ -56,8 +60,7 @@ export class AppErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Log the error
-    console.error('[AppErrorBoundary] Caught error:', error);
-    console.error('[AppErrorBoundary] Component stack:', errorInfo.componentStack);
+    log.error('Caught error:', error, { componentStack: errorInfo.componentStack });
 
     // Store error info for display
     this.setState({ errorInfo });
@@ -65,9 +68,8 @@ export class AppErrorBoundary extends Component<Props, State> {
     // Call optional error handler
     this.props.onError?.(error, errorInfo);
 
-    // TODO: Send to error tracking service (Sentry, Bugsnag, etc.)
-    // Example:
-    // Sentry.captureException(error, { extra: { componentStack: errorInfo.componentStack } });
+    // Report to error tracking service
+    reportError(error, { componentStack: errorInfo.componentStack });
   }
 
   handleReload = (): void => {

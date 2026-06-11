@@ -34,6 +34,9 @@ import { MissedRewardsAnalysis, CategoryMissedRewards, MissedReward } from '../t
 import { analyzeMissedRewards } from '../services/RewardsIQService';
 import { CATEGORY_INFO } from '../services/MockTransactionData';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('MissedRewardsScreen');
 
 type NavigationProp = NativeStackNavigationProp<InsightsStackParamList>;
 
@@ -204,7 +207,7 @@ export default function MissedRewardsScreen() {
       );
     } catch (e) {
       setError('Failed to analyze rewards. Please try again.');
-      console.error(e);
+      log.error('MissedRewardsScreen: failed to analyze rewards', e);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);

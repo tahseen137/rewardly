@@ -1,11 +1,11 @@
 /**
  * Sage Chat Stream - Supabase Edge Function
- * 
- * Handles streaming AI chat with Google Gemini Flash.
+ *
+ * Handles streaming AI chat with Ollama (primary) → Anthropic (fallback).
  * Auth-optional: works for both authenticated and anonymous users.
- * 
+ *
  * Performance Target: <400ms TTFB, <2s total response
- * 
+ *
  * UPDATED: Now queries Supabase for full card database to provide accurate recommendations
  */
 
@@ -334,39 +334,6 @@ function trimHistoryForTokens(history: Message[], maxTokens: number = 2000): Mes
 }
 
 // ============================================================================
-// Convert messages to Gemini format
-// ============================================================================
-
-function toGeminiMessages(systemPrompt: string, history: Message[], currentMessage: string) {
-  const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
-  
-  // Add history
-  for (const msg of history) {
-    contents.push({
-      role: msg.role === "user" ? "user" : "model",
-      parts: [{ text: msg.content }],
-    });
-  }
-  
-  // Add current message
-  contents.push({
-    role: "user",
-    parts: [{ text: currentMessage }],
-  });
-
-  return {
-    system_instruction: {
-      parts: [{ text: systemPrompt }],
-    },
-    contents,
-    generationConfig: {
-      maxOutputTokens: 1024,
-      temperature: 0.7,
-    },
-  };
-}
-
-// ============================================================================
 // Convert messages to Ollama format
 // ============================================================================
 
@@ -447,18 +414,17 @@ serve(async (req) => {
     // Parse request
     const { message, history, userContext, conversationId } = await req.json();
     
-    // Provider keys: Ollama (primary) → Gemini → Anthropic
+    // Provider keys: Ollama (primary) → Anthropic (fallback)
     const ollamaUrl = Deno.env.get("OLLAMA_API_URL");
     const ollamaApiKey = Deno.env.get("OLLAMA_API_KEY");
     const ollamaModel = Deno.env.get("OLLAMA_MODEL") || "gemma4:e4b";
-    const googleApiKey = Deno.env.get("GOOGLE_API_KEY");
     const anthropicApiKey = Deno.env.get("ANTHROPIC_API_KEY");
 
     if (!message) {
       throw new Error("Missing message");
     }
 
-    if (!ollamaUrl && !googleApiKey && !anthropicApiKey) {
+    if (!ollamaUrl && !anthropicApiKey) {
       throw new Error("No API key configured");
     }
 
@@ -486,7 +452,7 @@ serve(async (req) => {
       messages.push(...trimmedHistory);
     }
 
-    const engine = ollamaUrl ? `Ollama (${ollamaModel})` : googleApiKey ? 'Gemini' : 'Anthropic';
+    const engine = ollamaUrl ? `Ollama (${ollamaModel})` : 'Anthropic';
     console.log(`[Sage] TTFB: ${Date.now() - startTime}ms | History: ${messages.length} msgs | Engine: ${engine}`);
 
     // ========================================================================
@@ -605,7 +571,7 @@ serve(async (req) => {
         });
       }
 
-      // Ollama failed — fall through to Gemini/Anthropic
+      // Ollama failed — fall through to Anthropic
       if (ollamaResponse) {
         const errText = await ollamaResponse.text().catch(() => "unknown");
         console.warn(`[Sage] Ollama failed (${ollamaResponse.status}): ${errText.substring(0, 100)}. Falling back...`);
@@ -613,170 +579,7 @@ serve(async (req) => {
     }
 
     // ========================================================================
-    // Gemini Flash API (fallback)
-    // ========================================================================
-    if (googleApiKey) {
-      const geminiBody = toGeminiMessages(systemPrompt, messages, message);
-      // Try gemini-2.0-flash first, fall back to gemini-1.5-flash if unavailable
-      const geminiModels = ["gemini-2.0-flash", "gemini-1.5-flash"];
-      let response: Response | null = null;
-      let lastGeminiErr = "";
-
-      for (const geminiModel of geminiModels) {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?key=${googleApiKey}&alt=sse`;
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-        let candidate: Response;
-        try {
-          candidate = await fetch(geminiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(geminiBody),
-            signal: controller.signal,
-          });
-        } catch (err) {
-          clearTimeout(timeoutId);
-          if (err.name === "AbortError") {
-            console.error(`[Sage] Gemini ${geminiModel} timeout`);
-            lastGeminiErr = "timeout";
-            continue;
-          }
-          throw err;
-        }
-        clearTimeout(timeoutId);
-
-        if (candidate.ok) {
-          response = candidate;
-          console.log(`[Sage] Using Gemini model: ${geminiModel}`);
-          break;
-        }
-
-        const errText = await candidate.text();
-        lastGeminiErr = `${candidate.status}: ${errText.substring(0, 100)}`;
-        console.warn(`[Sage] Gemini ${geminiModel} failed (${candidate.status}), trying next model`);
-      }
-
-      if (!response) {
-        console.error("[Sage] All Gemini models failed:", lastGeminiErr);
-        // Return SSE-formatted error so client handles it properly
-        const encoder = new TextEncoder();
-        const errorStream = new ReadableStream({
-          start(ctrl) {
-            const fallbackText = getFallbackResponse(userContext);
-            ctrl.enqueue(encoder.encode(`event: text\ndata: ${JSON.stringify({ text: fallbackText })}\n\n`));
-            ctrl.enqueue(encoder.encode(`event: done\ndata: ${JSON.stringify({ conversationId: conversationId || `conv_${Date.now()}`, status: "fallback" })}\n\n`));
-            ctrl.close();
-          }
-        });
-        return new Response(errorStream, {
-          headers: { ...corsHeaders, "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
-        });
-      }
-
-      // Stream Gemini SSE response
-      const stream = new ReadableStream({
-        async start(controller) {
-          const reader = response.body?.getReader();
-          if (!reader) { controller.close(); return; }
-
-          const decoder = new TextDecoder();
-          const encoder = new TextEncoder();
-          let buffer = "";
-
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-
-              buffer += decoder.decode(value, { stream: true });
-              const events = buffer.split("\n\n");
-              buffer = events.pop() || "";
-
-              for (const eventBlock of events) {
-                const lines = eventBlock.split("\n");
-                let eventData = "";
-
-                for (const line of lines) {
-                  if (line.startsWith("data: ")) {
-                    eventData = line.slice(6);
-                    break;
-                  }
-                }
-
-                if (eventData) {
-                  try {
-                    const parsed = JSON.parse(eventData);
-                    console.log('[Sage] Gemini event FULL:', JSON.stringify(parsed));
-                    
-                    // Gemini response format: candidates[0].content.parts[0].text
-                    const text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (text) {
-                      console.log('[Sage] Streaming text chunk:', text);
-                      const chunk = JSON.stringify({ text });
-                      controller.enqueue(encoder.encode(`event: text\ndata: ${chunk}\n\n`));
-                    } else {
-                      console.error('[Sage] No text found. Parsed structure:', {
-                        hasCandidates: !!parsed?.candidates,
-                        candidatesLength: parsed?.candidates?.length,
-                        hasContent: !!parsed?.candidates?.[0]?.content,
-                        hasParts: !!parsed?.candidates?.[0]?.content?.parts,
-                        partsLength: parsed?.candidates?.[0]?.content?.parts?.length,
-                        fullParsed: JSON.stringify(parsed).substring(0, 500)
-                      });
-                    }
-
-                    // Check for finish
-                    const finishReason = parsed?.candidates?.[0]?.finishReason;
-                    if (finishReason === "STOP" || finishReason === "MAX_TOKENS") {
-                      const totalTime = Date.now() - startTime;
-                      const doneData = JSON.stringify({ 
-                        conversationId: conversationId || `conv_${Date.now()}`,
-                        status: "complete",
-                        metrics: { totalMs: totalTime, historyLength: messages.length }
-                      });
-                      controller.enqueue(encoder.encode(`event: done\ndata: ${doneData}\n\n`));
-                      console.log(`[Sage] Complete: ${totalTime}ms (Gemini Flash)`);
-                    }
-                  } catch (_e) {
-                    // Ignore parse errors
-                  }
-                }
-              }
-            }
-            
-            // Send done event if not already sent
-            const totalTime = Date.now() - startTime;
-            const doneData = JSON.stringify({ 
-              conversationId: conversationId || `conv_${Date.now()}`,
-              status: "complete",
-              metrics: { totalMs: totalTime, historyLength: messages.length }
-            });
-            controller.enqueue(encoder.encode(`event: done\ndata: ${doneData}\n\n`));
-          } catch (err) {
-            console.error("[Sage] Gemini stream error:", err);
-            const errorData = JSON.stringify({ error: "Stream interrupted" });
-            controller.enqueue(encoder.encode(`event: error\ndata: ${errorData}\n\n`));
-          } finally {
-            controller.close();
-            reader.releaseLock();
-          }
-        },
-      });
-
-      return new Response(stream, {
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "text/event-stream",
-          "Cache-Control": "no-cache",
-          "Connection": "keep-alive",
-        },
-      });
-    }
-
-    // ========================================================================
-    // Anthropic Fallback (if no Google key)
+    // Anthropic Fallback
     // ========================================================================
     if (anthropicApiKey) {
       messages.push({ role: "user", content: message });
