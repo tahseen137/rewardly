@@ -79,6 +79,9 @@ function renderMerchantView({ merchant, ranked }) {
   document.getElementById("bestCardIssuer").textContent = best.card.issuer;
   document.getElementById("bestCardName").textContent = best.card.name;
   document.getElementById("bestCardRate").textContent = formatRateShort(best.rate);
+  // Sub-label: full description e.g. "5x MR Points (≈10.5% value)"
+  const labelEl = document.getElementById("bestCardLabel");
+  if (labelEl) labelEl.textContent = best.rate.label;
 
   // Loyalty tip
   const loyaltySection = document.getElementById("loyaltySection");
