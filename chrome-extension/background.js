@@ -46,9 +46,8 @@ function effectiveRate(card, cardCategory) {
     };
   } else {
     // points, airline_miles, hotel_points — all use pointValuation
-    const pct = parseFloat(((val * card.pointValuation) / 100).toFixed(2));
+    const pct = parseFloat(((val * (card.pointValuation || 1)) / 100).toFixed(2));
     const program = card.rewardProgram || "Points";
-    const unit = type === "airline_miles" ? "miles" : "pts";
     return {
       percent: pct,
       label: `${val}x ${program} (≈${pct.toFixed(1)}% value)`,
@@ -111,7 +110,7 @@ async function handlePageVisit(hostname) {
 
   chrome.notifications.create(`rewardly-${Date.now()}`, {
     type: "basic",
-    iconUrl: "icons/icon128.png",
+    iconUrl: chrome.runtime.getURL("icons/icon128.png"),
     title: `💳 Use your ${best.card.name.split(" ").slice(-2).join(" ")} at ${rec.merchant.name}`,
     message: `Earn ${best.rate.label}. Open Rewardly to see all your cards.`,
     priority: 2,
