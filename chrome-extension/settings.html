@@ -256,50 +256,6 @@
     </p>
   </div>
 
-  <script>
-    const DEFAULTS = {
-      showBadge: true,
-      showNotifications: true,
-      minRate: 0,
-      sortOrder: 'best-first',
-      showEstimate: true,
-    };
-
-    // Load saved settings
-    chrome.storage.local.get(DEFAULTS, (settings) => {
-      if (chrome.runtime.lastError) {
-        console.error('Rewardly: failed to load settings', chrome.runtime.lastError);
-        return;
-      }
-      document.getElementById('showBadge').checked = settings.showBadge;
-      document.getElementById('showNotifications').checked = settings.showNotifications;
-      document.getElementById('minRate').value = settings.minRate;
-      document.getElementById('sortOrder').value = settings.sortOrder;
-      document.getElementById('showEstimate').checked = settings.showEstimate;
-    });
-
-    // Save settings
-    document.getElementById('saveBtn').addEventListener('click', () => {
-      const settings = {
-        showBadge: document.getElementById('showBadge').checked,
-        showNotifications: document.getElementById('showNotifications').checked,
-        minRate: parseInt(document.getElementById('minRate').value, 10),
-        sortOrder: document.getElementById('sortOrder').value,
-        showEstimate: document.getElementById('showEstimate').checked,
-      };
-
-      chrome.storage.local.set(settings, () => {
-        const confirm = document.getElementById('saveConfirm');
-        if (chrome.runtime.lastError) {
-          confirm.style.color = '#EF4444';
-          confirm.textContent = '✗ Save failed — ' + chrome.runtime.lastError.message;
-        } else {
-          confirm.style.color = '#10B981';
-          confirm.textContent = '✓ Settings saved';
-        }
-        setTimeout(() => { confirm.textContent = ''; }, 2500);
-      });
-    });
-  </script>
+  <script src="settings.js"></script>
 </body>
 </html>
