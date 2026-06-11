@@ -1,7 +1,7 @@
 // Rewardly Chrome Extension — Background Service Worker
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("Rewardly extension installed. Find cashback on every Canadian retailer.");
+  console.log("[Rewardly] Extension installed.");
 });
 
 function findMerchant(hostname, merchants) {
@@ -16,59 +16,76 @@ function findMerchant(hostname, merchants) {
   );
 }
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === "PAGE_VISIT") {
-    const { hostname } = message;
-    const notifKey = `notified-${hostname}`;
+async function handlePageVisit(hostname) {
+  console.log("[Rewardly] PAGE_VISIT:", hostname);
 
-    chrome.storage.local.get({ showNotifications: true, minRate: 0 }, (prefs) => {
-      if (!prefs.showNotifications) return;
-
-      chrome.storage.session.get([notifKey], (result) => {
-        if (result[notifKey]) return;
-
-        fetch(chrome.runtime.getURL("data/merchants.json"))
-          .then((r) => r.json())
-          .then((data) => {
-            const merchant = findMerchant(hostname, data.merchants);
-            if (!merchant) return;
-
-            const sorted = [...merchant.rates].sort((a, b) => b.rate - a.rate);
-            const best = sorted[0];
-            if (best.rate < prefs.minRate) return;
-
-            const programLabels = {
-              Rakuten: "Rakuten Canada",
-              GCR: "Great Canadian Rebates",
-              TopCashback: "TopCashback",
-              Honey: "PayPal Honey",
-            };
-            const bestProgramLabel = programLabels[best.program] || best.program;
-
-            chrome.notifications.create(`rewardly-${hostname}`, {
-              type: "basic",
-              iconUrl: "icons/icon128.png",
-              title: `💰 ${best.rate}% cashback at ${merchant.name}`,
-              message: `Best rate: ${best.rate}% via ${bestProgramLabel}. Open Rewardly to compare all rates and activate.`,
-              buttons: [{ title: "Open Rewardly" }],
-              requireInteraction: false,
-              priority: 1,
-            });
-
-            chrome.storage.session.set({ [notifKey]: true });
-          })
-          .catch((err) => console.error("Rewardly PAGE_VISIT error:", err));
-      });
-    });
-
-    sendResponse({ ok: true });
+  // Check user settings
+  const prefs = await chrome.storage.local.get({ showNotifications: true, minRate: 0 });
+  if (!prefs.showNotifications) {
+    console.log("[Rewardly] Notifications disabled in settings, skipping.");
+    return;
   }
 
+  // Deduplicate per session
+  const notifKey = `notified-${hostname}`;
+  const session = await chrome.storage.session.get([notifKey]);
+  if (session[notifKey]) {
+    console.log("[Rewardly] Already notified for", hostname, "this session.");
+    return;
+  }
+
+  // Load merchant database
+  const response = await fetch(chrome.runtime.getURL("data/merchants.json"));
+  const data = await response.json();
+  const merchant = findMerchant(hostname, data.merchants);
+
+  if (!merchant) {
+    console.log("[Rewardly] No merchant match for", hostname);
+    return;
+  }
+
+  const sorted = [...merchant.rates].sort((a, b) => b.rate - a.rate);
+  const best = sorted[0];
+
+  if (best.rate < prefs.minRate) {
+    console.log(`[Rewardly] Best rate ${best.rate}% is below minRate ${prefs.minRate}%, skipping.`);
+    return;
+  }
+
+  const programLabels = {
+    Rakuten: "Rakuten Canada",
+    GCR: "Great Canadian Rebates",
+    TopCashback: "TopCashback",
+    Honey: "PayPal Honey",
+  };
+  const bestProgramLabel = programLabels[best.program] || best.program;
+
+  console.log(`[Rewardly] Showing notification for ${merchant.name}: ${best.rate}% via ${bestProgramLabel}`);
+
+  chrome.notifications.create(`rewardly-${Date.now()}`, {
+    type: "basic",
+    iconUrl: "icons/icon128.png",
+    title: `💰 ${best.rate}% cashback at ${merchant.name}`,
+    message: `Best rate: ${best.rate}% via ${bestProgramLabel}. Click the Rewardly icon to activate.`,
+    priority: 2,
+  });
+
+  await chrome.storage.session.set({ [notifKey]: true });
+}
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.type === "PAGE_VISIT") {
+    handlePageVisit(message.hostname)
+      .catch((err) => console.error("[Rewardly] handlePageVisit error:", err));
+    sendResponse({ ok: true });
+  }
   return true;
 });
 
-chrome.notifications.onButtonClicked.addListener((notifId, buttonIndex) => {
-  if (notifId.startsWith("rewardly-") && buttonIndex === 0) {
-    chrome.action.openPopup();
+chrome.notifications.onClicked.addListener((notifId) => {
+  if (notifId.startsWith("rewardly-")) {
+    chrome.action.openPopup().catch(() => {
+      // openPopup() requires user gesture on some platforms — silently ignore
+    });
   }
 });
