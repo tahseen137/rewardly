@@ -1,32 +1,65 @@
 /**
  * Rewardly Chrome Extension — Popup
- * Shows the best Canadian credit card for the current merchant.
+ * Recommendation logic runs directly here — no background message needed.
  */
 
+// ─── Shared helpers (mirrored from background.js) ──────────────────────────
+
+function findMerchantByDomain(hostname, domainIndex, merchants) {
+  const clean = hostname.replace(/^www\./, "").toLowerCase();
+  if (domainIndex[clean]) return merchants.find(m => m.id === domainIndex[clean]);
+  const parts = clean.split(".");
+  for (let i = 1; i < parts.length - 1; i++) {
+    const candidate = parts.slice(i).join(".");
+    if (domainIndex[candidate]) return merchants.find(m => m.id === domainIndex[candidate]);
+  }
+  return null;
+}
+
+function effectiveRate(card, cardCategory) {
+  const catReward = card.categoryRewards?.find(cr => cr.category === cardCategory);
+  const rate = catReward ? catReward.rewardRate : card.baseRewardRate;
+  const val = rate.value;
+  const type = rate.type;
+  if (type === "cashback") {
+    return { percent: val, label: `${val}% cash back`, raw: val, type: "cashback" };
+  }
+  const pct = parseFloat(((val * (card.pointValuation || 1)) / 100).toFixed(2));
+  const program = card.rewardProgram || "Points";
+  return {
+    percent: pct,
+    label: `${val}x ${program} (≈${pct.toFixed(1)}% value)`,
+    raw: val,
+    type,
+  };
+}
+
+function getBestCards(walletCards, cardCategory) {
+  return walletCards
+    .map(card => ({ card, rate: effectiveRate(card, cardCategory) }))
+    .sort((a, b) => b.rate.percent - a.rate.percent);
+}
+
+// ─── UI helpers ─────────────────────────────────────────────────────────────
+
 const CATEGORY_ICONS = {
-  groceries: "🛒",
-  gas: "⛽",
-  dining: "🍽️",
-  drugstores: "💊",
-  travel: "✈️",
-  streaming: "📺",
-  entertainment: "🎬",
-  transit: "🚇",
-  recurring: "📱",
-  general: "🛍️",
+  groceries: "🛒", gas: "⛽", dining: "🍽️", drugstores: "💊",
+  travel: "✈️", streaming: "📺", entertainment: "🎬", transit: "🚇",
+  recurring: "📱", general: "🛍️",
 };
 
 const LOYALTY_INFO = {
-  "pc-optimum": { name: "PC Optimum", tip: "Stack PC Optimum points on top of your credit card rewards here." },
-  "scene-plus": { name: "Scene+", tip: "Stack Scene+ points on top of your credit card rewards here." },
-  "triangle": { name: "Triangle Rewards", tip: "Stack Triangle Rewards on top of your credit card here." },
-  "aeroplan": { name: "Aeroplan", tip: "Earn Aeroplan miles here — stack on top of your card points." },
-  "air-miles": { name: "Air Miles", tip: "Earn Air Miles here — stack on top of your card rewards." },
+  "pc-optimum":  { name: "PC Optimum",      tip: "Stack PC Optimum points on top of your credit card rewards here." },
+  "scene-plus":  { name: "Scene+",          tip: "Stack Scene+ points on top of your credit card rewards here." },
+  "triangle":    { name: "Triangle Rewards",tip: "Stack Triangle Rewards on top of your credit card here." },
+  "aeroplan":    { name: "Aeroplan",         tip: "Earn Aeroplan miles here — stack on top of your card points." },
+  "air-miles":   { name: "Air Miles",        tip: "Earn Air Miles here — stack on top of your card rewards." },
 };
 
 function showState(id) {
-  ["stateSetup", "stateMerchant", "stateNoMerchant", "stateLoading"].forEach(s => {
-    document.getElementById(s)?.classList.toggle("hidden", s !== id);
+  ["stateSetup", "stateMerchant", "stateNoMerchant", "stateLoading", "stateError"].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.classList.toggle("hidden", s !== id);
   });
 }
 
@@ -35,40 +68,71 @@ function formatRateShort(rate) {
   return `${rate.raw}x`;
 }
 
+// ─── Main ────────────────────────────────────────────────────────────────────
+
 async function main() {
   showState("stateLoading");
 
-  const { walletIds = [] } = await chrome.storage.local.get({ walletIds: [] });
+  try {
+    const { walletIds = [] } = await chrome.storage.local.get({ walletIds: [] });
 
-  if (!walletIds.length) {
-    showState("stateSetup");
-    document.getElementById("setupBtn").addEventListener("click", () => {
-      chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
-      window.close();
-    });
-    return;
+    if (!walletIds.length) {
+      showState("stateSetup");
+      document.getElementById("setupBtn").addEventListener("click", () => {
+        chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
+        window.close();
+      });
+      return;
+    }
+
+    // Get current tab
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    let hostname = null;
+    try { hostname = tab?.url ? new URL(tab.url).hostname : null; } catch {}
+
+    if (!hostname) {
+      await showWalletSummary(walletIds);
+      return;
+    }
+
+    // Load data and compute recommendation directly in popup
+    const [merchantData, cardData] = await Promise.all([
+      fetch(chrome.runtime.getURL("data/merchants.json")).then(r => r.json()),
+      fetch(chrome.runtime.getURL("data/cards.json")).then(r => r.json()),
+    ]);
+
+    const merchant = findMerchantByDomain(hostname, merchantData.domainIndex, merchantData.merchants);
+
+    if (!merchant) {
+      await showWalletSummary(walletIds, cardData);
+      return;
+    }
+
+    const walletCards = walletIds
+      .map(id => cardData.cards.find(c => c.id === id))
+      .filter(Boolean);
+
+    if (!walletCards.length) {
+      await showWalletSummary(walletIds, cardData);
+      return;
+    }
+
+    const ranked = getBestCards(walletCards, merchant.cardCategory);
+    renderMerchantView({ merchant, ranked }, walletIds, cardData);
+
+  } catch (err) {
+    console.error("[Rewardly] popup error:", err);
+    const errEl = document.getElementById("stateError");
+    if (errEl) {
+      errEl.querySelector("#errorMsg").textContent = err.message || "Unknown error";
+      showState("stateError");
+    } else {
+      showState("stateNoMerchant");
+    }
   }
-
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  let hostname = null;
-  try { hostname = tab?.url ? new URL(tab.url).hostname : null; } catch {}
-
-  if (!hostname) {
-    await showWalletSummary(walletIds);
-    return;
-  }
-
-  const rec = await chrome.runtime.sendMessage({ type: "GET_RECOMMENDATION", hostname });
-
-  if (!rec?.ok || !rec.merchant || !rec.ranked?.length) {
-    await showWalletSummary(walletIds);
-    return;
-  }
-
-  renderMerchantView(rec);
 }
 
-function renderMerchantView({ merchant, ranked }) {
+function renderMerchantView({ merchant, ranked }, walletIds, cardData) {
   showState("stateMerchant");
 
   document.getElementById("merchantIcon").textContent = CATEGORY_ICONS[merchant.cardCategory] || "🛍️";
@@ -79,7 +143,6 @@ function renderMerchantView({ merchant, ranked }) {
   document.getElementById("bestCardIssuer").textContent = best.card.issuer;
   document.getElementById("bestCardName").textContent = best.card.name;
   document.getElementById("bestCardRate").textContent = formatRateShort(best.rate);
-  // Sub-label: full description e.g. "5x MR Points (≈10.5% value)"
   const labelEl = document.getElementById("bestCardLabel");
   if (labelEl) labelEl.textContent = best.rate.label;
 
@@ -114,38 +177,35 @@ function renderMerchantView({ merchant, ranked }) {
     otherSection.classList.remove("hidden");
   }
 
-  checkUpgrade(merchant, ranked);
+  // Upgrade hint (async, non-blocking)
+  checkUpgrade(merchant, ranked, walletIds, cardData).catch(() => {});
 }
 
-async function checkUpgrade(merchant, ranked) {
-  try {
-    const { walletIds = [] } = await chrome.storage.local.get({ walletIds: [] });
-    const cardData = await fetch(chrome.runtime.getURL("data/cards.json")).then(r => r.json());
-    const nonWallet = cardData.cards.filter(c => c.country === "CA" && !walletIds.includes(c.id));
-    const bestInWallet = ranked[0]?.rate?.percent || 0;
+async function checkUpgrade(merchant, ranked, walletIds, cardData) {
+  const nonWallet = cardData.cards.filter(c => c.country === "CA" && !walletIds.includes(c.id));
+  const bestInWallet = ranked[0]?.rate?.percent || 0;
 
-    const best = nonWallet
-      .map(card => {
-        const cr = card.categoryRewards?.find(r => r.category === merchant.cardCategory);
-        const rate = cr ? cr.rewardRate : card.baseRewardRate;
-        const pct = rate.type === "cashback"
-          ? rate.value
-          : parseFloat(((rate.value * card.pointValuation) / 100).toFixed(2));
-        return { card, pct };
-      })
-      .sort((a, b) => b.pct - a.pct)[0];
+  const best = nonWallet
+    .map(card => {
+      const cr = card.categoryRewards?.find(r => r.category === merchant.cardCategory);
+      const rate = cr ? cr.rewardRate : card.baseRewardRate;
+      const pct = rate.type === "cashback"
+        ? rate.value
+        : parseFloat(((rate.value * (card.pointValuation || 1)) / 100).toFixed(2));
+      return { card, pct };
+    })
+    .sort((a, b) => b.pct - a.pct)[0];
 
-    if (best && best.pct > bestInWallet + 1) {
-      const upgradeSection = document.getElementById("upgradeSection");
-      document.getElementById("upgradeTip").innerHTML =
-        `<strong>💡 Upgrade tip</strong> — The <strong>${best.card.name}</strong> earns ` +
-        `≈${best.pct.toFixed(1)}% here vs your ≈${bestInWallet.toFixed(1)}%.`;
-      upgradeSection.classList.remove("hidden");
-    }
-  } catch {}
+  if (best && best.pct > bestInWallet + 1) {
+    const upgradeSection = document.getElementById("upgradeSection");
+    document.getElementById("upgradeTip").innerHTML =
+      `<strong>💡 Upgrade tip</strong> — The <strong>${best.card.name}</strong> earns ` +
+      `≈${best.pct.toFixed(1)}% here vs your ≈${bestInWallet.toFixed(1)}%.`;
+    upgradeSection.classList.remove("hidden");
+  }
 }
 
-async function showWalletSummary(walletIds) {
+async function showWalletSummary(walletIds, cardData) {
   showState("stateNoMerchant");
   const walletList = document.getElementById("walletList");
   walletList.innerHTML = "";
@@ -156,9 +216,9 @@ async function showWalletSummary(walletIds) {
   }
 
   try {
-    const cardData = await fetch(chrome.runtime.getURL("data/cards.json")).then(r => r.json());
+    const data = cardData || await fetch(chrome.runtime.getURL("data/cards.json")).then(r => r.json());
     walletIds.slice(0, 5).forEach(id => {
-      const card = cardData.cards.find(c => c.id === id);
+      const card = data.cards.find(c => c.id === id);
       if (!card) return;
       const row = document.createElement("div");
       row.className = "wallet-card-row";

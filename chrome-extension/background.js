@@ -1,11 +1,12 @@
 // Rewardly Chrome Extension — Background Service Worker
 // Recommends the best Canadian credit card for the merchant the user is visiting.
 
-chrome.runtime.onInstalled.addListener(async () => {
-  console.log("[Rewardly] Extension installed.");
-  // On first install, open the wallet setup page
-  const wallet = await chrome.storage.local.get({ wallet: null });
-  if (!wallet.wallet) {
+chrome.runtime.onInstalled.addListener(async ({ reason }) => {
+  console.log("[Rewardly] Extension installed/updated. Reason:", reason);
+  // Only open onboarding on fresh install, not on update/reload
+  if (reason !== "install") return;
+  const { walletIds = [] } = await chrome.storage.local.get({ walletIds: [] });
+  if (!walletIds.length) {
     chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
   }
 });

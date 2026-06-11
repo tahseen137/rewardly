@@ -6,17 +6,16 @@
   <title>Rewardly — Set Up Your Wallet</title>
   <style>
     :root {
-      --brand: #1DDB82; --brand-light: #4DE89D; --brand-dim: rgba(29,219,130,0.1);
-      --purple: #8B5CF6; --purple-light: #A78BFA;
-      --bg: #0A0E1F; --surface: #131929; --surface-2: #1C2338;
-      --border: #252D45; --text: #F8FAFC; --text-muted: #94A3B8; --text-dim: #64748B;
+      --brand: #1DDB82; --brand-light: #4AE99E; --brand-dim: rgba(29,219,130,0.1);
+      --bg: #0a0a0a; --surface: #141414; --surface-2: #1E1E1E;
+      --border: #2A2A2A; --text: #F5F3FF; --text-muted: #9CA3AF; --text-dim: #6B7280;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
     .page { max-width: 640px; margin: 0 auto; padding: 40px 20px 80px; }
     .hero { text-align: center; margin-bottom: 32px; }
     .hero-logo { font-size: 48px; margin-bottom: 12px; }
-    .hero h1 { font-size: 24px; font-weight: 800; background: linear-gradient(90deg, var(--brand-light), var(--purple-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+    .hero h1 { font-size: 24px; font-weight: 800; color: var(--brand-light); margin-bottom: 8px; }
     .hero p { font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 420px; margin: 0 auto; }
     .search-bar { position: relative; margin-bottom: 20px; }
     .search-bar input { width: 100%; padding: 12px 16px 12px 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 14px; outline: none; transition: border-color 0.15s; }
@@ -40,8 +39,8 @@
     .sticky-footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95); backdrop-filter: blur(8px); border-top: 1px solid var(--border); padding: 14px 20px; }
     .footer-inner { max-width: 640px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .footer-hint { font-size: 13px; color: var(--text-muted); }
-    .save-btn { padding: 11px 28px; background: linear-gradient(135deg, var(--brand), #14B66F); color: #0A0E1F; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
-    .save-btn:hover { opacity: 0.9; }
+    .save-btn { padding: 11px 28px; background: var(--brand); color: #000; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+    .save-btn:hover { background: var(--brand-light); }
     .save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   </style>
 </head>
