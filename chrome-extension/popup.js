@@ -24,7 +24,7 @@ function effectiveRate(card, cardCategory) {
   if (type === "cashback") {
     return { percent: val, label: `${val}% cash back`, raw: val, type: "cashback" };
   }
-  const pct = parseFloat(((val * (card.pointValuation || 1)) / 100).toFixed(2));
+  const pct = parseFloat((val * (card.pointValuation || 1)).toFixed(2));
   const program = card.rewardProgram || "Points";
   return {
     percent: pct,
