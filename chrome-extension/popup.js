@@ -74,9 +74,11 @@ function setDebug(msg, color) {
   const el = document.getElementById("debugLine");
   if (!el) return;
   el.textContent = msg;
-  el.style.color = color || "var(--text-dim)";
-  el.style.display = "block";
+  el.style.color = color || "#1DDB82";
 }
+
+// Show immediately on script load (synchronous — before any async)
+setDebug("popup.js loaded ✓");
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
@@ -254,8 +256,12 @@ async function showWalletSummary(walletIds, cardData) {
   } catch {}
 }
 
-document.getElementById("settingsBtn").addEventListener("click", () => {
-  chrome.runtime.openOptionsPage();
-});
+const settingsBtnEl = document.getElementById("settingsBtn");
+if (settingsBtnEl) {
+  settingsBtnEl.addEventListener("click", () => {
+    chrome.runtime.openOptionsPage();
+  });
+}
 
-document.addEventListener("DOMContentLoaded", main);
+// Call main directly — script is at end of body so DOM is ready
+main();
