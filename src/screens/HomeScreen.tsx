@@ -17,6 +17,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { ChevronRight, Sparkles } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import {
@@ -98,6 +99,7 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
   const navigation = useNavigation();
+  const tabBarHeight = useBottomTabBarHeight();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   // Initialize state with null values - show results only after user input
@@ -329,7 +331,10 @@ export default function HomeScreen() {
   if (state.isLoading) {
     return (
       <View style={styles.container}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]}
+        >
           <View style={styles.header}>
             <Skeleton
               width="60%"
@@ -368,7 +373,7 @@ export default function HomeScreen() {
     >
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]}
         keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl
@@ -574,9 +579,8 @@ const createStyles = (_t: Theme) =>
       flex: 1,
     },
     scrollContent: {
-      paddingHorizontal: 16, // px-4
-      paddingVertical: 24, // py-6
-      paddingBottom: 120, // Extra padding for tab bar (64px tab bar + 56px buffer)
+      paddingHorizontal: 16,
+      paddingVertical: 24,
     },
     header: {
       marginBottom: 24,

@@ -497,8 +497,12 @@ export default function AppNavigator() {
     const initializeApp = async () => {
       try {
         // Initialize each service independently — one failure shouldn't block the app
-        await initializePreferences().catch((e) => log.warn('Preferences init failed:', { error: e }));
-        await initializeSubscription().catch((e) => log.warn('Subscription init failed:', { error: e }));
+        await initializePreferences().catch((e) =>
+          log.warn('Preferences init failed:', { error: e })
+        );
+        await initializeSubscription().catch((e) =>
+          log.warn('Subscription init failed:', { error: e })
+        );
         await initializeAutoPilot().catch((e) => log.warn('AutoPilot init failed:', { error: e }));
 
         // Track app open (non-blocking)
