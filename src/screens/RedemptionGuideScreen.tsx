@@ -103,7 +103,7 @@ export default function RedemptionGuideScreen({ route }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [redemption, setRedemption] = useState<ProgramRedemption | null>(null);
 
-  const hasAccess = canAccessFeatureSync('concierge_service'); // Max feature
+  const hasAccess = canAccessFeatureSync('smartwallet'); // Max feature
 
   useEffect(() => {
     loadRedemptionGuide();
@@ -123,7 +123,7 @@ export default function RedemptionGuideScreen({ route }: Props) {
   if (!hasAccess) {
     return (
       <LockedFeature
-        feature="concierge_service"
+        feature="smartwallet"
         title="Redemption Guide"
         description="Maximize your points with transfer partners and redemption strategies"
         variant="overlay"

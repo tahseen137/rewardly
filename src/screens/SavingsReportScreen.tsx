@@ -95,7 +95,7 @@ export default function SavingsReportScreen({ route }: Props) {
   const [report, setReport] = useState<SavingsReport | null>(null);
   const [recentReports, setRecentReports] = useState<SavingsReport[]>([]);
 
-  const hasAccess = canAccessFeatureSync('benefits_tracking'); // Pro+ feature
+  const hasAccess = canAccessFeatureSync('insights'); // Pro+ feature
 
   useEffect(() => {
     loadReport();
@@ -142,7 +142,7 @@ export default function SavingsReportScreen({ route }: Props) {
   if (!hasAccess) {
     return (
       <LockedFeature
-        feature="benefits_tracking"
+        feature="insights"
         title="Monthly Savings Report"
         description="See your monthly rewards earned, missed, and optimization score"
         variant="overlay"

@@ -31,10 +31,7 @@ export type Feature =
   | 'smartwallet'
   | 'multi_country'
   | 'export'
-  | 'family_sharing'
-  | 'benefits_tracking'
-  | 'wallet_optimizer'
-  | 'concierge_service';
+  | 'family_sharing';
 
 export interface TierConfig {
   id: SubscriptionTier;

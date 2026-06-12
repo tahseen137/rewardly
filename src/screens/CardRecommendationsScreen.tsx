@@ -131,7 +131,7 @@ export default function CardRecommendationsScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [analysis, setAnalysis] = useState<RecommendationAnalysis | null>(null);
 
-  const hasAccess = canAccessFeatureSync('benefits_tracking'); // Pro+ feature
+  const hasAccess = canAccessFeatureSync('insights'); // Pro+ feature
   const tier = getCurrentTierSync();
   const showAffiliateLinks = tier === 'max';
 
@@ -166,7 +166,7 @@ export default function CardRecommendationsScreen() {
   if (!hasAccess) {
     return (
       <LockedFeature
-        feature="benefits_tracking"
+        feature="insights"
         title="Card Recommendations"
         description="Get personalized card suggestions based on your spending patterns"
         variant="overlay"

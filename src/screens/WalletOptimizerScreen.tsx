@@ -362,7 +362,7 @@ export default function WalletOptimizerScreen() {
           {/* Locked results for free tier */}
           {isFree && result.recommendations.length > 1 && (
             <LockedFeature
-              feature="wallet_optimizer"
+              feature="smartwallet"
               title="Unlock All Recommendations"
               description={`Upgrade to see ${result.recommendations.length - 1} more optimized wallet${result.recommendations.length - 1 !== 1 ? 's' : ''}.`}
               variant="card"

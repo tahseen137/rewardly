@@ -173,7 +173,7 @@ export default function AnnualFeeScreen() {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const hasAccess = canAccessFeatureSync('benefits_tracking'); // Pro+ feature
+  const hasAccess = canAccessFeatureSync('insights'); // Pro+ feature
 
   const loadData = useCallback(async () => {
     try {
@@ -221,7 +221,7 @@ export default function AnnualFeeScreen() {
   if (!hasAccess) {
     return (
       <LockedFeature
-        feature="benefits_tracking"
+        feature="insights"
         title="Annual Fee Tracker"
         description="See which cards are worth keeping based on fees vs rewards earned"
         variant="overlay"
