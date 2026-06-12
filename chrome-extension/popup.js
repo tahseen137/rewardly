@@ -208,7 +208,7 @@ async function checkUpgrade(merchant, ranked, walletIds, cardData) {
       const rate = cr ? cr.rewardRate : card.baseRewardRate;
       const pct = rate.type === "cashback"
         ? rate.value
-        : parseFloat(((rate.value * (card.pointValuation || 1)) / 100).toFixed(2));
+        : parseFloat((rate.value * (card.pointValuation || 1)).toFixed(2));
       return { card, pct };
     })
     .sort((a, b) => b.pct - a.pct)[0];
