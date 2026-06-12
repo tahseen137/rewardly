@@ -68,31 +68,16 @@ function formatRateShort(rate) {
   return `${rate.raw}x`;
 }
 
-// ─── Debug panel ─────────────────────────────────────────────────────────────
-
-function setDebug(msg, color) {
-  const el = document.getElementById("debugLine");
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = color || "#1DDB82";
-}
-
-// Show immediately on script load (synchronous — before any async)
-setDebug("popup.js loaded ✓");
-
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 async function main() {
   showState("stateLoading");
-  setDebug("v2.1 loading…");
 
   try {
     const { walletIds = [] } = await chrome.storage.local.get({ walletIds: [] });
-    setDebug(`wallet: ${walletIds.length} cards`);
 
     if (!walletIds.length) {
       showState("stateSetup");
-      setDebug("no wallet — go add cards");
       document.getElementById("setupBtn").addEventListener("click", () => {
         chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
         window.close();
@@ -104,7 +89,6 @@ async function main() {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     let hostname = null;
     try { hostname = tab?.url ? new URL(tab.url).hostname : null; } catch {}
-    setDebug(`host: ${hostname || "(none)"}`);
 
     if (!hostname) {
       await showWalletSummary(walletIds);
@@ -118,7 +102,6 @@ async function main() {
     ]);
 
     const merchant = findMerchantByDomain(hostname, merchantData.domainIndex, merchantData.merchants);
-    setDebug(`merchant: ${merchant ? merchant.name : "not found"}`);
 
     if (!merchant) {
       await showWalletSummary(walletIds, cardData);
