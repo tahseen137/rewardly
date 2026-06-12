@@ -198,7 +198,10 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       }
 
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: 'rewardly://reset-password',
+        redirectTo:
+          Platform.OS === 'web'
+            ? `${window.location.origin}/reset-password`
+            : 'rewardly://auth/reset-password',
       });
 
       if (resetError) {
