@@ -7,73 +7,88 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div id="app">
+<div id="app">
 
-    <!-- Header -->
-    <div class="header">
-      <div class="header-brand">
-        <img src="icons/icon32.png" alt="" class="header-logo">
-        <span class="header-name">Rewardly</span>
+  <div class="header">
+    <div class="header-brand">
+      <img src="icons/icon32.png" alt="" class="header-logo">
+      <span class="header-name">Rewardly</span>
+    </div>
+    <button id="settingsBtn" class="icon-btn" title="Manage wallet">⚙️</button>
+  </div>
+
+  <!-- No wallet -->
+  <div id="stateSetup" class="state hidden">
+    <div class="empty-icon">💳</div>
+    <h2 class="empty-title">Set up your wallet</h2>
+    <p class="empty-desc">Add your Canadian credit cards once. Rewardly tells you which one earns the most at every checkout — no logins, no bank details.</p>
+    <button id="setupBtn" class="btn-primary">Add My Cards</button>
+  </div>
+
+  <!-- Merchant detected -->
+  <div id="stateMerchant" class="state hidden">
+
+    <div class="merchant-header">
+      <span id="merchantIcon" class="merchant-icon">🛍️</span>
+      <div>
+        <div id="merchantName" class="merchant-name"></div>
+        <div id="merchantCategory" class="merchant-cat"></div>
       </div>
-      <button id="settingsBtn" class="icon-btn" title="Manage wallet">⚙️</button>
     </div>
 
-    <!-- State: No wallet set up -->
-    <div id="stateSetup" class="state hidden">
-      <div class="empty-icon">💳</div>
-      <h2 class="empty-title">Set up your wallet</h2>
-      <p class="empty-desc">Add your Canadian credit cards once and Rewardly will tell you which one to pull out at every checkout.</p>
-      <button id="setupBtn" class="btn-primary">Add My Cards</button>
-    </div>
-
-    <!-- State: Merchant detected -->
-    <div id="stateMerchant" class="state hidden">
-      <div class="merchant-header">
-        <span id="merchantIcon" class="merchant-icon">🛍️</span>
+    <div class="best-card-section">
+      <div class="section-label" style="margin-bottom:10px">Best card for this purchase</div>
+      <div class="best-card-row">
         <div>
-          <div id="merchantName" class="merchant-name">Merchant</div>
-          <div id="merchantCategory" class="merchant-cat">Category</div>
+          <div class="best-card-issuer" id="bestCardIssuer"></div>
+          <div class="best-card-name" id="bestCardName"></div>
         </div>
-      </div>
-
-      <div class="best-card-section">
-        <div class="section-label">BEST CARD FOR THIS PURCHASE</div>
-        <div class="best-card-row">
-          <div>
-            <div class="best-card-issuer" id="bestCardIssuer"></div>
-            <div class="best-card-name" id="bestCardName"></div>
-          </div>
+        <div class="best-card-right">
           <div class="best-card-rate" id="bestCardRate"></div>
+          <div class="best-card-label" id="bestCardLabel"></div>
         </div>
       </div>
-
-      <div id="loyaltySection" class="loyalty-section hidden">
-        <div class="loyalty-tip" id="loyaltyTip"></div>
-      </div>
-
-      <div id="otherCardsSection" class="other-section hidden">
-        <div class="section-label">YOUR OTHER CARDS</div>
-        <div id="otherCardsList" class="other-cards-list"></div>
-      </div>
-
-      <div id="upgradeSection" class="upgrade-section hidden">
-        <div class="upgrade-tip" id="upgradeTip"></div>
-      </div>
     </div>
 
-    <!-- State: No merchant / home -->
-    <div id="stateNoMerchant" class="state hidden">
-      <div class="section-label" style="margin-bottom:10px">YOUR WALLET</div>
-      <div id="walletList" class="wallet-list"></div>
-      <p class="hint-text">Visit a supported Canadian merchant and Rewardly will show you which card to use.</p>
+    <div id="loyaltySection" class="loyalty-section hidden">
+      <div class="loyalty-tip" id="loyaltyTip"></div>
     </div>
 
-    <!-- State: Loading -->
-    <div id="stateLoading" class="state">
-      <div class="loading-dots"><span></span><span></span><span></span></div>
+    <div id="otherCardsSection" class="other-section hidden">
+      <div class="section-label">Your other cards</div>
+      <div id="otherCardsList" class="other-cards-list"></div>
+    </div>
+
+    <div id="upgradeSection" class="upgrade-section hidden">
+      <div class="upgrade-tip" id="upgradeTip"></div>
     </div>
 
   </div>
-  <script src="popup.js"></script>
+
+  <!-- No merchant / home -->
+  <div id="stateNoMerchant" class="state hidden">
+    <div class="section-label" style="margin-bottom:10px">Your Wallet</div>
+    <div id="walletList" class="wallet-list"></div>
+    <p class="hint-text">Visit a supported Canadian merchant and Rewardly shows which card to use.</p>
+  </div>
+
+  <!-- Loading -->
+  <div id="stateLoading" class="state">
+    <div class="loading-dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- Error -->
+  <div id="stateError" class="state hidden">
+    <p style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px 0">
+      Something went wrong.<br>
+      <span id="errorMsg" style="color:var(--text-dim);font-size:11px"></span>
+    </p>
+  </div>
+
+  <div id="debugLine" style="display:none;font-size:10px;padding:3px 14px 6px;font-family:monospace;"></div>
+  <a href="https://rewardly.ca" target="_blank" class="footer-link">rewardly.ca</a>
+
+</div>
+<script src="popup.js"></script>
 </body>
 </html>
