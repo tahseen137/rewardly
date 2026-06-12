@@ -14,6 +14,7 @@ import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
+  Image,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
@@ -38,6 +39,7 @@ import {
 } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
+import owlLogoSrc from '../../assets/owl-logo.png';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -54,7 +56,15 @@ function NavHeader({ onGetStarted }: { onGetStarted: () => void }) {
   return (
     <View style={navStyles.header}>
       <View style={navStyles.inner}>
-        <Text style={navStyles.logo}>💳 Rewardly</Text>
+        <View style={navStyles.logoLockup}>
+          <Image
+            source={owlLogoSrc}
+            style={navStyles.owlIcon}
+            resizeMode="contain"
+            accessibilityLabel="Rewardly owl logo"
+          />
+          <Text style={navStyles.logo}>Rewardly</Text>
+        </View>
         <TouchableOpacity style={navStyles.ctaBtn} onPress={onGetStarted} activeOpacity={0.8}>
           <Text style={navStyles.ctaBtnText}>Get Started</Text>
         </TouchableOpacity>
@@ -82,6 +92,15 @@ const navStyles = StyleSheet.create({
     maxWidth: 1100,
     alignSelf: 'center',
     width: '100%',
+  },
+  logoLockup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  owlIcon: {
+    width: 28,
+    height: 28,
   },
   logo: {
     fontSize: 18,
