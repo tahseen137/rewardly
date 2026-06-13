@@ -2,13 +2,8 @@
   "manifest_version": 3,
   "name": "Rewardly \u2013 Best Card at Every Checkout",
   "version": "2.0.0",
-  "description": "Instantly see which Canadian credit card in your wallet earns the most rewards at every supported merchant. No logins. No bank credentials. Purely local.",
-  "permissions": [
-    "activeTab",
-    "storage",
-    "notifications",
-    "tabs"
-  ],
+  "description": "See which Canadian credit card earns the most rewards at every checkout. No logins, no bank credentials, purely local.",
+  "permissions": ["activeTab", "storage", "notifications", "tabs"],
   "host_permissions": [
     "*://*.airbnb.ca/*",
     "*://*.airbnb.com/*",
@@ -464,9 +459,7 @@
         "*://wholefoodsmarket.com/*",
         "*://winners.ca/*"
       ],
-      "js": [
-        "content.js"
-      ],
+      "js": ["content.js"],
       "run_at": "document_idle"
     }
   ],
@@ -479,14 +472,8 @@
   },
   "web_accessible_resources": [
     {
-      "resources": [
-        "onboarding.html",
-        "data/cards.json",
-        "data/merchants.json"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
+      "resources": ["onboarding.html", "data/cards.json", "data/merchants.json"],
+      "matches": ["<all_urls>"]
     }
   ]
 }
