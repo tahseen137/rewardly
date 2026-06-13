@@ -16,8 +16,9 @@ import {
   RefreshControl,
   ListRenderItem,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { MessageCircle, Plus, History, Sparkles, Crown, ArrowRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -508,23 +509,21 @@ export const SageScreen: React.FC = () => {
   // Auth is now optional — Sage works for all users
   // Signed-in users get personalized advice, guests get general advice
 
+  const insets = useSafeAreaInsets();
+
   // Main chat view
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={handleNewConversation}
-          accessibilityLabel="New conversation"
-        >
-          <Plus size={20} color={colors.text.primary} />
-        </TouchableOpacity>
-
-        <View style={styles.headerTitleContainer}>
-          <Sparkles size={18} color={colors.primary.main} />
-          <Text style={styles.headerTitle}>Sage</Text>
-          {/* Show chat counter for Pro users (limited chats) */}
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+        <View style={styles.headerLeft}>
+          <View style={styles.sageHeaderAvatar}>
+            <Sparkles size={18} color={colors.accent.main} />
+          </View>
+          <View>
+            <Text style={styles.headerTitle}>Sage</Text>
+            <Text style={styles.headerOnline}>● Online</Text>
+          </View>
           {sageUsage && sageUsage.limit !== null && sageUsage.remaining !== null && (
             <View style={styles.chatCounterBadge}>
               <Text
@@ -539,14 +538,22 @@ export const SageScreen: React.FC = () => {
             </View>
           )}
         </View>
-
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => setShowHistory(true)}
-          accessibilityLabel="View history"
-        >
-          <History size={20} color={colors.text.primary} />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={handleNewConversation}
+            accessibilityLabel="New conversation"
+          >
+            <Plus size={20} color={colors.text.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => setShowHistory(true)}
+            accessibilityLabel="View history"
+          >
+            <History size={20} color={colors.text.primary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Messages or Welcome Screen */}
@@ -559,9 +566,10 @@ export const SageScreen: React.FC = () => {
       ) : (
         <FlatList
           ref={flatListRef}
-          data={messages}
+          data={[...messages].reverse()}
           keyExtractor={(item) => item.id}
           renderItem={renderMessage}
+          inverted
           contentContainerStyle={styles.messagesList}
           refreshControl={
             <RefreshControl
@@ -618,22 +626,21 @@ export const SageScreen: React.FC = () => {
         </Animated.View>
       )}
 
-      {/* Input bar */}
-      <ChatInput
-        onSend={handleSendMessage}
-        disabled={!preferences || chatLimitReached}
-        isLoading={isLoading}
-        placeholder={
-          chatLimitReached
-            ? 'Chat limit reached - upgrade for unlimited'
-            : portfolio.length === 0
-              ? 'Add cards to get personalized advice...'
-              : 'Ask Sage anything...'
-        }
-      />
-
-      {/* Bottom safe area padding for tab bar */}
-      <View style={styles.bottomPadding} />
+      {/* Pinned input */}
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <ChatInput
+          onSend={handleSendMessage}
+          disabled={!preferences || chatLimitReached}
+          isLoading={isLoading}
+          placeholder={
+            chatLimitReached
+              ? 'Chat limit reached - upgrade for unlimited'
+              : portfolio.length === 0
+                ? 'Add cards to get personalized advice...'
+                : 'Ask Sage anything...'
+          }
+        />
+      </KeyboardAvoidingView>
 
       {/* Paywall Modal */}
       <Paywall
@@ -641,14 +648,13 @@ export const SageScreen: React.FC = () => {
         onClose={() => setShowPaywall(false)}
         defaultTier="max"
         onSubscribe={async (_tier) => {
-          // Refresh Sage usage after subscription
           const usage = await getSageUsage();
           setSageUsage(usage);
           const canUse = await canUseSage();
           setChatLimitReached(!canUse.allowed);
         }}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -666,24 +672,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.border.light,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  sageHeaderAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.accent.bg20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerButton: {
     padding: 8,
     borderRadius: 8,
     backgroundColor: colors.background.secondary,
   },
-  headerTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: colors.text.primary,
+  },
+  headerOnline: {
+    fontSize: 11,
+    color: colors.success.main,
+    marginTop: 1,
   },
   chatCounterBadge: {
     backgroundColor: colors.background.secondary,

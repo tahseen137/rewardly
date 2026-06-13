@@ -1,13 +1,6 @@
 /**
- * SmartWalletScreen - Main Smart Wallet management screen
- *
- * Includes:
- * - Smart Wallet toggle
- * - Merchant search and pinning
- * - Active geofences list
- * - Privacy dashboard
- *
- * Note: Requires Max subscription (free/pro users see paywall)
+ * SmartWalletScreen - Location-based card recommendations
+ * Requires Max subscription (free/pro users see paywall)
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -21,7 +14,6 @@ import {
   Switch,
   Alert,
   ActivityIndicator,
-  SafeAreaView,
   RefreshControl,
   Linking,
 } from 'react-native';
@@ -43,6 +35,8 @@ import {
 } from 'lucide-react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme/colors';
+import { borderRadius } from '../theme/borders';
+import Badge from '../components/Badge';
 import { SpendingCategory } from '../types';
 import {
   canAccessFeatureSync,
@@ -68,18 +62,43 @@ import {
   getBestCardForCategory,
 } from '../services/AutoPilotService';
 
-// ============================================================================
-// Types
-// ============================================================================
-
 interface MerchantWithBestCard extends SeedMerchant {
   bestCardName?: string;
   bestRewardRate?: number;
 }
 
-// ============================================================================
-// Main Component
-// ============================================================================
+function CategoryIcon({ category }: { category: SpendingCategory }) {
+  const iconProps = { size: 18, color: colors.text.secondary };
+  switch (category) {
+    case SpendingCategory.GROCERIES:
+      return <ShoppingCart {...iconProps} />;
+    case SpendingCategory.DINING:
+      return <Coffee {...iconProps} />;
+    case SpendingCategory.GAS:
+      return <Fuel {...iconProps} />;
+    case SpendingCategory.HOME_IMPROVEMENT:
+      return <Home {...iconProps} />;
+    case SpendingCategory.DRUGSTORES:
+      return <Pill {...iconProps} />;
+    default:
+      return <MoreHorizontal {...iconProps} />;
+  }
+}
+
+function formatCategory(category: SpendingCategory): string {
+  const mapping: Record<SpendingCategory, string> = {
+    [SpendingCategory.GROCERIES]: 'Groceries',
+    [SpendingCategory.DINING]: 'Dining',
+    [SpendingCategory.GAS]: 'Gas',
+    [SpendingCategory.TRAVEL]: 'Travel',
+    [SpendingCategory.ONLINE_SHOPPING]: 'Online Shopping',
+    [SpendingCategory.ENTERTAINMENT]: 'Entertainment',
+    [SpendingCategory.DRUGSTORES]: 'Drugstores',
+    [SpendingCategory.HOME_IMPROVEMENT]: 'Home Improvement',
+    [SpendingCategory.OTHER]: 'Other',
+  };
+  return mapping[category] || category;
+}
 
 export default function SmartWalletScreen() {
   const [isLoading, setIsLoading] = useState(true);
@@ -92,7 +111,6 @@ export default function SmartWalletScreen() {
   const [hasAccess, setHasAccess] = useState(true);
   const [, setCurrentTier] = useState<SubscriptionTier>('free');
 
-  // Check subscription access on focus
   useFocusEffect(
     useCallback(() => {
       const checkAccess = async () => {
@@ -105,7 +123,6 @@ export default function SmartWalletScreen() {
     }, [])
   );
 
-  // Load initial data
   useEffect(() => {
     loadData();
   }, []);
@@ -115,11 +132,9 @@ export default function SmartWalletScreen() {
       await initializeAutoPilot();
       const currentStatus = await getAutoPilotStatus();
       const currentGeofences = getGeofences();
-
       setStatus(currentStatus);
       setGeofences(currentGeofences);
 
-      // Load best card info for each seed merchant
       const merchantCards = await Promise.all(
         SEED_MERCHANTS.map(async (merchant) => {
           const recommendation = await getBestCardForCategory(merchant.category);
@@ -159,7 +174,6 @@ export default function SmartWalletScreen() {
       } else {
         await disableAutoPilot();
       }
-
       const currentStatus = await getAutoPilotStatus();
       setStatus(currentStatus);
     } catch (error) {
@@ -169,16 +183,11 @@ export default function SmartWalletScreen() {
 
   const handleAddMerchant = async (merchant: MerchantWithBestCard) => {
     try {
-      // Use the first location from the seed data
       const location = merchant.locations[0];
-
       await addGeofence(merchant.name, merchant.category, location.lat, location.lng);
-
       setGeofences(getGeofences());
       setShowMerchantPicker(false);
       setSearchQuery('');
-
-      // Update status
       const currentStatus = await getAutoPilotStatus();
       setStatus(currentStatus);
     } catch (error) {
@@ -196,7 +205,6 @@ export default function SmartWalletScreen() {
         onPress: async () => {
           await removeGeofence(geofenceId);
           setGeofences(getGeofences());
-
           const currentStatus = await getAutoPilotStatus();
           setStatus(currentStatus);
         },
@@ -214,19 +222,14 @@ export default function SmartWalletScreen() {
     Alert.alert('Test Sent', 'Check your notifications!');
   };
 
-  // Filter merchants based on search
   const filteredMerchants = useMemo(() => {
     if (!searchQuery) return merchantsWithCards;
-
     const query = searchQuery.toLowerCase();
     return merchantsWithCards.filter((m) => m.name.toLowerCase().includes(query));
   }, [merchantsWithCards, searchQuery]);
 
-  // Check if a merchant is already added
   const isMerchantAdded = useCallback(
-    (merchantName: string) => {
-      return geofences.some((g) => g.merchantName === merchantName);
-    },
+    (merchantName: string) => geofences.some((g) => g.merchantName === merchantName),
     [geofences]
   );
 
@@ -238,10 +241,9 @@ export default function SmartWalletScreen() {
     );
   }
 
-  // Show paywall for non-Max users
   if (!hasAccess) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <LockedFeature
           feature="smartwallet"
           title="Unlock Smart Wallet"
@@ -253,268 +255,204 @@ export default function SmartWalletScreen() {
             setCurrentTier(getCurrentTierSync());
           }}
         />
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary.main}
+          />
+        }
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View style={styles.headerRow}>
+          <Navigation size={22} color={colors.primary.main} />
           <Text style={styles.title}>Smart Wallet</Text>
-          <Text style={styles.subtitle}>
-            Get alerts with the best card to use at your favorite stores
-          </Text>
         </View>
+        <Text style={styles.subtitle}>Best card at every store near you</Text>
 
-        {/* Main Toggle */}
-        <View style={styles.toggleCard}>
-          <View style={styles.toggleContent}>
-            <View style={styles.toggleIcon}>
-              <Navigation size={24} color={colors.primary.main} />
-            </View>
-            <View style={styles.toggleText}>
-              <Text style={styles.toggleTitle}>Enable Smart Wallet</Text>
-              <Text style={styles.toggleDescription}>
-                {status?.enabled
-                  ? `Monitoring ${status.activeGeofences} stores`
-                  : 'Turn on to get card recommendations'}
-              </Text>
-            </View>
-          </View>
+        {/* Enable toggle */}
+        <View style={styles.toggleRow}>
+          <Text style={styles.toggleLabel}>Enable Smart Wallet</Text>
           <Switch
             value={status?.enabled || false}
             onValueChange={handleToggleAutoPilot}
-            trackColor={{
-              false: colors.border.medium,
-              true: colors.primary.light,
-            }}
-            thumbColor={status?.enabled ? colors.primary.main : '#f4f3f4'}
+            trackColor={{ false: colors.border.light, true: colors.success.main }}
+            thumbColor={colors.background.secondary}
           />
         </View>
 
-        {/* Add Store Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Monitored Stores</Text>
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => setShowMerchantPicker(!showMerchantPicker)}
-            >
-              <Plus size={20} color={colors.primary.main} />
-              <Text style={styles.addButtonText}>Add Store</Text>
-            </TouchableOpacity>
+        {/* Location banner (shown when enabled) */}
+        {status?.enabled && (
+          <View style={styles.locationBanner}>
+            <View style={styles.locationIconCircle}>
+              <MapPin size={16} color={colors.primary.main} />
+            </View>
+            <Text style={styles.locationText}>Location active · Canada</Text>
+            <Badge label="Live" variant="success" size="small" />
           </View>
+        )}
 
-          {/* Merchant Picker */}
-          {showMerchantPicker && (
-            <View style={styles.merchantPicker}>
-              <View style={styles.searchContainer}>
-                <Search size={20} color={colors.text.secondary} />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search stores..."
-                  placeholderTextColor={colors.text.secondary}
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                />
+        {/* NEARBY STORES section */}
+        <Text style={styles.overline}>NEARBY STORES</Text>
+
+        {merchantsWithCards.length > 0 ? (
+          merchantsWithCards.map((merchant, index) => (
+            <View key={`${merchant.name}-${index}`} style={styles.storeCard}>
+              <View style={styles.storeTopRow}>
+                <Text style={styles.storeName} numberOfLines={1}>
+                  {merchant.name}
+                </Text>
+                {merchant.bestRewardRate != null && (
+                  <Text style={[styles.storeRate]}>{merchant.bestRewardRate}%</Text>
+                )}
               </View>
-
-              <View style={styles.merchantList}>
-                {filteredMerchants.map((merchant, index) => (
-                  <TouchableOpacity
-                    key={`${merchant.name}-${index}`}
-                    style={[
-                      styles.merchantItem,
-                      isMerchantAdded(merchant.name) && styles.merchantItemDisabled,
-                    ]}
-                    onPress={() => !isMerchantAdded(merchant.name) && handleAddMerchant(merchant)}
-                    disabled={isMerchantAdded(merchant.name)}
-                  >
-                    <View style={styles.merchantIcon}>
-                      <CategoryIcon category={merchant.category} />
-                    </View>
-                    <View style={styles.merchantContent}>
-                      <Text style={styles.merchantName}>{merchant.name}</Text>
-                      {merchant.bestCardName && (
-                        <Text style={styles.merchantBestCard}>
-                          {merchant.bestRewardRate}% back with {merchant.bestCardName}
-                        </Text>
-                      )}
-                    </View>
-                    {isMerchantAdded(merchant.name) ? (
-                      <Text style={styles.merchantAdded}>Added</Text>
-                    ) : (
-                      <Plus size={20} color={colors.primary.main} />
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          )}
-
-          {/* Active Geofences */}
-          {geofences.length > 0 ? (
-            <View style={styles.geofenceList}>
-              {geofences.map((geofence) => (
-                <GeofenceCard
-                  key={geofence.id}
-                  geofence={geofence}
-                  onToggle={(enabled) => handleToggleGeofence(geofence.id, enabled)}
-                  onRemove={() => handleRemoveGeofence(geofence.id)}
-                />
-              ))}
-            </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <MapPin size={48} color={colors.text.secondary} />
-              <Text style={styles.emptyStateText}>No stores monitored yet</Text>
-              <Text style={styles.emptyStateSubtext}>
-                Add stores above to get card recommendations when you arrive
+              <Text style={styles.storeMeta}>
+                <CategoryIcon category={merchant.category} /> {formatCategory(merchant.category)}
               </Text>
+              {merchant.bestCardName ? (
+                <Text style={styles.storeTapWith}>
+                  Tap with <Text style={styles.storeCardName}>{merchant.bestCardName}</Text>
+                </Text>
+              ) : null}
             </View>
-          )}
+          ))
+        ) : (
+          <View style={styles.emptyState}>
+            <MapPin size={32} color={colors.text.secondary} />
+            <Text style={styles.emptyStateText}>No stores found</Text>
+          </View>
+        )}
+
+        {/* Monitored stores (geofences) */}
+        {geofences.length > 0 && (
+          <>
+            <Text style={[styles.overline, { marginTop: 24 }]}>MONITORED STORES</Text>
+            {geofences.map((geofence) => (
+              <View key={geofence.id} style={styles.geofenceCard}>
+                <View style={styles.geofenceContent}>
+                  <Text style={styles.geofenceName}>{geofence.merchantName}</Text>
+                  <Text style={styles.geofenceCategory}>{formatCategory(geofence.category)}</Text>
+                </View>
+                <Switch
+                  value={geofence.enabled}
+                  onValueChange={(enabled) => handleToggleGeofence(geofence.id, enabled)}
+                  trackColor={{ false: colors.border.light, true: colors.success.main }}
+                  thumbColor={colors.background.secondary}
+                />
+                <TouchableOpacity
+                  onPress={() => handleRemoveGeofence(geofence.id)}
+                  style={styles.removeButton}
+                >
+                  <Trash2 size={16} color={colors.error.main} />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </>
+        )}
+
+        {/* Add store button */}
+        <TouchableOpacity
+          style={styles.addStoreButton}
+          onPress={() => setShowMerchantPicker(!showMerchantPicker)}
+        >
+          <Plus size={16} color={colors.primary.main} />
+          <Text style={styles.addStoreText}>Add store to monitor</Text>
+        </TouchableOpacity>
+
+        {/* Merchant picker */}
+        {showMerchantPicker && (
+          <View style={styles.merchantPicker}>
+            <View style={styles.searchContainer}>
+              <Search size={16} color={colors.text.secondary} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search stores..."
+                placeholderTextColor={colors.text.secondary}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+            </View>
+            {filteredMerchants.map((merchant, index) => (
+              <TouchableOpacity
+                key={`picker-${merchant.name}-${index}`}
+                style={[
+                  styles.merchantItem,
+                  isMerchantAdded(merchant.name) && styles.merchantItemDisabled,
+                ]}
+                onPress={() => !isMerchantAdded(merchant.name) && handleAddMerchant(merchant)}
+                disabled={isMerchantAdded(merchant.name)}
+              >
+                <Text style={styles.merchantItemName}>{merchant.name}</Text>
+                {isMerchantAdded(merchant.name) ? (
+                  <Text style={styles.merchantAdded}>Added</Text>
+                ) : (
+                  <Plus size={16} color={colors.primary.main} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Privacy section */}
+        <View style={styles.privacyCard}>
+          <View style={styles.privacyRow}>
+            <Shield size={16} color={colors.success.main} />
+            <Text style={styles.privacyText}>Location processed on-device only</Text>
+          </View>
+          <View style={styles.privacyRow}>
+            <Shield size={16} color={colors.success.main} />
+            <Text style={styles.privacyText}>Only stores YOU choose are monitored</Text>
+          </View>
+          <View style={styles.privacyRow}>
+            <Shield size={16} color={colors.success.main} />
+            <Text style={styles.privacyText}>Disable anytime in Settings</Text>
+          </View>
         </View>
 
-        {/* Privacy Dashboard */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Privacy</Text>
-          </View>
-
-          <View style={styles.privacyCard}>
-            <View style={styles.privacyRow}>
-              <Shield size={20} color={colors.success.main} />
-              <Text style={styles.privacyText}>Location processed on-device only</Text>
-            </View>
-            <View style={styles.privacyRow}>
-              <Shield size={20} color={colors.success.main} />
-              <Text style={styles.privacyText}>Only stores YOU choose are monitored</Text>
-            </View>
-            <View style={styles.privacyRow}>
-              <Shield size={20} color={colors.success.main} />
-              <Text style={styles.privacyText}>Disable anytime in Settings</Text>
-            </View>
-          </View>
-
-          <TouchableOpacity
-            style={styles.privacyLink}
-            onPress={async () => {
-              // Prefer the hosted privacy policy (public/privacy-policy.html),
-              // fall back to an in-app alert if the URL can't be opened.
-              const privacyUrl = 'https://rewardly.ca/privacy-policy';
-              try {
-                const supported = await Linking.canOpenURL(privacyUrl);
-                if (supported) {
-                  await Linking.openURL(privacyUrl);
-                  return;
-                }
-              } catch {
-                // fall through to alert
+        <TouchableOpacity
+          style={styles.privacyLink}
+          onPress={async () => {
+            const privacyUrl = 'https://rewardly.ca/privacy-policy';
+            try {
+              const supported = await Linking.canOpenURL(privacyUrl);
+              if (supported) {
+                await Linking.openURL(privacyUrl);
+                return;
               }
-              Alert.alert(
-                'Privacy Details',
-                'Smart Wallet uses geofencing technology to detect when you enter a monitored store. Your exact location is never stored or transmitted. All processing happens on your device.\n\nYou control which stores are monitored. You can disable Smart Wallet or remove individual stores at any time.\n\nWe do not sell your data to third parties.',
-                [{ text: 'Got it' }]
-              );
-            }}
-          >
-            <Text style={styles.privacyLinkText}>Learn more about privacy</Text>
-            <ChevronRight size={16} color={colors.primary.main} />
-          </TouchableOpacity>
-        </View>
+            } catch {
+              // fall through
+            }
+            Alert.alert(
+              'Privacy Details',
+              'Smart Wallet uses geofencing to detect when you enter a monitored store. Your exact location is never stored or transmitted. All processing happens on your device.',
+              [{ text: 'Got it' }]
+            );
+          }}
+        >
+          <Text style={styles.privacyLinkText}>Learn more about privacy</Text>
+          <ChevronRight size={14} color={colors.primary.main} />
+        </TouchableOpacity>
 
-        {/* Test Button (for development) */}
         {__DEV__ && (
           <TouchableOpacity style={styles.testButton} onPress={handleTestNotification}>
-            <Bell size={20} color={colors.primary.main} />
+            <Bell size={16} color={colors.primary.main} />
             <Text style={styles.testButtonText}>Send Test Notification</Text>
           </TouchableOpacity>
         )}
+
+        <View style={{ height: 100 }} />
       </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-// ============================================================================
-// Sub-Components
-// ============================================================================
-
-interface GeofenceCardProps {
-  geofence: MerchantGeofence;
-  onToggle: (enabled: boolean) => void;
-  onRemove: () => void;
-}
-
-function GeofenceCard({ geofence, onToggle, onRemove }: GeofenceCardProps) {
-  return (
-    <View style={styles.geofenceCard}>
-      <View style={styles.geofenceIcon}>
-        <CategoryIcon category={geofence.category} />
-      </View>
-      <View style={styles.geofenceContent}>
-        <Text style={styles.geofenceName}>{geofence.merchantName}</Text>
-        <Text style={styles.geofenceCategory}>{formatCategory(geofence.category)}</Text>
-      </View>
-      <View style={styles.geofenceActions}>
-        <Switch
-          value={geofence.enabled}
-          onValueChange={onToggle}
-          trackColor={{
-            false: colors.border.medium,
-            true: colors.primary.light,
-          }}
-          thumbColor={geofence.enabled ? colors.primary.main : '#f4f3f4'}
-        />
-        <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
-          <Trash2 size={18} color={colors.error.main} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
-
-function CategoryIcon({ category }: { category: SpendingCategory }) {
-  const iconProps = { size: 20, color: colors.text.primary };
-
-  switch (category) {
-    case SpendingCategory.GROCERIES:
-      return <ShoppingCart {...iconProps} />;
-    case SpendingCategory.DINING:
-      return <Coffee {...iconProps} />;
-    case SpendingCategory.GAS:
-      return <Fuel {...iconProps} />;
-    case SpendingCategory.HOME_IMPROVEMENT:
-      return <Home {...iconProps} />;
-    case SpendingCategory.DRUGSTORES:
-      return <Pill {...iconProps} />;
-    default:
-      return <MoreHorizontal {...iconProps} />;
-  }
-}
-
-function formatCategory(category: SpendingCategory): string {
-  const mapping: Record<SpendingCategory, string> = {
-    [SpendingCategory.GROCERIES]: 'Groceries',
-    [SpendingCategory.DINING]: 'Dining',
-    [SpendingCategory.GAS]: 'Gas',
-    [SpendingCategory.TRAVEL]: 'Travel',
-    [SpendingCategory.ONLINE_SHOPPING]: 'Online Shopping',
-    [SpendingCategory.ENTERTAINMENT]: 'Entertainment',
-    [SpendingCategory.DRUGSTORES]: 'Drugstores',
-    [SpendingCategory.HOME_IMPROVEMENT]: 'Home Improvement',
-    [SpendingCategory.OTHER]: 'Other',
-  };
-  return mapping[category] || category;
-}
-
-// ============================================================================
-// Styles
-// ============================================================================
 
 const styles = StyleSheet.create({
   container: {
@@ -528,245 +466,265 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
   },
   scrollContent: {
-    padding: 20,
+    paddingHorizontal: 16,
+    paddingTop: 24,
     paddingBottom: 40,
   },
-  header: {
-    marginBottom: 24,
+  // Header
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 6,
   },
   title: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: '700',
     color: colors.text.primary,
-    marginBottom: 8,
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 13,
     color: colors.text.secondary,
-    lineHeight: 24,
+    marginBottom: 20,
   },
-  toggleCard: {
+  // Toggle row
+  toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.background.secondary,
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 24,
+    borderRadius: borderRadius.card,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    paddingHorizontal: 16,
+    paddingVertical: 13,
+    marginBottom: 12,
   },
-  toggleContent: {
+  toggleLabel: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.text.primary,
+  },
+  // Location banner
+  locationBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    gap: 10,
+    borderRadius: borderRadius.card,
+    borderWidth: 1,
+    borderColor: colors.primary.main,
+    padding: 12,
+    marginBottom: 20,
   },
-  toggleIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.primary.light + '20',
+  locationIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.primary.bg10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
   },
-  toggleText: {
+  locationText: {
     flex: 1,
-  },
-  toggleTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: 4,
-  },
-  toggleDescription: {
     fontSize: 14,
+    color: colors.text.primary,
+    fontWeight: '500',
+  },
+  // Overline
+  overline: {
+    fontSize: 11,
+    fontWeight: '600',
     color: colors.text.secondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 10,
   },
-  section: {
-    marginBottom: 24,
+  // Store cards
+  storeCard: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.card,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    padding: 16,
+    marginBottom: 10,
   },
-  sectionHeader: {
+  storeTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 4,
   },
-  sectionTitle: {
-    fontSize: 20,
+  storeName: {
+    fontSize: 15,
     fontWeight: '600',
     color: colors.text.primary,
+    flex: 1,
+    marginRight: 8,
   },
-  addButton: {
+  storeRate: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.primary.main,
+    fontVariant: ['tabular-nums'],
+  },
+  storeMeta: {
+    fontSize: 12,
+    color: colors.text.tertiary,
+    marginBottom: 4,
+  },
+  storeTapWith: {
+    fontSize: 12,
+    color: colors.text.secondary,
+  },
+  storeCardName: {
+    color: colors.primary.main,
+    fontWeight: '600',
+  },
+  // Empty state
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    gap: 8,
+  },
+  emptyStateText: {
+    fontSize: 15,
+    color: colors.text.secondary,
+  },
+  // Geofences
+  geofenceCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: colors.primary.light + '20',
-    borderRadius: 20,
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.card,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    padding: 14,
+    marginBottom: 8,
+    gap: 12,
   },
-  addButtonText: {
+  geofenceContent: {
+    flex: 1,
+  },
+  geofenceName: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.text.primary,
+  },
+  geofenceCategory: {
+    fontSize: 12,
+    color: colors.text.secondary,
+    marginTop: 2,
+  },
+  removeButton: {
+    padding: 6,
+  },
+  // Add store
+  addStoreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 8,
+    marginBottom: 12,
+    paddingVertical: 12,
+    borderRadius: borderRadius.card,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    borderStyle: 'dashed',
+  },
+  addStoreText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
     color: colors.primary.main,
-    marginLeft: 6,
   },
+  // Merchant picker
   merchantPicker: {
     backgroundColor: colors.background.secondary,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: borderRadius.card,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    padding: 12,
+    marginBottom: 12,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.background.primary,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    marginBottom: 12,
+    backgroundColor: colors.background.tertiary,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 8,
+    gap: 8,
   },
   searchInput: {
     flex: 1,
-    paddingVertical: 12,
-    paddingLeft: 8,
-    fontSize: 16,
+    paddingVertical: 10,
+    fontSize: 14,
     color: colors.text.primary,
-  },
-  merchantList: {
-    maxHeight: 300,
   },
   merchantItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    justifyContent: 'space-between',
+    paddingVertical: 11,
     borderBottomWidth: 1,
     borderBottomColor: colors.border.light,
   },
   merchantItemDisabled: {
     opacity: 0.5,
   },
-  merchantIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.background.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  merchantContent: {
-    flex: 1,
-  },
-  merchantName: {
-    fontSize: 16,
-    fontWeight: '500',
+  merchantItemName: {
+    fontSize: 14,
     color: colors.text.primary,
-    marginBottom: 2,
-  },
-  merchantBestCard: {
-    fontSize: 13,
-    color: colors.primary.main,
   },
   merchantAdded: {
-    fontSize: 14,
+    fontSize: 12,
     color: colors.text.secondary,
   },
-  geofenceList: {
-    gap: 12,
-  },
-  geofenceCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background.secondary,
-    padding: 16,
-    borderRadius: 12,
-  },
-  geofenceIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.primary.light + '20',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  geofenceContent: {
-    flex: 1,
-  },
-  geofenceName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: 2,
-  },
-  geofenceCategory: {
-    fontSize: 14,
-    color: colors.text.secondary,
-  },
-  geofenceActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  removeButton: {
-    padding: 8,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    backgroundColor: colors.background.secondary,
-    borderRadius: 16,
-  },
-  emptyStateText: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyStateSubtext: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    paddingHorizontal: 32,
-  },
+  // Privacy
   privacyCard: {
     backgroundColor: colors.background.secondary,
-    borderRadius: 12,
-    padding: 16,
-    gap: 12,
+    borderRadius: borderRadius.card,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    padding: 14,
+    gap: 10,
+    marginTop: 24,
   },
   privacyRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 10,
   },
   privacyText: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.text.primary,
-    marginLeft: 12,
   },
   privacyLink: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
+    paddingVertical: 14,
+    gap: 4,
   },
   privacyLinkText: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.primary.main,
-    marginRight: 4,
   },
+  // Test button
   testButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
+    paddingVertical: 12,
     backgroundColor: colors.background.secondary,
-    borderRadius: 12,
-    marginTop: 16,
+    borderRadius: borderRadius.card,
+    marginTop: 12,
+    gap: 8,
   },
   testButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '500',
     color: colors.primary.main,
-    marginLeft: 8,
   },
 });

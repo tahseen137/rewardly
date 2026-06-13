@@ -234,7 +234,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
         <View style={styles.header}>
           <Image
             source={owlLogo}
-            style={{ width: 56, height: 56, borderRadius: 14, marginBottom: 16 }}
+            style={{ width: 80, height: 80, borderRadius: 20, marginBottom: 16 }}
           />
           <Text style={styles.title}>
             {mode === 'forgotPassword' ? 'Reset Password' : t('auth.title')}
@@ -440,7 +440,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>{t('auth.termsNotice')}</Text>
+          <Text style={styles.footerText}>Made for the Canadian rewards community 🇨🇦</Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -464,13 +464,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: '800',
+    letterSpacing: -0.5,
     color: colors.text.primary,
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 15,
+    fontSize: 14,
     color: colors.text.secondary,
     textAlign: 'center',
   },

@@ -25,6 +25,8 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { Plus, Search, Trash2, ChevronRight, Wallet, TrendingUp, Edit3 } from 'lucide-react-native';
+import { RewardsIQScore } from '../types/rewards-iq';
+import { calculateRewardsIQ } from '../services/RewardsIQService';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -449,6 +451,7 @@ export default function MyCardsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [portfolio, setPortfolio] = useState<UserCard[]>([]);
+  const [rewardsIQ, setRewardsIQ] = useState<RewardsIQScore | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [portfolioSearchQuery, setPortfolioSearchQuery] = useState('');
@@ -500,6 +503,12 @@ export default function MyCardsScreen() {
   useEffect(() => {
     loadPortfolio();
   }, [loadPortfolio]);
+
+  useEffect(() => {
+    calculateRewardsIQ()
+      .then(setRewardsIQ)
+      .catch(() => {});
+  }, []);
 
   // Re-load when country changes so card lookups resolve correctly
   useEffect(() => {
@@ -685,8 +694,8 @@ export default function MyCardsScreen() {
           <View style={styles.subtitleRow}>
             <Text style={styles.subtitle}>
               {showLimit
-                ? `${portfolio.length} of ${limit} slots used`
-                : `${portfolio.length} card${portfolio.length !== 1 ? 's' : ''}`}
+                ? `Your portfolio · ${portfolio.length} of ${limit} slots`
+                : `Your portfolio · ${portfolio.length} card${portfolio.length !== 1 ? 's' : ''}`}
             </Text>
             {atLimit && (
               <TouchableOpacity
@@ -749,7 +758,36 @@ export default function MyCardsScreen() {
         <FlatList
           data={filteredPortfolio}
           keyExtractor={(item) => item.cardId}
-          ListHeaderComponent={<PortfolioSummary portfolio={portfolio} />}
+          ListHeaderComponent={
+            <>
+              {rewardsIQ && (
+                <View style={styles.iqCard}>
+                  <Text style={styles.iqOverline}>REWARDS IQ</Text>
+                  <View style={styles.iqScoreRow}>
+                    <Text style={styles.iqScore}>{rewardsIQ.overallScore}</Text>
+                    <Text style={styles.iqScoreMax}>
+                      {' '}
+                      / 100 ·{' '}
+                      {rewardsIQ.overallScore >= 80
+                        ? 'well optimized'
+                        : rewardsIQ.overallScore >= 60
+                          ? 'room to improve'
+                          : 'needs attention'}
+                    </Text>
+                  </View>
+                  <View style={styles.iqProgressBg}>
+                    <View
+                      style={[
+                        styles.iqProgressFill,
+                        { width: `${rewardsIQ.overallScore}%` as any },
+                      ]}
+                    />
+                  </View>
+                </View>
+              )}
+              <PortfolioSummary portfolio={portfolio} />
+            </>
+          }
           renderItem={({ item }) => (
             <CardItem
               userCard={item}
@@ -843,9 +881,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 24, // text-2xl
-    fontWeight: '700', // bold
+    fontSize: 26,
+    fontWeight: '700',
     color: colors.text.primary,
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 13, // text-sm
@@ -1106,5 +1145,47 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 15,
     color: colors.text.secondary,
+  },
+  // Rewards IQ card
+  iqCard: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    padding: 16,
+    marginBottom: 16,
+  },
+  iqOverline: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.text.secondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 10,
+  },
+  iqScoreRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 14,
+  },
+  iqScore: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: colors.primary.main,
+    fontVariant: ['tabular-nums'],
+  },
+  iqScoreMax: {
+    fontSize: 13,
+    color: colors.text.secondary,
+  },
+  iqProgressBg: {
+    height: 6,
+    borderRadius: 99,
+    backgroundColor: colors.background.tertiary,
+  },
+  iqProgressFill: {
+    height: 6,
+    borderRadius: 99,
+    backgroundColor: colors.primary.main,
   },
 });

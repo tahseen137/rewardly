@@ -587,8 +587,9 @@ const createStyles = (_t: Theme) =>
       alignItems: 'center', // Center aligned
     },
     title: {
-      fontSize: 24, // text-2xl
-      fontWeight: '700', // bold
+      fontSize: 24,
+      fontWeight: '700',
+      letterSpacing: -0.5,
       marginBottom: 4,
       textAlign: 'center',
     },
@@ -602,15 +603,17 @@ const createStyles = (_t: Theme) =>
       marginBottom: 16, // space-y-4 (16px gap)
     },
     sectionLabel: {
-      fontSize: 13, // text-sm
-      fontWeight: '500', // font-medium
+      fontSize: 11,
+      fontWeight: '600',
       color: colors.text.secondary,
-      marginBottom: 8, // space-y-2 (8px gap)
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginBottom: 8,
     },
     divider: {
       height: 1,
       backgroundColor: colors.border.light,
-      marginVertical: 24, // Divider spacing
+      marginVertical: 14,
     },
     resultsHeader: {
       fontSize: 13, // text-sm

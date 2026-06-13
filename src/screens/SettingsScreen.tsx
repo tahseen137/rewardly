@@ -1,10 +1,3 @@
-/**
- * SettingsScreen - User preferences and settings
- * Redesigned to match web with section grouping and lucide icons
- * Now includes country selector and account management
- * Requirements: 5.1, 3.4
- */
-
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -25,7 +18,6 @@ import {
   Bell,
   Globe,
   RefreshCw,
-  Info,
   MapPin,
   LogOut,
   LogIn,
@@ -34,10 +26,15 @@ import {
   Navigation,
   ChevronRight,
   Gift,
+  Trash2,
+  Shield,
+  Database,
+  CreditCard,
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
+import Badge from '../components/Badge';
 
 import {
   isNewCardSuggestionsEnabled,
@@ -46,7 +43,6 @@ import {
   setLanguage,
   getCountry,
   setCountry,
-  getCountryFlag,
   getCountryName,
   initializePreferences,
   Language,
@@ -80,23 +76,8 @@ import {
   initializeAutoPilot,
   AutoPilotStatus,
 } from '../services/AutoPilotService';
+import { initializePortfolio, getCards } from '../services/CardPortfolioManager';
 
-/**
- * Language options
- */
-const _LANGUAGE_OPTIONS: Array<{ code: Language; labelKey: string; icon: string }> = [
-  { code: 'en', labelKey: 'languages.en', icon: '🇬🇧' },
-  { code: 'fr', labelKey: 'languages.fr', icon: '🇫🇷' },
-];
-
-/**
- * Country options
- */
-const COUNTRY_OPTIONS: Country[] = ['US', 'CA'];
-
-/**
- * Settings section header component
- */
 function SectionHeader({ title }: { title: string }) {
   return (
     <View style={styles.sectionHeader}>
@@ -105,32 +86,36 @@ function SectionHeader({ title }: { title: string }) {
   );
 }
 
-/**
- * Settings row component (matches web design)
- */
 function SettingsRow({
   icon,
   title,
-  description,
+  value,
   children,
   onPress,
   isLast = false,
+  danger = false,
 }: {
   icon: React.ReactNode;
   title: string;
-  description?: string;
+  value?: string;
   children?: React.ReactNode;
   onPress?: () => void;
   isLast?: boolean;
+  danger?: boolean;
 }) {
   const content = (
     <View style={[styles.settingsRow, !isLast && styles.settingsRowBorder]}>
       <View style={styles.settingsRowIcon}>{icon}</View>
-      <View style={styles.settingsRowContent}>
-        <Text style={styles.settingsRowTitle}>{title}</Text>
-        {description && <Text style={styles.settingsRowDescription}>{description}</Text>}
+      <Text style={[styles.settingsRowTitle, danger && styles.settingsRowTitleDanger]}>
+        {title}
+      </Text>
+      <View style={styles.settingsRowRight}>
+        {value ? <Text style={styles.settingsRowValue}>{value}</Text> : null}
+        {children}
+        {onPress && !danger && !children ? (
+          <ChevronRight size={16} color={colors.text.secondary} />
+        ) : null}
       </View>
-      <View style={styles.settingsRowAction}>{children}</View>
     </View>
   );
 
@@ -158,9 +143,10 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
   const [currentCountry, setCurrentCountry] = useState<Country>('US');
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastSync, setLastSync] = useState<Date | null>(null);
+  const [_lastSync, setLastSync] = useState<Date | null>(null);
   const [cardCount, setCardCount] = useState<number>(0);
-  const [cardCountDetail, setCardCountDetail] = useState<string>('');
+  const [_cardCountDetail, setCardCountDetail] = useState<string>('');
+  const [portfolioCount, setPortfolioCount] = useState<number>(0);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>('free');
   const [subscriptionState, setSubscriptionState] = useState<SubscriptionState | null>(null);
@@ -174,11 +160,9 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
     setCurrentLanguage(getLanguage());
     setCurrentCountry(getCountry());
 
-    // Load user
     const currentUser = await getCurrentUser();
     setUser(currentUser);
 
-    // Load subscription tier and state
     await refreshSubscription();
     const tier = await getCurrentTier();
     setSubscriptionTier(tier);
@@ -186,13 +170,11 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
     const subState = await getSubscriptionState();
     setSubscriptionState(subState);
 
-    // Load Sage usage if user has access
     if (tier === 'pro') {
       const usage = await getSageUsage();
       setSageUsage(usage);
     }
 
-    // Load card count and last sync time
     try {
       const cardStats = await getTotalCardCount();
       setCardCount(cardStats.total);
@@ -204,10 +186,12 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
     const syncTime = await getLastSyncTime();
     setLastSync(syncTime);
 
-    // Load AutoPilot status
     await initializeAutoPilot();
     const apStatus = await getAutoPilotStatus();
     setAutoPilotStatus(apStatus);
+
+    await initializePortfolio();
+    setPortfolioCount(getCards().length);
 
     setIsLoading(false);
   }, []);
@@ -233,7 +217,6 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
     await setCountry(country);
     await onCountryChange();
 
-    // Reload cards for new country
     try {
       const cardStats = await getTotalCardCount();
       setCardCount(cardStats.total);
@@ -243,31 +226,24 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
       setCardCountDetail('');
     }
 
-    // Notify other screens (HomeScreen) that country has changed
     CountryChangeEmitter.emit();
-
     setIsLoading(false);
   };
 
   const handleCountryChange = async (country: Country) => {
     if (country === currentCountry) return;
 
-    // On web, Alert.alert callbacks don't work reliably — switch directly
     if (Platform.OS === 'web') {
       await performCountrySwitch(country);
       return;
     }
 
-    // On native, show confirmation dialog
     Alert.alert(
       t('settings.changeCountryTitle'),
       t('settings.changeCountryMessage', { country: getCountryName(country) }),
       [
         { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.ok'),
-          onPress: () => performCountrySwitch(country),
-        },
+        { text: t('common.ok'), onPress: () => performCountrySwitch(country) },
       ]
     );
   };
@@ -304,7 +280,6 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
   };
 
   const handleSignOut = async () => {
-    // On web, Alert.alert callbacks don't work reliably — sign out directly
     if (Platform.OS === 'web') {
       await signOut();
       onSignOut?.();
@@ -322,6 +297,36 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
         },
       },
     ]);
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete account',
+      'This will permanently delete your account and all data. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            await signOut();
+            onSignOut?.();
+          },
+        },
+      ]
+    );
+  };
+
+  const handleExportData = () => {
+    Alert.alert(
+      'Export data',
+      'Your data export will be sent to your email address within 24 hours.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handlePrivacyPolicy = () => {
+    Linking.openURL('https://rewardly.ca/privacy');
   };
 
   const handleUpgrade = () => {
@@ -350,16 +355,32 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>{t('common.loading')}</Text>
+        <ActivityIndicator size="small" color={colors.primary.main} />
       </View>
     );
   }
 
-  const getLanguageLabel = (lang: Language) => {
-    return lang === 'en' ? 'English' : 'Français';
+  const tierConfig = SUBSCRIPTION_TIERS[subscriptionTier];
+
+  const getTierBadgeLabel = () => {
+    if (subscriptionState?.isAdmin) return 'Admin';
+    if (subscriptionTier === 'lifetime') return 'Lifetime';
+    if (subscriptionTier === 'max') return 'Max';
+    if (subscriptionTier === 'pro') return 'Pro';
+    return 'Free';
   };
 
-  const tierConfig = SUBSCRIPTION_TIERS[subscriptionTier];
+  const getTierBadgeVariant = (): 'primary' | 'secondary' | 'success' | 'warning' | 'neutral' => {
+    if (subscriptionState?.isAdmin) return 'warning';
+    if (subscriptionTier === 'lifetime') return 'success';
+    if (subscriptionTier === 'max') return 'primary';
+    if (subscriptionTier === 'pro') return 'secondary';
+    return 'neutral';
+  };
+
+  const getLanguageLabel = (lang: Language) => (lang === 'en' ? 'English' : 'Français');
+
+  const countryValue = currentCountry === 'CA' ? 'Canada 🇨🇦' : 'United States 🇺🇸';
 
   return (
     <>
@@ -370,293 +391,227 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
           <Text style={styles.subtitle}>{t('settings.customizeExperience')}</Text>
         </View>
 
-        {/* Account Section */}
-        {user && (
-          <>
-            <SectionHeader title={t('settings.account')} />
-            <View style={styles.section}>
-              <SettingsRow
-                icon={<User size={20} color={colors.text.secondary} />}
-                title={user.displayName || user.email || t('settings.guest')}
-                description={
-                  user.isAnonymous ? t('settings.signInPrompt') : user.email || undefined
-                }
-                isLast={false}
-              >
-                {!user.isAnonymous ? (
-                  <TouchableOpacity onPress={handleSignOut}>
-                    <LogOut size={20} color={colors.error.main} />
-                  </TouchableOpacity>
-                ) : onSignIn ? (
-                  <TouchableOpacity onPress={onSignIn} style={styles.signInButton}>
-                    <Text style={styles.signInText}>{t('settings.signIn')}</Text>
-                    <LogIn size={18} color={colors.primary.main} />
-                  </TouchableOpacity>
-                ) : null}
-              </SettingsRow>
-
-              <SettingsRow
-                icon={
-                  <Crown
-                    size={20}
-                    color={
-                      subscriptionTier === 'lifetime'
-                        ? '#FFD700'
-                        : subscriptionState?.isAdmin
-                          ? colors.warning.main
-                          : tierConfig.id === 'free'
-                            ? colors.text.secondary
-                            : colors.primary.main
-                    }
-                  />
-                }
-                title={
-                  subscriptionTier === 'lifetime'
-                    ? 'Lifetime Member ✨'
-                    : t('settings.subscription')
-                }
-                description={
-                  subscriptionTier === 'lifetime'
-                    ? 'All Premium features — forever'
-                    : subscriptionState?.isAdmin
-                      ? 'Admin Access'
-                      : tierConfig.name
-                }
-                isLast={subscriptionTier !== 'pro'}
-                onPress={subscriptionTier === 'free' ? handleUpgrade : undefined}
-              >
-                {subscriptionTier === 'free' && (
-                  <Text style={styles.upgradeText}>{t('settings.upgrade')}</Text>
-                )}
-                {subscriptionTier === 'lifetime' && (
-                  <View style={styles.lifetimeBadge}>
-                    <Text style={styles.lifetimeBadgeText}>LIFETIME</Text>
-                  </View>
-                )}
-                {subscriptionState?.isAdmin && (
-                  <View style={styles.adminBadge}>
-                    <Text style={styles.adminBadgeText}>ADMIN</Text>
-                  </View>
-                )}
-                {/* Subscription management — requires the manage-subscription edge function
-                    to be deployed: `supabase functions deploy manage-subscription`. */}
-                {(subscriptionTier === 'pro' || subscriptionTier === 'max') &&
-                  !subscriptionState?.isAdmin && (
-                    <TouchableOpacity
-                      style={styles.manageButton}
-                      onPress={async () => {
-                        try {
-                          const result = await openCustomerPortal();
-                          if ('error' in result) {
-                            Alert.alert('Error', result.error);
-                          } else if (result.url) {
-                            const supported = await Linking.canOpenURL(result.url);
-                            if (supported) {
-                              await Linking.openURL(result.url);
-                            } else {
-                              Alert.alert('Error', 'Unable to open settings page');
-                            }
-                          }
-                        } catch (error) {
-                          console.error('Portal error:', error);
-                          Alert.alert('Error', 'Failed to open subscription management');
-                        }
-                      }}
-                    >
-                      <Text style={styles.manageButtonText}>Manage</Text>
-                      <ChevronRight size={14} color={colors.primary.main} />
-                    </TouchableOpacity>
-                  )}
-              </SettingsRow>
-
-              {/* Sage usage for Pro users */}
-              {subscriptionTier === 'pro' && sageUsage && sageUsage.limit !== null && (
-                <SettingsRow
-                  icon={<Crown size={20} color={colors.primary.main} />}
-                  title="Sage AI Usage"
-                  description={`${sageUsage.chatCount} of ${sageUsage.limit} chats used this month`}
-                  isLast={false}
-                >
-                  <Text
-                    style={[
-                      styles.usageText,
-                      sageUsage.remaining !== null &&
-                        sageUsage.remaining <= 2 &&
-                        styles.usageTextWarning,
-                      sageUsage.remaining !== null &&
-                        sageUsage.remaining === 0 &&
-                        styles.usageTextDanger,
-                    ]}
-                  >
-                    {sageUsage.remaining ?? 0} left
-                  </Text>
-                </SettingsRow>
-              )}
-
-              {/* Referral Program */}
-              <SettingsRow
-                icon={<Gift size={20} color="#10b981" />}
-                title="Invite & Earn Rewards"
-                description="Share Rewardly and unlock free Pro features"
-                isLast={true}
-                onPress={() => navigation.navigate('ReferralDashboard')}
-              >
-                <ChevronRight size={20} color={colors.text.secondary} />
-              </SettingsRow>
-            </View>
-          </>
-        )}
-
-        {/* Region Section */}
-        <SectionHeader title={t('settings.region')} />
-        <View style={styles.section}>
-          <SettingsRow
-            icon={<MapPin size={20} color={colors.text.secondary} />}
-            title={t('settings.country')}
-            description={t('settings.countryDescription')}
-            isLast={true}
-          >
-            <View style={styles.countryToggle}>
-              {COUNTRY_OPTIONS.map((country) => (
-                <TouchableOpacity
-                  key={country}
-                  style={[
-                    styles.countryOption,
-                    currentCountry === country && styles.countryOptionActive,
-                  ]}
-                  onPress={() => handleCountryChange(country)}
-                >
-                  <Text style={styles.countryFlag}>{getCountryFlag(country)}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </SettingsRow>
+        {/* Account card */}
+        <View style={styles.accountCard}>
+          <View style={styles.accountAvatar}>
+            <User size={22} color={colors.primary.main} />
+          </View>
+          <View style={styles.accountInfo}>
+            <Text style={styles.accountName} numberOfLines={1}>
+              {user?.displayName || user?.email || t('settings.guest') || 'Guest'}
+            </Text>
+            {user && !user.isAnonymous && user.email ? (
+              <Text style={styles.accountEmail} numberOfLines={1}>
+                {user.email}
+              </Text>
+            ) : null}
+          </View>
+          <Badge label={getTierBadgeLabel()} variant={getTierBadgeVariant()} size="small" />
+          {user && !user.isAnonymous ? (
+            <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
+              <LogOut size={18} color={colors.error.main} />
+            </TouchableOpacity>
+          ) : onSignIn ? (
+            <TouchableOpacity onPress={onSignIn} style={styles.signOutButton}>
+              <LogIn size={18} color={colors.primary.main} />
+            </TouchableOpacity>
+          ) : null}
         </View>
 
-        {/* Preferences Section */}
-        <SectionHeader title={t('settings.preferences')} />
+        {/* ACCOUNT section */}
+        <SectionHeader title="ACCOUNT" />
         <View style={styles.section}>
           <SettingsRow
-            icon={<Bell size={20} color={colors.text.secondary} />}
-            title={t('settings.newCardSuggestions')}
-            description={t('settings.newCardSuggestionsDescription')}
-            isLast={false}
+            icon={<CreditCard size={16} color={colors.text.secondary} />}
+            title="My portfolio"
+            value={`${portfolioCount} cards`}
+            onPress={() => navigation.navigate('MyCards' as never)}
+          />
+          <SettingsRow
+            icon={<Bell size={16} color={colors.text.secondary} />}
+            title={t('settings.newCardSuggestions') || 'Notifications'}
+            value={newCardSuggestions ? 'On' : 'Off'}
           >
             <Switch
               value={newCardSuggestions}
               onValueChange={handleNewCardSuggestionsChange}
               trackColor={{ false: colors.border.light, true: colors.success.main }}
               thumbColor={colors.background.secondary}
-              accessibilityLabel={t('settings.newCardSuggestions')}
-              accessibilityRole="switch"
             />
           </SettingsRow>
-
           <SettingsRow
-            icon={<Globe size={20} color={colors.text.secondary} />}
-            title={t('settings.language')}
-            description={t('settings.languageDescription')}
-            isLast={true}
+            icon={<MapPin size={16} color={colors.text.secondary} />}
+            title={t('settings.country') || 'Country'}
+            value={countryValue}
             onPress={() => {
-              // Toggle language for now (can be enhanced to a modal)
+              const next: Country = currentCountry === 'CA' ? 'US' : 'CA';
+              handleCountryChange(next);
+            }}
+          />
+          <SettingsRow
+            icon={<Globe size={16} color={colors.text.secondary} />}
+            title={t('settings.language') || 'Language'}
+            value={getLanguageLabel(currentLanguage)}
+            isLast
+            onPress={() => {
               const newLang = currentLanguage === 'en' ? 'fr' : 'en';
               handleLanguageChange(newLang);
             }}
-          >
-            <Text style={styles.languageValue}>{getLanguageLabel(currentLanguage)}</Text>
-          </SettingsRow>
+          />
         </View>
 
-        {/* Smart Wallet Section */}
-        <SectionHeader title={t('settings.smartWallet') || 'Smart Wallet'} />
+        {/* SUBSCRIPTION section */}
+        <SectionHeader title="SUBSCRIPTION" />
+        <View style={[styles.section, styles.subscriptionCard]}>
+          <View style={styles.subscriptionHeader}>
+            <View>
+              <Text style={styles.subscriptionPlan}>
+                {subscriptionTier === 'lifetime'
+                  ? 'Lifetime Member ✨'
+                  : subscriptionState?.isAdmin
+                    ? 'Admin Access'
+                    : tierConfig.name}
+              </Text>
+              <Text style={styles.subscriptionDesc}>
+                {subscriptionTier === 'free'
+                  ? 'Upgrade to unlock AI, insights, and more'
+                  : subscriptionTier === 'lifetime'
+                    ? 'All Premium features — forever'
+                    : 'Full access to all features'}
+              </Text>
+            </View>
+            {subscriptionTier === 'lifetime' && <Crown size={20} color="#FFD700" />}
+          </View>
+
+          {subscriptionTier === 'pro' && sageUsage && sageUsage.limit !== null && (
+            <View style={styles.usageRow}>
+              <Text style={styles.usageLabel}>
+                Sage AI: {sageUsage.chatCount} / {sageUsage.limit} chats
+              </Text>
+              <Text
+                style={[
+                  styles.usageRemaining,
+                  sageUsage.remaining !== null && sageUsage.remaining <= 2
+                    ? styles.usageWarning
+                    : null,
+                  sageUsage.remaining === 0 ? styles.usageDanger : null,
+                ]}
+              >
+                {sageUsage.remaining ?? 0} left
+              </Text>
+            </View>
+          )}
+
+          {subscriptionTier === 'free' ? (
+            <TouchableOpacity style={styles.upgradeButton} onPress={handleUpgrade}>
+              <Text style={styles.upgradeButtonText}>Upgrade to Pro</Text>
+            </TouchableOpacity>
+          ) : (subscriptionTier === 'pro' || subscriptionTier === 'max') &&
+            !subscriptionState?.isAdmin ? (
+            <TouchableOpacity
+              style={styles.manageButton}
+              onPress={async () => {
+                try {
+                  const result = await openCustomerPortal();
+                  if ('error' in result) {
+                    Alert.alert('Error', result.error);
+                  } else if (result.url) {
+                    const supported = await Linking.canOpenURL(result.url);
+                    if (supported) {
+                      await Linking.openURL(result.url);
+                    } else {
+                      Alert.alert('Error', 'Unable to open settings page');
+                    }
+                  }
+                } catch (error) {
+                  console.error('Portal error:', error);
+                  Alert.alert('Error', 'Failed to open subscription management');
+                }
+              }}
+            >
+              <Text style={styles.manageButtonText}>Manage subscription</Text>
+              <ChevronRight size={14} color={colors.primary.main} />
+            </TouchableOpacity>
+          ) : null}
+        </View>
+
+        {/* Referral row */}
+        <SectionHeader title="EARN" />
+        <View style={styles.section}>
+          <SettingsRow
+            icon={<Gift size={16} color={colors.primary.main} />}
+            title="Invite & Earn Rewards"
+            value="Share Rewardly"
+            isLast
+            onPress={() => navigation.navigate('ReferralDashboard' as never)}
+          />
+        </View>
+
+        {/* Smart Wallet row */}
+        <SectionHeader title="SMART WALLET" />
         <View style={styles.section}>
           <SettingsRow
             icon={
               <Navigation
-                size={20}
+                size={16}
                 color={autoPilotStatus?.enabled ? colors.primary.main : colors.text.secondary}
               />
             }
             title={t('settings.smartWalletEnabled') || 'Enable Smart Wallet'}
-            description={
-              autoPilotStatus?.enabled
-                ? t('settings.smartWalletActiveDescription', {
-                    count: autoPilotStatus.activeGeofences,
-                  })
-                : t('settings.smartWalletDescription')
-            }
-            isLast={true}
+            value={autoPilotStatus?.enabled ? 'On' : 'Off'}
+            isLast
           >
             <Switch
               value={autoPilotStatus?.enabled || false}
               onValueChange={handleAutoPilotToggle}
               trackColor={{ false: colors.border.light, true: colors.success.main }}
               thumbColor={colors.background.secondary}
-              accessibilityLabel={t('settings.smartWalletEnabled') || 'Enable Smart Wallet'}
-              accessibilityRole="switch"
             />
           </SettingsRow>
         </View>
 
-        {/* Data Section */}
-        <SectionHeader title={t('settings.data')} />
+        {/* DATA & PRIVACY section */}
+        <SectionHeader title="DATA & PRIVACY" />
         <View style={styles.section}>
+          <SettingsRow
+            icon={<Shield size={16} color={colors.text.secondary} />}
+            title="Privacy policy"
+            onPress={handlePrivacyPolicy}
+          />
           <SettingsRow
             icon={
-              <RefreshCw
-                size={20}
-                color={colors.text.secondary}
-                style={isRefreshing ? { transform: [{ rotate: '180deg' }] } : undefined}
-              />
+              isRefreshing ? (
+                <ActivityIndicator size="small" color={colors.primary.main} />
+              ) : (
+                <Database size={16} color={colors.text.secondary} />
+              )
             }
-            title={t('settings.refreshCards')}
-            description={t('settings.refreshCardsDescription')}
-            isLast={true}
+            title="Export my data"
+            onPress={handleExportData}
+          />
+          <SettingsRow
+            icon={<RefreshCw size={16} color={colors.text.secondary} />}
+            title={t('settings.refreshCards') || 'Refresh card database'}
+            value={cardCount > 0 ? `${cardCount} cards` : undefined}
             onPress={isRefreshing ? undefined : handleRefreshCards}
           >
-            {isRefreshing ? (
-              <ActivityIndicator size="small" color={colors.primary.main} />
-            ) : (
-              <Text style={styles.syncButtonText}>{t('settings.syncNow')}</Text>
-            )}
+            {isRefreshing ? <ActivityIndicator size="small" color={colors.primary.main} /> : null}
           </SettingsRow>
-        </View>
-
-        {/* About Section */}
-        <SectionHeader title={t('settings.about')} />
-        <View style={styles.section}>
           <SettingsRow
-            icon={<Info size={20} color={colors.text.secondary} />}
-            title={t('settings.appVersion')}
-            description="Rewardly"
-            isLast={false}
-          >
-            <Text style={styles.aboutValue}>1.0.0</Text>
-          </SettingsRow>
-
-          <SettingsRow
-            icon={<Info size={20} color={colors.text.secondary} />}
-            title={t('settings.cardsInDatabase')}
-            description={
-              cardCountDetail
-                ? `${cardCountDetail}${lastSync ? ` • ${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}` : ''}`
-                : lastSync
-                  ? `${t('settings.lastSynced')}: ${lastSync.toLocaleDateString()}`
-                  : undefined
-            }
-            isLast={true}
-          >
-            <Text style={styles.aboutValue}>{cardCount}</Text>
-          </SettingsRow>
+            icon={<Trash2 size={16} color={colors.error.main} />}
+            title="Delete account"
+            isLast
+            danger
+            onPress={handleDeleteAccount}
+          />
         </View>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>{t('settings.footerText')}</Text>
+          <Text style={styles.footerText}>Made for the Canadian rewards community</Text>
         </View>
       </ScrollView>
 
-      {/* Paywall Modal */}
       <Paywall
         visible={showPaywall}
         onClose={() => setShowPaywall(false)}
@@ -674,7 +629,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
   },
   contentContainer: {
-    paddingBottom: 120, // Extra padding for tab bar (64px tab bar + 56px buffer)
+    paddingBottom: 120,
   },
   loadingContainer: {
     flex: 1,
@@ -682,189 +637,202 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.background.primary,
   },
-  loadingText: {
-    fontSize: 15,
-    color: colors.text.secondary,
-  },
   // Header
   header: {
-    marginBottom: 24,
     paddingHorizontal: 16,
     paddingTop: 24,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 24, // text-2xl
-    fontWeight: '700', // bold
+    fontSize: 26,
+    fontWeight: '700',
     color: colors.text.primary,
+    letterSpacing: -0.5,
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 13, // text-sm
+    fontSize: 13,
     color: colors.text.secondary,
   },
-  // Section Header
+  // Account card
+  accountCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: colors.background.elevated,
+    marginHorizontal: 16,
+    borderRadius: borderRadius.card,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    padding: 16,
+    marginBottom: 4,
+  },
+  accountAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.primary.bg20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  accountInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
+  accountName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text.primary,
+  },
+  accountEmail: {
+    fontSize: 13,
+    color: colors.text.secondary,
+    marginTop: 2,
+  },
+  signOutButton: {
+    padding: 4,
+  },
+  // Section header
   sectionHeader: {
     paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
+    marginTop: 24,
+    marginBottom: 8,
   },
   sectionHeaderText: {
-    fontSize: 13, // text-sm
-    fontWeight: '500', // font-medium
+    fontSize: 11,
+    fontWeight: '600',
     color: colors.text.secondary,
     textTransform: 'uppercase',
-    letterSpacing: 0.5, // tracking-wide
+    letterSpacing: 0.5,
   },
-  // Section Container
+  // Section container
   section: {
     backgroundColor: colors.background.secondary,
     marginHorizontal: 16,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.card,
     borderWidth: 1,
     borderColor: colors.border.light,
     overflow: 'hidden',
   },
-  // Settings Row
+  // Settings row
   settingsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
-    padding: 16,
+    gap: 12,
+    paddingVertical: 13,
+    paddingHorizontal: 16,
   },
   settingsRowBorder: {
     borderBottomWidth: 1,
     borderBottomColor: colors.border.light,
   },
   settingsRowIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: colors.background.tertiary,
+    alignItems: 'center',
+    justifyContent: 'center',
     flexShrink: 0,
   },
-  settingsRowContent: {
-    flex: 1,
-    minWidth: 0,
-  },
   settingsRowTitle: {
+    flex: 1,
     fontSize: 15,
     fontWeight: '500',
     color: colors.text.primary,
   },
-  settingsRowDescription: {
-    fontSize: 11,
-    color: colors.text.secondary,
-    marginTop: 2,
-  },
-  settingsRowAction: {
-    flexShrink: 0,
-  },
-  // Country toggle
-  countryToggle: {
-    flexDirection: 'row',
-    backgroundColor: colors.background.primary,
-    borderRadius: borderRadius.md,
-    padding: 4,
-    gap: 4,
-  },
-  countryOption: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: borderRadius.sm,
-  },
-  countryOptionActive: {
-    backgroundColor: colors.primary.bg20,
-  },
-  countryFlag: {
-    fontSize: 20,
-  },
-  // Language value
-  languageValue: {
-    fontSize: 13,
-    color: colors.text.secondary,
-  },
-  // Sync button
-  syncButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.primary.main,
-  },
-  // About value
-  aboutValue: {
-    fontSize: 13,
-    color: colors.text.secondary,
-  },
-  // Upgrade
-  upgradeText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.primary.main,
-  },
-  // Admin badge
-  adminBadge: {
-    backgroundColor: colors.warning.main,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  adminBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.background.primary,
-  },
-  // Lifetime badge
-  lifetimeBadge: {
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  lifetimeBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#1A1A2E',
-  },
-  // Manage subscription button
-  manageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: colors.background.tertiary,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  manageButtonText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: colors.text.secondary,
-  },
-  // Usage text
-  usageText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: colors.primary.main,
-  },
-  usageTextWarning: {
-    color: colors.warning.main,
-  },
-  usageTextDanger: {
+  settingsRowTitleDanger: {
     color: colors.error.main,
   },
-  // Sign In
-  signInButton: {
+  settingsRowRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    flexShrink: 0,
   },
-  signInText: {
+  settingsRowValue: {
+    fontSize: 13,
+    color: colors.text.secondary,
+  },
+  // Subscription card
+  subscriptionCard: {
+    padding: 16,
+    gap: 12,
+  },
+  subscriptionHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  subscriptionPlan: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.text.primary,
+    marginBottom: 4,
+  },
+  subscriptionDesc: {
+    fontSize: 13,
+    color: colors.text.secondary,
+  },
+  usageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.background.tertiary,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  usageLabel: {
+    fontSize: 13,
+    color: colors.text.secondary,
+  },
+  usageRemaining: {
     fontSize: 13,
     fontWeight: '600',
+    color: colors.primary.main,
+  },
+  usageWarning: {
+    color: colors.warning.main,
+  },
+  usageDanger: {
+    color: colors.error.main,
+  },
+  upgradeButton: {
+    backgroundColor: colors.primary.main,
+    borderRadius: borderRadius.button,
+    paddingVertical: 11,
+    alignItems: 'center',
+  },
+  upgradeButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.background.primary,
+  },
+  manageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    borderRadius: borderRadius.button,
+    paddingVertical: 10,
+  },
+  manageButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
     color: colors.primary.main,
   },
   // Footer
   footer: {
     paddingVertical: 32,
     alignItems: 'center',
+    paddingHorizontal: 16,
   },
   footerText: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.text.tertiary,
     textAlign: 'center',
   },
