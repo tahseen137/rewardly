@@ -87,6 +87,7 @@ const navStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 24,
     paddingHorizontal: 20,
     paddingVertical: 14,
     maxWidth: 1100,
