@@ -14,7 +14,9 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
+  Image,
 } from 'react-native';
+import owlLogo from '../../assets/owl-logo.png';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Mail, Lock, Eye, EyeOff, Chrome, Apple } from 'lucide-react-native';
@@ -230,7 +232,10 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.logoEmoji}>💳</Text>
+          <Image
+            source={owlLogo}
+            style={{ width: 56, height: 56, borderRadius: 14, marginBottom: 16 }}
+          />
           <Text style={styles.title}>
             {mode === 'forgotPassword' ? 'Reset Password' : t('auth.title')}
           </Text>
@@ -456,10 +461,6 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 40,
-  },
-  logoEmoji: {
-    fontSize: 64,
-    marginBottom: 16,
   },
   title: {
     fontSize: 28,

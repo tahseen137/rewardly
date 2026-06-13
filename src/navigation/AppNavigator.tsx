@@ -416,7 +416,7 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
           borderTopWidth: 1,
           borderTopColor: colors.border.light,
           position: 'absolute',
-          paddingBottom: Platform.OS === 'ios' ? 20 : 8, // Safe area inset bottom
+          paddingBottom: Platform.OS === 'ios' ? 20 : Platform.OS === 'web' ? 24 : 8,
           paddingTop: 8,
         },
         tabBarLabelStyle: {

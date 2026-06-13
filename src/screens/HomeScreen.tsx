@@ -388,7 +388,7 @@ export default function HomeScreen() {
         {/* Header - Redesigned with GradientText */}
         <View style={styles.header}>
           <GradientText variant="primary" style={styles.title}>
-            {t('home.title') || 'Rewards Optimizer'}
+            {t('home.title') || 'Rewardly'}
           </GradientText>
           <Text style={styles.subtitle}>
             {t('home.subtitle') || 'Find the best card for every purchase'}

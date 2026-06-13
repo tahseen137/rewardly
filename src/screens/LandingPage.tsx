@@ -767,7 +767,15 @@ function Footer() {
     <View style={styles.footer}>
       <View style={styles.footerContent}>
         <View style={styles.footerBrand}>
-          <Text style={styles.footerLogo}>💳 Rewardly</Text>
+          <View style={styles.footerLogoLockup}>
+            <Image
+              source={owlLogoSrc}
+              style={styles.footerOwlIcon}
+              resizeMode="contain"
+              accessibilityLabel="Rewardly owl logo"
+            />
+            <Text style={styles.footerLogo}>Rewardly</Text>
+          </View>
           <Text style={styles.footerTagline}>Maximize every swipe.</Text>
         </View>
 
@@ -1429,11 +1437,20 @@ const styles = StyleSheet.create({
   footerBrand: {
     flex: SCREEN_WIDTH > 600 ? 1 : undefined,
   },
+  footerLogoLockup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  footerOwlIcon: {
+    width: 24,
+    height: 24,
+  },
   footerLogo: {
     fontSize: 22,
     fontWeight: '700',
     color: colors.text.primary,
-    marginBottom: 8,
   },
   footerTagline: {
     fontSize: 14,
