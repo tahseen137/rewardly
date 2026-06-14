@@ -566,10 +566,9 @@ export const SageScreen: React.FC = () => {
       ) : (
         <FlatList
           ref={flatListRef}
-          data={[...messages].reverse()}
+          data={messages}
           keyExtractor={(item) => item.id}
           renderItem={renderMessage}
-          inverted
           contentContainerStyle={styles.messagesList}
           refreshControl={
             <RefreshControl
