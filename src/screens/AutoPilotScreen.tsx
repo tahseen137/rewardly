@@ -118,6 +118,8 @@ export default function SmartWalletScreen() {
         const tier = getCurrentTierSync();
         setCurrentTier(tier);
         setHasAccess(canAccessFeatureSync('smartwallet'));
+        const currentStatus = await getAutoPilotStatus();
+        setStatus(currentStatus);
       };
       checkAccess();
     }, [])

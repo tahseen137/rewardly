@@ -134,7 +134,25 @@ function parseMessage(text: string): React.ReactNode[] {
       }
     }
 
-    // Handle headers (##)
+    // Handle horizontal rules (---  ***  ___)
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
+      parts.push(<View key={`hr-${i}`} style={styles.divider} />);
+      i++;
+      continue;
+    }
+
+    // Handle h1 headings (#)
+    if (line.startsWith('# ') && !line.startsWith('## ')) {
+      parts.push(
+        <Text key={`h1-${i}`} style={styles.h1}>
+          {line.slice(2)}
+        </Text>
+      );
+      i++;
+      continue;
+    }
+
+    // Handle h2 headings (##)
     if (line.startsWith('## ')) {
       parts.push(
         <Text key={`h2-${i}`} style={styles.header}>
@@ -348,12 +366,25 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
   },
+  h1: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginTop: 6,
+    marginBottom: 2,
+    color: colors.text.primary,
+  },
   header: {
     fontSize: 16,
     fontWeight: '600',
     marginTop: 4,
     marginBottom: 2,
     color: colors.text.primary,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.border.light,
+    marginVertical: 8,
+    width: '100%',
   },
   bold: {
     fontWeight: '600',

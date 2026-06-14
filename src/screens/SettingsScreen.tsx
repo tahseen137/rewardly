@@ -11,7 +11,7 @@ import {
   Linking,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import {
@@ -199,6 +199,16 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
   useEffect(() => {
     loadPreferences();
   }, [loadPreferences]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const refreshAutoPilot = async () => {
+        const apStatus = await getAutoPilotStatus();
+        setAutoPilotStatus(apStatus);
+      };
+      refreshAutoPilot();
+    }, [])
+  );
 
   const handleNewCardSuggestionsChange = async (enabled: boolean) => {
     setNewCardSuggestions(enabled);
