@@ -626,10 +626,10 @@ export const SageScreen: React.FC = () => {
       )}
 
       {/* Pinned input */}
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      {Platform.OS === 'web' ? (
         <ChatInput
           onSend={handleSendMessage}
-          disabled={!preferences || chatLimitReached}
+          disabled={chatLimitReached}
           isLoading={isLoading}
           placeholder={
             chatLimitReached
@@ -639,7 +639,22 @@ export const SageScreen: React.FC = () => {
                 : 'Ask Sage anything...'
           }
         />
-      </KeyboardAvoidingView>
+      ) : (
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ChatInput
+            onSend={handleSendMessage}
+            disabled={chatLimitReached}
+            isLoading={isLoading}
+            placeholder={
+              chatLimitReached
+                ? 'Chat limit reached - upgrade for unlimited'
+                : portfolio.length === 0
+                  ? 'Add cards to get personalized advice...'
+                  : 'Ask Sage anything...'
+            }
+          />
+        </KeyboardAvoidingView>
+      )}
 
       {/* Paywall Modal */}
       <Paywall
