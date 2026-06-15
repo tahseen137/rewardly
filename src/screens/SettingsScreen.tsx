@@ -6,11 +6,11 @@ import {
   Switch,
   TouchableOpacity,
   ScrollView,
-  Alert,
   ActivityIndicator,
   Linking,
   Platform,
 } from 'react-native';
+import { showAlert, showConfirm, showError } from '../utils/crossPlatformAlert';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -248,21 +248,18 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
       return;
     }
 
-    Alert.alert(
+    const confirmed = await showConfirm(
       t('settings.changeCountryTitle'),
-      t('settings.changeCountryMessage', { country: getCountryName(country) }),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        { text: t('common.ok'), onPress: () => performCountrySwitch(country) },
-      ]
+      t('settings.changeCountryMessage', { country: getCountryName(country) })
     );
+    if (confirmed) {
+      await performCountrySwitch(country);
+    }
   };
 
   const handleRefreshCards = async () => {
     if (!isSupabaseConfigured()) {
-      Alert.alert(t('settings.refreshCards'), t('settings.supabaseNotConfigured'), [
-        { text: t('common.ok') },
-      ]);
+      showAlert(t('settings.refreshCards'), t('settings.supabaseNotConfigured'));
       return;
     }
 
@@ -275,15 +272,9 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
       const syncTime = await getLastSyncTime();
       setLastSync(syncTime);
 
-      Alert.alert(
-        t('settings.refreshSuccess'),
-        t('settings.refreshSuccessMessage', { count: cardStats.total }),
-        [{ text: t('common.ok') }]
-      );
+      showAlert(t('settings.refreshSuccess'), t('settings.refreshSuccessMessage', { count: cardStats.total }));
     } catch {
-      Alert.alert(t('settings.refreshError'), t('settings.refreshErrorMessage'), [
-        { text: t('common.ok') },
-      ]);
+      showAlert(t('settings.refreshError'), t('settings.refreshErrorMessage'));
     } finally {
       setIsRefreshing(false);
     }
@@ -296,43 +287,26 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
       return;
     }
 
-    Alert.alert(t('settings.signOutTitle'), t('settings.signOutMessage'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('settings.signOut'),
-        style: 'destructive',
-        onPress: async () => {
-          await signOut();
-          onSignOut?.();
-        },
-      },
-    ]);
+    const confirmed = await showConfirm(t('settings.signOutTitle'), t('settings.signOutMessage'));
+    if (confirmed) {
+      await signOut();
+      onSignOut?.();
+    }
   };
 
-  const handleDeleteAccount = () => {
-    Alert.alert(
+  const handleDeleteAccount = async () => {
+    const confirmed = await showConfirm(
       'Delete account',
-      'This will permanently delete your account and all data. This cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            await signOut();
-            onSignOut?.();
-          },
-        },
-      ]
+      'This will permanently delete your account and all data. This cannot be undone.'
     );
+    if (confirmed) {
+      await signOut();
+      onSignOut?.();
+    }
   };
 
   const handleExportData = () => {
-    Alert.alert(
-      'Export data',
-      'Your data export will be sent to your email address within 24 hours.',
-      [{ text: 'OK' }]
-    );
+    showAlert('Export data', 'Your data export will be sent to your email address within 24 hours.');
   };
 
   const handlePrivacyPolicy = () => {
@@ -352,11 +326,10 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
     if (enabled) {
       const success = await enableAutoPilot();
       if (!success) {
-        Alert.alert(
+        showAlert(
           t('settings.smartWalletPermissionTitle') || 'Permission Required',
           t('settings.smartWalletPermissionMessage') ||
-            'Smart Wallet needs location and notification permissions to work. Please enable them in your device settings.',
-          [{ text: t('common.ok') || 'OK' }]
+            'Smart Wallet needs location and notification permissions to work. Please enable them in your device settings.'
         );
         return;
       }
@@ -529,18 +502,18 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
                 try {
                   const result = await openCustomerPortal();
                   if ('error' in result) {
-                    Alert.alert('Error', result.error);
+                    showError(result.error);
                   } else if (result.url) {
                     const supported = await Linking.canOpenURL(result.url);
                     if (supported) {
                       await Linking.openURL(result.url);
                     } else {
-                      Alert.alert('Error', 'Unable to open settings page');
+                      showError('Unable to open settings page');
                     }
                   }
                 } catch (error) {
                   console.error('Portal error:', error);
-                  Alert.alert('Error', 'Failed to open subscription management');
+                  showError('Failed to open subscription management');
                 }
               }}
             >
