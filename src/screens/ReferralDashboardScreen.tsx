@@ -18,9 +18,9 @@ import {
   Share,
   Clipboard,
   ActivityIndicator,
-  Alert,
   RefreshControl,
 } from 'react-native';
+import { showAlert, showError } from '../utils/crossPlatformAlert';
 import { getCurrentUser } from '../services/AuthService';
 import { ReferralService, ReferralStats } from '../services/ReferralService';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -55,7 +55,7 @@ export function ReferralDashboardScreen() {
       setStats(data);
     } catch (err) {
       console.error('[ReferralDashboard] Error loading stats:', err);
-      Alert.alert('Error', 'Failed to load referral stats. Please try again.');
+      showError('Failed to load referral stats. Please try again.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -79,7 +79,7 @@ export function ReferralDashboardScreen() {
       setCopiedTooltip(true);
       setTimeout(() => setCopiedTooltip(false), 2000);
     } catch {
-      Alert.alert('Error', 'Failed to copy link');
+      showError('Failed to copy link');
     }
   };
 
@@ -93,15 +93,15 @@ export function ReferralDashboardScreen() {
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
         // Open URL (implementation depends on Linking or WebBrowser)
         console.log('[ReferralDashboard] Twitter share:', twitterUrl);
-        Alert.alert('Share on Twitter', 'Opening Twitter...');
+        showAlert('Share on Twitter', 'Opening Twitter...');
       } else if (platform === 'whatsapp') {
         const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
         console.log('[ReferralDashboard] WhatsApp share:', whatsappUrl);
-        Alert.alert('Share on WhatsApp', 'Opening WhatsApp...');
+        showAlert('Share on WhatsApp', 'Opening WhatsApp...');
       } else if (platform === 'email') {
         const emailUrl = `mailto:?subject=${encodeURIComponent('Join me on Rewardly!')}&body=${encodeURIComponent(message)}`;
         console.log('[ReferralDashboard] Email share:', emailUrl);
-        Alert.alert('Share via Email', 'Opening email...');
+        showAlert('Share via Email', 'Opening email...');
       } else {
         // Native share sheet
         await Share.share({

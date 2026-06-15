@@ -19,9 +19,9 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
-  Alert,
   TextInput,
 } from 'react-native';
+import { showConfirm } from '../utils/crossPlatformAlert';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { withSpring, useSharedValue } from 'react-native-reanimated';
@@ -222,23 +222,14 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
   }, [currentStep, selectedCards, onComplete]);
 
   // P1: Skip confirmation (especially important on card step)
-  const handleSkip = useCallback(() => {
+  const handleSkip = useCallback(async () => {
     if (currentStep === 1 && selectedCards.length === 0) {
       // Show confirmation dialog on card step if no cards selected
-      Alert.alert(t('onboarding.skipCardTitle'), t('onboarding.skipCardMessage'), [
-        {
-          text: t('onboarding.skipCardAddNow'),
-          style: 'cancel',
-        },
-        {
-          text: t('onboarding.skipCardConfirm'),
-          onPress: async () => {
-            await setOnboardingComplete(true);
-            onComplete();
-          },
-          style: 'destructive',
-        },
-      ]);
+      const confirmed = await showConfirm(t('onboarding.skipCardTitle'), t('onboarding.skipCardMessage'));
+      if (confirmed) {
+        await setOnboardingComplete(true);
+        onComplete();
+      }
     } else {
       // Skip without confirmation on other steps
       setOnboardingComplete(true).then(onComplete);

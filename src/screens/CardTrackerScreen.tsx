@@ -10,10 +10,10 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   TextInput,
   Modal,
 } from 'react-native';
+import { showConfirm } from '../utils/crossPlatformAlert';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   FadeInDown,
@@ -529,19 +529,13 @@ export default function CardTrackerScreen() {
   );
 
   const handleRemove = useCallback(
-    (cardId: string) => {
-      Alert.alert('Remove Card', 'Are you sure you want to stop tracking this card?', [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: () => {
-            const updated = trackedCards.filter((tc) => tc.cardId !== cardId);
-            setTrackedCards(updated);
-            saveTrackerState(updated);
-          },
-        },
-      ]);
+    async (cardId: string) => {
+      const confirmed = await showConfirm('Remove Card', 'Are you sure you want to stop tracking this card?');
+      if (confirmed) {
+        const updated = trackedCards.filter((tc) => tc.cardId !== cardId);
+        setTrackedCards(updated);
+        saveTrackerState(updated);
+      }
     },
     [trackedCards]
   );

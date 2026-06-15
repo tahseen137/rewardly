@@ -19,8 +19,8 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
+import { showAlert, showConfirm, showError } from '../utils/crossPlatformAlert';
 import { useNavigation } from '@react-navigation/native';
 import { ArrowLeft, Plus, AlertCircle, TrendingUp } from 'lucide-react-native';
 import { colors } from '../theme/colors';
@@ -74,7 +74,7 @@ export default function ApplicationTrackerScreen() {
 
   const handleAddApplication = async () => {
     if (!selectedCardId) {
-      Alert.alert('Error', 'Please select a card');
+      showError('Please select a card');
       return;
     }
 
@@ -98,27 +98,21 @@ export default function ApplicationTrackerScreen() {
         setApplicationDate(new Date());
         setStatus('approved');
       } else {
-        Alert.alert('Error', 'Failed to add application');
+        showError('Failed to add application');
       }
     } catch {
-      Alert.alert('Error', 'Failed to save application');
+      showError('Failed to save application');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDeleteApplication = async (appId: string) => {
-    Alert.alert('Delete Application', 'Are you sure you want to delete this application?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          await deleteApplication(appId);
-          await loadData();
-        },
-      },
-    ]);
+    const confirmed = await showConfirm('Delete Application', 'Are you sure you want to delete this application?');
+    if (confirmed) {
+      await deleteApplication(appId);
+      await loadData();
+    }
   };
 
   if (loading) {
