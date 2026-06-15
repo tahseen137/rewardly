@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ChevronRight, Sparkles, BarChart3 } from 'lucide-react-native';
+import { ChevronRight, Sparkles, BarChart3, Trophy } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -215,6 +215,22 @@ export default function InsightsHomeScreen() {
         </TouchableOpacity>
       )}
 
+      {/* Achievements card */}
+      <TouchableOpacity
+        style={styles.achievementsCard}
+        onPress={() => navigation.navigate('Achievements')}
+        activeOpacity={0.8}
+      >
+        <View style={styles.achievementsIconCircle}>
+          <Trophy size={18} color={colors.warning.main} />
+        </View>
+        <View style={styles.optimizerText}>
+          <Text style={styles.optimizerTitle}>Achievements</Text>
+          <Text style={styles.optimizerDesc}>Track badges, streaks, and your rewards rank</Text>
+        </View>
+        <ChevronRight size={18} color={colors.text.secondary} />
+      </TouchableOpacity>
+
       <View style={{ height: 100 }} />
     </ScrollView>
   );
@@ -373,6 +389,26 @@ const styles = StyleSheet.create({
     borderColor: colors.border.light,
     padding: 16,
     marginTop: 16,
+  },
+  achievementsCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.card,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    padding: 16,
+    marginTop: 12,
+  },
+  achievementsIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.warning.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
   optimizerIconCircle: {
     width: 36,
