@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ChevronRight, Sparkles, BarChart3, Trophy, Upload } from 'lucide-react-native';
+import { ChevronRight, Sparkles, BarChart3, Trophy, Upload, ClipboardList } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -243,6 +243,22 @@ export default function InsightsHomeScreen() {
         <View style={styles.optimizerText}>
           <Text style={styles.optimizerTitle}>Achievements</Text>
           <Text style={styles.optimizerDesc}>Track badges, streaks, and your rewards rank</Text>
+        </View>
+        <ChevronRight size={18} color={colors.text.secondary} />
+      </TouchableOpacity>
+
+      {/* Application Tracker card */}
+      <TouchableOpacity
+        style={styles.achievementsCard}
+        onPress={() => navigation.navigate('ApplicationTracker')}
+        activeOpacity={0.8}
+      >
+        <View style={[styles.achievementsIconCircle, { backgroundColor: colors.success.background }]}>
+          <ClipboardList size={18} color={colors.success.main} />
+        </View>
+        <View style={styles.optimizerText}>
+          <Text style={styles.optimizerTitle}>Application Tracker</Text>
+          <Text style={styles.optimizerDesc}>Monitor 5/24 limits, cooldowns, and approval strategy</Text>
         </View>
         <ChevronRight size={18} color={colors.text.secondary} />
       </TouchableOpacity>
