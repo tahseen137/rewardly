@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ChevronRight, Sparkles, BarChart3, Trophy } from 'lucide-react-native';
+import { ChevronRight, Sparkles, BarChart3, Trophy, Upload } from 'lucide-react-native';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -214,6 +214,22 @@ export default function InsightsHomeScreen() {
           <ChevronRight size={18} color={colors.text.secondary} />
         </TouchableOpacity>
       )}
+
+      {/* Spending Insights card */}
+      <TouchableOpacity
+        style={styles.achievementsCard}
+        onPress={() => navigation.navigate('InsightsDashboard')}
+        activeOpacity={0.8}
+      >
+        <View style={[styles.achievementsIconCircle, { backgroundColor: colors.info.background }]}>
+          <Upload size={18} color={colors.info.main} />
+        </View>
+        <View style={styles.optimizerText}>
+          <Text style={styles.optimizerTitle}>Spending Insights</Text>
+          <Text style={styles.optimizerDesc}>Upload a statement to see your category breakdown</Text>
+        </View>
+        <ChevronRight size={18} color={colors.text.secondary} />
+      </TouchableOpacity>
 
       {/* Achievements card */}
       <TouchableOpacity
