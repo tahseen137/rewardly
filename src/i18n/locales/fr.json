@@ -63,7 +63,8 @@
     "seeAll": "Voir Tout",
     "topCardsTitle": "Meilleures Cartes pour cette Catégorie",
     "topCards": "Meilleures Cartes à Considérer",
-    "noRecommendations": "Ajoutez des données de dépenses pour obtenir des recommandations personnalisées"
+    "noRecommendations": "Ajoutez des données de dépenses pour obtenir des recommandations personnalisées",
+    "addCards": "Ajouter des Cartes"
   },
   "productSearch": {
     "title": "Recherche de Produit",
@@ -139,7 +140,18 @@
     "refreshError": "Erreur",
     "refreshErrorMessage": "Échec de l'actualisation des cartes. Vérifiez votre connexion.",
     "supabaseNotConfigured": "Connexion à la base de données non configurée. Utilisation des données locales.",
-    "footerText": "Fait pour maximiser chaque achat"
+    "footerText": "Fait pour maximiser chaque achat",
+    "signIn": "Se Connecter",
+    "signInPrompt": "Créez un compte pour déverrouiller toutes les fonctionnalités",
+    "smartWallet": "Portefeuille Intelligent",
+    "smartWalletEnabled": "Portefeuille Intelligent",
+    "smartWalletDescription": "Recevez une notification avec la meilleure carte à utiliser quand vous arrivez en magasin",
+    "smartWalletActiveDescription": "Surveillance de {{count}} magasins près de vous",
+    "smartWalletPermissionTitle": "Permission Requise",
+    "smartWalletPermissionMessage": "Le Portefeuille Intelligent nécessite des autorisations de localisation et de notification. Veuillez les activer dans les paramètres de votre appareil.",
+    "earn": "Récompenses",
+    "dataPrivacy": "Données & Confidentialité",
+    "subscription_header": "Abonnement"
   },
   "rewardTypes": {
     "cashback": "Remise en Argent",
@@ -198,17 +210,34 @@
   },
   "onboarding": {
     "skip": "Passer",
+    "back": "Retour",
+    "skipLater": "Plus tard",
     "continue": "Continuer",
     "getStarted": "Commencer",
+    "skipCardTitle": "Passer la Configuration des Cartes?",
+    "skipCardMessage": "Sans cartes, nous ne pouvons pas vous donner de recommandations personnalisées. Vous devrez les ajouter plus tard.",
+    "skipCardAddNow": "Ajouter des Cartes",
+    "skipCardConfirm": "Passer Quand Même",
     "countryTitle": "Où êtes-vous situé?",
     "countryDescription": "Nous vous montrerons les meilleures cartes de crédit disponibles dans votre pays.",
+    "countryValue": "Obtenez des taux de récompenses précis pour votre région",
     "cardsTitle": "Ajoutez Vos Cartes",
     "cardsDescription": "Sélectionnez les cartes de crédit que vous possédez actuellement. Vous pouvez en ajouter d'autres plus tard.",
+    "cardsValue": "Nous vous montrerons quelle carte utiliser dans chaque magasin",
+    "cardsGuidance": "Ajoutez 1 à 3 cartes que vous utilisez le plus souvent. Vous pourrez en ajouter d'autres plus tard.",
+    "searchCards": "Rechercher des cartes...",
+    "showingCards": "Affichage de {{count}} sur {{total}} cartes",
+    "noCardsFound": "Aucune carte trouvée. Essayez une autre recherche.",
+    "noPopularCards": "Aucune carte populaire disponible. Essayez l'onglet 'Toutes'.",
     "cardsHint": "{{count}} cartes sélectionnées",
     "selectedCards": "Sélectionnées ({{count}})",
     "loadingCards": "Chargement des cartes disponibles...",
+    "popularTab": "Populaires",
+    "allTab": "Toutes les Cartes",
+    "searchTab": "Recherche",
     "sageTitle": "Rencontrez Sage",
     "sageDescription": "Sage, votre assistant de récompenses IA, est prêt à vous aider à tirer le meilleur de chaque achat.",
+    "sageValue": "Obtenez des réponses instantanées à toutes vos questions sur les récompenses",
     "sageFeature1Title": "Recommandations Intelligentes",
     "sageFeature1Desc": "Obtenez la meilleure carte pour tout achat, instantanément.",
     "sageFeature2Title": "Planification de Voyage",
@@ -263,5 +292,250 @@
     "unauthorized": "Veuillez vous connecter pour continuer",
     "limitReached": "Vous avez atteint votre limite",
     "upgradeRequired": "Améliorez pour accéder à cette fonctionnalité"
+  },
+  "benefits": {
+    "title": "Avantages de la Carte",
+    "categories": {
+      "travel": "Avantages Voyage",
+      "purchase": "Protection des Achats",
+      "insurance": "Couverture d'Assurance",
+      "lifestyle": "Avantages Lifestyle"
+    },
+    "noBenefits": "Aucune donnée d'avantages disponible pour cette carte",
+    "viewAll": "Voir Tous les Avantages",
+    "lockedTitle": "Déverrouiller Tous les Avantages",
+    "lockedDesc": "Passez à Pro pour voir les {{count}} avantages"
+  },
+  "subTracker": {
+    "title": "Suivi des Bonus d'Inscription",
+    "subtitle": "Suivez vos dépenses vers les bonus d'inscription",
+    "addSUB": "Ajouter un Bonus",
+    "editSUB": "Modifier le Bonus",
+    "deleteSUB": "Supprimer le Suivi",
+    "deleteConfirm": "Arrêter le suivi de ce bonus?",
+    "progress": {
+      "spent": "Dépensé",
+      "of": "sur",
+      "remaining": "{{amount}} restant",
+      "daysLeft": "{{days}} jours restants",
+      "daysLeftOne": "1 jour restant",
+      "onTrack": "En bonne voie!",
+      "behindSchedule": "Dépensez {{amount}}/jour pour atteindre l'objectif",
+      "completed": "Complété!",
+      "expired": "Expiré"
+    },
+    "empty": {
+      "title": "Aucun Bonus en Suivi",
+      "description": "Ajoutez un bonus d'inscription pour suivre votre progression",
+      "cta": "Ajouter Votre Premier Bonus"
+    }
+  },
+  "cardCompare": {
+    "title": "Comparer les Cartes",
+    "subtitle": "Voyez quelle carte gagne",
+    "selectCards": "Sélectionnez les cartes à comparer",
+    "addCard": "Ajouter une Carte",
+    "removeCard": "Supprimer",
+    "maxCards": "Comparez jusqu'à {{count}} cartes",
+    "upgradeFor3": "Améliorez pour comparer 3 cartes",
+    "winner": "Gagnant",
+    "overallScore": "Score Global",
+    "noFee": "Sans frais",
+    "noBenefits": "Aucun"
+  },
+  "spendingLog": {
+    "title": "Journal des Dépenses",
+    "subtitle": "Suivez vos achats et récompenses",
+    "addEntry": "Enregistrer un Achat",
+    "editEntry": "Modifier l'Achat",
+    "deleteEntry": "Supprimer",
+    "deleteConfirm": "Supprimer cette transaction?",
+    "form": {
+      "amount": "Montant",
+      "store": "Magasin (optionnel)",
+      "category": "Catégorie",
+      "card": "Carte Utilisée",
+      "date": "Date",
+      "notes": "Notes (optionnel)"
+    },
+    "summary": {
+      "totalSpend": "Total Dépensé",
+      "earned": "Récompenses Gagnées",
+      "missed": "Récompenses Manquées"
+    },
+    "optimal": "Optimal: {{card}}",
+    "earnedLabel": "+{{amount}}",
+    "missedLabel": "-{{amount}} manqué",
+    "limitReached": {
+      "title": "Limite Gratuite Atteinte",
+      "message": "Passez à Pro pour un historique illimité",
+      "cta": "Améliorer"
+    },
+    "empty": {
+      "title": "Aucune Transaction",
+      "description": "Enregistrez votre premier achat pour commencer le suivi",
+      "cta": "Enregistrer un Achat"
+    }
+  },
+  "recurring": {
+    "title": "Charges Récurrentes",
+    "subtitle": "Optimisez vos abonnements",
+    "addCharge": "Ajouter un Abonnement",
+    "editCharge": "Modifier",
+    "deleteCharge": "Supprimer",
+    "summary": {
+      "totalCharges": "Total Mensuel",
+      "currentRewards": "Récompenses Actuelles",
+      "potentialRewards": "Récompenses Potentielles",
+      "monthlySavings": "Économies Mensuelles",
+      "yearlySavings": "C'est {{amount}}/an!"
+    },
+    "sections": {
+      "needsOptimization": "À Optimiser",
+      "optimized": "Déjà Optimisé"
+    },
+    "card": {
+      "current": "Actuel",
+      "optimal": "Utiliser",
+      "savings": "+{{amount}}/mois"
+    },
+    "empty": {
+      "title": "Aucune Charge Récurrente",
+      "description": "Ajoutez vos abonnements pour voir quelles cartes rapportent le plus",
+      "cta": "Ajouter un Abonnement"
+    }
+  },
+  "annualFee": {
+    "title": "Frais Annuels",
+    "subtitle": "Vaut-il la peine de garder vos cartes?",
+    "summary": {
+      "totalFees": "Total des Frais Annuels",
+      "rewardsEarned": "Récompenses Estimées",
+      "netValue": "Valeur Nette",
+      "worthKeeping": "{{count}} à conserver",
+      "needsReview": "{{count}} à revoir"
+    },
+    "upcomingRenewals": "Renouvellements à Venir",
+    "allCardsWithFees": "Toutes les Cartes avec Frais",
+    "card": {
+      "fee": "{{amount}}/an",
+      "renewsIn": "Renouvellement dans {{days}} jours",
+      "renewsOn": "Renouvellement le {{date}}",
+      "renewalUnknown": "Définir la date de renouvellement",
+      "earned": "~{{amount}} gagné",
+      "netValue": "Net: {{amount}}",
+      "setOpenDate": "Définir la Date d'Ouverture"
+    },
+    "worth": {
+      "yes": "À Conserver",
+      "maybe": "Révision Nécessaire",
+      "no": "Envisager d'Annuler",
+      "reasonPositive": "Les récompenses dépassent les frais",
+      "reasonBreakeven": "Proche du seuil de rentabilité",
+      "reasonNegative": "Les frais dépassent les récompenses"
+    },
+    "noFeeCards": "Aucune carte avec des frais annuels",
+    "renewalAlert": "Renouvellement de {{card}} dans {{days}} jours"
+  },
+  "redemption": {
+    "title": "Guide de Rachat",
+    "subtitle": "Maximisez la valeur de vos points",
+    "cppLabel": "Centimes par Point",
+    "directRate": "Rachat Direct",
+    "optimalRate": "Valeur Optimale",
+    "optimalMethod": "Meilleure Méthode",
+    "transferPartners": "Partenaires de Transfert",
+    "otherRedemptions": "Autres Rachats",
+    "partner": {
+      "ratio": "{{ratio}}:1",
+      "instant": "Instantané",
+      "time": "Transfert {{time}}",
+      "sweetSpots": "Offres Spéciales",
+      "viewSweetSpots": "Voir les offres"
+    },
+    "options": {
+      "portal": "Portail Voyage",
+      "statement": "Crédit de Relevé",
+      "giftCard": "Cartes Cadeaux",
+      "merchandise": "Marchandises"
+    },
+    "rating": {
+      "excellent": "Excellent",
+      "good": "Bon",
+      "fair": "Passable",
+      "poor": "Faible"
+    }
+  },
+  "recommendations": {
+    "title": "Recommandations de Cartes",
+    "subtitle": "Cartes correspondant à vos dépenses",
+    "analysis": {
+      "topCategories": "Vos Catégories Principales",
+      "gapsFound": "{{count}} catégories pourraient être optimisées",
+      "potentialGain": "+{{amount}}/an de potentiel"
+    },
+    "card": {
+      "reason": "Pourquoi cette carte?",
+      "basedOn": {
+        "spending": "Basé sur vos dépenses",
+        "gap": "Idéal pour cette catégorie",
+        "upgrade": "Amélioration de votre carte actuelle",
+        "signup_bonus": "Excellent bonus d'inscription"
+      },
+      "estimatedRewards": "~{{amount}}/an",
+      "signupBonus": "Bonus de {{amount}}",
+      "apply": "En Savoir Plus",
+      "applyAffiliate": "Postuler Maintenant"
+    },
+    "refresh": "Actualiser les Recommandations",
+    "disclaimer": "Les détails des cartes peuvent changer. Vérifiez les conditions avant de postuler.",
+    "empty": {
+      "title": "Plus de Données Nécessaires",
+      "description": "Enregistrez des achats pour obtenir des recommandations personnalisées"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "filters": {
+      "all": "Toutes",
+      "unread": "Non lues"
+    },
+    "types": {
+      "sub_deadline": "Échéance de Bonus",
+      "fee_renewal": "Renouvellement de Frais",
+      "bonus_category": "Catégorie Bonus",
+      "monthly_report": "Rapport Mensuel",
+      "new_card_offer": "Nouvelle Offre",
+      "spending_alert": "Alerte de Dépense",
+      "general": "Général"
+    },
+    "empty": {
+      "title": "Aucune Notification",
+      "unread": "Tout est à jour!",
+      "all": "Vous n'avez aucune notification"
+    }
+  },
+  "savingsReport": {
+    "title": "Rapport d'Économies Mensuel",
+    "shareReport": "Partager le Rapport",
+    "optimizationScore": "Score d'Optimisation",
+    "totalSpent": "Total Dépensé",
+    "earned": "Gagné",
+    "missed": "Manqué",
+    "bestPerformer": "Meilleure Carte",
+    "underperformer": "Carte Sous-performante",
+    "categoryBreakdown": "Répartition par Catégorie",
+    "pastReports": "Rapports Précédents",
+    "scoreRating": {
+      "excellent": "Excellent!",
+      "good": "Bien!",
+      "needsWork": "À Améliorer",
+      "improve": "Beaucoup de place pour s'améliorer"
+    },
+    "empty": {
+      "title": "Aucun Rapport Disponible",
+      "description": "Enregistrez des achats pour générer votre premier rapport mensuel"
+    }
   }
 }

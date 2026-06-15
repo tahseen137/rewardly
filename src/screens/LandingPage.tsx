@@ -789,7 +789,14 @@ function Footer() {
           <View style={styles.footerLinkColumn}>
             <Text style={styles.footerLinkHeader}>Legal</Text>
             <TouchableOpacity
-              onPress={() => Linking.openURL('/privacy-policy')}
+              onPress={() => {
+                const url = 'https://rewardly.ca/privacy-policy';
+                if (typeof window !== 'undefined') {
+                  window.open(url, '_blank', 'noopener,noreferrer');
+                } else {
+                  Linking.openURL(url);
+                }
+              }}
               activeOpacity={0.7}
             >
               <Text style={[styles.footerLink, styles.footerLinkClickable]}>Privacy Policy</Text>

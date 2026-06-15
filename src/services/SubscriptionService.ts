@@ -343,7 +343,7 @@ async function loadSubscription(): Promise<SubscriptionState> {
         );
 
         if (isAdmin) {
-          return {
+          const adminState: SubscriptionState = {
             tier: 'admin',
             isAdmin: true,
             billingPeriod: null,
@@ -352,6 +352,9 @@ async function loadSubscription(): Promise<SubscriptionState> {
             stripeCustomerId: null,
             stripeSubscriptionId: null,
           };
+          // Persist to local storage so the fallback path also returns admin tier
+          await saveSubscription(adminState);
+          return adminState;
         }
 
         // Fetch profile with tier
@@ -641,11 +644,13 @@ export async function canUseSage(): Promise<{
 
   const tier = await getCurrentTier();
 
-  // Free users get limited access (3 chats/month)
-  // Falls through to the Pro limit check below
-
   // Max, Lifetime, and Admin have unlimited access
   if (tier === 'max' || tier === 'lifetime' || tier === 'admin') {
+    return { allowed: true, remaining: null };
+  }
+
+  // Backup: check isAdmin flag directly in case tier resolution fell back to local storage
+  if (subscriptionCache?.isAdmin) {
     return { allowed: true, remaining: null };
   }
 

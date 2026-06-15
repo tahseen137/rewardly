@@ -63,7 +63,8 @@
     "seeAll": "See All",
     "topCardsTitle": "Top Cards for This Category",
     "topCards": "Top Cards to Consider",
-    "noRecommendations": "Add spending data to get personalized recommendations"
+    "noRecommendations": "Add spending data to get personalized recommendations",
+    "addCards": "Add Cards"
   },
   "productSearch": {
     "title": "Product Search",
@@ -147,7 +148,10 @@
     "smartWalletDescription": "Get notified with the best card to use when you arrive at a store",
     "smartWalletActiveDescription": "Monitoring {{count}} stores near you",
     "smartWalletPermissionTitle": "Permission Required",
-    "smartWalletPermissionMessage": "Smart Wallet needs location and notification permissions to work. Please enable them in your device settings."
+    "smartWalletPermissionMessage": "Smart Wallet needs location and notification permissions to work. Please enable them in your device settings.",
+    "earn": "Earn",
+    "dataPrivacy": "Data & Privacy",
+    "subscription_header": "Subscription"
   },
   "rewardTypes": {
     "cashback": "Cash Back",

@@ -336,7 +336,12 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
   };
 
   const handlePrivacyPolicy = () => {
-    Linking.openURL('https://rewardly.ca/privacy');
+    const url = 'https://rewardly.ca/privacy-policy';
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      Linking.openURL(url);
+    }
   };
 
   const handleUpgrade = () => {
@@ -429,7 +434,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
         </View>
 
         {/* ACCOUNT section */}
-        <SectionHeader title="ACCOUNT" />
+        <SectionHeader title={t('settings.account')} />
         <View style={styles.section}>
           <SettingsRow
             icon={<CreditCard size={16} color={colors.text.secondary} />}
@@ -471,7 +476,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
         </View>
 
         {/* SUBSCRIPTION section */}
-        <SectionHeader title="SUBSCRIPTION" />
+        <SectionHeader title={t('settings.subscription_header')} />
         <View style={[styles.section, styles.subscriptionCard]}>
           <View style={styles.subscriptionHeader}>
             <View>
@@ -546,7 +551,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
         </View>
 
         {/* Referral row */}
-        <SectionHeader title="EARN" />
+        <SectionHeader title={t('settings.earn')} />
         <View style={styles.section}>
           <SettingsRow
             icon={<Gift size={16} color={colors.primary.main} />}
@@ -558,7 +563,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
         </View>
 
         {/* Smart Wallet row */}
-        <SectionHeader title="SMART WALLET" />
+        <SectionHeader title={t('settings.smartWallet')} />
         <View style={styles.section}>
           <SettingsRow
             icon={
@@ -581,7 +586,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
         </View>
 
         {/* DATA & PRIVACY section */}
-        <SectionHeader title="DATA & PRIVACY" />
+        <SectionHeader title={t('settings.dataPrivacy')} />
         <View style={styles.section}>
           <SettingsRow
             icon={<Shield size={16} color={colors.text.secondary} />}
