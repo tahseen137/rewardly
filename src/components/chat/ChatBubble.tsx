@@ -109,6 +109,35 @@ function renderTable(table: string[][], key: string): React.ReactNode {
 }
 
 /**
+ * Render inline formatting (bold **text**) within a string.
+ * Returns an array of React nodes (strings and <Text> components).
+ */
+function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
+  const boldRegex = /\*\*([^*]+)\*\*/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = boldRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    parts.push(
+      <Text key={`${keyPrefix}-bold-${match.index}`} style={styles.bold}>
+        {match[1]}
+      </Text>
+    );
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : [text];
+}
+
+/**
  * Parse simple markdown-like formatting in messages
  */
 function parseMessage(text: string): React.ReactNode[] {
@@ -145,7 +174,7 @@ function parseMessage(text: string): React.ReactNode[] {
     if (line.startsWith('# ') && !line.startsWith('## ')) {
       parts.push(
         <Text key={`h1-${i}`} style={styles.h1}>
-          {line.slice(2)}
+          {renderInline(line.slice(2), `h1-${i}`)}
         </Text>
       );
       i++;
@@ -156,7 +185,7 @@ function parseMessage(text: string): React.ReactNode[] {
     if (line.startsWith('## ')) {
       parts.push(
         <Text key={`h2-${i}`} style={styles.header}>
-          {line.slice(3)}
+          {renderInline(line.slice(3), `h2-${i}`)}
         </Text>
       );
       i++;
@@ -168,7 +197,7 @@ function parseMessage(text: string): React.ReactNode[] {
       parts.push(
         <Text key={`bullet-${i}`} style={styles.bulletPoint}>
           {'  • '}
-          {line.slice(2)}
+          {renderInline(line.slice(2), `bullet-${i}`)}
         </Text>
       );
       i++;
@@ -181,36 +210,17 @@ function parseMessage(text: string): React.ReactNode[] {
       parts.push(
         <Text key={`num-${i}`} style={styles.bulletPoint}>
           {'  '}
-          {line}
+          {renderInline(line, `num-${i}`)}
         </Text>
       );
       i++;
       continue;
     }
 
-    // Handle bold (**text**)
-    const boldRegex = /\*\*([^*]+)\*\*/g;
-    let lastIndex = 0;
-    let match;
-    const lineParts: React.ReactNode[] = [];
-
-    while ((match = boldRegex.exec(line)) !== null) {
-      if (match.index > lastIndex) {
-        lineParts.push(line.slice(lastIndex, match.index));
-      }
-      lineParts.push(
-        <Text key={`bold-${i}-${match.index}`} style={styles.bold}>
-          {match[1]}
-        </Text>
-      );
-      lastIndex = match.index + match[0].length;
-    }
-
-    if (lineParts.length > 0) {
-      if (lastIndex < line.length) {
-        lineParts.push(line.slice(lastIndex));
-      }
-      parts.push(<Text key={`line-${i}`}>{lineParts}</Text>);
+    // Handle inline bold (**text**) in regular lines
+    const inlineParts = renderInline(line, `line-${i}`);
+    if (inlineParts.length > 1 || (inlineParts.length === 1 && inlineParts[0] !== line)) {
+      parts.push(<Text key={`line-${i}`}>{inlineParts}</Text>);
     } else {
       parts.push(line);
     }
