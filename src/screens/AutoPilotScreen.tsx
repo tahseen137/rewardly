@@ -12,11 +12,11 @@ import {
   TouchableOpacity,
   TextInput,
   Switch,
-  Alert,
   ActivityIndicator,
   RefreshControl,
   Linking,
 } from 'react-native';
+import { showAlert, showConfirm, showError } from '../utils/crossPlatformAlert';
 import {
   MapPin,
   Bell,
@@ -166,10 +166,9 @@ export default function SmartWalletScreen() {
       if (enabled) {
         const success = await enableAutoPilot();
         if (!success) {
-          Alert.alert(
+          showAlert(
             'Permission Required',
-            'Smart Wallet needs location and notification permissions to work. Please enable them in Settings.',
-            [{ text: 'OK' }]
+            'Smart Wallet needs location and notification permissions to work. Please enable them in Settings.'
           );
           return;
         }
@@ -194,24 +193,18 @@ export default function SmartWalletScreen() {
       setStatus(currentStatus);
     } catch (error) {
       console.error('Failed to add geofence:', error);
-      Alert.alert('Error', 'Failed to add store. Please try again.');
+      showError('Failed to add store. Please try again.');
     }
   };
 
   const handleRemoveGeofence = async (geofenceId: string) => {
-    Alert.alert('Remove Store', 'Are you sure you want to stop monitoring this store?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Remove',
-        style: 'destructive',
-        onPress: async () => {
-          await removeGeofence(geofenceId);
-          setGeofences(getGeofences());
-          const currentStatus = await getAutoPilotStatus();
-          setStatus(currentStatus);
-        },
-      },
-    ]);
+    const confirmed = await showConfirm('Remove Store', 'Are you sure you want to stop monitoring this store?');
+    if (confirmed) {
+      await removeGeofence(geofenceId);
+      setGeofences(getGeofences());
+      const currentStatus = await getAutoPilotStatus();
+      setStatus(currentStatus);
+    }
   };
 
   const handleToggleGeofence = async (geofenceId: string, enabled: boolean) => {
@@ -221,7 +214,7 @@ export default function SmartWalletScreen() {
 
   const handleTestNotification = async () => {
     await sendTestNotification();
-    Alert.alert('Test Sent', 'Check your notifications!');
+    showAlert('Test Sent', 'Check your notifications!');
   };
 
   const filteredMerchants = useMemo(() => {
@@ -432,10 +425,9 @@ export default function SmartWalletScreen() {
             } catch {
               // fall through
             }
-            Alert.alert(
+            showAlert(
               'Privacy Details',
-              'Smart Wallet uses geofencing to detect when you enter a monitored store. Your exact location is never stored or transmitted. All processing happens on your device.',
-              [{ text: 'Got it' }]
+              'Smart Wallet uses geofencing to detect when you enter a monitored store. Your exact location is never stored or transmitted. All processing happens on your device.'
             );
           }}
         >
