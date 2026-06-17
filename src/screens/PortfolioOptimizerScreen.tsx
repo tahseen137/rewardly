@@ -39,6 +39,7 @@ import { borderRadius } from '../theme/borders';
 import { Card } from '../types';
 import { PortfolioOptimization, CategoryOptimization } from '../types/rewards-iq';
 import { getPortfolioOptimization } from '../services/RewardsIQService';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { CATEGORY_INFO } from '../services/MockTransactionData';
 
 // ============================================================================
@@ -213,6 +214,15 @@ export default function PortfolioOptimizerScreen() {
     try {
       const data = await getPortfolioOptimization();
       setOptimization(data);
+
+      // Track achievement events
+      if (data.cardsToAdd.length > 0) {
+        AchievementEventEmitter.track('gaps_found', { gapsCount: data.cardsToAdd.length });
+      }
+      const optimizationScore = data.currentSetup.annualRewards > 0
+        ? Math.round((data.currentSetup.annualRewards / data.recommendedSetup.annualRewards) * 100)
+        : 0;
+      AchievementEventEmitter.track('optimization_score_calculated', { optimizationScore });
 
       // Pulse animation for the gain
       gainScale.value = withDelay(

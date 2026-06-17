@@ -27,6 +27,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const REWARDS_IQ_KEY = 'rewards_iq_history';
 const SPENDING_PROFILE_KEY = 'user_spending_profile';
+const MOCK_TRANSACTIONS_KEY = 'rewards_iq_mock_transactions_cache';
 
 // Weight factors for Rewards IQ calculation
 const WEIGHTS = {
@@ -102,6 +103,41 @@ function findBestCard(category: SpendingCategory, cards: Card[]): Card | null {
 // ============================================================================
 
 /**
+ * Get (or generate + cache) mock transactions for today.
+ * Re-uses the same set within a calendar day so the IQ score is stable.
+ */
+async function getStableMockTransactions(portfolioCardIds: string[]): Promise<Transaction[]> {
+  try {
+    const cached = await AsyncStorage.getItem(MOCK_TRANSACTIONS_KEY);
+    if (cached) {
+      const { date, cardIds, transactions } = JSON.parse(cached);
+      const today = new Date().toISOString().slice(0, 10);
+      // Invalidate if date changed or portfolio changed
+      if (date === today && JSON.stringify(cardIds) === JSON.stringify(portfolioCardIds)) {
+        return transactions.map((t: any) => ({ ...t, date: new Date(t.date) }));
+      }
+    }
+  } catch {
+    // ignore cache errors
+  }
+
+  const transactions = generateMockTransactions(portfolioCardIds, 30, 25);
+  try {
+    await AsyncStorage.setItem(
+      MOCK_TRANSACTIONS_KEY,
+      JSON.stringify({
+        date: new Date().toISOString().slice(0, 10),
+        cardIds: portfolioCardIds,
+        transactions,
+      })
+    );
+  } catch {
+    // ignore write errors
+  }
+  return transactions;
+}
+
+/**
  * Analyze missed rewards from transactions
  */
 export async function analyzeMissedRewards(
@@ -114,8 +150,8 @@ export async function analyzeMissedRewards(
     .map((id) => allCards.find((c) => c.id === id))
     .filter((c): c is Card => c !== null);
 
-  // Generate mock transactions if not provided
-  const txns = transactions || generateMockTransactions(portfolio, 30, 25);
+  // Use stable cached transactions so the score doesn't re-roll on every load
+  const txns = transactions || (await getStableMockTransactions(portfolio));
 
   const missedRewards: MissedReward[] = [];
   const categoryTotals = new Map<
@@ -580,4 +616,76 @@ export async function getShareableStats(): Promise<ShareableStats> {
     // link handler (scheme "rewards-optimizer") also honours this path.
     shareUrl: `https://rewardly.ca/rewards-iq?score=${score.overallScore}&category=${encodeURIComponent(topCategory)}`,
   };
+}
+
+// ============================================================================
+// Score Boost Tips
+// ============================================================================
+
+export interface ScoreBoostTip {
+  id: string;
+  label: string;
+  description: string;
+  pointGain: number; // estimated score increase
+  action: 'enable_smart_wallet' | 'add_card' | 'set_spending_profile' | 'explore_cards' | 'view_iq';
+}
+
+/**
+ * Return up to 3 actionable tips the user can take to improve their IQ score.
+ * Based on real current state, not mock data.
+ */
+export async function getScoreBoostTips(): Promise<ScoreBoostTip[]> {
+  const tips: ScoreBoostTip[] = [];
+
+  // Tip 1: Smart Wallet off → biggest single toggle (15% weight, worth up to 15 pts)
+  const autoPilotEnabled = await isAutoPilotEnabled();
+  if (!autoPilotEnabled) {
+    tips.push({
+      id: 'enable_smart_wallet',
+      label: 'Enable Smart Wallet',
+      description: 'Automatic card suggestions at stores. Worth up to +15 pts.',
+      pointGain: 15,
+      action: 'enable_smart_wallet',
+    });
+  }
+
+  // Tip 2: Portfolio optimization gap
+  const optimization = await getPortfolioOptimization();
+  if (optimization.annualGain > 50 && optimization.cardsToAdd.length > 0) {
+    const topCard = optimization.cardsToAdd[0];
+    tips.push({
+      id: 'add_card',
+      label: `Add ${topCard.name.split(' ').slice(0, 3).join(' ')}`,
+      description: `Could earn you $${optimization.annualGain.toFixed(0)}/yr more and boost your score.`,
+      pointGain: Math.min(12, Math.round(optimization.annualGain / 20)),
+      action: 'add_card',
+    });
+  }
+
+  // Tip 3: No spending profile set
+  const spending = await getSpendingProfile();
+  const isDefault = spending.get(SpendingCategory.GROCERIES) === 600 &&
+    spending.get(SpendingCategory.DINING) === 250;
+  if (isDefault) {
+    tips.push({
+      id: 'set_spending_profile',
+      label: 'Personalize your spending',
+      description: 'Set your actual monthly spend to get accurate insights.',
+      pointGain: 8,
+      action: 'set_spending_profile',
+    });
+  }
+
+  // Always suggest viewing the full IQ breakdown if under 70
+  if (tips.length < 3) {
+    tips.push({
+      id: 'view_iq',
+      label: 'See your full IQ breakdown',
+      description: 'Understand exactly where your score comes from.',
+      pointGain: 0,
+      action: 'view_iq',
+    });
+  }
+
+  return tips.slice(0, 3);
 }

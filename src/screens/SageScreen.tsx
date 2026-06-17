@@ -37,6 +37,7 @@ import {
   QUICK_ACTIONS,
 } from '../services/SageService';
 import { getCards } from '../services/CardPortfolioManager';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { getPreferences } from '../services/PreferenceManager';
 import { getCardByIdSync } from '../services/CardDataService';
 import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
@@ -323,6 +324,9 @@ export const SageScreen: React.FC = () => {
         // Increment Sage usage after successful chat
         const updatedUsage = await incrementSageUsage();
         setSageUsage(updatedUsage);
+
+        // Track achievement event
+        AchievementEventEmitter.track('sage_chat', {});
 
         // Update final message with metadata (recommendations, etc.)
         setMessages((prev) =>

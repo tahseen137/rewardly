@@ -32,6 +32,7 @@ import { borderRadius } from '../theme/borders';
 import { ApplyNowButton } from '../components';
 import { MissedRewardsAnalysis, CategoryMissedRewards, MissedReward } from '../types/rewards-iq';
 import { analyzeMissedRewards } from '../services/RewardsIQService';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { CATEGORY_INFO } from '../services/MockTransactionData';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
 import { createLogger } from '../utils/logger';
@@ -197,6 +198,13 @@ export default function MissedRewardsScreen() {
       const data = await analyzeMissedRewards();
       setAnalysis(data);
       setError(null);
+
+      // Track achievement event
+      if (data.totalMissed >= 1) {
+        AchievementEventEmitter.track('money_left_on_table_calculated', {
+          moneyLeftOnTable: data.totalMissed,
+        });
+      }
 
       // Trigger attention-grabbing animation
       shakeValue.value = withSequence(

@@ -43,6 +43,7 @@ import {
 import { getAllCards, searchCards, getCardByIdSync } from '../services/CardDataService';
 import { getCurrentTierSync, getCardLimitSync } from '../services/SubscriptionService';
 import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { formatUpToRate, formatBestForCategories } from '../utils/rewardFormatUtils';
 
@@ -531,7 +532,9 @@ export default function MyCardsScreen() {
   const handleAddCard = async (cardId: string) => {
     const result = await addCard(cardId);
     if (result.success) {
-      setPortfolio(getCards());
+      const updatedPortfolio = getCards();
+      setPortfolio(updatedPortfolio);
+      AchievementEventEmitter.track('card_added', { cardCount: updatedPortfolio.length });
       setIsModalVisible(false);
       setSearchQuery('');
     } else {

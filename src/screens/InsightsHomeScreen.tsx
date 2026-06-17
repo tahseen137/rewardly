@@ -7,7 +7,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ChevronRight, Sparkles, BarChart3, Trophy, Upload, ClipboardList } from 'lucide-react-native';
+import { ChevronRight, Sparkles, BarChart3, Trophy, Upload, ClipboardList, Zap } from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
@@ -17,7 +18,10 @@ import {
   calculateRewardsIQ,
   analyzeMissedRewards,
   getPortfolioOptimization,
+  getScoreBoostTips,
+  ScoreBoostTip,
 } from '../services/RewardsIQService';
+import { getAchievements, calculateRank } from '../services/AchievementService';
 import { getAllCards } from '../services/CardDataService';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
 import {
@@ -42,6 +46,10 @@ export default function InsightsHomeScreen() {
   const [rewardsIQ, setRewardsIQ] = useState<RewardsIQScore | null>(null);
   const [missedRewards, setMissedRewards] = useState<MissedRewardsAnalysis | null>(null);
   const [optimization, setOptimization] = useState<PortfolioOptimization | null>(null);
+  const [boostTips, setBoostTips] = useState<ScoreBoostTip[]>([]);
+  const [rankEmoji, setRankEmoji] = useState<string>('🌱');
+  const [rankTitle, setRankTitle] = useState<string>('Beginner');
+  const [scoreHistory, setScoreHistory] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasAccess, setHasAccess] = useState(true);
@@ -62,14 +70,33 @@ export default function InsightsHomeScreen() {
   const loadData = useCallback(async () => {
     try {
       await getAllCards();
-      const [iq, missed, opt] = await Promise.all([
+      const [iq, missed, opt, tips, userAchievements] = await Promise.all([
         calculateRewardsIQ(),
         analyzeMissedRewards(),
         getPortfolioOptimization(),
+        getScoreBoostTips(),
+        getAchievements(),
       ]);
       setRewardsIQ(iq);
       setMissedRewards(missed);
       setOptimization(opt);
+      setBoostTips(tips);
+
+      // Rank from real achievement count
+      const rank = calculateRank(userAchievements.totalUnlocked);
+      setRankEmoji(rank.emoji);
+      setRankTitle(rank.title);
+
+      // Score history sparkline
+      try {
+        const raw = await AsyncStorage.getItem('rewards_iq_history');
+        if (raw) {
+          const history: { score: number }[] = JSON.parse(raw);
+          setScoreHistory(history.slice(-7).map((h) => h.score));
+        }
+      } catch {
+        // ignore
+      }
     } catch (e) {
       console.error('Failed to load insights:', e);
     } finally {
@@ -135,9 +162,15 @@ export default function InsightsHomeScreen() {
         />
       }
     >
-      {/* Header */}
+      {/* Header with rank badge */}
       <View style={styles.header}>
-        <Text style={styles.title}>Insights</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>Insights</Text>
+          <View style={styles.rankBadge}>
+            <Text style={styles.rankEmoji}>{rankEmoji}</Text>
+            <Text style={styles.rankTitle}>{rankTitle}</Text>
+          </View>
+        </View>
         <Text style={styles.subtitle}>Your rewards performance this month</Text>
       </View>
 
@@ -161,8 +194,60 @@ export default function InsightsHomeScreen() {
           <View style={[styles.progressFill, { width: `${score}%` as any }]} />
         </View>
 
+        {/* Sparkline */}
+        {scoreHistory.length > 1 && (
+          <View style={styles.sparklineContainer}>
+            {scoreHistory.map((s, i) => {
+              const max = Math.max(...scoreHistory, 1);
+              const height = Math.max(4, (s / max) * 28);
+              const isLast = i === scoreHistory.length - 1;
+              return (
+                <View
+                  key={i}
+                  style={[
+                    styles.sparklineBar,
+                    { height, backgroundColor: isLast ? colors.primary.main : colors.primary.bg10 },
+                  ]}
+                />
+              );
+            })}
+          </View>
+        )}
+
         <Text style={styles.iqFooter}>{trendText}</Text>
       </TouchableOpacity>
+
+      {/* Boost tips */}
+      {boostTips.length > 0 && (
+        <>
+          <Text style={styles.overlineSeparator}>BOOST YOUR SCORE</Text>
+          {boostTips.map((tip) => (
+            <TouchableOpacity
+              key={tip.id}
+              style={styles.tipCard}
+              activeOpacity={0.8}
+              onPress={() => {
+                if (tip.action === 'enable_smart_wallet') navigation.navigate('SmartWallet' as any);
+                else if (tip.action === 'set_spending_profile') navigation.navigate('InsightsDashboard');
+                else if (tip.action === 'view_iq') navigation.navigate('RewardsIQ');
+              }}
+            >
+              <View style={styles.tipIconCircle}>
+                <Zap size={14} color={colors.accent.main} />
+              </View>
+              <View style={styles.optimizerText}>
+                <Text style={styles.tipLabel}>{tip.label}</Text>
+                <Text style={styles.optimizerDesc}>{tip.description}</Text>
+              </View>
+              {tip.pointGain > 0 && (
+                <View style={styles.tipGainBadge}>
+                  <Text style={styles.tipGainText}>+{tip.pointGain}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+        </>
+      )}
 
       {/* Missed rewards */}
       {topMissed.length > 0 && (
@@ -301,16 +386,92 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 20,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
   title: {
     fontSize: 26,
     fontWeight: '700',
     color: colors.text.primary,
     letterSpacing: -0.5,
-    marginBottom: 4,
+  },
+  rankBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.background.secondary,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  rankEmoji: {
+    fontSize: 14,
+  },
+  rankTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.text.primary,
   },
   subtitle: {
     fontSize: 13,
     color: colors.text.secondary,
+  },
+  // Sparkline
+  sparklineContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 3,
+    height: 32,
+    marginBottom: 8,
+    marginTop: 4,
+  },
+  sparklineBar: {
+    flex: 1,
+    borderRadius: 2,
+  },
+  // Boost tips
+  tipCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.card,
+    borderWidth: 1,
+    borderColor: colors.accent.bg20,
+    padding: 14,
+    marginBottom: 8,
+  },
+  tipIconCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.accent.bg20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  tipLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text.primary,
+    marginBottom: 2,
+  },
+  tipGainBadge: {
+    backgroundColor: colors.primary.bg10,
+    borderRadius: 8,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    flexShrink: 0,
+  },
+  tipGainText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.primary.main,
   },
   // Overline
   overline: {

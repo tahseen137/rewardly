@@ -151,6 +151,7 @@ export default function CardBenefitsScreen() {
           const feeResult = calculateFeeBreakeven(cardId, profile);
           if (feeResult.success) {
             setFeeBreakevenResult(feeResult.value);
+            AchievementEventEmitter.track('fee_breakeven_viewed', {});
           }
         }
 
@@ -159,6 +160,7 @@ export default function CardBenefitsScreen() {
           const bonusResult = calculateSignupBonusROI(cardId, profile);
           if (bonusResult.success) {
             setSignupBonusResult(bonusResult.value);
+            AchievementEventEmitter.track('signup_roi_viewed', {});
           }
         }
       } else {

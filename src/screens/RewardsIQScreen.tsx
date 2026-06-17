@@ -50,6 +50,7 @@ import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
 import { RewardsIQScore, ShareableStats } from '../types/rewards-iq';
 import { calculateRewardsIQ, getShareableStats } from '../services/RewardsIQService';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -226,6 +227,12 @@ export default function RewardsIQScreen() {
       const [score, stats] = await Promise.all([calculateRewardsIQ(), getShareableStats()]);
       setScoreData(score);
       setShareStats(stats);
+
+      // Track achievement events
+      AchievementEventEmitter.track('trends_viewed', {});
+      AchievementEventEmitter.track('optimization_score_calculated', {
+        optimizationScore: score.portfolioOptimizationScore,
+      });
     } catch (e) {
       console.error('Failed to load Rewards IQ:', e);
     } finally {

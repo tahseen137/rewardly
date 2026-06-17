@@ -21,6 +21,7 @@ import {
 import { getCards } from '../services/CardPortfolioManager';
 import { getCardByIdSync } from '../services/CardDataService';
 import { getCurrentTierSync } from '../services/SubscriptionService';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { ApplyNowButton } from '../components';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -33,6 +34,7 @@ export default function CardCompareScreen() {
   useEffect(() => {
     const tier = getCurrentTierSync();
     setMaxCards(getMaxCardsForTier(tier));
+    AchievementEventEmitter.track('card_comparison_viewed', {});
   }, []);
 
   const comparison = useMemo(() => {

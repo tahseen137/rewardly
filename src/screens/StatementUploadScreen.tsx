@@ -28,6 +28,7 @@ import { TransactionReviewList } from '../components/TransactionReviewList';
 import { parseStatement } from '../services/StatementParserService';
 import { saveStatement } from '../services/StatementStorageService';
 import { updateFromParsedTransactions } from '../services/SpendingProfileService';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { CSVParseResult } from '../types';
 
 type UploadState = 'idle' | 'parsing' | 'review' | 'saving' | 'success' | 'error';
@@ -178,6 +179,7 @@ export default function StatementUploadScreen() {
       );
 
       setState('success');
+      AchievementEventEmitter.track('statement_uploaded', {});
 
       // Navigate back after 2 seconds
       setTimeout(() => {

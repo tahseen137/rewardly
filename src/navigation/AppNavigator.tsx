@@ -6,11 +6,11 @@
  * MEGA BUILD UPDATE: Added Insights tab with MissedRewards, RewardsIQ, PortfolioOptimizer
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Platform, View, ActivityIndicator, StyleSheet, Animated } from 'react-native';
+import { Platform, View, Text, ActivityIndicator, StyleSheet, Animated } from 'react-native';
 import { Home, CreditCard, Settings, Sparkles, Navigation, BarChart3 } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 
@@ -67,6 +67,11 @@ import { supabase, isSupabaseConfigured } from '../services/supabase';
 import { initializeSubscription, refreshSubscription } from '../services/SubscriptionService';
 import { initializeAutoPilot } from '../services/AutoPilotService';
 import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
+import {
+  initializeAchievements,
+  onAchievementUnlock,
+} from '../services/AchievementService';
+import { AchievementUnlockEvent } from '../types';
 import { createLogger } from '../utils/logger';
 
 const log = createLogger('AppNavigator');
@@ -508,6 +513,9 @@ export default function AppNavigator() {
           log.warn('Subscription init failed:', { error: e })
         );
         await initializeAutoPilot().catch((e) => log.warn('AutoPilot init failed:', { error: e }));
+        await initializeAchievements().catch((e) =>
+          log.warn('Achievements init failed:', { error: e })
+        );
 
         // Track app open (non-blocking)
         try {
@@ -702,10 +710,53 @@ export default function AppNavigator() {
 
 /**
  * RootNavigator - Wraps MainTabs and provides modal screens (Upgrade)
+ * Also hosts the global achievement unlock toast overlay.
  */
 function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: () => void }) {
+  const [unlockToast, setUnlockToast] = useState<AchievementUnlockEvent | null>(null);
+  const toastOpacity = useRef(new Animated.Value(0)).current;
+  const toastTranslateY = useRef(new Animated.Value(-80)).current;
+
+  useEffect(() => {
+    const unsubscribe = onAchievementUnlock((event) => {
+      setUnlockToast(event);
+      toastOpacity.setValue(0);
+      toastTranslateY.setValue(-80);
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(toastOpacity, {
+            toValue: 1,
+            duration: 350,
+            useNativeDriver: true,
+          }),
+          Animated.spring(toastTranslateY, {
+            toValue: 0,
+            friction: 8,
+            tension: 80,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.delay(2800),
+        Animated.parallel([
+          Animated.timing(toastOpacity, {
+            toValue: 0,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(toastTranslateY, {
+            toValue: -80,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start(() => setUnlockToast(null));
+    });
+    return unsubscribe;
+  }, []);
+
   return (
-    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+    <View style={{ flex: 1 }}>
+      <RootStack.Navigator screenOptions={{ headerShown: false }}>
       <RootStack.Screen name="MainTabs">
         {() => <MainTabs onSignOut={onSignOut} onSignIn={onSignIn} />}
       </RootStack.Screen>
@@ -748,5 +799,82 @@ function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignI
         }}
       />
     </RootStack.Navigator>
+
+    {/* Achievement unlock toast overlay */}
+    {unlockToast && (
+      <Animated.View
+        style={[
+          toastStyles.container,
+          {
+            opacity: toastOpacity,
+            transform: [{ translateY: toastTranslateY }],
+          },
+        ]}
+        pointerEvents="none"
+      >
+        <View style={toastStyles.pill}>
+          <Text style={toastStyles.icon}>{unlockToast.achievement.icon}</Text>
+          <View style={toastStyles.textBlock}>
+            <Text style={toastStyles.title}>Achievement Unlocked!</Text>
+            <Text style={toastStyles.name}>{unlockToast.achievement.name}</Text>
+            {unlockToast.newRank && (
+              <Text style={toastStyles.rank}>🏆 {unlockToast.newRank.title}</Text>
+            )}
+          </View>
+        </View>
+      </Animated.View>
+    )}
+  </View>
   );
 }
+
+const toastStyles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 56 : 40,
+    left: 16,
+    right: 16,
+    zIndex: 9999,
+    alignItems: 'center',
+  },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: colors.primary.main,
+    shadowColor: colors.primary.main,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 12,
+    gap: 12,
+  },
+  icon: {
+    fontSize: 28,
+  },
+  textBlock: {
+    flex: 1,
+    gap: 2,
+  },
+  title: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.primary.main,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  name: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.text.primary,
+  },
+  rank: {
+    fontSize: 12,
+    color: colors.text.secondary,
+    marginTop: 1,
+  },
+});
