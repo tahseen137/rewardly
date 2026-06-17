@@ -22,6 +22,7 @@ import {
   ScoreBoostTip,
 } from '../services/RewardsIQService';
 import { getAchievements, calculateRank } from '../services/AchievementService';
+import { hasSpendingProfile } from '../services/SpendingProfileService';
 import { getAllCards } from '../services/CardDataService';
 import { InsightsStackParamList } from '../navigation/AppNavigator';
 import {
@@ -54,6 +55,7 @@ export default function InsightsHomeScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasAccess, setHasAccess] = useState(true);
   const [_currentTier, setCurrentTier] = useState<SubscriptionTier>('free');
+  const [hasProfile, setHasProfile] = useState(true); // assume yes to avoid flicker
 
   useFocusEffect(
     useCallback(() => {
@@ -70,13 +72,15 @@ export default function InsightsHomeScreen() {
   const loadData = useCallback(async () => {
     try {
       await getAllCards();
-      const [iq, missed, opt, tips, userAchievements] = await Promise.all([
+      const [iq, missed, opt, tips, userAchievements, profileExists] = await Promise.all([
         calculateRewardsIQ(),
         analyzeMissedRewards(),
         getPortfolioOptimization(),
         getScoreBoostTips(),
         getAchievements(),
+        hasSpendingProfile(),
       ]);
+      setHasProfile(profileExists);
       setRewardsIQ(iq);
       setMissedRewards(missed);
       setOptimization(opt);
@@ -228,7 +232,7 @@ export default function InsightsHomeScreen() {
               activeOpacity={0.8}
               onPress={() => {
                 if (tip.action === 'enable_smart_wallet') navigation.navigate('SmartWallet' as any);
-                else if (tip.action === 'set_spending_profile') navigation.navigate('InsightsDashboard');
+                else if (tip.action === 'set_spending_profile') navigation.navigate('SpendingProfileWizard');
                 else if (tip.action === 'view_iq') navigation.navigate('RewardsIQ');
               }}
             >
@@ -315,6 +319,31 @@ export default function InsightsHomeScreen() {
         </View>
         <ChevronRight size={18} color={colors.text.secondary} />
       </TouchableOpacity>
+
+      {/* Spending Profile setup CTA — only shown when no profile exists */}
+      {!hasProfile && (
+        <TouchableOpacity
+          style={styles.profileCta}
+          onPress={() => navigation.navigate('SpendingProfileWizard')}
+          activeOpacity={0.8}
+        >
+          <View style={styles.profileCtaLeft}>
+            <Text style={styles.profileCtaIcon}>💸</Text>
+            <View style={styles.optimizerText}>
+              <View style={styles.profileCtaTitleRow}>
+                <Text style={styles.optimizerTitle}>Set Up Spending Profile</Text>
+                <View style={styles.profileCtaNew}>
+                  <Text style={styles.profileCtaNewText}>SETUP</Text>
+                </View>
+              </View>
+              <Text style={styles.optimizerDesc}>
+                Tell us your monthly spend to personalize your score and recommendations
+              </Text>
+            </View>
+          </View>
+          <ChevronRight size={18} color={colors.primary.main} />
+        </TouchableOpacity>
+      )}
 
       {/* Achievements card */}
       <TouchableOpacity
@@ -624,5 +653,44 @@ const styles = StyleSheet.create({
   optimizerDesc: {
     fontSize: 12,
     color: colors.text.secondary,
+  },
+  // Spending profile CTA
+  profileCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary.bg10,
+    borderRadius: borderRadius.card,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: colors.primary.main,
+    gap: 12,
+  },
+  profileCtaLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  profileCtaIcon: {
+    fontSize: 28,
+  },
+  profileCtaTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  profileCtaNew: {
+    backgroundColor: colors.primary.main,
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  profileCtaNewText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 0.5,
   },
 });

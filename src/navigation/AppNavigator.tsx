@@ -44,6 +44,7 @@ import {
   ExploreCardsScreen,
   CardDetailScreen,
   ReferralDashboardScreen,
+  SpendingProfileWizardScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
 import PremiumOnboardingScreen from '../screens/PremiumOnboardingScreen';
@@ -99,6 +100,7 @@ export type InsightsStackParamList = {
   Achievements: undefined;
   ApplicationTracker: undefined;
   ExploreCards: undefined;
+  SpendingProfileWizard: undefined;
 };
 
 export type RootTabParamList = {
@@ -256,6 +258,11 @@ function InsightsNavigator() {
         name="ExploreCards"
         component={ExploreCardsScreen}
         options={{ animation: 'slide_from_right', title: 'Explore Cards' }}
+      />
+      <InsightsStack.Screen
+        name="SpendingProfileWizard"
+        component={SpendingProfileWizardScreen}
+        options={{ headerShown: false, animation: 'slide_from_bottom' }}
       />
     </InsightsStack.Navigator>
   );
