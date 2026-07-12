@@ -568,6 +568,23 @@ export default function HomeScreen() {
             )}
           </View>
         )}
+
+        {/* ── Referral banner ── */}
+        <TouchableOpacity
+          style={styles.referralBanner}
+          onPress={() => (navigation as any).navigate('ReferralDashboard')}
+          activeOpacity={0.82}
+          accessibilityRole="button"
+          accessibilityLabel="Share Rewardly to earn free Pro access"
+        >
+          <Text style={styles.referralEmoji}>🎁</Text>
+          <View style={styles.referralText}>
+            <Text style={styles.referralTitle}>Share Rewardly, get free Pro</Text>
+            <Text style={styles.referralSub}>Earn 1 month free for every friend who signs up</Text>
+          </View>
+          <ChevronRight size={16} color={colors.primary.main} />
+        </TouchableOpacity>
+
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -769,5 +786,34 @@ const createStyles = (_t: Theme) =>
       fontSize: 13,
       fontWeight: '500',
       color: colors.primary.dark,
+    },
+    // Referral banner
+    referralBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+      padding: 14,
+      marginTop: 16,
+      marginBottom: 8,
+      gap: 10,
+    },
+    referralEmoji: {
+      fontSize: 22,
+    },
+    referralText: {
+      flex: 1,
+    },
+    referralTitle: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.text.primary,
+      marginBottom: 2,
+    },
+    referralSub: {
+      fontSize: 11,
+      color: colors.text.secondary,
     },
   });
