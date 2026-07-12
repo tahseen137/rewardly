@@ -587,7 +587,7 @@ export default function HomeScreen() {
             style={styles.rewardsEstimator}
             onPress={() =>
               isFreeTier
-                ? (navigation as any).navigate('Upgrade', { feature: 'insights', source: 'home_estimator' })
+                ? (navigation as any).navigate('Upgrade', { feature: 'insights', source: 'home_estimator', annualGain: portfolioOpt.annualGain })
                 : (navigation as any).navigate('Insights', { screen: 'InsightsDashboard' })
             }
             activeOpacity={0.82}
