@@ -27,12 +27,16 @@ import {
   SubscriptionTier,
   BillingPeriod,
   SUBSCRIPTION_TIERS,
+  STRIPE_PRICE_IDS,
   TierConfig,
   getAnnualSavings,
   setTier,
   createCheckoutSession,
   getLifetimeSpotsRemaining,
 } from '../services/SubscriptionService';
+
+// Annual billing is available only when Stripe annual price IDs are configured
+const ANNUAL_BILLING_AVAILABLE = !!(STRIPE_PRICE_IDS.pro_annual && STRIPE_PRICE_IDS.max_annual);
 
 interface PaywallProps {
   visible: boolean;
@@ -291,20 +295,32 @@ export default function Paywall({
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.billingOption, billingPeriod === 'annual' && styles.billingOptionActive]}
-            onPress={() => setBillingPeriod('annual')}
+            style={[
+              styles.billingOption,
+              billingPeriod === 'annual' && styles.billingOptionActive,
+              !ANNUAL_BILLING_AVAILABLE && styles.billingOptionDisabled,
+            ]}
+            onPress={() => ANNUAL_BILLING_AVAILABLE && setBillingPeriod('annual')}
+            disabled={!ANNUAL_BILLING_AVAILABLE}
           >
             <Text
               style={[
                 styles.billingOptionText,
                 billingPeriod === 'annual' && styles.billingOptionTextActive,
+                !ANNUAL_BILLING_AVAILABLE && styles.billingOptionTextDisabled,
               ]}
             >
               Annual
             </Text>
-            <View style={styles.discountBadge}>
-              <Text style={styles.discountText}>Save 30%+</Text>
-            </View>
+            {ANNUAL_BILLING_AVAILABLE ? (
+              <View style={styles.discountBadge}>
+                <Text style={styles.discountText}>Save 30%+</Text>
+              </View>
+            ) : (
+              <View style={styles.comingSoonBadge}>
+                <Text style={styles.comingSoonText}>Soon</Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -530,6 +546,12 @@ const styles = StyleSheet.create({
   billingOptionTextActive: {
     color: colors.text.primary,
   },
+  billingOptionDisabled: {
+    opacity: 0.5,
+  },
+  billingOptionTextDisabled: {
+    color: colors.text.tertiary,
+  },
   discountBadge: {
     backgroundColor: colors.primary.bg20,
     paddingHorizontal: 8,
@@ -540,6 +562,17 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     color: colors.primary.main,
+  },
+  comingSoonBadge: {
+    backgroundColor: colors.background.tertiary,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: borderRadius.sm,
+  },
+  comingSoonText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.text.tertiary,
   },
   tierList: {
     flex: 1,

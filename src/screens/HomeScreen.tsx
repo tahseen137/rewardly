@@ -28,6 +28,7 @@ import {
   SkeletonCard,
   Skeleton,
 } from '../components';
+import { ApplyNowButton } from '../components/ApplyNowButton';
 import { formatUpToRate } from '../utils/rewardFormatUtils';
 import { StoreSelector } from '../components/StoreSelectorNew';
 import { CategoryGrid, CategoryType } from '../components/CategoryGrid';
@@ -514,39 +515,46 @@ export default function HomeScreen() {
                 {recommendations.map((rec, index) => {
                   const upToRate = formatUpToRate(rec.card);
                   return (
-                    <TouchableOpacity
-                      key={rec.card.id}
-                      style={styles.recommendationItem}
-                      onPress={() =>
-                        (navigation as any).navigate('CardDetail', { cardId: rec.card.id })
-                      }
-                      accessibilityRole="button"
-                      accessibilityLabel={`View ${rec.card.name} details`}
-                    >
-                      <View style={styles.recommendationRank}>
-                        <Text style={styles.rankText}>{index + 1}</Text>
-                      </View>
-                      <View style={styles.recommendationContent}>
-                        <Text style={styles.recommendationCardName} numberOfLines={1}>
-                          {rec.card.name}
-                        </Text>
-                        <Text style={styles.recommendationCategoryRate} numberOfLines={1}>
-                          {upToRate}
-                        </Text>
-                        <Text style={styles.recommendationReason} numberOfLines={1}>
-                          {rec.reason}
-                        </Text>
-                      </View>
-                      <View style={styles.recommendationValue}>
-                        {rec.estimatedAnnualRewards > 0 ? (
-                          <Text style={styles.rewardValue}>
-                            ${rec.estimatedAnnualRewards.toFixed(0)}/yr
+                    <View key={rec.card.id} style={styles.recommendationItem}>
+                      <TouchableOpacity
+                        style={styles.recommendationMainRow}
+                        onPress={() =>
+                          (navigation as any).navigate('CardDetail', { cardId: rec.card.id })
+                        }
+                        accessibilityRole="button"
+                        accessibilityLabel={`View ${rec.card.name} details`}
+                      >
+                        <View style={styles.recommendationRank}>
+                          <Text style={styles.rankText}>{index + 1}</Text>
+                        </View>
+                        <View style={styles.recommendationContent}>
+                          <Text style={styles.recommendationCardName} numberOfLines={1}>
+                            {rec.card.name}
                           </Text>
-                        ) : (
-                          <Text style={styles.rewardValue}>{upToRate}</Text>
-                        )}
-                      </View>
-                    </TouchableOpacity>
+                          <Text style={styles.recommendationCategoryRate} numberOfLines={1}>
+                            {upToRate}
+                          </Text>
+                          <Text style={styles.recommendationReason} numberOfLines={1}>
+                            {rec.reason}
+                          </Text>
+                        </View>
+                        <View style={styles.recommendationValue}>
+                          {rec.estimatedAnnualRewards > 0 ? (
+                            <Text style={styles.rewardValue}>
+                              ${rec.estimatedAnnualRewards.toFixed(0)}/yr
+                            </Text>
+                          ) : (
+                            <Text style={styles.rewardValue}>{upToRate}</Text>
+                          )}
+                        </View>
+                      </TouchableOpacity>
+                      <ApplyNowButton
+                        card={rec.card}
+                        sourceScreen="home_recommendations"
+                        variant="compact"
+                        showDisclosure={false}
+                      />
+                    </View>
                   );
                 })}
               </View>
@@ -676,13 +684,17 @@ const createStyles = (_t: Theme) =>
       gap: 8,
     },
     recommendationItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: 'column',
       backgroundColor: colors.background.secondary,
       borderRadius: 12,
       borderWidth: 1,
       borderColor: colors.border.light,
       padding: 12,
+      gap: 10,
+    },
+    recommendationMainRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 12,
     },
     recommendationRank: {
