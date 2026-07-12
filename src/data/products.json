@@ -1,0 +1,228 @@
+{
+  "products": [
+    {
+      "id": "milk-2l",
+      "name": "Milk 2L",
+      "nameFr": "Lait 2L",
+      "category": "groceries",
+      "stores": ["loblaws", "no-frills", "superstore", "sobeys", "metro-canada", "food-basics", "freshco", "walmart-canada", "costco-canada", "safeway-canada", "save-on-foods", "iga-canada", "farm-boy", "longos", "whole-foods-canada", "t-and-t"],
+      "aliases": ["milk", "2% milk", "whole milk", "skim milk", "lait"]
+    },
+    {
+      "id": "bread-white",
+      "name": "White Bread",
+      "nameFr": "Pain blanc",
+      "category": "groceries",
+      "stores": ["loblaws", "no-frills", "superstore", "sobeys", "metro-canada", "food-basics", "freshco", "walmart-canada", "costco-canada", "safeway-canada", "save-on-foods", "iga-canada", "farm-boy", "longos", "whole-foods-canada"],
+      "aliases": ["bread", "loaf", "pain"]
+    },
+    {
+      "id": "eggs-dozen",
+      "name": "Eggs (Dozen)",
+      "nameFr": "Oeufs (Douzaine)",
+      "category": "groceries",
+      "stores": ["loblaws", "no-frills", "superstore", "sobeys", "metro-canada", "food-basics", "freshco", "walmart-canada", "costco-canada", "safeway-canada", "save-on-foods", "iga-canada", "farm-boy", "longos", "whole-foods-canada", "t-and-t"],
+      "aliases": ["eggs", "oeufs", "egg carton"]
+    },
+    {
+      "id": "chicken-breast",
+      "name": "Chicken Breast",
+      "nameFr": "Poitrine de poulet",
+      "category": "groceries",
+      "stores": ["loblaws", "no-frills", "superstore", "sobeys", "metro-canada", "food-basics", "freshco", "walmart-canada", "costco-canada", "safeway-canada", "save-on-foods", "iga-canada", "farm-boy", "longos", "whole-foods-canada", "t-and-t"],
+      "aliases": ["chicken", "poulet", "poultry"]
+    },
+    {
+      "id": "ground-beef",
+      "name": "Ground Beef",
+      "nameFr": "Boeuf haché",
+      "category": "groceries",
+      "stores": ["loblaws", "no-frills", "superstore", "sobeys", "metro-canada", "food-basics", "freshco", "walmart-canada", "costco-canada", "safeway-canada", "save-on-foods", "iga-canada", "farm-boy", "longos", "whole-foods-canada"],
+      "aliases": ["beef", "hamburger meat", "boeuf", "viande hachée"]
+    },
+    {
+      "id": "bananas",
+      "name": "Bananas",
+      "nameFr": "Bananes",
+      "category": "groceries",
+      "stores": ["loblaws", "no-frills", "superstore", "sobeys", "metro-canada", "food-basics", "freshco", "walmart-canada", "costco-canada", "safeway-canada", "save-on-foods", "iga-canada", "farm-boy", "longos", "whole-foods-canada", "t-and-t"],
+      "aliases": ["banana", "banane"]
+    },
+    {
+      "id": "apples",
+      "name": "Apples",
+      "nameFr": "Pommes",
+      "category": "groceries",
+      "stores": ["loblaws", "no-frills", "superstore", "sobeys", "metro-canada", "food-basics", "freshco", "walmart-canada", "costco-canada", "safeway-canada", "save-on-foods", "iga-canada", "farm-boy", "longos", "whole-foods-canada", "t-and-t"],
+      "aliases": ["apple", "pomme"]
+    },
+    {
+      "id": "coffee-ground",
+      "name": "Ground Coffee",
+      "nameFr": "Café moulu",
+      "category": "groceries",
+      "stores": ["loblaws", "no-frills", "superstore", "sobeys", "metro-canada", "walmart-canada", "costco-canada", "safeway-canada", "save-on-foods", "iga-canada", "whole-foods-canada", "starbucks-canada", "tim-hortons", "second-cup"],
+      "aliases": ["coffee", "café", "coffee beans"]
+    },
+    {
+      "id": "gasoline-regular",
+      "name": "Regular Gasoline",
+      "nameFr": "Essence ordinaire",
+      "category": "gas",
+      "stores": ["petro-canada", "esso", "shell-canada", "canadian-tire-gas", "ultramar", "husky", "pioneer", "mobil-canada", "costco-gas-canada", "co-op-gas"],
+      "aliases": ["gas", "fuel", "petrol", "essence", "87 octane"]
+    },
+    {
+      "id": "gasoline-premium",
+      "name": "Premium Gasoline",
+      "nameFr": "Essence super",
+      "category": "gas",
+      "stores": ["petro-canada", "esso", "shell-canada", "canadian-tire-gas", "ultramar", "husky", "pioneer", "mobil-canada", "costco-gas-canada"],
+      "aliases": ["premium gas", "91 octane", "93 octane", "super gas"]
+    },
+    {
+      "id": "tylenol",
+      "name": "Tylenol",
+      "nameFr": "Tylenol",
+      "category": "drugstores",
+      "stores": ["shoppers-drug-mart", "rexall", "london-drugs", "jean-coutu", "walmart-canada", "costco-canada", "loblaws", "superstore"],
+      "aliases": ["acetaminophen", "pain reliever", "headache medicine"]
+    },
+    {
+      "id": "advil",
+      "name": "Advil",
+      "nameFr": "Advil",
+      "category": "drugstores",
+      "stores": ["shoppers-drug-mart", "rexall", "london-drugs", "jean-coutu", "walmart-canada", "costco-canada", "loblaws", "superstore"],
+      "aliases": ["ibuprofen", "pain reliever"]
+    },
+    {
+      "id": "toothpaste",
+      "name": "Toothpaste",
+      "nameFr": "Dentifrice",
+      "category": "drugstores",
+      "stores": ["shoppers-drug-mart", "rexall", "london-drugs", "jean-coutu", "walmart-canada", "costco-canada", "loblaws", "superstore", "dollarama"],
+      "aliases": ["colgate", "crest", "sensodyne"]
+    },
+    {
+      "id": "shampoo",
+      "name": "Shampoo",
+      "nameFr": "Shampooing",
+      "category": "drugstores",
+      "stores": ["shoppers-drug-mart", "rexall", "london-drugs", "jean-coutu", "walmart-canada", "costco-canada", "loblaws", "superstore", "dollarama"],
+      "aliases": ["hair shampoo", "head and shoulders", "pantene"]
+    },
+    {
+      "id": "drill",
+      "name": "Power Drill",
+      "nameFr": "Perceuse électrique",
+      "category": "home_improvement",
+      "stores": ["canadian-tire", "home-hardware", "rona", "home-depot-canada", "lowes-canada", "kent"],
+      "aliases": ["drill", "cordless drill", "dewalt drill", "makita drill"]
+    },
+    {
+      "id": "paint",
+      "name": "Interior Paint",
+      "nameFr": "Peinture intérieure",
+      "category": "home_improvement",
+      "stores": ["canadian-tire", "home-hardware", "rona", "home-depot-canada", "lowes-canada", "kent"],
+      "aliases": ["paint", "wall paint", "peinture"]
+    },
+    {
+      "id": "lumber",
+      "name": "Lumber 2x4",
+      "nameFr": "Bois 2x4",
+      "category": "home_improvement",
+      "stores": ["home-hardware", "rona", "home-depot-canada", "lowes-canada", "kent"],
+      "aliases": ["wood", "2x4", "lumber", "bois"]
+    },
+    {
+      "id": "movie-ticket",
+      "name": "Movie Ticket",
+      "nameFr": "Billet de cinéma",
+      "category": "entertainment",
+      "stores": ["cineplex", "landmark-cinemas"],
+      "aliases": ["cinema ticket", "film ticket", "billet cinéma"]
+    },
+    {
+      "id": "streaming-subscription",
+      "name": "Streaming Subscription",
+      "nameFr": "Abonnement streaming",
+      "category": "entertainment",
+      "stores": ["netflix-canada", "spotify-canada", "disney-plus-canada", "crave", "apple-music-canada"],
+      "aliases": ["netflix", "spotify", "disney+", "streaming"]
+    },
+    {
+      "id": "flight-domestic",
+      "name": "Domestic Flight",
+      "nameFr": "Vol intérieur",
+      "category": "travel",
+      "stores": ["air-canada", "westjet", "porter-airlines", "flair-airlines"],
+      "aliases": ["flight", "plane ticket", "airfare", "vol"]
+    },
+    {
+      "id": "hotel-room",
+      "name": "Hotel Room",
+      "nameFr": "Chambre d'hôtel",
+      "category": "travel",
+      "stores": ["marriott-canada", "hilton-canada", "fairmont", "four-seasons", "airbnb-canada", "expedia-canada"],
+      "aliases": ["hotel", "accommodation", "lodging", "hébergement"]
+    },
+    {
+      "id": "train-ticket",
+      "name": "Train Ticket",
+      "nameFr": "Billet de train",
+      "category": "travel",
+      "stores": ["via-rail"],
+      "aliases": ["train", "rail ticket", "via rail"]
+    },
+    {
+      "id": "laptop",
+      "name": "Laptop Computer",
+      "nameFr": "Ordinateur portable",
+      "category": "online_shopping",
+      "stores": ["amazon-canada", "best-buy-canada", "apple-store-canada", "staples-canada", "costco-canada", "walmart-canada"],
+      "aliases": ["laptop", "notebook", "macbook", "computer", "ordinateur"]
+    },
+    {
+      "id": "headphones",
+      "name": "Headphones",
+      "nameFr": "Écouteurs",
+      "category": "online_shopping",
+      "stores": ["amazon-canada", "best-buy-canada", "apple-store-canada", "staples-canada", "costco-canada", "walmart-canada"],
+      "aliases": ["earbuds", "airpods", "earphones", "casque"]
+    },
+    {
+      "id": "book",
+      "name": "Book",
+      "nameFr": "Livre",
+      "category": "other",
+      "stores": ["indigo", "amazon-canada", "costco-canada", "walmart-canada"],
+      "aliases": ["novel", "textbook", "livre"]
+    },
+    {
+      "id": "running-shoes",
+      "name": "Running Shoes",
+      "nameFr": "Chaussures de course",
+      "category": "other",
+      "stores": ["sport-chek", "atmosphere", "mec", "lululemon", "amazon-canada", "walmart-canada"],
+      "aliases": ["sneakers", "athletic shoes", "trainers", "souliers"]
+    },
+    {
+      "id": "yoga-mat",
+      "name": "Yoga Mat",
+      "nameFr": "Tapis de yoga",
+      "category": "other",
+      "stores": ["lululemon", "sport-chek", "atmosphere", "mec", "amazon-canada", "walmart-canada", "winners"],
+      "aliases": ["exercise mat", "fitness mat", "tapis yoga"]
+    },
+    {
+      "id": "furniture",
+      "name": "Furniture",
+      "nameFr": "Meubles",
+      "category": "other",
+      "stores": ["ikea-canada", "the-bay", "homesense", "wayfair-canada", "amazon-canada", "costco-canada"],
+      "aliases": ["sofa", "couch", "table", "chair", "meuble"]
+    }
+  ]
+}
