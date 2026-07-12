@@ -38,6 +38,7 @@ import { Store, SpendingCategory } from '../types';
 import { getCards } from '../services/CardPortfolioManager';
 import { getAllCardsSync, getAllCards, refreshCards } from '../services/CardDataService';
 import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
+import { getCurrentTierSync } from '../services/SubscriptionService';
 import { analyzeAndRecommend, CardRecommendation } from '../services/CardRecommendationEngine';
 import {
   calculateRewards,
@@ -119,6 +120,9 @@ export default function HomeScreen() {
   const [recommendations, setRecommendations] = useState<CardRecommendation[]>([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Subscription tier — used to show Pro teaser to free users
+  const isFreeTier = getCurrentTierSync() === 'free';
 
   // Top cards for category - shown when user has no portfolio
   const [, setTopCardsForCategory] = useState<CalculatorOutput | null>(null);
@@ -569,6 +573,28 @@ export default function HomeScreen() {
           </View>
         )}
 
+        {/* ── Pro teaser for free users with cards ── */}
+        {isFreeTier && hasCards && (
+          <TouchableOpacity
+            style={styles.proTeaser}
+            onPress={() => (navigation as any).navigate('Upgrade', { feature: 'insights', source: 'home_teaser' })}
+            activeOpacity={0.82}
+            accessibilityRole="button"
+            accessibilityLabel="Unlock Pro features"
+          >
+            <View style={styles.proTeaserHeader}>
+              <Text style={styles.proTeaserBadge}>PRO</Text>
+              <Text style={styles.proTeaserTitle}>Unlock deeper insights</Text>
+            </View>
+            <View style={styles.proTeaserItems}>
+              <Text style={styles.proTeaserItem}>✦ Unlimited wallet cards</Text>
+              <Text style={styles.proTeaserItem}>✦ 10 Sage AI chats / month</Text>
+              <Text style={styles.proTeaserItem}>✦ Rewards IQ score + missed rewards</Text>
+            </View>
+            <Text style={styles.proTeaserCta}>See Pro plans →</Text>
+          </TouchableOpacity>
+        )}
+
         {/* ── Referral banner ── */}
         <TouchableOpacity
           style={styles.referralBanner}
@@ -815,5 +841,52 @@ const createStyles = (_t: Theme) =>
     referralSub: {
       fontSize: 11,
       color: colors.text.secondary,
+    },
+    // Pro teaser for free users
+    proTeaser: {
+      backgroundColor: colors.background.secondary,
+      borderRadius: 14,
+      borderWidth: 1.5,
+      borderColor: colors.primary.main + '50',
+      padding: 16,
+      marginTop: 16,
+      marginBottom: 4,
+    },
+    proTeaserHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 10,
+    },
+    proTeaserBadge: {
+      fontSize: 10,
+      fontWeight: '800',
+      color: colors.background.primary,
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 4,
+      letterSpacing: 0.5,
+      overflow: 'hidden',
+    },
+    proTeaserTitle: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.text.primary,
+      flex: 1,
+    },
+    proTeaserItems: {
+      gap: 5,
+      marginBottom: 12,
+    },
+    proTeaserItem: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      lineHeight: 18,
+    },
+    proTeaserCta: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.primary.main,
     },
   });
