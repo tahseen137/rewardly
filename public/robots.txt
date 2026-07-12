@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /ceo-queue.html
+
+Sitemap: https://rewardly.ca/sitemap.xml
