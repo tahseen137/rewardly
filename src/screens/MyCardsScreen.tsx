@@ -542,9 +542,14 @@ export default function MyCardsScreen() {
       if (result.error.type === 'LIMIT_REACHED') {
         // Show upgrade prompt for card limit reached
         if (Platform.OS === 'web') {
-          // On web, navigate directly to Upgrade (nicer UX than browser confirm dialog)
-          setIsModalVisible(false);
-          navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards_limit' });
+          if (
+            window.confirm(
+              `Card Limit Reached\n\n${result.error.message}\n\nWould you like to upgrade to Pro?`
+            )
+          ) {
+            setIsModalVisible(false);
+            navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards' });
+          }
         } else {
           Alert.alert('Card Limit Reached', result.error.message, [
             { text: 'Maybe Later', style: 'cancel' },

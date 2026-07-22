@@ -1,0 +1,489 @@
+{
+  "programs": [
+    {
+      "id": "aeroplan",
+      "name": "Aeroplan",
+      "category": "Airline Miles",
+      "pointValuation": 2.0,
+      "description": "Air Canada's loyalty program, one of Canada's most valuable travel rewards programs",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Air Canada Flights",
+          "cents_per_point": 2.5,
+          "minimum_redemption": 6000,
+          "notes": "Best value for long-haul business class"
+        },
+        {
+          "redemption_type": "Star Alliance Flights",
+          "cents_per_point": 2.0,
+          "minimum_redemption": 7500,
+          "notes": "Excellent for international travel"
+        },
+        {
+          "redemption_type": "Aeroplan Store",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 1000,
+          "notes": "Merchandise and gift cards"
+        },
+        {
+          "redemption_type": "Hotel Bookings",
+          "cents_per_point": 1.5,
+          "minimum_redemption": 5000,
+          "notes": "Book through Aeroplan travel portal"
+        }
+      ],
+      "transferPartners": [
+        "Marriott Bonvoy",
+        "Air Canada Altitude"
+      ],
+      "optimalRedemption": "Star Alliance business class flights",
+      "optimalRateCents": 2.5
+    },
+    {
+      "id": "scene-plus",
+      "name": "Scene+",
+      "category": "Multi-partner Points",
+      "pointValuation": 1.0,
+      "description": "Combined loyalty program from Scotiabank, Cineplex, and Empire (Sobeys, Safeway, etc.)",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Movie Tickets",
+          "cents_per_point": 1.25,
+          "minimum_redemption": 1250,
+          "notes": "Best value at Cineplex theatres"
+        },
+        {
+          "redemption_type": "Grocery Purchases",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 100,
+          "notes": "Redeem at checkout at Empire stores"
+        },
+        {
+          "redemption_type": "Travel Bookings",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 2500,
+          "notes": "Book through Scene+ travel portal"
+        },
+        {
+          "redemption_type": "Statement Credit",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 5000,
+          "notes": "Against Scotiabank credit card balance"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "Movie tickets or grocery checkout",
+      "optimalRateCents": 1.25
+    },
+    {
+      "id": "pc-optimum",
+      "name": "PC Optimum",
+      "category": "Retail Points",
+      "pointValuation": 0.1,
+      "description": "Loblaw Companies loyalty program (Loblaws, Shoppers Drug Mart, No Frills, etc.)",
+      "redemptionOptions": [
+        {
+          "redemption_type": "In-Store Purchases",
+          "cents_per_point": 0.1,
+          "minimum_redemption": 10000,
+          "notes": "Redeem at checkout at all PC Optimum partners"
+        },
+        {
+          "redemption_type": "Joe Fresh",
+          "cents_per_point": 0.1,
+          "minimum_redemption": 10000,
+          "notes": "Clothing and accessories"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "In-store at Shoppers Drug Mart during bonus redemption events",
+      "optimalRateCents": 0.1
+    },
+    {
+      "id": "triangle-rewards",
+      "name": "Triangle Rewards",
+      "category": "Retail Points",
+      "pointValuation": 0.1,
+      "description": "Canadian Tire's multi-banner loyalty program (Canadian Tire, Sport Chek, Mark's, etc.)",
+      "redemptionOptions": [
+        {
+          "redemption_type": "In-Store Purchases",
+          "cents_per_point": 0.1,
+          "minimum_redemption": 100,
+          "notes": "All Triangle banner stores"
+        },
+        {
+          "redemption_type": "Gas Purchases",
+          "cents_per_point": 0.1,
+          "minimum_redemption": 100,
+          "notes": "Canadian Tire Gas+ locations"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "In-store during bonus redemption events",
+      "optimalRateCents": 0.1
+    },
+    {
+      "id": "air-miles",
+      "name": "AIR MILES",
+      "category": "Airline Miles",
+      "pointValuation": 10.5,
+      "description": "Canada's original coalition loyalty program with retail and travel redemptions",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Flight Redemptions",
+          "cents_per_point": 12.0,
+          "minimum_redemption": 1500,
+          "notes": "Best value for short-haul economy flights"
+        },
+        {
+          "redemption_type": "Merchandise",
+          "cents_per_point": 10.0,
+          "minimum_redemption": 95,
+          "notes": "Wide variety of products"
+        },
+        {
+          "redemption_type": "Statement Credit",
+          "cents_per_point": 9.5,
+          "minimum_redemption": 500,
+          "notes": "Against BMO credit card balance"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "Short-haul flights within Canada",
+      "optimalRateCents": 12.0
+    },
+    {
+      "id": "westjet-dollars",
+      "name": "WestJet Dollars",
+      "category": "Airline Currency",
+      "pointValuation": 1.0,
+      "description": "WestJet's loyalty currency, 1 WestJet dollar = $1 CAD toward flights",
+      "redemptionOptions": [
+        {
+          "redemption_type": "WestJet Flights",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 5,
+          "notes": "Apply directly to flight bookings"
+        },
+        {
+          "redemption_type": "WestJet Vacations",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 5,
+          "notes": "Package vacations"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "WestJet flights (1:1 value)",
+      "optimalRateCents": 1.0
+    },
+    {
+      "id": "bmo-rewards",
+      "name": "BMO Rewards",
+      "category": "Credit Card Points",
+      "pointValuation": 0.67,
+      "description": "BMO's flexible points program for travel and merchandise",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Travel Bookings",
+          "cents_per_point": 0.7,
+          "minimum_redemption": 15000,
+          "notes": "Book through BMO Rewards Travel"
+        },
+        {
+          "redemption_type": "Investments",
+          "cents_per_point": 0.67,
+          "minimum_redemption": 25000,
+          "notes": "Contribute to BMO InvestorLine account"
+        },
+        {
+          "redemption_type": "Merchandise",
+          "cents_per_point": 0.5,
+          "minimum_redemption": 5000,
+          "notes": "BMO Rewards catalogue"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "Travel bookings through BMO portal",
+      "optimalRateCents": 0.7
+    },
+    {
+      "id": "cibc-aventura",
+      "name": "CIBC Aventura",
+      "category": "Credit Card Points",
+      "pointValuation": 1.0,
+      "description": "CIBC's travel rewards program with flexible redemption",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Flight Redemptions",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 15000,
+          "notes": "Book through CIBC Rewards Centre"
+        },
+        {
+          "redemption_type": "Hotel Bookings",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 15000,
+          "notes": "Book through CIBC Rewards Centre"
+        },
+        {
+          "redemption_type": "Merchandise",
+          "cents_per_point": 0.7,
+          "minimum_redemption": 5000,
+          "notes": "Lower value redemption"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "Travel bookings",
+      "optimalRateCents": 1.0
+    },
+    {
+      "id": "rbc-avion",
+      "name": "RBC Avion Rewards",
+      "category": "Credit Card Points",
+      "pointValuation": 1.0,
+      "description": "RBC's premium travel rewards program with airline transfer options",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Flight Redemptions",
+          "cents_per_point": 2.0,
+          "minimum_redemption": 15000,
+          "notes": "Best value for short-haul flights"
+        },
+        {
+          "redemption_type": "Transfer to British Airways Avios",
+          "cents_per_point": 1.5,
+          "minimum_redemption": 5000,
+          "notes": "1:1 transfer ratio"
+        },
+        {
+          "redemption_type": "Transfer to Cathay Pacific Asia Miles",
+          "cents_per_point": 1.5,
+          "minimum_redemption": 5000,
+          "notes": "1:1 transfer ratio"
+        },
+        {
+          "redemption_type": "Merchandise",
+          "cents_per_point": 0.7,
+          "minimum_redemption": 5000,
+          "notes": "Lower value option"
+        }
+      ],
+      "transferPartners": [
+        "British Airways Avios",
+        "Cathay Pacific Asia Miles",
+        "WestJet Rewards"
+      ],
+      "optimalRedemption": "Short-haul flight redemptions or transfers to airline partners",
+      "optimalRateCents": 2.0
+    },
+    {
+      "id": "amex-membership-rewards",
+      "name": "American Express Membership Rewards (Canada)",
+      "category": "Credit Card Points",
+      "pointValuation": 2.1,
+      "description": "Premium flexible points program with excellent transfer partners",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Transfer to Aeroplan",
+          "cents_per_point": 2.5,
+          "minimum_redemption": 1000,
+          "notes": "1:1 transfer, best value option"
+        },
+        {
+          "redemption_type": "Transfer to Marriott Bonvoy",
+          "cents_per_point": 2.0,
+          "minimum_redemption": 1000,
+          "notes": "1:1 transfer"
+        },
+        {
+          "redemption_type": "Fixed Points Travel",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 10000,
+          "notes": "Book through Amex Travel"
+        },
+        {
+          "redemption_type": "Statement Credit (Pay with Points)",
+          "cents_per_point": 0.7,
+          "minimum_redemption": 1000,
+          "notes": "Lower value option"
+        }
+      ],
+      "transferPartners": [
+        "Aeroplan",
+        "Marriott Bonvoy",
+        "Hilton Honors",
+        "Choice Privileges",
+        "British Airways Avios",
+        "Cathay Pacific Asia Miles",
+        "Emirates Skywards"
+      ],
+      "optimalRedemption": "Transfer to Aeroplan for premium cabin flights",
+      "optimalRateCents": 2.5
+    },
+    {
+      "id": "marriott-bonvoy",
+      "name": "Marriott Bonvoy",
+      "category": "Hotel Points",
+      "pointValuation": 0.74,
+      "description": "Marriott's global hotel loyalty program",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Hotel Stays",
+          "cents_per_point": 0.9,
+          "minimum_redemption": 5000,
+          "notes": "Best value at Category 5-7 properties"
+        },
+        {
+          "redemption_type": "Transfer to Airlines",
+          "cents_per_point": 0.6,
+          "minimum_redemption": 3000,
+          "notes": "3:1 transfer ratio to most airlines"
+        },
+        {
+          "redemption_type": "Experiences",
+          "cents_per_point": 0.5,
+          "minimum_redemption": 10000,
+          "notes": "Lower value option"
+        }
+      ],
+      "transferPartners": [
+        "Aeroplan (60+ airlines)"
+      ],
+      "optimalRedemption": "Luxury hotel redemptions at peak times",
+      "optimalRateCents": 0.9
+    },
+    {
+      "id": "hilton-honors",
+      "name": "Hilton Honors",
+      "category": "Hotel Points",
+      "pointValuation": 0.5,
+      "description": "Hilton's global hotel loyalty program",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Hotel Stays",
+          "cents_per_point": 0.6,
+          "minimum_redemption": 5000,
+          "notes": "Best value at premium properties"
+        },
+        {
+          "redemption_type": "Experiences",
+          "cents_per_point": 0.4,
+          "minimum_redemption": 10000,
+          "notes": "Lower value option"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "Luxury hotel stays and 5th night free benefit",
+      "optimalRateCents": 0.6
+    },
+    {
+      "id": "td-rewards",
+      "name": "TD Rewards",
+      "category": "Credit Card Points",
+      "pointValuation": 0.5,
+      "description": "TD's flexible rewards program for travel and merchandise",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Travel Bookings",
+          "cents_per_point": 0.5,
+          "minimum_redemption": 20000,
+          "notes": "Flights, hotels, car rentals"
+        },
+        {
+          "redemption_type": "Merchandise",
+          "cents_per_point": 0.4,
+          "minimum_redemption": 5000,
+          "notes": "Lower value option"
+        },
+        {
+          "redemption_type": "Gift Cards",
+          "cents_per_point": 0.45,
+          "minimum_redemption": 10000,
+          "notes": "Various retailers"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "Travel bookings through Expedia for TD",
+      "optimalRateCents": 0.5
+    },
+    {
+      "id": "scotia-rewards",
+      "name": "Scotia Rewards",
+      "category": "Credit Card Points",
+      "pointValuation": 1.0,
+      "description": "Scotiabank's travel rewards program",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Travel Bookings",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 10000,
+          "notes": "Book through Scotia Rewards Travel Service"
+        },
+        {
+          "redemption_type": "Apple Products",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 20000,
+          "notes": "Special redemption option"
+        },
+        {
+          "redemption_type": "Merchandise",
+          "cents_per_point": 0.7,
+          "minimum_redemption": 5000,
+          "notes": "Lower value option"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "Travel bookings or Apple products",
+      "optimalRateCents": 1.0
+    },
+    {
+      "id": "odyssey-points",
+      "name": "Desjardins Odyssey Points",
+      "category": "Credit Card Points",
+      "pointValuation": 1.0,
+      "description": "Desjardins flexible rewards program",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Travel Bookings",
+          "cents_per_point": 1.0,
+          "minimum_redemption": 10000,
+          "notes": "Book through Desjardins travel portal"
+        },
+        {
+          "redemption_type": "Merchandise",
+          "cents_per_point": 0.8,
+          "minimum_redemption": 5000,
+          "notes": "Various products"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "Travel bookings",
+      "optimalRateCents": 1.0
+    },
+    {
+      "id": "hsbc-rewards",
+      "name": "HSBC Rewards",
+      "category": "Credit Card Points",
+      "pointValuation": 0.5,
+      "description": "HSBC's travel and lifestyle rewards program",
+      "redemptionOptions": [
+        {
+          "redemption_type": "Travel Bookings",
+          "cents_per_point": 0.5,
+          "minimum_redemption": 15000,
+          "notes": "Flights, hotels, packages"
+        },
+        {
+          "redemption_type": "Merchandise",
+          "cents_per_point": 0.4,
+          "minimum_redemption": 5000,
+          "notes": "Lower value option"
+        }
+      ],
+      "transferPartners": [],
+      "optimalRedemption": "Travel redemptions",
+      "optimalRateCents": 0.5
+    }
+  ]
+}

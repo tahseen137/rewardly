@@ -43,8 +43,6 @@ interface PaywallProps {
   onClose: () => void;
   onSubscribe?: (tier: SubscriptionTier, period: BillingPeriod) => void;
   highlightFeature?: string;
-  /** Estimated annual gain from switching to optimal wallet — personalizes hero copy */
-  annualGain?: number;
   /** Pre-select a specific tier */
   defaultTier?: SubscriptionTier;
 }
@@ -95,8 +93,7 @@ export default function Paywall({
   visible,
   onClose,
   onSubscribe,
-  highlightFeature,
-  annualGain,
+  highlightFeature: _highlightFeature,
   defaultTier = 'pro',
 }: PaywallProps) {
   const { t: _t } = useTranslation();
@@ -272,42 +269,10 @@ export default function Paywall({
           <View style={styles.heroIconContainer}>
             <Sparkles size={32} color={colors.primary.main} />
           </View>
-          {annualGain && annualGain > 0 ? (
-            <>
-              <Text style={styles.heroTitle}>
-                You're leaving ${Math.round(annualGain).toLocaleString()}/yr on the table
-              </Text>
-              <Text style={styles.heroSubtitle}>
-                Unlock your optimal wallet to start earning it back
-              </Text>
-            </>
-          ) : highlightFeature === 'insights' ? (
-            <>
-              <Text style={styles.heroTitle}>Your Wallet Has Untapped Potential</Text>
-              <Text style={styles.heroSubtitle}>
-                See exactly how to maximize every dollar you spend
-              </Text>
-            </>
-          ) : highlightFeature === 'sage' ? (
-            <>
-              <Text style={styles.heroTitle}>Ask Anything About Canadian Cards</Text>
-              <Text style={styles.heroSubtitle}>
-                Sage AI answers in seconds — personalized to your wallet
-              </Text>
-            </>
-          ) : (
-            <>
-              <Text style={styles.heroTitle}>See Every Reward You're Missing</Text>
-              <Text style={styles.heroSubtitle}>
-                Unlimited recommendations, AI assistance, and wallet analysis
-              </Text>
-            </>
-          )}
-          {/* Social proof */}
-          <View style={styles.socialProof}>
-            <Text style={styles.socialProofStars}>★★★★★</Text>
-            <Text style={styles.socialProofText}> 4.8 · Trusted by Canadian reward seekers</Text>
-          </View>
+          <Text style={styles.heroTitle}>See Every Reward You're Missing</Text>
+          <Text style={styles.heroSubtitle}>
+            Unlimited recommendations, AI assistance, and wallet analysis
+          </Text>
         </View>
 
         {/* Billing Toggle */}
@@ -479,7 +444,6 @@ export default function Paywall({
               ? 'One-time payment • Lifetime access • No recurring charges'
               : '7-day free trial • Cancel anytime'}
           </Text>
-          <Text style={styles.secureNote}>🔒 Secure payment via Stripe</Text>
 
           <View style={styles.legalLinks}>
             <TouchableOpacity onPress={() => Linking.openURL('https://rewardly.app/terms')}>
@@ -553,25 +517,6 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
-  },
-  socialProof: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    backgroundColor: colors.background.secondary,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  socialProofStars: {
-    fontSize: 12,
-    color: '#F59E0B',
-    letterSpacing: 1,
-  },
-  socialProofText: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    fontWeight: '500',
   },
   billingToggle: {
     flexDirection: 'row',
@@ -855,13 +800,7 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     textAlign: 'center',
     marginTop: 12,
-    marginBottom: 4,
-  },
-  secureNote: {
-    fontSize: 11,
-    color: colors.text.tertiary,
-    textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   legalLinks: {
     flexDirection: 'row',

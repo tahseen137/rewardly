@@ -1,0 +1,306 @@
+{
+  "programs": [
+    {
+      "id": "chase-ultimate-rewards",
+      "name": "Chase Ultimate Rewards",
+      "category": "Credit Card Points",
+      "pointValuation": 2.05,
+      "country": "US",
+      "transferPartners": [
+        {"name": "United MileagePlus", "ratio": "1:1", "type": "airline"},
+        {"name": "Southwest Rapid Rewards", "ratio": "1:1", "type": "airline"},
+        {"name": "British Airways Avios", "ratio": "1:1", "type": "airline"},
+        {"name": "Air France/KLM Flying Blue", "ratio": "1:1", "type": "airline"},
+        {"name": "Singapore KrisFlyer", "ratio": "1:1", "type": "airline"},
+        {"name": "Virgin Atlantic Flying Club", "ratio": "1:1", "type": "airline"},
+        {"name": "Aer Lingus AerClub", "ratio": "1:1", "type": "airline"},
+        {"name": "Iberia Plus", "ratio": "1:1", "type": "airline"},
+        {"name": "Emirates Skywards", "ratio": "1:1", "type": "airline"},
+        {"name": "JetBlue TrueBlue", "ratio": "1:1", "type": "airline"},
+        {"name": "World of Hyatt", "ratio": "1:1", "type": "hotel"},
+        {"name": "Marriott Bonvoy", "ratio": "1:1", "type": "hotel"},
+        {"name": "IHG One Rewards", "ratio": "1:1", "type": "hotel"}
+      ],
+      "redemptionOptions": [
+        {"type": "Chase Travel Portal", "value": 1.25, "notes": "1.25 cpp for Sapphire Preferred, 1.5 cpp for Sapphire Reserve"},
+        {"type": "Statement Credit", "value": 1.0, "notes": "1 cpp fixed"},
+        {"type": "Transfer Partners", "value": 2.05, "notes": "Average value through transfer partners"}
+      ]
+    },
+    {
+      "id": "amex-membership-rewards",
+      "name": "American Express Membership Rewards",
+      "category": "Credit Card Points",
+      "pointValuation": 2.0,
+      "country": "US",
+      "transferPartners": [
+        {"name": "Delta SkyMiles", "ratio": "1:1", "type": "airline"},
+        {"name": "Air France/KLM Flying Blue", "ratio": "1:1", "type": "airline"},
+        {"name": "British Airways Avios", "ratio": "1:1", "type": "airline"},
+        {"name": "Singapore KrisFlyer", "ratio": "1:1", "type": "airline"},
+        {"name": "ANA Mileage Club", "ratio": "1:1", "type": "airline"},
+        {"name": "Cathay Pacific Asia Miles", "ratio": "1:1", "type": "airline"},
+        {"name": "Emirates Skywards", "ratio": "1:1", "type": "airline"},
+        {"name": "Etihad Guest", "ratio": "1:1", "type": "airline"},
+        {"name": "JetBlue TrueBlue", "ratio": "1:1", "type": "airline"},
+        {"name": "Hawaiian Airlines HawaiianMiles", "ratio": "1:1", "type": "airline"},
+        {"name": "Virgin Atlantic Flying Club", "ratio": "1:1", "type": "airline"},
+        {"name": "Qantas Frequent Flyer", "ratio": "1:1", "type": "airline"},
+        {"name": "Avianca LifeMiles", "ratio": "1:1", "type": "airline"},
+        {"name": "Aeroplan", "ratio": "1:1", "type": "airline"},
+        {"name": "Marriott Bonvoy", "ratio": "1:1", "type": "hotel"},
+        {"name": "Hilton Honors", "ratio": "1:2", "type": "hotel"},
+        {"name": "Choice Privileges", "ratio": "1:1", "type": "hotel"}
+      ],
+      "redemptionOptions": [
+        {"type": "Amex Travel Portal", "value": 1.0, "notes": "1 cpp fixed through Amex Travel"},
+        {"type": "Statement Credit", "value": 0.6, "notes": "0.6 cpp for statement credits"},
+        {"type": "Transfer Partners", "value": 2.0, "notes": "Average value through transfer partners"},
+        {"type": "Amazon/PayPal", "value": 0.7, "notes": "Reduced value for shopping portal redemptions"}
+      ]
+    },
+    {
+      "id": "capital-one-miles",
+      "name": "Capital One Miles",
+      "category": "Credit Card Points",
+      "pointValuation": 1.85,
+      "country": "US",
+      "transferPartners": [
+        {"name": "Turkish Airlines Miles&Smiles", "ratio": "1:1", "type": "airline"},
+        {"name": "Emirates Skywards", "ratio": "1:1", "type": "airline"},
+        {"name": "British Airways Avios", "ratio": "1:1", "type": "airline"},
+        {"name": "Air France/KLM Flying Blue", "ratio": "1:1", "type": "airline"},
+        {"name": "Avianca LifeMiles", "ratio": "1:1", "type": "airline"},
+        {"name": "Singapore KrisFlyer", "ratio": "1:1", "type": "airline"},
+        {"name": "Qantas Frequent Flyer", "ratio": "1:1", "type": "airline"},
+        {"name": "Cathay Pacific Asia Miles", "ratio": "1:1", "type": "airline"},
+        {"name": "Etihad Guest", "ratio": "1:1", "type": "airline"},
+        {"name": "TAP Miles&Go", "ratio": "1:1", "type": "airline"},
+        {"name": "Finnair Plus", "ratio": "1:1", "type": "airline"},
+        {"name": "Wyndham Rewards", "ratio": "1:1", "type": "hotel"},
+        {"name": "Accor Live Limitless", "ratio": "2:1", "type": "hotel"},
+        {"name": "Choice Privileges", "ratio": "1:1", "type": "hotel"}
+      ],
+      "redemptionOptions": [
+        {"type": "Capital One Travel", "value": 1.0, "notes": "1 cpp through Capital One Travel"},
+        {"type": "Statement Credit", "value": 0.5, "notes": "Travel eraser for past travel purchases"},
+        {"type": "Transfer Partners", "value": 1.85, "notes": "Average value through transfer partners"}
+      ]
+    },
+    {
+      "id": "citi-thankyou-rewards",
+      "name": "Citi ThankYou Rewards",
+      "category": "Credit Card Points",
+      "pointValuation": 1.9,
+      "country": "US",
+      "transferPartners": [
+        {"name": "Turkish Airlines Miles&Smiles", "ratio": "1:1", "type": "airline"},
+        {"name": "Emirates Skywards", "ratio": "1:1", "type": "airline"},
+        {"name": "Singapore KrisFlyer", "ratio": "1:1", "type": "airline"},
+        {"name": "Cathay Pacific Asia Miles", "ratio": "1:1", "type": "airline"},
+        {"name": "Etihad Guest", "ratio": "1:1", "type": "airline"},
+        {"name": "Air France/KLM Flying Blue", "ratio": "1:1", "type": "airline"},
+        {"name": "Virgin Atlantic Flying Club", "ratio": "1:1", "type": "airline"},
+        {"name": "Qatar Airways Privilege Club", "ratio": "1:1", "type": "airline"},
+        {"name": "Avianca LifeMiles", "ratio": "1:1", "type": "airline"},
+        {"name": "JetBlue TrueBlue", "ratio": "1:1", "type": "airline"},
+        {"name": "Qantas Frequent Flyer", "ratio": "1:1", "type": "airline"},
+        {"name": "Accor Live Limitless", "ratio": "1:2", "type": "hotel"},
+        {"name": "Choice Privileges", "ratio": "1:1", "type": "hotel"},
+        {"name": "Wyndham Rewards", "ratio": "1:1", "type": "hotel"}
+      ],
+      "redemptionOptions": [
+        {"type": "Citi Travel Portal", "value": 1.0, "notes": "1 cpp through Citi Travel"},
+        {"type": "Statement Credit", "value": 0.5, "notes": "0.5 cpp for cash back"},
+        {"type": "Transfer Partners", "value": 1.9, "notes": "Average value through transfer partners"}
+      ]
+    },
+    {
+      "id": "wells-fargo-rewards",
+      "name": "Wells Fargo Rewards",
+      "category": "Credit Card Points",
+      "pointValuation": 1.65,
+      "country": "US",
+      "transferPartners": [],
+      "redemptionOptions": [
+        {"type": "Wells Fargo Travel", "value": 1.5, "notes": "1.5 cpp with Autograph Journey"},
+        {"type": "Statement Credit", "value": 1.0, "notes": "1 cpp fixed"},
+        {"type": "Gift Cards", "value": 1.0, "notes": "1 cpp for select retailers"}
+      ]
+    },
+    {
+      "id": "bilt-rewards",
+      "name": "Bilt Rewards",
+      "category": "Credit Card Points",
+      "pointValuation": 2.2,
+      "country": "US",
+      "transferPartners": [
+        {"name": "American Airlines AAdvantage", "ratio": "1:1", "type": "airline"},
+        {"name": "United MileagePlus", "ratio": "1:1", "type": "airline"},
+        {"name": "Alaska Airlines Mileage Plan", "ratio": "1:1", "type": "airline"},
+        {"name": "Air France/KLM Flying Blue", "ratio": "1:1", "type": "airline"},
+        {"name": "British Airways Avios", "ratio": "1:1", "type": "airline"},
+        {"name": "Emirates Skywards", "ratio": "1:1", "type": "airline"},
+        {"name": "Turkish Airlines Miles&Smiles", "ratio": "1:1", "type": "airline"},
+        {"name": "Virgin Atlantic Flying Club", "ratio": "1:1", "type": "airline"},
+        {"name": "Aeroplan", "ratio": "1:1", "type": "airline"},
+        {"name": "Cathay Pacific Asia Miles", "ratio": "1:1", "type": "airline"},
+        {"name": "World of Hyatt", "ratio": "1:1", "type": "hotel"},
+        {"name": "IHG One Rewards", "ratio": "1:1", "type": "hotel"},
+        {"name": "Marriott Bonvoy", "ratio": "1:1.5", "type": "hotel"}
+      ],
+      "redemptionOptions": [
+        {"type": "Transfer Partners", "value": 2.2, "notes": "Best value through airline transfers"},
+        {"type": "Fitness Classes", "value": 1.25, "notes": "Redeem for SoulCycle, Rumble, etc."},
+        {"type": "Home Equity", "value": 1.0, "notes": "Use toward down payment (unique feature)"}
+      ]
+    },
+    {
+      "id": "american-airlines-aadvantage",
+      "name": "American Airlines AAdvantage",
+      "category": "Airline Miles",
+      "pointValuation": 1.7,
+      "country": "US",
+      "transferPartners": [],
+      "redemptionOptions": [
+        {"type": "Award Flights", "value": 1.7, "notes": "Average value on AA and partner flights"},
+        {"type": "Upgrades", "value": 1.5, "notes": "Main cabin to premium cabin upgrades"},
+        {"type": "Hotels/Rentals", "value": 0.8, "notes": "Lower value for non-flight redemptions"}
+      ]
+    },
+    {
+      "id": "united-mileageplus",
+      "name": "United MileagePlus",
+      "category": "Airline Miles",
+      "pointValuation": 1.5,
+      "country": "US",
+      "transferPartners": [],
+      "redemptionOptions": [
+        {"type": "Award Flights", "value": 1.5, "notes": "Average value on United and Star Alliance"},
+        {"type": "Upgrades", "value": 1.3, "notes": "PlusPoints upgrades"},
+        {"type": "Travel Extras", "value": 0.8, "notes": "Hotels, cars, experiences"}
+      ]
+    },
+    {
+      "id": "delta-skymiles",
+      "name": "Delta SkyMiles",
+      "category": "Airline Miles",
+      "pointValuation": 1.25,
+      "country": "US",
+      "transferPartners": [],
+      "redemptionOptions": [
+        {"type": "Award Flights", "value": 1.25, "notes": "Variable pricing, can find good deals"},
+        {"type": "Upgrades", "value": 1.0, "notes": "Cabin upgrades when available"},
+        {"type": "SkyMiles Shopping", "value": 0.8, "notes": "Amazon, gift cards"}
+      ]
+    },
+    {
+      "id": "southwest-rapid-rewards",
+      "name": "Southwest Rapid Rewards",
+      "category": "Airline Miles",
+      "pointValuation": 1.3,
+      "country": "US",
+      "transferPartners": [],
+      "redemptionOptions": [
+        {"type": "Wanna Get Away", "value": 1.5, "notes": "Best value on cheapest fares"},
+        {"type": "Anytime Fares", "value": 1.2, "notes": "Flexible fares"},
+        {"type": "Business Select", "value": 1.0, "notes": "Premium fares"}
+      ]
+    },
+    {
+      "id": "alaska-mileage-plan",
+      "name": "Alaska Airlines Mileage Plan",
+      "category": "Airline Miles",
+      "pointValuation": 1.5,
+      "country": "US",
+      "transferPartners": [],
+      "redemptionOptions": [
+        {"type": "Partner Awards", "value": 2.0, "notes": "Excellent value on partners like Cathay, JAL"},
+        {"type": "Alaska Flights", "value": 1.5, "notes": "Decent value on domestic flights"},
+        {"type": "Main Cabin Upgrades", "value": 1.2, "notes": "First class upgrades"}
+      ]
+    },
+    {
+      "id": "jetblue-trueblue",
+      "name": "JetBlue TrueBlue",
+      "category": "Airline Miles",
+      "pointValuation": 1.35,
+      "country": "US",
+      "transferPartners": [],
+      "redemptionOptions": [
+        {"type": "Award Flights", "value": 1.35, "notes": "Revenue-based pricing"},
+        {"type": "Pool Points", "value": 1.35, "notes": "Share with family members"}
+      ]
+    },
+    {
+      "id": "marriott-bonvoy",
+      "name": "Marriott Bonvoy",
+      "category": "Hotel Points",
+      "pointValuation": 0.7,
+      "country": "US",
+      "transferPartners": [
+        {"name": "United MileagePlus", "ratio": "3:1", "type": "airline"},
+        {"name": "American Airlines AAdvantage", "ratio": "3:1", "type": "airline"},
+        {"name": "Delta SkyMiles", "ratio": "3:1", "type": "airline"},
+        {"name": "Southwest Rapid Rewards", "ratio": "3:1", "type": "airline"},
+        {"name": "Alaska Mileage Plan", "ratio": "3:1", "type": "airline"}
+      ],
+      "redemptionOptions": [
+        {"type": "Off-Peak Nights", "value": 1.0, "notes": "Best value on category 1-4 properties"},
+        {"type": "Peak Nights", "value": 0.5, "notes": "Lower value at peak times"},
+        {"type": "Airline Transfers", "value": 0.4, "notes": "Generally poor value, avoid"}
+      ]
+    },
+    {
+      "id": "hilton-honors",
+      "name": "Hilton Honors",
+      "category": "Hotel Points",
+      "pointValuation": 0.5,
+      "country": "US",
+      "transferPartners": [],
+      "redemptionOptions": [
+        {"type": "Standard Rooms", "value": 0.5, "notes": "Dynamic pricing varies widely"},
+        {"type": "5th Night Free", "value": 0.6, "notes": "20% bonus on 5+ night stays"},
+        {"type": "Points + Cash", "value": 0.45, "notes": "Partial point redemptions"}
+      ]
+    },
+    {
+      "id": "world-of-hyatt",
+      "name": "World of Hyatt",
+      "category": "Hotel Points",
+      "pointValuation": 1.7,
+      "country": "US",
+      "transferPartners": [],
+      "redemptionOptions": [
+        {"type": "Category 1-4", "value": 2.0, "notes": "Best value at lower category hotels"},
+        {"type": "Category 5-8", "value": 1.5, "notes": "Luxury properties still offer good value"},
+        {"type": "Points + Cash", "value": 1.5, "notes": "Hybrid redemptions"}
+      ]
+    },
+    {
+      "id": "ihg-one-rewards",
+      "name": "IHG One Rewards",
+      "category": "Hotel Points",
+      "pointValuation": 0.5,
+      "country": "US",
+      "transferPartners": [],
+      "redemptionOptions": [
+        {"type": "Dynamic Pricing", "value": 0.5, "notes": "Variable rates by property and date"},
+        {"type": "4th Night Free", "value": 0.65, "notes": "Bonus on longer stays"},
+        {"type": "PointBreaks", "value": 1.0, "notes": "Promotional rates on select hotels"}
+      ]
+    },
+    {
+      "id": "wyndham-rewards",
+      "name": "Wyndham Rewards",
+      "category": "Hotel Points",
+      "pointValuation": 1.1,
+      "country": "US",
+      "transferPartners": [],
+      "redemptionOptions": [
+        {"type": "Go Free Awards", "value": 1.1, "notes": "Flat rate redemptions by category"},
+        {"type": "Go Fast Awards", "value": 0.7, "notes": "Points + cash option"}
+      ]
+    }
+  ]
+}

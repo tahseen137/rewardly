@@ -1,0 +1,2130 @@
+{
+  "cards": [
+    {
+      "id": "chase-sapphire-preferred",
+      "name": "Chase Sapphire Preferred Card",
+      "issuer": "Chase",
+      "rewardProgram": "Chase Ultimate Rewards",
+      "annualFee": 95,
+      "pointValuation": 2.05,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "5x on travel purchased through Chase Travel"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "online_shopping",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "3x on online groceries"
+        },
+        {
+          "category": "entertainment",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "3x on select streaming services"
+        }
+      ],
+      "signupBonus": {
+        "amount": 75000,
+        "currency": "points",
+        "spendRequirement": 5000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "chase-sapphire-reserve",
+      "name": "Chase Sapphire Reserve",
+      "issuer": "Chase",
+      "rewardProgram": "Chase Ultimate Rewards",
+      "annualFee": 795,
+      "pointValuation": 2.05,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 8,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "8x on travel through Chase Travel including The Edit"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 125000,
+        "currency": "points",
+        "spendRequirement": 6000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "chase-freedom-unlimited",
+      "name": "Chase Freedom Unlimited",
+      "issuer": "Chase",
+      "rewardProgram": "Chase Ultimate Rewards",
+      "annualFee": 0,
+      "pointValuation": 2.05,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1.5,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "5% on travel through Chase Travel"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "drugstores",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 200,
+        "currency": "cashback",
+        "spendRequirement": 500,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "chase-freedom-flex",
+      "name": "Chase Freedom Flex",
+      "issuer": "Chase",
+      "rewardProgram": "Chase Ultimate Rewards",
+      "annualFee": 0,
+      "pointValuation": 2.05,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "5% on travel through Chase Travel"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "drugstores",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "other",
+          "rewardRate": {
+            "value": 5,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "5% on rotating quarterly categories (activation required, $1,500 cap)"
+        }
+      ],
+      "signupBonus": {
+        "amount": 200,
+        "currency": "cashback",
+        "spendRequirement": 500,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "chase-ink-business-preferred",
+      "name": "Ink Business Preferred Credit Card",
+      "issuer": "Chase",
+      "rewardProgram": "Chase Ultimate Rewards",
+      "annualFee": 95,
+      "pointValuation": 2.05,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "3x on first $150,000 in combined purchases per year"
+        },
+        {
+          "category": "online_shopping",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "3x on shipping, internet, cable, phone services"
+        }
+      ],
+      "signupBonus": {
+        "amount": 100000,
+        "currency": "points",
+        "spendRequirement": 8000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "chase-ink-business-unlimited",
+      "name": "Ink Business Unlimited Credit Card",
+      "issuer": "Chase",
+      "rewardProgram": "Chase Ultimate Rewards",
+      "annualFee": 0,
+      "pointValuation": 2.05,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1.5,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [],
+      "signupBonus": {
+        "amount": 900,
+        "currency": "cashback",
+        "spendRequirement": 6000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "amex-gold-card",
+      "name": "American Express Gold Card",
+      "issuer": "American Express",
+      "rewardProgram": "Membership Rewards",
+      "annualFee": 325,
+      "pointValuation": 2.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 4,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 4,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "4x at U.S. supermarkets on up to $25,000 per year"
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "3x on flights booked directly with airlines or amextravel.com"
+        }
+      ],
+      "signupBonus": {
+        "amount": 60000,
+        "currency": "points",
+        "spendRequirement": 6000,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "amex-platinum-card",
+      "name": "American Express Platinum Card",
+      "issuer": "American Express",
+      "rewardProgram": "Membership Rewards",
+      "annualFee": 895,
+      "pointValuation": 2.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "5x on flights and prepaid hotels through amextravel.com"
+        }
+      ],
+      "signupBonus": {
+        "amount": 175000,
+        "currency": "points",
+        "spendRequirement": 12000,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "amex-blue-cash-preferred",
+      "name": "Blue Cash Preferred Card from American Express",
+      "issuer": "American Express",
+      "rewardProgram": "Cash Back",
+      "annualFee": 95,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 6,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "6% at U.S. supermarkets on up to $6,000 per year"
+        },
+        {
+          "category": "entertainment",
+          "rewardRate": {
+            "value": 6,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "6% on select U.S. streaming subscriptions"
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "3% on transit including rideshare, parking, tolls"
+        }
+      ],
+      "signupBonus": {
+        "amount": 250,
+        "currency": "cashback",
+        "spendRequirement": 3000,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "amex-blue-cash-everyday",
+      "name": "Blue Cash Everyday Card from American Express",
+      "issuer": "American Express",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "3% at U.S. supermarkets on up to $6,000 per year"
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "online_shopping",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "3% at U.S. online retail purchases"
+        }
+      ],
+      "signupBonus": {
+        "amount": 250,
+        "currency": "cashback",
+        "spendRequirement": 3000,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "amex-delta-skymiles-gold",
+      "name": "Delta SkyMiles Gold American Express Card",
+      "issuer": "American Express",
+      "rewardProgram": "Delta SkyMiles",
+      "annualFee": 150,
+      "pointValuation": 1.25,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "airline_miles",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          },
+          "description": "2x on Delta purchases"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          },
+          "description": "2x at U.S. supermarkets"
+        }
+      ],
+      "signupBonus": {
+        "amount": 90000,
+        "currency": "airline_miles",
+        "spendRequirement": 3000,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "amex-delta-skymiles-platinum",
+      "name": "Delta SkyMiles Platinum American Express Card",
+      "issuer": "American Express",
+      "rewardProgram": "Delta SkyMiles",
+      "annualFee": 350,
+      "pointValuation": 1.25,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "airline_miles",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 3,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          },
+          "description": "3x on Delta purchases"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          },
+          "description": "2x at U.S. supermarkets"
+        }
+      ],
+      "signupBonus": {
+        "amount": 100000,
+        "currency": "airline_miles",
+        "spendRequirement": 4000,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "amex-hilton-honors",
+      "name": "Hilton Honors American Express Card",
+      "issuer": "American Express",
+      "rewardProgram": "Hilton Honors",
+      "annualFee": 0,
+      "pointValuation": 0.5,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 3,
+        "type": "hotel_points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 7,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          },
+          "description": "7x at Hilton properties"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 5,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 5,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          },
+          "description": "5x at U.S. supermarkets"
+        }
+      ],
+      "signupBonus": {
+        "amount": 100000,
+        "currency": "hotel_points",
+        "spendRequirement": 2000,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "amex-hilton-honors-surpass",
+      "name": "Hilton Honors American Express Surpass Card",
+      "issuer": "American Express",
+      "rewardProgram": "Hilton Honors",
+      "annualFee": 150,
+      "pointValuation": 0.5,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 3,
+        "type": "hotel_points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 12,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          },
+          "description": "12x at Hilton properties"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 6,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 6,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          },
+          "description": "6x at U.S. supermarkets"
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 6,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 155000,
+        "currency": "hotel_points",
+        "spendRequirement": 3000,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "amex-hilton-honors-aspire",
+      "name": "Hilton Honors American Express Aspire Card",
+      "issuer": "American Express",
+      "rewardProgram": "Hilton Honors",
+      "annualFee": 550,
+      "pointValuation": 0.5,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 3,
+        "type": "hotel_points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 14,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          },
+          "description": "14x at Hilton properties"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 7,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 175000,
+        "currency": "hotel_points",
+        "spendRequirement": 6000,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "capital-one-venture-x",
+      "name": "Capital One Venture X Rewards Credit Card",
+      "issuer": "Capital One",
+      "rewardProgram": "Capital One Miles",
+      "annualFee": 395,
+      "pointValuation": 1.85,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 10,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "10x on hotels and rental cars through Capital One Travel"
+        }
+      ],
+      "signupBonus": {
+        "amount": 75000,
+        "currency": "points",
+        "spendRequirement": 4000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "capital-one-venture",
+      "name": "Capital One Venture Rewards Credit Card",
+      "issuer": "Capital One",
+      "rewardProgram": "Capital One Miles",
+      "annualFee": 95,
+      "pointValuation": 1.85,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "5x on hotels, vacation rentals, rental cars through Capital One Travel"
+        }
+      ],
+      "signupBonus": {
+        "amount": 75000,
+        "currency": "points",
+        "spendRequirement": 4000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "capital-one-savor-one",
+      "name": "Capital One SavorOne Cash Rewards Credit Card",
+      "issuer": "Capital One",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "entertainment",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "3% at grocery stores (excluding superstores)"
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 8,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "8% on Capital One Entertainment purchases"
+        }
+      ],
+      "signupBonus": {
+        "amount": 200,
+        "currency": "cashback",
+        "spendRequirement": 500,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "capital-one-quicksilver",
+      "name": "Capital One Quicksilver Cash Rewards Credit Card",
+      "issuer": "Capital One",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1.5,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "5% on hotels, vacation rentals, rental cars through Capital One Travel"
+        }
+      ],
+      "signupBonus": {
+        "amount": 200,
+        "currency": "cashback",
+        "spendRequirement": 500,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "citi-custom-cash",
+      "name": "Citi Custom Cash Card",
+      "issuer": "Citi",
+      "rewardProgram": "Citi ThankYou",
+      "annualFee": 0,
+      "pointValuation": 1.9,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "other",
+          "rewardRate": {
+            "value": 5,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "5% on your top eligible spend category each billing cycle (up to $500)"
+        }
+      ],
+      "signupBonus": {
+        "amount": 200,
+        "currency": "cashback",
+        "spendRequirement": 1500,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "citi-double-cash",
+      "name": "Citi Double Cash Card",
+      "issuer": "Citi",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [],
+      "signupBonus": {
+        "amount": 200,
+        "currency": "cashback",
+        "spendRequirement": 1500,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "citi-strata-premier",
+      "name": "Citi Strata Premier Card",
+      "issuer": "Citi",
+      "rewardProgram": "Citi ThankYou",
+      "annualFee": 95,
+      "pointValuation": 1.9,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "3x on flights, hotels, and travel"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "3x at gas stations and EV charging"
+        }
+      ],
+      "signupBonus": {
+        "amount": 75000,
+        "currency": "points",
+        "spendRequirement": 4000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "citi-aadvantage-platinum-select",
+      "name": "Citi AAdvantage Platinum Select World Elite Mastercard",
+      "issuer": "Citi",
+      "rewardProgram": "American Airlines AAdvantage",
+      "annualFee": 99,
+      "pointValuation": 1.7,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "airline_miles",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          },
+          "description": "2x on American Airlines purchases"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 80000,
+        "currency": "airline_miles",
+        "spendRequirement": 4000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "discover-it-cash-back",
+      "name": "Discover it Cash Back",
+      "issuer": "Discover",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "other",
+          "rewardRate": {
+            "value": 5,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "5% on rotating quarterly categories (activation required, $1,500 cap)"
+        }
+      ],
+      "signupBonus": {
+        "amount": 0,
+        "currency": "cashback",
+        "spendRequirement": 0,
+        "timeframeDays": 365,
+        "description": "Cashback Match - Discover matches all cash back earned in first year"
+      }
+    },
+    {
+      "id": "discover-it-miles",
+      "name": "Discover it Miles",
+      "issuer": "Discover",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1.5,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [],
+      "signupBonus": {
+        "amount": 0,
+        "currency": "cashback",
+        "spendRequirement": 0,
+        "timeframeDays": 365,
+        "description": "Miles Match - Discover matches all miles earned in first year"
+      }
+    },
+    {
+      "id": "bank-of-america-premium-rewards",
+      "name": "Bank of America Premium Rewards Credit Card",
+      "issuer": "Bank of America",
+      "rewardProgram": "Cash Back",
+      "annualFee": 95,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1.5,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 60000,
+        "currency": "points",
+        "spendRequirement": 4000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "bank-of-america-customized-cash",
+      "name": "Bank of America Customized Cash Rewards Credit Card",
+      "issuer": "Bank of America",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "other",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "3% in a category of your choice (gas, online shopping, dining, travel, drugstores, or home improvement)"
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "2% at grocery stores and wholesale clubs"
+        }
+      ],
+      "signupBonus": {
+        "amount": 200,
+        "currency": "cashback",
+        "spendRequirement": 1000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "wells-fargo-active-cash",
+      "name": "Wells Fargo Active Cash Card",
+      "issuer": "Wells Fargo",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [],
+      "signupBonus": {
+        "amount": 200,
+        "currency": "cashback",
+        "spendRequirement": 500,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "wells-fargo-autograph",
+      "name": "Wells Fargo Autograph Card",
+      "issuer": "Wells Fargo",
+      "rewardProgram": "Wells Fargo Rewards",
+      "annualFee": 0,
+      "pointValuation": 1.65,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "entertainment",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "3x on streaming services"
+        }
+      ],
+      "signupBonus": {
+        "amount": 20000,
+        "currency": "points",
+        "spendRequirement": 1000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "wells-fargo-autograph-journey",
+      "name": "Wells Fargo Autograph Journey Card",
+      "issuer": "Wells Fargo",
+      "rewardProgram": "Wells Fargo Rewards",
+      "annualFee": 95,
+      "pointValuation": 1.65,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "5x on flights and hotels booked directly"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 4,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 60000,
+        "currency": "points",
+        "spendRequirement": 4000,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "us-bank-altitude-connect",
+      "name": "U.S. Bank Altitude Connect Visa Signature Card",
+      "issuer": "U.S. Bank",
+      "rewardProgram": "Cash Back",
+      "annualFee": 95,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "5x on prepaid hotels and car rentals through Altitude Rewards Center"
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 4,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "4x at gas stations and EV charging"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "entertainment",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "2x on streaming services"
+        }
+      ],
+      "signupBonus": {
+        "amount": 30000,
+        "currency": "points",
+        "spendRequirement": 2000,
+        "timeframeDays": 120
+      }
+    },
+    {
+      "id": "us-bank-altitude-reserve",
+      "name": "U.S. Bank Altitude Reserve Visa Infinite Card",
+      "issuer": "U.S. Bank",
+      "rewardProgram": "Cash Back",
+      "annualFee": 400,
+      "pointValuation": 1.5,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "5x on prepaid hotels and car rentals through Altitude Rewards Center"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 50000,
+        "currency": "points",
+        "spendRequirement": 4500,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "barclays-aadvantage-aviator-red",
+      "name": "AAdvantage Aviator Red World Elite Mastercard",
+      "issuer": "Barclays",
+      "rewardProgram": "American Airlines AAdvantage",
+      "annualFee": 99,
+      "pointValuation": 1.7,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "airline_miles",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          },
+          "description": "2x on American Airlines purchases"
+        }
+      ],
+      "signupBonus": {
+        "amount": 60000,
+        "currency": "airline_miles",
+        "spendRequirement": 1,
+        "timeframeDays": 90,
+        "description": "60,000 miles after first purchase and paying annual fee"
+      }
+    },
+    {
+      "id": "bilt-mastercard",
+      "name": "Bilt Mastercard",
+      "issuer": "Bilt",
+      "rewardProgram": "Bilt Rewards",
+      "annualFee": 0,
+      "pointValuation": 2.2,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "other",
+          "rewardRate": {
+            "value": 1,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "1x on rent with no transaction fees"
+        }
+      ]
+    },
+    {
+      "id": "bilt-palladium",
+      "name": "Bilt Palladium Card",
+      "issuer": "Bilt",
+      "rewardProgram": "Bilt Rewards",
+      "annualFee": 495,
+      "pointValuation": 2.2,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 50000,
+        "currency": "points",
+        "spendRequirement": 4000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "chase-united-explorer",
+      "name": "United Explorer Card",
+      "issuer": "Chase",
+      "rewardProgram": "United MileagePlus",
+      "annualFee": 95,
+      "pointValuation": 1.5,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "airline_miles",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          },
+          "description": "2x on United purchases and at hotels"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 85000,
+        "currency": "airline_miles",
+        "spendRequirement": 3000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "chase-marriott-bonvoy-boundless",
+      "name": "Marriott Bonvoy Boundless Credit Card",
+      "issuer": "Chase",
+      "rewardProgram": "Marriott Bonvoy",
+      "annualFee": 95,
+      "pointValuation": 0.7,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "hotel_points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 6,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          },
+          "description": "6x at Marriott Bonvoy hotels"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 3,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 3,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 250000,
+        "currency": "hotel_points",
+        "spendRequirement": 3000,
+        "timeframeDays": 90,
+        "description": "5 Free Night Certificates (up to 50,000 points each)"
+      }
+    },
+    {
+      "id": "chase-world-of-hyatt",
+      "name": "World of Hyatt Credit Card",
+      "issuer": "Chase",
+      "rewardProgram": "World of Hyatt",
+      "annualFee": 95,
+      "pointValuation": 1.7,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "hotel_points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 4,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          },
+          "description": "4x at Hyatt hotels"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 2,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 2,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 5,
+        "currency": "hotel_points",
+        "spendRequirement": 6000,
+        "timeframeDays": 180,
+        "description": "5 Free Night Certificates for Category 1-4 hotels"
+      }
+    },
+    {
+      "id": "chase-ihg-rewards-premier",
+      "name": "IHG One Rewards Premier Credit Card",
+      "issuer": "Chase",
+      "rewardProgram": "IHG One Rewards",
+      "annualFee": 99,
+      "pointValuation": 0.5,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 3,
+        "type": "hotel_points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 26,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          },
+          "description": "26x total at IHG hotels"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 5,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 5,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 175000,
+        "currency": "hotel_points",
+        "spendRequirement": 3000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "amex-marriott-bonvoy-brilliant",
+      "name": "Marriott Bonvoy Brilliant American Express Card",
+      "issuer": "American Express",
+      "rewardProgram": "Marriott Bonvoy",
+      "annualFee": 650,
+      "pointValuation": 0.7,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "hotel_points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 6,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          },
+          "description": "6x at Marriott Bonvoy properties"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "hotel_points",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 95000,
+        "currency": "hotel_points",
+        "spendRequirement": 6000,
+        "timeframeDays": 180
+      }
+    },
+    {
+      "id": "chase-southwest-rapid-rewards-plus",
+      "name": "Southwest Rapid Rewards Plus Credit Card",
+      "issuer": "Chase",
+      "rewardProgram": "Southwest Rapid Rewards",
+      "annualFee": 69,
+      "pointValuation": 1.3,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "airline_miles",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          },
+          "description": "2x on Southwest purchases, Rapid Rewards hotel and car rentals"
+        }
+      ],
+      "signupBonus": {
+        "amount": 50000,
+        "currency": "airline_miles",
+        "spendRequirement": 1000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "chase-southwest-rapid-rewards-priority",
+      "name": "Southwest Rapid Rewards Priority Credit Card",
+      "issuer": "Chase",
+      "rewardProgram": "Southwest Rapid Rewards",
+      "annualFee": 149,
+      "pointValuation": 1.3,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "airline_miles",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 3,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          },
+          "description": "3x on Southwest purchases"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "airline_miles",
+            "unit": "multiplier"
+          }
+        }
+      ],
+      "signupBonus": {
+        "amount": 75000,
+        "currency": "airline_miles",
+        "spendRequirement": 3000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "amex-business-platinum",
+      "name": "Business Platinum Card from American Express",
+      "issuer": "American Express",
+      "rewardProgram": "Membership Rewards",
+      "annualFee": 895,
+      "pointValuation": 2.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "5x on flights and prepaid hotels through amextravel.com"
+        }
+      ],
+      "signupBonus": {
+        "amount": 200000,
+        "currency": "points",
+        "spendRequirement": 20000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "amex-business-gold",
+      "name": "American Express Business Gold Card",
+      "issuer": "American Express",
+      "rewardProgram": "Membership Rewards",
+      "annualFee": 375,
+      "pointValuation": 2.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 4,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "4x on 2 select categories where you spend the most each month (up to $150K/year)"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 4,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "4x on 2 select categories where you spend the most each month"
+        },
+        {
+          "category": "online_shopping",
+          "rewardRate": {
+            "value": 4,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "4x on U.S. purchases for advertising in select media"
+        }
+      ],
+      "signupBonus": {
+        "amount": 200000,
+        "currency": "points",
+        "spendRequirement": 20000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "amex-blue-business-plus",
+      "name": "Blue Business Plus Credit Card from American Express",
+      "issuer": "American Express",
+      "rewardProgram": "Membership Rewards",
+      "annualFee": 0,
+      "pointValuation": 2.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [],
+      "signupBonus": {
+        "amount": 15000,
+        "currency": "points",
+        "spendRequirement": 3000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "capital-one-spark-cash-plus",
+      "name": "Capital One Spark Cash Plus",
+      "issuer": "Capital One",
+      "rewardProgram": "Cash Back",
+      "annualFee": 150,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 5,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "5% on hotels and rental cars through Capital One Travel"
+        }
+      ],
+      "signupBonus": {
+        "amount": 2000,
+        "currency": "cashback",
+        "spendRequirement": 30000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "capital-one-venture-x-business",
+      "name": "Capital One Venture X Business",
+      "issuer": "Capital One",
+      "rewardProgram": "Capital One Miles",
+      "annualFee": 395,
+      "pointValuation": 1.85,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "points",
+        "unit": "multiplier"
+      },
+      "categoryRewards": [
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 10,
+            "type": "points",
+            "unit": "multiplier"
+          },
+          "description": "10x on hotels and rental cars through Capital One Travel"
+        }
+      ],
+      "signupBonus": {
+        "amount": 150000,
+        "currency": "points",
+        "spendRequirement": 30000,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "amazon-prime-visa",
+      "name": "Prime Visa",
+      "issuer": "Chase",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "online_shopping",
+          "rewardRate": {
+            "value": 5,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "5% at Amazon.com and Whole Foods Market with Prime membership"
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "2% on local transit and commuting"
+        }
+      ]
+    },
+    {
+      "id": "costco-anywhere-visa",
+      "name": "Costco Anywhere Visa Card by Citi",
+      "issuer": "Citi",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "gas",
+          "rewardRate": {
+            "value": 4,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "4% on eligible gas and EV charging on first $7,000 per year"
+        },
+        {
+          "category": "travel",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "dining",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          }
+        },
+        {
+          "category": "groceries",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "2% on Costco and Costco.com purchases"
+        }
+      ]
+    },
+    {
+      "id": "apple-card",
+      "name": "Apple Card",
+      "issuer": "Apple",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "other",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "3% at Apple and select partners (Uber, Walgreens, Panera, Nike, etc.)"
+        },
+        {
+          "category": "online_shopping",
+          "rewardRate": {
+            "value": 2,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "2% on all Apple Pay purchases"
+        }
+      ],
+      "signupBonus": {
+        "amount": 75,
+        "currency": "cashback",
+        "spendRequirement": 75,
+        "timeframeDays": 30
+      }
+    },
+    {
+      "id": "paypal-cashback-mastercard",
+      "name": "PayPal Cashback Mastercard",
+      "issuer": "PayPal",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 1.5,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [
+        {
+          "category": "online_shopping",
+          "rewardRate": {
+            "value": 3,
+            "type": "cashback",
+            "unit": "percent"
+          },
+          "description": "3% on purchases made through PayPal"
+        }
+      ]
+    },
+    {
+      "id": "sofi-credit-card",
+      "name": "SoFi Credit Card",
+      "issuer": "SoFi",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [],
+      "signupBonus": {
+        "amount": 200,
+        "currency": "cashback",
+        "spendRequirement": 1500,
+        "timeframeDays": 90
+      }
+    },
+    {
+      "id": "fidelity-rewards-visa",
+      "name": "Fidelity Rewards Visa Signature Card",
+      "issuer": "Fidelity",
+      "rewardProgram": "Cash Back",
+      "annualFee": 0,
+      "pointValuation": 1.0,
+      "country": "US",
+      "baseRewardRate": {
+        "value": 2,
+        "type": "cashback",
+        "unit": "percent"
+      },
+      "categoryRewards": [],
+      "signupBonus": {
+        "amount": 150,
+        "currency": "cashback",
+        "spendRequirement": 1500,
+        "timeframeDays": 90
+      }
+    }
+  ]
+}

@@ -34,7 +34,6 @@ export type RootStackParamList = {
   Upgrade: {
     feature?: Feature;
     source?: string;
-    annualGain?: number;
   };
 };
 
@@ -44,7 +43,7 @@ type UpgradeScreenProps = {
 };
 
 export default function UpgradeScreen({ route, navigation }: UpgradeScreenProps) {
-  const { feature, source: _source, annualGain } = route.params || {};
+  const { feature, source: _source } = route.params || {};
   const [showPaywall, setShowPaywall] = useState(true);
 
   // Auto-show paywall on mount
@@ -89,7 +88,6 @@ export default function UpgradeScreen({ route, navigation }: UpgradeScreenProps)
         onClose={handleClose}
         onSubscribe={handleSubscribe}
         highlightFeature={feature}
-        annualGain={annualGain}
       />
     </SafeAreaView>
   );

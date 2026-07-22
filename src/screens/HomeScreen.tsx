@@ -38,15 +38,12 @@ import { Store, SpendingCategory } from '../types';
 import { getCards } from '../services/CardPortfolioManager';
 import { getAllCardsSync, getAllCards, refreshCards } from '../services/CardDataService';
 import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
-import { getCurrentTierSync } from '../services/SubscriptionService';
 import { analyzeAndRecommend, CardRecommendation } from '../services/CardRecommendationEngine';
 import {
   calculateRewards,
   CalculatorInput,
   CalculatorOutput,
 } from '../services/RewardsCalculatorService';
-import { getPortfolioOptimization } from '../services/RewardsIQService';
-import { PortfolioOptimization } from '../types/rewards-iq';
 // Achievement imports removed - achievements section moved to Insights tab
 
 // Map CategoryType to SpendingCategory
@@ -122,10 +119,6 @@ export default function HomeScreen() {
   const [recommendations, setRecommendations] = useState<CardRecommendation[]>([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [portfolioOpt, setPortfolioOpt] = useState<PortfolioOptimization | null>(null);
-
-  // Subscription tier — used to show Pro teaser to free users
-  const isFreeTier = getCurrentTierSync() === 'free';
 
   // Top cards for category - shown when user has no portfolio
   const [, setTopCardsForCategory] = useState<CalculatorOutput | null>(null);
@@ -143,12 +136,8 @@ export default function HomeScreen() {
       if (userHasCards) {
         setRecommendationsLoading(true);
         try {
-          const [analysis, opt] = await Promise.all([
-            analyzeAndRecommend(),
-            getPortfolioOptimization().catch(() => null),
-          ]);
+          const analysis = await analyzeAndRecommend();
           setRecommendations(analysis.recommendations.slice(0, 3)); // Top 3
-          setPortfolioOpt(opt);
         } catch (err) {
           console.warn('Failed to load recommendations:', err);
         } finally {
@@ -156,7 +145,6 @@ export default function HomeScreen() {
         }
       } else {
         setRecommendations([]);
-        setPortfolioOpt(null);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to load card data';
@@ -581,64 +569,6 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* ── Annual Rewards Estimator (free users with cards) ── */}
-        {hasCards && portfolioOpt && (
-          <TouchableOpacity
-            style={styles.rewardsEstimator}
-            onPress={() =>
-              isFreeTier
-                ? (navigation as any).navigate('Upgrade', { feature: 'insights', source: 'home_estimator', annualGain: portfolioOpt.annualGain })
-                : (navigation as any).navigate('Insights', { screen: 'InsightsDashboard' })
-            }
-            activeOpacity={0.82}
-            accessibilityRole="button"
-            accessibilityLabel="View annual rewards estimate"
-          >
-            {/* Current wallet row */}
-            <View style={styles.estimatorRow}>
-              <View style={styles.estimatorLabelGroup}>
-                <Text style={styles.estimatorLabel}>Your wallet earns</Text>
-                <Text style={styles.estimatorSub}>est. annually</Text>
-              </View>
-              <Text style={styles.estimatorValueCurrent}>
-                ${Math.round(portfolioOpt.currentSetup.annualRewards).toLocaleString()}
-              </Text>
-            </View>
-
-            {/* Divider */}
-            <View style={styles.estimatorDivider} />
-
-            {/* Optimal wallet row */}
-            <View style={styles.estimatorRow}>
-              <View style={styles.estimatorLabelGroup}>
-                <Text style={styles.estimatorLabel}>Optimal wallet</Text>
-                <Text style={styles.estimatorSub}>could earn annually</Text>
-              </View>
-              {isFreeTier ? (
-                <View style={styles.estimatorBlurred}>
-                  <Text style={styles.estimatorValueBlurred}>$••••</Text>
-                  <View style={styles.estimatorLockBadge}>
-                    <Text style={styles.estimatorLockText}>PRO</Text>
-                  </View>
-                </View>
-              ) : (
-                <Text style={styles.estimatorValueOptimal}>
-                  ${Math.round(portfolioOpt.recommendedSetup.annualRewards).toLocaleString()}
-                </Text>
-              )}
-            </View>
-
-            {/* CTA */}
-            {isFreeTier && portfolioOpt.annualGain > 0 && (
-              <View style={styles.estimatorCta}>
-                <Text style={styles.estimatorCtaText}>
-                  You could earn ${Math.round(portfolioOpt.annualGain).toLocaleString()} more/yr →
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        )}
-
         {/* ── Referral banner ── */}
         <TouchableOpacity
           style={styles.referralBanner}
@@ -885,131 +815,5 @@ const createStyles = (_t: Theme) =>
     referralSub: {
       fontSize: 11,
       color: colors.text.secondary,
-    },
-    // Pro teaser for free users
-    proTeaser: {
-      backgroundColor: colors.background.secondary,
-      borderRadius: 14,
-      borderWidth: 1.5,
-      borderColor: colors.primary.main + '50',
-      padding: 16,
-      marginTop: 16,
-      marginBottom: 4,
-    },
-    proTeaserHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      marginBottom: 10,
-    },
-    proTeaserBadge: {
-      fontSize: 10,
-      fontWeight: '800',
-      color: colors.background.primary,
-      backgroundColor: colors.primary.main,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
-      borderRadius: 4,
-      letterSpacing: 0.5,
-      overflow: 'hidden',
-    },
-    proTeaserTitle: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: colors.text.primary,
-      flex: 1,
-    },
-    proTeaserItems: {
-      gap: 5,
-      marginBottom: 12,
-    },
-    proTeaserItem: {
-      fontSize: 12,
-      color: colors.text.secondary,
-      lineHeight: 18,
-    },
-    proTeaserCta: {
-      fontSize: 13,
-      fontWeight: '700',
-      color: colors.primary.main,
-    },
-    // Annual Rewards Estimator widget
-    rewardsEstimator: {
-      backgroundColor: colors.background.secondary,
-      borderRadius: 16,
-      borderWidth: 1.5,
-      borderColor: colors.primary.main + '40',
-      padding: 16,
-      marginTop: 16,
-      marginBottom: 4,
-    },
-    estimatorRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: 4,
-    },
-    estimatorLabelGroup: {
-      flex: 1,
-    },
-    estimatorLabel: {
-      fontSize: 13,
-      fontWeight: '600',
-      color: colors.text.primary,
-    },
-    estimatorSub: {
-      fontSize: 11,
-      color: colors.text.secondary,
-      marginTop: 1,
-    },
-    estimatorValueCurrent: {
-      fontSize: 22,
-      fontWeight: '800',
-      color: colors.success.main,
-    },
-    estimatorValueOptimal: {
-      fontSize: 22,
-      fontWeight: '800',
-      color: colors.primary.main,
-    },
-    estimatorBlurred: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-    },
-    estimatorValueBlurred: {
-      fontSize: 22,
-      fontWeight: '800',
-      color: colors.text.secondary,
-      opacity: 0.5,
-    },
-    estimatorLockBadge: {
-      backgroundColor: colors.primary.main,
-      borderRadius: 4,
-      paddingHorizontal: 5,
-      paddingVertical: 2,
-    },
-    estimatorLockText: {
-      fontSize: 9,
-      fontWeight: '800',
-      color: colors.background.primary,
-      letterSpacing: 0.5,
-    },
-    estimatorDivider: {
-      height: 1,
-      backgroundColor: colors.border.light,
-      marginVertical: 10,
-    },
-    estimatorCta: {
-      marginTop: 10,
-      paddingTop: 10,
-      borderTopWidth: 1,
-      borderTopColor: colors.border.light,
-    },
-    estimatorCtaText: {
-      fontSize: 13,
-      fontWeight: '700',
-      color: colors.primary.main,
-      textAlign: 'center',
     },
   });
