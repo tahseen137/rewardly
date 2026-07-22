@@ -1,33 +1,78 @@
 /**
  * Rewards Optimizer - Main App Entry Point
  * A mobile app that helps users maximize credit card rewards
+ * 
+ * Error Handling Architecture:
+ * 1. AppErrorBoundary (top-level) - catches fatal errors, shows friendly UI
+ * 2. ThemeProvider - provides theme context
+ * 3. AppContent - handles initialization errors
+ * 4. ErrorBoundary (per-navigator) - catches navigation errors
  */
 
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, Platform } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import './src/i18n'; // Initialize i18n
 import i18n from './src/i18n';
 import { AppNavigator } from './src/navigation';
-import { ErrorBoundary } from './src/components';
+import { ErrorBoundary, AppErrorBoundary } from './src/components';
 import { initializePortfolio } from './src/services/CardPortfolioManager';
 import { initializePreferences, getLanguage } from './src/services/PreferenceManager';
+import { getAllCards } from './src/services/CardDataService';
+import { ReferralService } from './src/services/ReferralService';
+import { ThemeProvider, useTheme } from './src/theme';
+import { isWeb, platformLog } from './src/utils/platform';
+import { initErrorReporting, reportError } from './src/utils/errorReporting';
 
-export default function App() {
+// Initialize error reporting as early as possible so startup errors are captured.
+initErrorReporting();
+
+// Debug: Log app startup
+if (__DEV__ || isWeb) {
+  platformLog('App module loading...');
+}
+
+// Global error handler for unhandled promise rejections
+if (isWeb && typeof window !== 'undefined') {
+  window.addEventListener('unhandledrejection', (event) => {
+    console.error('[Rewardly] Unhandled promise rejection:', event.reason);
+  });
+}
+
+function AppContent() {
+  const theme = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function initialize() {
       try {
-        await Promise.all([initializePortfolio(), initializePreferences()]);
+        platformLog('Initializing app services...');
+        
+        // Track referral from URL (if present)
+        await ReferralService.trackReferralFromUrl().catch(err => {
+          console.warn('[Rewardly] Failed to track referral:', err);
+        });
+        
+        // Initialize services and preload cards
+        await Promise.all([
+          initializePortfolio(),
+          initializePreferences(),
+          getAllCards(), // Preload cards into memory cache
+        ]);
+        
         // Set i18n language from preferences
         const savedLanguage = getLanguage();
         i18n.changeLanguage(savedLanguage);
+        
+        platformLog('App initialization complete');
         setIsLoading(false);
       } catch (err) {
-        setError('Failed to initialize app');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to initialize app';
+        console.error('[Rewardly] Initialization error:', err);
+        setError(errorMessage);
         setIsLoading(false);
       }
     }
@@ -36,56 +81,116 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Loading...</Text>
-        <StatusBar style="auto" />
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: theme.colors.background.primary,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text style={{ fontSize: 56, marginBottom: 16 }}>💳</Text>
+        <Text
+          style={{
+            fontSize: 28,
+            fontWeight: '700',
+            color: theme.colors.text.primary,
+            marginBottom: 8,
+          }}
+        >
+          Rewardly
+        </Text>
+        <Text
+          style={{
+            fontSize: 14,
+            color: theme.colors.text.secondary,
+            marginBottom: 24,
+          }}
+        >
+          Maximize every swipe
+        </Text>
+        <ActivityIndicator size="small" color={theme.colors.primary.main} />
+        <StatusBar style={theme.isDark ? 'light' : 'dark'} />
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-        <StatusBar style="auto" />
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: theme.colors.background.secondary,
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 20,
+        }}
+      >
+        <Text style={{ fontSize: 48, marginBottom: 16 }}>⚠️</Text>
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: '600',
+            color: theme.colors.text.primary,
+            textAlign: 'center',
+            marginBottom: 8,
+          }}
+        >
+          Initialization Error
+        </Text>
+        <Text
+          style={{
+            fontSize: 14,
+            color: theme.colors.error.main,
+            textAlign: 'center',
+          }}
+        >
+          {error}
+        </Text>
+        <StatusBar style={theme.isDark ? 'light' : 'dark'} />
       </View>
     );
   }
 
   return (
     <ErrorBoundary
-      fallbackTitle="App Error"
-      fallbackMessage="Something went wrong with the app. Please restart and try again."
+      fallbackTitle="Navigation Error"
+      fallbackMessage="Something went wrong loading this screen. Please restart the app."
     >
       <AppNavigator />
-      <StatusBar style="auto" />
+      <StatusBar style={theme.isDark ? 'light' : 'dark'} />
     </ErrorBoundary>
   );
 }
 
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#666',
-  },
-  errorContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#FF3B30',
-    textAlign: 'center',
-  },
-});
+/**
+ * Root App Component
+ * 
+ * Wrapped with:
+ * 1. AppErrorBoundary - Catches all React errors, prevents white screen
+ * 2. GestureHandlerRootView - Required for gesture handling
+ * 3. ThemeProvider - Provides theme context to all children
+ */
+export default function App() {
+  return (
+    <AppErrorBoundary
+      onError={(error, errorInfo) => {
+        // Log to console in all environments
+        console.error('[Rewardly] Fatal error caught by AppErrorBoundary:', error);
+        console.error('[Rewardly] Component stack:', errorInfo.componentStack);
+
+        // Route to the configured error reporter (Sentry/Bugsnag/noop).
+        reportError(error, {
+          source: 'AppErrorBoundary',
+          componentStack: errorInfo.componentStack,
+        });
+      }}
+    >
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </GestureHandlerRootView>
+    </AppErrorBoundary>
+  );
+}

@@ -12,25 +12,76 @@ export interface Database {
         Row: CardRow;
         Insert: CardInsert;
         Update: CardUpdate;
+        Relationships: [];
       };
       category_rewards: {
         Row: CategoryRewardRow;
         Insert: CategoryRewardInsert;
         Update: CategoryRewardUpdate;
+        Relationships: [];
       };
       signup_bonuses: {
         Row: SignupBonusRow;
         Insert: SignupBonusInsert;
         Update: SignupBonusUpdate;
+        Relationships: [];
       };
       spending_categories: {
         Row: SpendingCategoryRow;
         Insert: SpendingCategoryInsert;
         Update: SpendingCategoryUpdate;
+        Relationships: [];
+      };
+      reward_programs: {
+        Row: RewardProgramRow;
+        Insert: RewardProgramInsert;
+        Update: RewardProgramUpdate;
+        Relationships: [];
+      };
+      point_valuations: {
+        Row: PointValuationRow;
+        Insert: PointValuationInsert;
+        Update: PointValuationUpdate;
+        Relationships: [];
+      };
+      user_cards: {
+        Row: UserCardRow;
+        Insert: UserCardInsert;
+        Update: UserCardUpdate;
+        Relationships: [];
+      };
+      user_profiles: {
+        Row: UserProfileRow;
+        Insert: UserProfileInsert;
+        Update: UserProfileUpdate;
+        Relationships: [];
+      };
+      referral_codes: {
+        Row: ReferralCodeRow;
+        Insert: ReferralCodeInsert;
+        Update: ReferralCodeUpdate;
+        Relationships: [];
+      };
+      referral_signups: {
+        Row: ReferralSignupRow;
+        Insert: ReferralSignupInsert;
+        Update: ReferralSignupUpdate;
+        Relationships: [];
+      };
+      referral_clicks: {
+        Row: ReferralClickRow;
+        Insert: ReferralClickInsert;
+        Update: ReferralClickUpdate;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      increment_referral_usage: {
+        Args: { code_id: string };
+        Returns: void;
+      };
+    };
     Enums: Record<string, never>;
   };
 }
@@ -54,6 +105,7 @@ export interface CardRow {
   image_url: string | null;
   apply_url: string | null;
   is_active: boolean;
+  reward_program_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -92,6 +144,7 @@ export interface CardUpdate {
   image_url?: string | null;
   apply_url?: string | null;
   is_active?: boolean;
+  reward_program_id?: string | null;
   updated_at?: string;
 }
 
@@ -241,4 +294,295 @@ export interface SpendingCategoryUpdate {
 export interface CardWithRelations extends CardRow {
   category_rewards: CategoryRewardRow[];
   signup_bonuses: SignupBonusRow[];
+}
+
+// ============================================================================
+// Reward Programs Table
+// ============================================================================
+
+export interface RewardProgramRow {
+  id: string;
+  program_name: string;
+  program_key: string;
+  program_category: string;
+  program_type: string;
+  unit: string;
+  direct_rate_cents: number | null;
+  optimal_rate_cents: number | null;
+  optimal_method: string | null;
+  issuer: string | null;
+  country: string;
+  redemption_methods: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RewardProgramInsert {
+  id?: string;
+  program_name: string;
+  program_key: string;
+  program_category: string;
+  program_type: string;
+  unit: string;
+  direct_rate_cents?: number | null;
+  optimal_rate_cents?: number | null;
+  optimal_method?: string | null;
+  issuer?: string | null;
+  country?: string;
+  redemption_methods?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface RewardProgramUpdate {
+  id?: string;
+  program_name?: string;
+  program_key?: string;
+  program_category?: string;
+  program_type?: string;
+  unit?: string;
+  direct_rate_cents?: number | null;
+  optimal_rate_cents?: number | null;
+  optimal_method?: string | null;
+  issuer?: string | null;
+  country?: string;
+  redemption_methods?: string | null;
+  updated_at?: string;
+}
+
+// ============================================================================
+// Point Valuations Table
+// ============================================================================
+
+export interface PointValuationRow {
+  id: string;
+  program_id: string;
+  redemption_type: string;
+  cents_per_point: number;
+  minimum_redemption: number | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface PointValuationInsert {
+  id?: string;
+  program_id: string;
+  redemption_type: string;
+  cents_per_point: number;
+  minimum_redemption?: number | null;
+  notes?: string | null;
+  created_at?: string;
+}
+
+export interface PointValuationUpdate {
+  id?: string;
+  program_id?: string;
+  redemption_type?: string;
+  cents_per_point?: number;
+  minimum_redemption?: number | null;
+  notes?: string | null;
+}
+
+// ============================================================================
+// Extended Types with Program Data
+// ============================================================================
+
+/**
+ * Redemption option for a reward program
+ */
+export interface RedemptionOption {
+  redemption_type: string;
+  cents_per_point: number;
+  minimum_redemption: number | null;
+  notes: string | null;
+}
+
+/**
+ * Card with reward program details and redemption options
+ */
+export interface CardWithProgramDetails extends CardRow {
+  program_name: string | null;
+  program_category: string | null;
+  program_type: string | null;
+  unit: string | null;
+  direct_rate_cents: number | null;
+  optimal_rate_cents: number | null;
+  optimal_method: string | null;
+  redemption_methods: string | null;
+  redemption_options: RedemptionOption[] | null;
+  category_rewards?: CategoryRewardRow[];
+  signup_bonuses?: SignupBonusRow[];
+}
+
+/**
+ * Reward program with all its point valuations
+ */
+export interface RewardProgramWithValuations extends RewardProgramRow {
+  point_valuations: PointValuationRow[];
+}
+
+// ============================================================================
+// User Cards Table (synced portfolio)
+// ============================================================================
+
+export interface UserCardRow {
+  id: string;
+  user_id: string;
+  card_key: string;
+  nickname: string | null;
+  notes: string | null;
+  added_at: string;
+  updated_at: string;
+}
+
+export interface UserCardInsert {
+  id?: string;
+  user_id: string;
+  card_key: string;
+  nickname?: string | null;
+  notes?: string | null;
+  added_at?: string;
+  updated_at?: string;
+}
+
+export interface UserCardUpdate {
+  id?: string;
+  user_id?: string;
+  card_key?: string;
+  nickname?: string | null;
+  notes?: string | null;
+  added_at?: string;
+  updated_at?: string;
+}
+
+// ============================================================================
+// User Profiles Table
+// ============================================================================
+
+export interface UserProfileRow {
+  id: string;
+  country: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  preferred_language: string;
+  onboarding_complete: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserProfileInsert {
+  id: string;
+  country?: string;
+  display_name?: string | null;
+  avatar_url?: string | null;
+  preferred_language?: string;
+  onboarding_complete?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface UserProfileUpdate {
+  id?: string;
+  country?: string;
+  display_name?: string | null;
+  avatar_url?: string | null;
+  preferred_language?: string;
+  onboarding_complete?: boolean;
+  updated_at?: string;
+}
+
+// ============================================================================
+// Referral Tables
+// ============================================================================
+
+export interface ReferralCodeRow {
+  id: string;
+  user_id: string;
+  code: string;
+  created_at: string;
+  expires_at: string;
+  is_active: boolean;
+  usage_count: number;
+  max_uses: number | null;
+}
+
+export interface ReferralCodeInsert {
+  id?: string;
+  user_id: string;
+  code: string;
+  created_at?: string;
+  expires_at?: string;
+  is_active?: boolean;
+  usage_count?: number;
+  max_uses?: number | null;
+}
+
+export interface ReferralCodeUpdate {
+  id?: string;
+  user_id?: string;
+  code?: string;
+  expires_at?: string;
+  is_active?: boolean;
+  usage_count?: number;
+  max_uses?: number | null;
+}
+
+export interface ReferralSignupRow {
+  id: string;
+  referral_code_id: string;
+  referrer_user_id: string;
+  referee_user_id: string;
+  referrer_reward: string | null;
+  referee_reward: string | null;
+  signed_up_at: string;
+  reward_claimed_at: string | null;
+  status: 'pending' | 'claimed' | 'expired';
+}
+
+export interface ReferralSignupInsert {
+  id?: string;
+  referral_code_id: string;
+  referrer_user_id: string;
+  referee_user_id: string;
+  referrer_reward?: string | null;
+  referee_reward?: string | null;
+  signed_up_at?: string;
+  reward_claimed_at?: string | null;
+  status?: 'pending' | 'claimed' | 'expired';
+}
+
+export interface ReferralSignupUpdate {
+  referral_code_id?: string;
+  referrer_user_id?: string;
+  referee_user_id?: string;
+  referrer_reward?: string | null;
+  referee_reward?: string | null;
+  reward_claimed_at?: string | null;
+  status?: 'pending' | 'claimed' | 'expired';
+}
+
+export interface ReferralClickRow {
+  id: string;
+  referral_code_id: string;
+  clicked_at: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  converted: boolean;
+}
+
+export interface ReferralClickInsert {
+  id?: string;
+  referral_code_id: string;
+  clicked_at?: string;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  converted?: boolean;
+}
+
+export interface ReferralClickUpdate {
+  referral_code_id?: string;
+  clicked_at?: string;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  converted?: boolean;
 }

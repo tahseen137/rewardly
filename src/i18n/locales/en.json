@@ -6,7 +6,16 @@
     "cancel": "Cancel",
     "remove": "Remove",
     "search": "Search",
-    "close": "Close"
+    "close": "Close",
+    "ok": "OK",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "continue": "Continue"
   },
   "tabs": {
     "home": "Home",
@@ -14,16 +23,25 @@
     "settings": "Settings"
   },
   "home": {
-    "title": "Find Best Card",
+    "title": "Rewardly",
+    "subtitle": "Find the best card for every purchase",
     "searchPlaceholder": "Search for a store...",
     "clearSearch": "Clear search",
-    "noCardsTitle": "No Cards Added",
+    "selectStore": "Select Store (Optional)",
+    "category": "Category",
+    "purchaseAmount": "Purchase Amount",
+    "enterAmount": "0.00",
+    "resultsTitle": "Best Cards for This Purchase",
+    "calculating": "Calculating rewards...",
+    "noCardsTitle": "No Cards in Portfolio",
     "noCardsText": "Add your credit cards in the \"My Cards\" tab to get personalized recommendations.",
+    "noCardsMessage": "Add cards to your portfolio to see rewards",
+    "getStartedTitle": "Get Started",
+    "getStartedMessage": "Select a category and enter an amount to find the best card",
     "findBestCardTitle": "Find Your Best Card",
     "findBestCardText": "Enter a store name above to see which card earns the most rewards.",
     "storeNotFoundTitle": "Store Not Found",
     "storeNotFoundText": "We couldn't find \"{{storeName}}\" in our database. Try a different store name.",
-    "category": "Category",
     "bestCardToUse": "BEST CARD TO USE",
     "cashBackCards": "CASH BACK CARDS",
     "pointsMilesCards": "POINTS & MILES CARDS",
@@ -32,7 +50,37 @@
     "better": "Better",
     "noCardsForCategory": "No cards in your portfolio have rewards for this category.",
     "youHaveBestCard": "You have the best card for this store!",
-    "tapForDetails": "Tap for details"
+    "tapForDetails": "Tap for details",
+    "googlePlacesEnabled": "Enhanced store search enabled",
+    "rewardsComparison": "Rewards Comparison",
+    "cardsInPortfolio_one": "{{count}} card in your portfolio",
+    "cardsInPortfolio_other": "{{count}} cards in your portfolio",
+    "topCardsCount_one": "Top {{count}} card",
+    "topCardsCount_other": "Top {{count}} cards",
+    "noResultsTitle": "No Results",
+    "noResultsMessage": "Unable to calculate rewards. Please try again.",
+    "recommendedCards": "Recommended Cards",
+    "seeAll": "See All",
+    "topCardsTitle": "Top Cards for This Category",
+    "topCards": "Top Cards to Consider",
+    "noRecommendations": "Add spending data to get personalized recommendations",
+    "addCards": "Add Cards"
+  },
+  "productSearch": {
+    "title": "Product Search",
+    "description": "Search for a product to compare prices and rewards across stores",
+    "searchPlaceholder": "Search for a product...",
+    "sortBy": "Sort by",
+    "bestDeal": "Best Deal",
+    "lowestPrice": "Lowest Price",
+    "highestRewards": "Highest Rewards",
+    "allOptions": "ALL STORE OPTIONS",
+    "priceUnavailable": "Price unavailable",
+    "rewards": "Rewards",
+    "effectivePrice": "Effective Price",
+    "earnRewards": "Earn {{rate}} rewards",
+    "productNotFound": "Product \"{{productName}}\" not found. Try a different search.",
+    "noCardsError": "Add cards to your portfolio to see recommendations"
   },
   "myCards": {
     "title": "My Cards",
@@ -53,18 +101,57 @@
   },
   "settings": {
     "title": "Settings",
+    "customizeExperience": "Customize your experience",
+    "account": "ACCOUNT",
+    "guest": "Guest",
+    "guestMode": "Limited features",
+    "subscription": "Subscription",
+    "upgrade": "Upgrade",
+    "signOut": "Sign Out",
+    "signIn": "Sign In",
+    "signInPrompt": "Create an account to unlock all features",
+    "signOutTitle": "Sign Out",
+    "signOutMessage": "Are you sure you want to sign out?",
+    "region": "REGION",
+    "country": "Country",
+    "countryDescription": "Choose your country for card recommendations",
+    "changeCountryTitle": "Change Country",
+    "changeCountryMessage": "Switching to {{country}} will reload card data. Continue?",
+    "preferences": "PREFERENCES",
     "rewardPreference": "REWARD PREFERENCE",
     "rewardPreferenceDescription": "Choose your preferred reward type. Cards matching this preference will be prioritized in recommendations.",
     "recommendations": "RECOMMENDATIONS",
     "newCardSuggestions": "New Card Suggestions",
     "newCardSuggestionsDescription": "Show cards you don't own that could earn better rewards",
-    "language": "LANGUAGE",
+    "language": "Language",
     "languageDescription": "Choose your preferred language",
+    "data": "DATA",
+    "refreshCards": "Refresh Cards from Database",
+    "refreshCardsDescription": "Refresh card data from server",
+    "syncNow": "Sync Now",
     "about": "ABOUT",
+    "appVersion": "App Version",
     "version": "Version",
     "cardsInDatabase": "Cards in Database",
     "storesInDatabase": "Stores in Database",
-    "footerText": "Rewards Optimizer helps you maximize credit card rewards by recommending the best card for every purchase."
+    "lastSynced": "Last synced",
+    "dataSource": "Data Source",
+    "localData": "Local",
+    "refreshSuccess": "Success",
+    "refreshSuccessMessage": "Loaded {{count}} cards from database",
+    "refreshError": "Error",
+    "refreshErrorMessage": "Failed to refresh cards. Please check your connection.",
+    "supabaseNotConfigured": "Database connection not configured. Using local data.",
+    "footerText": "Made for the Canadian rewards community",
+    "smartWallet": "SMART WALLET",
+    "smartWalletEnabled": "Smart Wallet",
+    "smartWalletDescription": "Get notified with the best card to use when you arrive at a store",
+    "smartWalletActiveDescription": "Monitoring {{count}} stores near you",
+    "smartWalletPermissionTitle": "Permission Required",
+    "smartWalletPermissionMessage": "Smart Wallet needs location and notification permissions to work. Please enable them in your device settings.",
+    "earn": "Earn",
+    "dataPrivacy": "Data & Privacy",
+    "subscription_header": "Subscription"
   },
   "rewardTypes": {
     "cashback": "Cash Back",
@@ -84,12 +171,372 @@
     "bonusCategories": "BONUS CATEGORIES",
     "annualFee": "Annual Fee",
     "noFee": "No annual fee",
-    "signupBonus": "SIGNUP BONUS",
-    "signupBonusDetails": "Spend {{spendRequirement}} in {{timeframeDays}} days",
-    "signupBonusAmount": "{{amount}} {{currency}}"
+    "signupBonus": "WELCOME BONUS",
+    "signupBonusDetails": "Spend {{spendRequirement}} in {{timeframeDays}}",
+    "signupBonusAmount": "{{amount}} {{currency}}",
+    "bonusValueLabel": "in value"
   },
   "languages": {
     "en": "English",
     "fr": "Français"
+  },
+  "auth": {
+    "title": "Rewardly",
+    "subtitle": "Find the best card for every purchase",
+    "emailPlaceholder": "Email address",
+    "passwordPlaceholder": "Password",
+    "confirmPasswordPlaceholder": "Confirm password",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "noAccount": "Don't have an account? Sign up",
+    "hasAccount": "Already have an account? Sign in",
+    "or": "or",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
+    "continueAsGuest": "Continue as Guest",
+    "guestLimitations": "Limited features • No sync",
+    "comingSoon": "Coming soon",
+    "termsNotice": "By continuing, you agree to our Terms of Service and Privacy Policy",
+    "forgotPassword": "Forgot password?",
+    "errors": {
+      "emailRequired": "Please enter your email",
+      "passwordRequired": "Please enter your password",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "passwordMismatch": "Passwords don't match",
+      "unknown": "Something went wrong. Please try again.",
+      "googleFailed": "Failed to sign in with Google",
+      "appleFailed": "Failed to sign in with Apple",
+      "guestFailed": "Failed to create guest session"
+    }
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "back": "Back",
+    "skipLater": "Later",
+    "continue": "Continue",
+    "getStarted": "Get Started",
+    "skipCardTitle": "Skip Card Setup?",
+    "skipCardMessage": "Without cards, we can't give you personalized recommendations. You'll need to add them later.",
+    "skipCardAddNow": "Add Cards Now",
+    "skipCardConfirm": "Skip Anyway",
+    "countryTitle": "Where are you located?",
+    "countryDescription": "We'll show you the best credit cards available in your country.",
+    "countryValue": "Get accurate rewards rates for your region",
+    "cardsTitle": "Add Your Cards",
+    "cardsDescription": "Select the credit cards you currently have. You can add more later.",
+    "cardsValue": "We'll show you which card to use at every store",
+    "cardsGuidance": "Add 1-3 cards you use most often. You can add more later.",
+    "searchCards": "Search cards...",
+    "showingCards": "Showing {{count}} of {{total}} cards",
+    "noCardsFound": "No cards found. Try a different search.",
+    "noPopularCards": "No popular cards available. Try the 'All' tab.",
+    "cardsHint": "{{count}} cards selected",
+    "selectedCards": "Selected ({{count}})",
+    "loadingCards": "Loading available cards...",
+    "popularTab": "Popular",
+    "allTab": "All Cards",
+    "searchTab": "Search",
+    "sageTitle": "Meet Sage",
+    "sageDescription": "Sage, your AI rewards assistant, is ready to help you get the most from every purchase.",
+    "sageValue": "Get instant answers to any rewards question",
+    "sageFeature1Title": "Smart Recommendations",
+    "sageFeature1Desc": "Get the best card for any purchase, instantly.",
+    "sageFeature2Title": "Travel Planning",
+    "sageFeature2Desc": "Plan trips and optimize point redemptions.",
+    "sageFeature3Title": "Expert Guidance",
+    "sageFeature3Desc": "Ask questions about rewards, cards, and strategies."
+  },
+  "paywall": {
+    "title": "See Every Reward You're Missing",
+    "subtitle": "Unlimited recommendations, AI assistance, and wallet analysis",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "month": "mo",
+    "twoMonthsFree": "2 months free",
+    "mostPopular": "Most Popular",
+    "saveAmount": "Save ${{amount}}/year",
+    "moreFeatures": "more features",
+    "startFreeTrial": "Start Free Trial",
+    "trialNote": "7-day free trial, then billed automatically. Cancel anytime.",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "restorePurchases": "Restore Purchases"
+  },
+  "subscription": {
+    "free": "Free",
+    "plus": "Plus",
+    "pro": "Pro",
+    "elite": "Elite",
+    "currentPlan": "Current Plan",
+    "upgrade": "Upgrade",
+    "manage": "Manage Subscription",
+    "features": {
+      "recommendations": "{{count}} recommendations/day",
+      "unlimitedRecommendations": "Unlimited recommendations",
+      "aiQuestions": "{{count}} AI questions/month",
+      "unlimitedAI": "Unlimited AI questions",
+      "cardsInPortfolio": "{{count}} cards in portfolio",
+      "unlimitedCards": "Unlimited cards",
+      "pointValuations": "Point valuations",
+      "locationRecommendations": "Location-based suggestions",
+      "travelPlanner": "Travel planner",
+      "benefitsTracking": "Benefits tracking",
+      "expertConsultations": "{{count}} expert consultations/month",
+      "familySharing": "Family sharing ({{count}} members)",
+      "prioritySupport": "Priority support",
+      "conciergeService": "Concierge service"
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "network": "Please check your internet connection",
+    "unauthorized": "Please sign in to continue",
+    "limitReached": "You've reached your limit",
+    "upgradeRequired": "Upgrade to access this feature"
+  },
+  "benefits": {
+    "title": "Card Benefits",
+    "categories": {
+      "travel": "Travel Benefits",
+      "purchase": "Purchase Protection",
+      "insurance": "Insurance Coverage",
+      "lifestyle": "Lifestyle Perks"
+    },
+    "noBenefits": "No benefits data available for this card",
+    "viewAll": "View All Benefits",
+    "lockedTitle": "Unlock All Benefits",
+    "lockedDesc": "Upgrade to Pro to see all {{count}} benefits"
+  },
+  "subTracker": {
+    "title": "Sign-Up Bonus Tracker",
+    "subtitle": "Track your spending toward signup bonuses",
+    "addSUB": "Add Bonus to Track",
+    "editSUB": "Edit Bonus",
+    "deleteSUB": "Remove Tracking",
+    "deleteConfirm": "Stop tracking this bonus?",
+    "progress": {
+      "spent": "Spent",
+      "of": "of",
+      "remaining": "{{amount}} to go",
+      "daysLeft": "{{days}} days left",
+      "daysLeftOne": "1 day left",
+      "onTrack": "On track!",
+      "behindSchedule": "Spend {{amount}}/day to hit goal",
+      "completed": "Completed!",
+      "expired": "Expired"
+    },
+    "empty": {
+      "title": "No Bonuses Being Tracked",
+      "description": "Add a sign-up bonus to track your progress",
+      "cta": "Add Your First Bonus"
+    }
+  },
+  "cardCompare": {
+    "title": "Compare Cards",
+    "subtitle": "See which card wins",
+    "selectCards": "Select cards to compare",
+    "addCard": "Add Card",
+    "removeCard": "Remove",
+    "maxCards": "Compare up to {{count}} cards",
+    "upgradeFor3": "Upgrade to compare 3 cards",
+    "winner": "Winner",
+    "overallScore": "Overall Score",
+    "noFee": "No fee",
+    "noBenefits": "None"
+  },
+  "spendingLog": {
+    "title": "Spending Log",
+    "subtitle": "Track your purchases and rewards",
+    "addEntry": "Log Purchase",
+    "editEntry": "Edit Purchase",
+    "deleteEntry": "Delete",
+    "deleteConfirm": "Delete this transaction?",
+    "form": {
+      "amount": "Amount",
+      "store": "Store (optional)",
+      "category": "Category",
+      "card": "Card Used",
+      "date": "Date",
+      "notes": "Notes (optional)"
+    },
+    "summary": {
+      "totalSpend": "Total Spent",
+      "earned": "Rewards Earned",
+      "missed": "Rewards Missed"
+    },
+    "optimal": "Optimal: {{card}}",
+    "earnedLabel": "+{{amount}}",
+    "missedLabel": "-{{amount}} missed",
+    "limitReached": {
+      "title": "Free Limit Reached",
+      "message": "Upgrade to Pro for unlimited history",
+      "cta": "Upgrade"
+    },
+    "empty": {
+      "title": "No Transactions Yet",
+      "description": "Log your first purchase to start tracking rewards",
+      "cta": "Log Purchase"
+    }
+  },
+  "recurring": {
+    "title": "Recurring Charges",
+    "subtitle": "Optimize your subscriptions",
+    "addCharge": "Add Subscription",
+    "editCharge": "Edit",
+    "deleteCharge": "Remove",
+    "summary": {
+      "totalCharges": "Monthly Total",
+      "currentRewards": "Current Rewards",
+      "potentialRewards": "Potential Rewards",
+      "monthlySavings": "Monthly Savings",
+      "yearlySavings": "That's {{amount}}/year!"
+    },
+    "sections": {
+      "needsOptimization": "Needs Optimization",
+      "optimized": "Already Optimized"
+    },
+    "card": {
+      "current": "Current",
+      "optimal": "Use",
+      "savings": "+{{amount}}/mo"
+    },
+    "empty": {
+      "title": "No Recurring Charges",
+      "description": "Add your subscriptions to see which cards earn the most",
+      "cta": "Add Subscription"
+    }
+  },
+  "annualFee": {
+    "title": "Annual Fees",
+    "subtitle": "Are your cards worth keeping?",
+    "summary": {
+      "totalFees": "Total Annual Fees",
+      "rewardsEarned": "Est. Rewards Earned",
+      "netValue": "Net Value",
+      "worthKeeping": "{{count}} worth keeping",
+      "needsReview": "{{count}} to review"
+    },
+    "upcomingRenewals": "Upcoming Renewals",
+    "allCardsWithFees": "All Cards with Fees",
+    "card": {
+      "fee": "{{amount}}/year",
+      "renewsIn": "Renews in {{days}} days",
+      "renewsOn": "Renews {{date}}",
+      "renewalUnknown": "Set renewal date",
+      "earned": "~{{amount}} earned",
+      "netValue": "Net: {{amount}}",
+      "setOpenDate": "Set Card Open Date"
+    },
+    "worth": {
+      "yes": "Worth Keeping",
+      "maybe": "Review Needed",
+      "no": "Consider Canceling",
+      "reasonPositive": "Rewards exceed fee",
+      "reasonBreakeven": "Close to break-even",
+      "reasonNegative": "Fee exceeds rewards"
+    },
+    "noFeeCards": "No cards with annual fees",
+    "renewalAlert": "{{card}} renewal in {{days}} days"
+  },
+  "redemption": {
+    "title": "Redemption Guide",
+    "subtitle": "Maximize your point value",
+    "cppLabel": "Cents per Point",
+    "directRate": "Direct Redemption",
+    "optimalRate": "Optimal Value",
+    "optimalMethod": "Best Method",
+    "transferPartners": "Transfer Partners",
+    "otherRedemptions": "Other Redemptions",
+    "partner": {
+      "ratio": "{{ratio}}:1",
+      "instant": "Instant",
+      "time": "{{time}} transfer",
+      "sweetSpots": "Sweet Spots",
+      "viewSweetSpots": "View deals"
+    },
+    "options": {
+      "portal": "Travel Portal",
+      "statement": "Statement Credit",
+      "giftCard": "Gift Cards",
+      "merchandise": "Merchandise"
+    },
+    "rating": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "poor": "Poor"
+    }
+  },
+  "recommendations": {
+    "title": "Card Recommendations",
+    "subtitle": "Cards that match your spending",
+    "analysis": {
+      "topCategories": "Your Top Categories",
+      "gapsFound": "{{count}} categories could be optimized",
+      "potentialGain": "+{{amount}}/year potential"
+    },
+    "card": {
+      "reason": "Why this card?",
+      "basedOn": {
+        "spending": "Based on your spending",
+        "gap": "Great for this spending category",
+        "upgrade": "Upgrade from your current card",
+        "signup_bonus": "Great sign-up bonus"
+      },
+      "estimatedRewards": "~{{amount}}/year",
+      "signupBonus": "{{amount}} bonus",
+      "apply": "Learn More",
+      "applyAffiliate": "Apply Now"
+    },
+    "refresh": "Refresh Recommendations",
+    "disclaimer": "Card details may change. Verify terms before applying.",
+    "empty": {
+      "title": "Need More Data",
+      "description": "Log some purchases to get personalized recommendations"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "filters": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "types": {
+      "sub_deadline": "Bonus Deadline",
+      "fee_renewal": "Fee Renewal",
+      "bonus_category": "Bonus Category",
+      "monthly_report": "Monthly Report",
+      "new_card_offer": "New Offer",
+      "spending_alert": "Spending Alert",
+      "general": "General"
+    },
+    "empty": {
+      "title": "No Notifications",
+      "unread": "All caught up!",
+      "all": "You have no notifications"
+    }
+  },
+  "savingsReport": {
+    "title": "Monthly Savings Report",
+    "shareReport": "Share Report",
+    "optimizationScore": "Optimization Score",
+    "totalSpent": "Total Spent",
+    "earned": "Earned",
+    "missed": "Missed",
+    "bestPerformer": "Best Performer",
+    "underperformer": "Underperformer",
+    "categoryBreakdown": "Category Breakdown",
+    "pastReports": "Past Reports",
+    "scoreRating": {
+      "excellent": "Excellent!",
+      "good": "Good!",
+      "needsWork": "Needs Work",
+      "improve": "Lots of room to improve"
+    },
+    "empty": {
+      "title": "No Report Available",
+      "description": "Log some purchases to generate your first monthly report"
+    }
   }
 }

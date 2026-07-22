@@ -13,8 +13,60 @@ import {
 import { getAllStores } from '../../StoreDataService';
 import { SpendingCategory, RewardType, Card, UserCard, UserPreferences } from '../../../types';
 
+// Mock cards for testing when database is not available
+const mockCards: Card[] = [
+  {
+    id: 'mock-cashback-1',
+    name: 'Mock Cashback Card',
+    issuer: 'Mock Bank',
+    rewardProgram: 'Cash Back',
+    annualFee: 0,
+    baseRewardRate: { value: 1, type: RewardType.CASHBACK, unit: 'percent' },
+    categoryRewards: [
+      {
+        category: SpendingCategory.GROCERIES,
+        rewardRate: { value: 3, type: RewardType.CASHBACK, unit: 'percent' },
+      },
+    ],
+  },
+  {
+    id: 'mock-points-1',
+    name: 'Mock Points Card',
+    issuer: 'Mock Bank',
+    rewardProgram: 'Points',
+    annualFee: 100,
+    baseRewardRate: { value: 1, type: RewardType.POINTS, unit: 'multiplier' },
+    categoryRewards: [
+      {
+        category: SpendingCategory.DINING,
+        rewardRate: { value: 5, type: RewardType.POINTS, unit: 'multiplier' },
+      },
+    ],
+  },
+  {
+    id: 'mock-miles-1',
+    name: 'Mock Miles Card',
+    issuer: 'Mock Bank',
+    rewardProgram: 'Miles',
+    annualFee: 150,
+    baseRewardRate: { value: 1.5, type: RewardType.AIRLINE_MILES, unit: 'multiplier' },
+    categoryRewards: [
+      {
+        category: SpendingCategory.TRAVEL,
+        rewardRate: { value: 3, type: RewardType.AIRLINE_MILES, unit: 'multiplier' },
+      },
+    ],
+  },
+];
+
+// Get cards from cache if available, otherwise use mock cards
+const getTestCards = (): Card[] => {
+  const cards = getAllCardsSync();
+  return cards.length > 0 ? cards : mockCards;
+};
+
 // Get all cards, stores, and categories for testing
-const allCards = getAllCardsSync();
+const allCards = getTestCards();
 const allStores = getAllStores();
 const allCategories = Object.values(SpendingCategory);
 const allRewardTypes = Object.values(RewardType);
@@ -104,7 +156,6 @@ describe('Property 8: New Card Suggestions Are Superior', () => {
   });
 });
 
-
 describe('Property 9: No Suggestions When Optimal', () => {
   /**
    * Feature: rewards-optimizer, Property 9: No Suggestions When Optimal
@@ -179,7 +230,6 @@ describe('Property 9: No Suggestions When Optimal', () => {
     );
   });
 });
-
 
 describe('Property 10: New Card Toggle Control', () => {
   /**
@@ -257,7 +307,6 @@ describe('Property 10: New Card Toggle Control', () => {
     );
   });
 });
-
 
 describe('Property 2: Card Removal Excludes from Recommendations', () => {
   /**

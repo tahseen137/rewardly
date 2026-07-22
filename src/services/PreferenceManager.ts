@@ -1,47 +1,98 @@
 /**
- * PreferenceManager - Handles user preferences including reward type selection
+ * PreferenceManager - Handles user preferences
  * Uses AsyncStorage for persistence
+ * Extended for country support
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { RewardType } from '../types';
+import { NativeModules, Platform } from 'react-native';
 
-const REWARD_TYPE_STORAGE_KEY = '@rewards_optimizer/reward_type_preference';
 const NEW_CARD_SUGGESTIONS_STORAGE_KEY = '@rewards_optimizer/new_card_suggestions_enabled';
 const LANGUAGE_STORAGE_KEY = '@rewards_optimizer/language';
+const COUNTRY_STORAGE_KEY = '@rewards_optimizer/country';
+const ONBOARDING_COMPLETE_KEY = '@rewards_optimizer/onboarding_complete';
 
 export type Language = 'en' | 'fr';
+export type Country = 'US' | 'CA';
 
 /**
  * In-memory cache of preferences for synchronous operations
  */
-let rewardTypeCache: RewardType | null = null;
 let newCardSuggestionsCache: boolean | null = null;
 let languageCache: Language | null = null;
+let countryCache: Country | null = null;
+let onboardingCompleteCache: boolean | null = null;
 
 /**
  * Default values for preferences
  */
-const DEFAULT_REWARD_TYPE = RewardType.CASHBACK;
 const DEFAULT_NEW_CARD_SUGGESTIONS = true;
 const DEFAULT_LANGUAGE: Language = 'en';
+const DEFAULT_COUNTRY: Country = 'US';
+
+/**
+ * Detect country from device locale
+ * Uses device region settings to determine default country
+ */
+function detectCountryFromLocale(): Country {
+  try {
+    // Web defaults to CA since the app is marketed as "Canada's #1 Rewards Optimizer"
+    // Most Canadian users have en-US browser locale, so locale detection is unreliable on web
+    if (Platform.OS === 'web') {
+      // Web defaults to CA since the app is marketed as "Canada's #1 Rewards Optimizer"
+      // Most Canadian users have en-US browser locale, so locale detection is unreliable
+      // Only return US if we find an EXPLICIT US locale (not en-US which is the default everywhere)
+      if (typeof navigator !== 'undefined') {
+        const languages = navigator.languages || [navigator.language || 'en-US'];
+        for (const lang of languages) {
+          const parts = lang.replace('_', '-').split('-');
+          const code = parts.length > 1 ? parts[1].toUpperCase() : '';
+          // Only detect CA explicitly — en-US is too common to be reliable
+          if (code === 'CA') return 'CA';
+        }
+      }
+      // Default to CA on web — our primary market
+      // Canadian users almost always have en-US as their browser locale
+      return 'CA';
+    }
+
+    let locale = 'en-US';
+
+    if (Platform.OS === 'ios') {
+      locale =
+        NativeModules.SettingsManager?.settings?.AppleLocale ||
+        NativeModules.SettingsManager?.settings?.AppleLanguages?.[0] ||
+        'en-US';
+    } else if (Platform.OS === 'android') {
+      locale = NativeModules.I18nManager?.localeIdentifier || 'en_US';
+    }
+
+    // Extract country code from locale (e.g., "en-CA" -> "CA", "en_CA" -> "CA")
+    const parts = locale.replace('_', '-').split('-');
+    const countryCode = parts.length > 1 ? parts[1].toUpperCase() : '';
+
+    if (countryCode === 'CA') {
+      return 'CA';
+    }
+
+    return 'US';
+  } catch {
+    return 'CA'; // Default to CA — our primary market
+  }
+}
 
 /**
  * Initialize the preference manager by loading data from storage
  */
 export async function initializePreferences(): Promise<void> {
   try {
-    const [storedRewardType, storedNewCardSuggestions, storedLanguage] = await Promise.all([
-      AsyncStorage.getItem(REWARD_TYPE_STORAGE_KEY),
-      AsyncStorage.getItem(NEW_CARD_SUGGESTIONS_STORAGE_KEY),
-      AsyncStorage.getItem(LANGUAGE_STORAGE_KEY),
-    ]);
-
-    if (storedRewardType && isValidRewardType(storedRewardType)) {
-      rewardTypeCache = storedRewardType as RewardType;
-    } else {
-      rewardTypeCache = DEFAULT_REWARD_TYPE;
-    }
+    const [storedNewCardSuggestions, storedLanguage, storedCountry, storedOnboarding] =
+      await Promise.all([
+        AsyncStorage.getItem(NEW_CARD_SUGGESTIONS_STORAGE_KEY),
+        AsyncStorage.getItem(LANGUAGE_STORAGE_KEY),
+        AsyncStorage.getItem(COUNTRY_STORAGE_KEY),
+        AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY),
+      ]);
 
     if (storedNewCardSuggestions !== null) {
       newCardSuggestionsCache = storedNewCardSuggestions === 'true';
@@ -54,18 +105,26 @@ export async function initializePreferences(): Promise<void> {
     } else {
       languageCache = DEFAULT_LANGUAGE;
     }
+
+    if (storedCountry && isValidCountry(storedCountry)) {
+      countryCache = storedCountry as Country;
+    } else {
+      // Auto-detect on first launch
+      countryCache = detectCountryFromLocale();
+      await AsyncStorage.setItem(COUNTRY_STORAGE_KEY, countryCache);
+    }
+
+    if (storedOnboarding !== null) {
+      onboardingCompleteCache = storedOnboarding === 'true';
+    } else {
+      onboardingCompleteCache = false;
+    }
   } catch {
-    rewardTypeCache = DEFAULT_REWARD_TYPE;
     newCardSuggestionsCache = DEFAULT_NEW_CARD_SUGGESTIONS;
     languageCache = DEFAULT_LANGUAGE;
+    countryCache = detectCountryFromLocale();
+    onboardingCompleteCache = false;
   }
-}
-
-/**
- * Check if a string is a valid RewardType
- */
-function isValidRewardType(value: string): boolean {
-  return Object.values(RewardType).includes(value as RewardType);
 }
 
 /**
@@ -76,23 +135,10 @@ function isValidLanguage(value: string): boolean {
 }
 
 /**
- * Set the user's reward type preference
- * @param type - The reward type to set as preference
+ * Check if a string is a valid Country
  */
-export async function setRewardTypePreference(type: RewardType): Promise<void> {
-  rewardTypeCache = type;
-  await AsyncStorage.setItem(REWARD_TYPE_STORAGE_KEY, type);
-}
-
-/**
- * Get the user's reward type preference
- * @returns The current reward type preference
- */
-export function getRewardTypePreference(): RewardType {
-  if (rewardTypeCache === null) {
-    return DEFAULT_REWARD_TYPE;
-  }
-  return rewardTypeCache;
+function isValidCountry(value: string): boolean {
+  return value === 'US' || value === 'CA';
 }
 
 /**
@@ -136,16 +182,76 @@ export function getLanguage(): Language {
 }
 
 /**
+ * Set the user's country preference
+ * @param country - The country to set ('US' or 'CA')
+ */
+export async function setCountry(country: Country): Promise<void> {
+  countryCache = country;
+  await AsyncStorage.setItem(COUNTRY_STORAGE_KEY, country);
+}
+
+/**
+ * Get the user's country preference
+ * @returns The current country preference
+ */
+export function getCountry(): Country {
+  if (countryCache === null) {
+    return DEFAULT_COUNTRY;
+  }
+  return countryCache;
+}
+
+/**
+ * Get country flag emoji
+ * @param country - Country code
+ * @returns Flag emoji for the country
+ */
+export function getCountryFlag(country: Country): string {
+  return country === 'CA' ? '🇨🇦' : '🇺🇸';
+}
+
+/**
+ * Get country display name
+ * @param country - Country code
+ * @returns Display name for the country
+ */
+export function getCountryName(country: Country): string {
+  return country === 'CA' ? 'Canada' : 'United States';
+}
+
+/**
+ * Set whether onboarding is complete
+ * @param complete - Whether onboarding is complete
+ */
+export async function setOnboardingComplete(complete: boolean): Promise<void> {
+  onboardingCompleteCache = complete;
+  await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, String(complete));
+}
+
+/**
+ * Check if onboarding is complete
+ * @returns Whether onboarding has been completed
+ */
+export function isOnboardingComplete(): boolean {
+  if (onboardingCompleteCache === null) {
+    return false;
+  }
+  return onboardingCompleteCache;
+}
+
+/**
  * Clear all preferences (useful for testing)
  */
 export async function clearPreferences(): Promise<void> {
-  rewardTypeCache = DEFAULT_REWARD_TYPE;
   newCardSuggestionsCache = DEFAULT_NEW_CARD_SUGGESTIONS;
   languageCache = DEFAULT_LANGUAGE;
+  countryCache = DEFAULT_COUNTRY;
+  onboardingCompleteCache = false;
   await Promise.all([
-    AsyncStorage.removeItem(REWARD_TYPE_STORAGE_KEY),
     AsyncStorage.removeItem(NEW_CARD_SUGGESTIONS_STORAGE_KEY),
     AsyncStorage.removeItem(LANGUAGE_STORAGE_KEY),
+    AsyncStorage.removeItem(COUNTRY_STORAGE_KEY),
+    AsyncStorage.removeItem(ONBOARDING_COMPLETE_KEY),
   ]);
 }
 
@@ -153,7 +259,31 @@ export async function clearPreferences(): Promise<void> {
  * Reset the in-memory cache (useful for testing)
  */
 export function resetPreferenceCache(): void {
-  rewardTypeCache = null;
   newCardSuggestionsCache = null;
   languageCache = null;
+  countryCache = null;
+  onboardingCompleteCache = null;
+}
+
+/**
+ * Get all user preferences as an object
+ * @returns UserPreferences object with all preference values
+ */
+export async function getPreferences(): Promise<{
+  rewardType: 'POINTS' | 'CASHBACK';
+  newCardSuggestionsEnabled: boolean;
+  language: Language;
+  country: Country;
+}> {
+  // Ensure preferences are initialized
+  if (newCardSuggestionsCache === null) {
+    await initializePreferences();
+  }
+
+  return {
+    rewardType: 'POINTS', // Default to points, could be made configurable later
+    newCardSuggestionsEnabled: isNewCardSuggestionsEnabled(),
+    language: getLanguage(),
+    country: getCountry(),
+  };
 }

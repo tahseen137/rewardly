@@ -18,4 +18,8 @@ export type {
   SpendingCategoryInsert,
   SpendingCategoryUpdate,
   CardWithRelations,
+  RewardProgramRow,
+  PointValuationRow,
+  CardWithProgramDetails,
+  RedemptionOption,
 } from './types';

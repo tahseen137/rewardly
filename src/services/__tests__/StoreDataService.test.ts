@@ -4,12 +4,7 @@
  * Validates: Requirements 2.1 (store identification)
  */
 
-import {
-  getAllStores,
-  findStore,
-  searchStores,
-  getStoreCategory,
-} from '../StoreDataService';
+import { getAllStores, findStore, searchStores, getStoreCategory } from '../StoreDataService';
 import { SpendingCategory } from '../../types';
 
 describe('StoreDataService', () => {
@@ -198,7 +193,7 @@ describe('StoreDataService', () => {
   describe('edge cases', () => {
     it('should handle unicode characters gracefully', () => {
       // Test with accented characters
-      const store = findStore('Café');
+      const _store = findStore('Café');
       // Should not throw, may or may not find a match
       expect(() => findStore('Café')).not.toThrow();
     });

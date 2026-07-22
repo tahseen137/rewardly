@@ -1,9 +1,10 @@
 /**
  * MyCardsScreen - Display and manage user's card portfolio
+ * Redesigned to match web with lucide icons and modern card styling
  * Requirements: 1.1, 1.2, 1.3
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,41 +15,206 @@ import {
   TextInput,
   Alert,
   RefreshControl,
+  Platform,
 } from 'react-native';
-
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  runOnJS,
+} from 'react-native-reanimated';
+import { Plus, Search, Trash2, ChevronRight, Wallet, TrendingUp, Edit3 } from 'lucide-react-native';
+import { RewardsIQScore } from '../types/rewards-iq';
+import { calculateRewardsIQ } from '../services/RewardsIQService';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { colors } from '../theme/colors';
+import { borderRadius } from '../theme/borders';
 import { Card, UserCard, RewardType } from '../types';
 import {
   getCards,
   addCard,
   removeCard,
   initializePortfolio,
+  updatePointBalance,
 } from '../services/CardPortfolioManager';
-import { getAllCardsSync, getCardByIdSync, searchCardsSync } from '../services/CardDataService';
+import { getAllCards, searchCards, getCardByIdSync } from '../services/CardDataService';
+import { getCurrentTierSync, getCardLimitSync } from '../services/SubscriptionService';
+import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
+import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
+import { RootStackParamList } from '../navigation/AppNavigator';
+import { formatUpToRate, formatBestForCategories } from '../utils/rewardFormatUtils';
 
-/**
- * Format reward rate for display
- */
-function formatRewardRate(value: number, type: RewardType, unit: 'percent' | 'multiplier'): string {
+function _formatRewardRate(
+  value: number,
+  type: RewardType,
+  unit: 'percent' | 'multiplier'
+): string {
   if (unit === 'percent') {
     return `${value}% ${type === RewardType.CASHBACK ? 'cash back' : type.replace('_', ' ')}`;
   }
   return `${value}x ${type.replace('_', ' ')}`;
 }
 
-/**
- * Card item component for the portfolio list
- */
+function formatNumber(num: number): string {
+  return new Intl.NumberFormat('en-US').format(num);
+}
+
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  }).format(amount);
+}
+
+// Portfolio Summary Component
+function PortfolioSummary({ portfolio }: { portfolio: UserCard[] }) {
+  const totalPoints = portfolio.reduce((sum, uc) => sum + (uc.pointBalance || 0), 0);
+
+  // Calculate estimated value (rough estimate using 1.5 cents average)
+  const estimatedValue = totalPoints * 0.015;
+
+  const cardsWithBalance = portfolio.filter((uc) => uc.pointBalance && uc.pointBalance > 0).length;
+
+  if (totalPoints === 0) return null;
+
+  return (
+    <View style={summaryStyles.container}>
+      <LinearGradient
+        colors={[colors.primary.main + '20', colors.accent.main + '15']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={summaryStyles.gradient}
+      >
+        <View style={summaryStyles.content}>
+          <View style={summaryStyles.iconContainer}>
+            <Wallet size={24} color={colors.primary.main} />
+          </View>
+          <View style={summaryStyles.stats}>
+            <Text style={summaryStyles.pointsValue}>{formatNumber(totalPoints)}</Text>
+            <Text style={summaryStyles.pointsLabel}>Total Points</Text>
+          </View>
+          <View style={summaryStyles.divider} />
+          <View style={summaryStyles.stats}>
+            <View style={summaryStyles.valueRow}>
+              <TrendingUp size={14} color={colors.primary.main} />
+              <Text style={summaryStyles.estimatedValue}>{formatCurrency(estimatedValue)}</Text>
+            </View>
+            <Text style={summaryStyles.valueLabel}>Est. Value</Text>
+          </View>
+        </View>
+        <Text style={summaryStyles.footer}>
+          {cardsWithBalance} card{cardsWithBalance !== 1 ? 's' : ''} with tracked balances
+        </Text>
+      </LinearGradient>
+    </View>
+  );
+}
+
+const summaryStyles = StyleSheet.create({
+  container: {
+    marginBottom: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  gradient: {
+    padding: 16,
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: colors.primary.main + '20',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  stats: {
+    flex: 1,
+  },
+  pointsValue: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: colors.text.primary,
+  },
+  pointsLabel: {
+    fontSize: 12,
+    color: colors.text.secondary,
+    marginTop: 2,
+  },
+  divider: {
+    width: 1,
+    height: 36,
+    backgroundColor: colors.border.light,
+    marginHorizontal: 12,
+  },
+  valueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  estimatedValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.primary.main,
+  },
+  valueLabel: {
+    fontSize: 12,
+    color: colors.text.secondary,
+    marginTop: 2,
+  },
+  footer: {
+    fontSize: 11,
+    color: colors.text.tertiary,
+    marginTop: 12,
+    textAlign: 'center',
+  },
+});
+
 function CardItem({
   userCard,
   onRemove,
+  onViewDetails,
+  onUpdateBalance,
 }: {
   userCard: UserCard;
   onRemove: (cardId: string) => void;
+  onViewDetails: (card: Card) => void;
+  onUpdateBalance: (cardId: string, currentBalance?: number) => void;
 }) {
   const card = getCardByIdSync(userCard.cardId);
 
+  // Show placeholder for cards not in current country's cache
+  // This can happen if user switches country but has cards from another country
   if (!card) {
-    return null;
+    return (
+      <View style={styles.cardItemContainer}>
+        <View style={styles.cardItem}>
+          <View style={[styles.issuerBadge, { backgroundColor: colors.background.tertiary }]}>
+            <Text style={styles.issuerText}>??</Text>
+          </View>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardName}>Card not available</Text>
+            <Text style={styles.cardMeta}>This card may be from another country</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => onRemove(userCard.cardId)}
+            accessibilityLabel="Remove card"
+            accessibilityRole="button"
+          >
+            <Trash2 size={18} color={colors.text.secondary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
   }
 
   const formatAnnualFee = (fee?: number) => {
@@ -56,40 +222,183 @@ function CardItem({
     return `$${fee}/year`;
   };
 
-  return (
+  // Web-compatible card item without gesture handler
+  // Gesture handler has issues on web with Modal, so we use a simpler implementation
+  const cardContent = (
     <View style={styles.cardItem}>
-      <View style={styles.cardInfo}>
-        <Text style={styles.cardName}>{card.name}</Text>
-        <Text style={styles.cardIssuer}>{card.issuer}</Text>
-        <Text style={styles.cardAnnualFee}>{formatAnnualFee(card.annualFee)}</Text>
-        <Text style={styles.cardReward}>
-          Base: {formatRewardRate(
-            card.baseRewardRate.value,
-            card.baseRewardRate.type,
-            card.baseRewardRate.unit
-          )}
-        </Text>
-        {card.categoryRewards.length > 0 && (
-          <Text style={styles.cardCategories}>
-            Bonus categories: {card.categoryRewards.map((cr) => cr.category).join(', ')}
-          </Text>
-        )}
-      </View>
+      {/* Issuer Badge with Gradient */}
+      <LinearGradient
+        colors={[colors.primary.main + '4D', colors.accent.main + '4D']} // 30% opacity (~4D in hex)
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.issuerBadge}
+      >
+        <Text style={styles.issuerText}>{card.issuer.slice(0, 2).toUpperCase()}</Text>
+      </LinearGradient>
+
+      {/* Card Info - Tappable */}
       <TouchableOpacity
-        style={styles.removeButton}
+        style={styles.cardInfo}
+        onPress={() => onViewDetails(card)}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.cardName}>{card.name}</Text>
+        <Text style={styles.cardMeta}>
+          {card.issuer} • {formatAnnualFee(card.annualFee)}
+        </Text>
+        {/* Point Balance Display */}
+        {userCard.pointBalance !== undefined && userCard.pointBalance > 0 ? (
+          <View style={styles.balanceRow}>
+            <Wallet size={12} color={colors.primary.main} />
+            <Text style={styles.balanceText}>{formatNumber(userCard.pointBalance)} pts</Text>
+          </View>
+        ) : null}
+      </TouchableOpacity>
+
+      {/* Balance Edit Button */}
+      <TouchableOpacity
+        style={styles.balanceEditButton}
+        onPress={() => onUpdateBalance(card.id, userCard.pointBalance)}
+        accessibilityLabel={`Edit balance for ${card.name}`}
+        accessibilityRole="button"
+      >
+        <Edit3 size={16} color={colors.text.tertiary} />
+      </TouchableOpacity>
+
+      {/* Delete Button */}
+      <TouchableOpacity
+        style={styles.deleteButton}
         onPress={() => onRemove(card.id)}
         accessibilityLabel={`Remove ${card.name}`}
         accessibilityRole="button"
       >
-        <Text style={styles.removeButtonText}>✕</Text>
+        <Trash2 size={18} color={colors.text.secondary} />
       </TouchableOpacity>
+
+      {/* Chevron */}
+      <ChevronRight size={18} color={colors.text.tertiary} />
+    </View>
+  );
+
+  // On native, wrap with gesture handler for swipe-to-delete
+  // On web, skip gesture handler to avoid React hook errors
+  if (Platform.OS === 'web') {
+    return <View style={styles.cardItemContainer}>{cardContent}</View>;
+  }
+
+  // Native implementation with gesture handler
+  return (
+    <CardItemWithGesture
+      userCard={userCard}
+      onRemove={onRemove}
+      onViewDetails={onViewDetails}
+      onUpdateBalance={onUpdateBalance}
+      card={card}
+    />
+  );
+}
+
+// Native-only component with gesture handler
+function CardItemWithGesture({
+  userCard,
+  onRemove,
+  onViewDetails,
+  onUpdateBalance,
+  card,
+}: {
+  userCard: UserCard;
+  onRemove: (cardId: string) => void;
+  onViewDetails: (card: Card) => void;
+  onUpdateBalance: (cardId: string, currentBalance?: number) => void;
+  card: Card;
+}) {
+  const translateX = useSharedValue(0);
+
+  const formatAnnualFee = (fee?: number) => {
+    if (fee === undefined || fee === 0) return 'No annual fee';
+    return `$${fee}/year`;
+  };
+
+  const panGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      translateX.value = Math.min(0, event.translationX);
+    })
+    .onEnd(() => {
+      if (translateX.value < -80) {
+        runOnJS(onRemove)(card.id);
+      } else {
+        translateX.value = withSpring(0);
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
+
+  return (
+    <View style={styles.cardItemContainer}>
+      <View style={styles.deleteBackground}>
+        <Trash2 size={20} color={colors.error.main} />
+      </View>
+      <GestureDetector gesture={panGesture}>
+        <Animated.View style={[styles.cardItem, animatedStyle]}>
+          {/* Issuer Badge with Gradient */}
+          <LinearGradient
+            colors={[colors.primary.main + '4D', colors.accent.main + '4D']} // 30% opacity (~4D in hex)
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.issuerBadge}
+          >
+            <Text style={styles.issuerText}>{card.issuer.slice(0, 2).toUpperCase()}</Text>
+          </LinearGradient>
+
+          {/* Card Info - Tappable */}
+          <TouchableOpacity
+            style={styles.cardInfo}
+            onPress={() => onViewDetails(card)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.cardName}>{card.name}</Text>
+            <Text style={styles.cardMeta}>
+              {card.issuer} • {formatAnnualFee(card.annualFee)}
+            </Text>
+            {/* Point Balance Display */}
+            {userCard.pointBalance !== undefined && userCard.pointBalance > 0 ? (
+              <View style={styles.balanceRow}>
+                <Wallet size={12} color={colors.primary.main} />
+                <Text style={styles.balanceText}>{formatNumber(userCard.pointBalance)} pts</Text>
+              </View>
+            ) : null}
+          </TouchableOpacity>
+
+          {/* Balance Edit Button */}
+          <TouchableOpacity
+            style={styles.balanceEditButton}
+            onPress={() => onUpdateBalance(card.id, userCard.pointBalance)}
+            accessibilityLabel={`Edit balance for ${card.name}`}
+            accessibilityRole="button"
+          >
+            <Edit3 size={16} color={colors.text.tertiary} />
+          </TouchableOpacity>
+
+          {/* Delete Button */}
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => onRemove(card.id)}
+            accessibilityLabel={`Remove ${card.name}`}
+            accessibilityRole="button"
+          >
+            <Trash2 size={18} color={colors.text.secondary} />
+          </TouchableOpacity>
+
+          {/* Chevron */}
+          <ChevronRight size={18} color={colors.text.tertiary} />
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 }
 
-/**
- * Card picker item for the add card modal
- */
 function CardPickerItem({
   card,
   isOwned,
@@ -123,12 +432,16 @@ function CardPickerItem({
           {formatAnnualFee(card.annualFee)}
         </Text>
         <Text style={[styles.pickerItemReward, isOwned && styles.pickerItemTextDisabled]}>
-          {formatRewardRate(
-            card.baseRewardRate.value,
-            card.baseRewardRate.type,
-            card.baseRewardRate.unit
-          )}
+          {formatUpToRate(card)}
         </Text>
+        {(() => {
+          const bestFor = formatBestForCategories(card, 3);
+          return bestFor ? (
+            <Text style={[styles.pickerItemBestFor, isOwned && styles.pickerItemTextDisabled]}>
+              {bestFor}
+            </Text>
+          ) : null;
+        })()}
       </View>
       {isOwned && <Text style={styles.ownedBadge}>Owned</Text>}
     </TouchableOpacity>
@@ -136,19 +449,79 @@ function CardPickerItem({
 }
 
 export default function MyCardsScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   const [portfolio, setPortfolio] = useState<UserCard[]>([]);
+  const [rewardsIQ, setRewardsIQ] = useState<RewardsIQScore | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [portfolioSearchQuery, setPortfolioSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [availableCards, setAvailableCards] = useState<Card[]>([]);
+  const [isLoadingCards, setIsLoadingCards] = useState(false);
+  // Navigate to CardDetail when a card is tapped
+  const handleViewDetails = useCallback(
+    (card: Card) => {
+      (navigation as any).navigate('CardDetail', { cardId: card.id });
+    },
+    [navigation]
+  );
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const loadPortfolio = useCallback(async () => {
+    // Ensure card cache is populated before loading portfolio
+    // This fixes the race condition where portfolio loads before cards are cached
+    await getAllCards();
     await initializePortfolio();
     setPortfolio(getCards());
+    setIsInitialLoading(false);
   }, []);
+
+  const loadAvailableCards = useCallback(async () => {
+    setIsLoadingCards(true);
+    try {
+      const cards = searchQuery ? await searchCards(searchQuery) : await getAllCards();
+      setAvailableCards(cards);
+    } catch (error) {
+      console.error('Failed to load cards:', error);
+      setAvailableCards([]);
+    } finally {
+      setIsLoadingCards(false);
+    }
+  }, [searchQuery]);
+
+  // Filter portfolio based on search
+  const filteredPortfolio = useMemo(() => {
+    if (!portfolioSearchQuery.trim()) return portfolio;
+    const query = portfolioSearchQuery.toLowerCase();
+    return portfolio.filter((userCard) => {
+      const card = getCardByIdSync(userCard.cardId);
+      if (!card) return false;
+      return card.name.toLowerCase().includes(query) || card.issuer.toLowerCase().includes(query);
+    });
+  }, [portfolio, portfolioSearchQuery]);
 
   useEffect(() => {
     loadPortfolio();
   }, [loadPortfolio]);
+
+  useEffect(() => {
+    calculateRewardsIQ()
+      .then(setRewardsIQ)
+      .catch(() => {});
+  }, []);
+
+  // Re-load when country changes so card lookups resolve correctly
+  useEffect(() => {
+    const unsubscribe = CountryChangeEmitter.subscribe(() => {
+      loadPortfolio();
+    });
+    return unsubscribe;
+  }, [loadPortfolio]);
+
+  useEffect(() => {
+    if (isModalVisible) loadAvailableCards();
+  }, [isModalVisible, loadAvailableCards]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -159,46 +532,210 @@ export default function MyCardsScreen() {
   const handleAddCard = async (cardId: string) => {
     const result = await addCard(cardId);
     if (result.success) {
-      setPortfolio(getCards());
+      const updatedPortfolio = getCards();
+      setPortfolio(updatedPortfolio);
+      AchievementEventEmitter.track('card_added', { cardCount: updatedPortfolio.length });
       setIsModalVisible(false);
       setSearchQuery('');
     } else {
-      if (result.error.type === 'DUPLICATE_CARD') {
-        Alert.alert('Duplicate Card', `${result.error.cardName} is already in your portfolio.`);
+      // Handle different error types
+      if (result.error.type === 'LIMIT_REACHED') {
+        // Show upgrade prompt for card limit reached
+        if (Platform.OS === 'web') {
+          // On web, navigate directly to Upgrade (nicer UX than browser confirm dialog)
+          setIsModalVisible(false);
+          navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards_limit' });
+        } else {
+          Alert.alert('Card Limit Reached', result.error.message, [
+            { text: 'Maybe Later', style: 'cancel' },
+            {
+              text: 'Upgrade to Pro',
+              onPress: () => {
+                setIsModalVisible(false);
+                navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards' });
+              },
+            },
+          ]);
+        }
+      } else if (result.error.type === 'DUPLICATE_CARD') {
+        if (Platform.OS === 'web') {
+          window.alert(`${result.error.cardName} is already in your portfolio.`);
+        } else {
+          Alert.alert('Duplicate Card', `${result.error.cardName} is already in your portfolio.`);
+        }
+      } else if (result.error.type === 'CARD_NOT_FOUND') {
+        if (Platform.OS === 'web') {
+          window.alert('The selected card could not be found.');
+        } else {
+          Alert.alert('Card Not Found', 'The selected card could not be found.');
+        }
       } else {
-        Alert.alert('Error', 'Failed to add card. Please try again.');
+        if (Platform.OS === 'web') {
+          window.alert('Failed to add card. Please try again.');
+        } else {
+          Alert.alert('Error', 'Failed to add card. Please try again.');
+        }
       }
     }
   };
 
   const handleRemoveCard = (cardId: string) => {
     const card = getCardByIdSync(cardId);
-    Alert.alert(
-      'Remove Card',
-      `Are you sure you want to remove ${card?.name || 'this card'} from your portfolio?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            const result = await removeCard(cardId);
-            if (result.success) {
-              setPortfolio(getCards());
-            } else {
-              Alert.alert('Error', 'Failed to remove card. Please try again.');
-            }
+    const cardName = card?.name || 'this card';
+
+    if (typeof window !== 'undefined' && window.confirm) {
+      if (window.confirm(`Are you sure you want to remove ${cardName} from your portfolio?`)) {
+        removeCard(cardId).then((result) => {
+          if (result.success) setPortfolio(getCards());
+          else alert('Failed to remove card. Please try again.');
+        });
+      }
+    } else {
+      Alert.alert(
+        'Remove Card',
+        `Are you sure you want to remove ${cardName} from your portfolio?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Remove',
+            style: 'destructive',
+            onPress: async () => {
+              const result = await removeCard(cardId);
+              if (result.success) setPortfolio(getCards());
+              else Alert.alert('Error', 'Failed to remove card. Please try again.');
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
+  const handleUpdateBalance = useCallback((cardId: string, currentBalance?: number) => {
+    const card = getCardByIdSync(cardId);
+    const cardName = card?.name || 'this card';
+
+    // Use a simple prompt for balance input
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      const input = window.prompt(
+        `Enter point balance for ${cardName}:`,
+        currentBalance?.toString() || ''
+      );
+      if (input !== null) {
+        const newBalance = input.trim() === '' ? undefined : parseInt(input.replace(/,/g, ''), 10);
+        if (newBalance === undefined || (!isNaN(newBalance) && newBalance >= 0)) {
+          updatePointBalance(cardId, newBalance).then((result) => {
+            if (result.success) {
+              setPortfolio(getCards());
+            }
+          });
+        } else {
+          alert('Please enter a valid number');
+        }
+      }
+    } else {
+      Alert.prompt(
+        'Update Balance',
+        `Enter point balance for ${cardName}:`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Clear',
+            style: 'destructive',
+            onPress: () => {
+              updatePointBalance(cardId, undefined).then((result) => {
+                if (result.success) setPortfolio(getCards());
+              });
+            },
+          },
+          {
+            text: 'Save',
+            onPress: (value?: string) => {
+              const newBalance =
+                value?.trim() === '' ? undefined : parseInt(value?.replace(/,/g, '') || '0', 10);
+              if (newBalance === undefined || (!isNaN(newBalance) && newBalance >= 0)) {
+                updatePointBalance(cardId, newBalance).then((result) => {
+                  if (result.success) setPortfolio(getCards());
+                });
+              }
+            },
+          },
+        ],
+        'plain-text',
+        currentBalance?.toString() || ''
+      );
+    }
+  }, []);
+
   const ownedCardIds = new Set(portfolio.map((uc) => uc.cardId));
-  const availableCards = searchQuery ? searchCardsSync(searchQuery) : getAllCardsSync();
+
+  // Show loading state while initializing
+  if (isInitialLoading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <Text style={styles.loadingText}>Loading cards...</Text>
+      </View>
+    );
+  }
+
+  // Get subscription tier and limits
+  const tier = getCurrentTierSync();
+  const limit = getCardLimitSync();
+  const showLimit = tier === 'free' && limit !== Infinity;
+  const atLimit = showLimit && portfolio.length >= limit;
 
   return (
     <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerText}>
+          <Text style={styles.title}>My Cards</Text>
+          <View style={styles.subtitleRow}>
+            <Text style={styles.subtitle}>
+              {showLimit
+                ? `Your portfolio · ${portfolio.length} of ${limit} slots`
+                : `Your portfolio · ${portfolio.length} card${portfolio.length !== 1 ? 's' : ''}`}
+            </Text>
+            {atLimit && (
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('Upgrade', {
+                    feature: 'unlimited_cards',
+                    source: 'my_cards_header',
+                  })
+                }
+                hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
+              >
+                <Text style={styles.upgradeLink}>Upgrade for unlimited</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setIsModalVisible(true)}
+          accessibilityLabel="Add card"
+          accessibilityRole="button"
+        >
+          <Plus size={16} color={colors.primary.main} />
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Search */}
+      {portfolio.length > 0 && (
+        <View style={styles.searchContainer}>
+          <Search size={16} color={colors.text.secondary} style={styles.searchIcon} />
+          <TextInput
+            placeholder="Search cards..."
+            value={portfolioSearchQuery}
+            onChangeText={setPortfolioSearchQuery}
+            placeholderTextColor={colors.text.tertiary}
+            style={styles.searchInput}
+          />
+        </View>
+      )}
+
+      {/* Content */}
       {portfolio.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyStateIcon}>💳</Text>
@@ -216,27 +753,57 @@ export default function MyCardsScreen() {
           </TouchableOpacity>
         </View>
       ) : (
-        <>
-          <FlatList
-            data={portfolio}
-            keyExtractor={(item) => item.cardId}
-            renderItem={({ item }) => (
-              <CardItem userCard={item} onRemove={handleRemoveCard} />
-            )}
-            contentContainerStyle={styles.listContent}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          />
-          <TouchableOpacity
-            style={styles.fab}
-            onPress={() => setIsModalVisible(true)}
-            accessibilityLabel="Add a card"
-            accessibilityRole="button"
-          >
-            <Text style={styles.fabText}>+</Text>
-          </TouchableOpacity>
-        </>
+        <FlatList
+          data={filteredPortfolio}
+          keyExtractor={(item) => item.cardId}
+          ListHeaderComponent={
+            <>
+              {rewardsIQ && (
+                <View style={styles.iqCard}>
+                  <Text style={styles.iqOverline}>REWARDS IQ</Text>
+                  <View style={styles.iqScoreRow}>
+                    <Text style={styles.iqScore}>{rewardsIQ.overallScore}</Text>
+                    <Text style={styles.iqScoreMax}>
+                      {' '}
+                      / 100 ·{' '}
+                      {rewardsIQ.overallScore >= 80
+                        ? 'well optimized'
+                        : rewardsIQ.overallScore >= 60
+                          ? 'room to improve'
+                          : 'needs attention'}
+                    </Text>
+                  </View>
+                  <View style={styles.iqProgressBg}>
+                    <View
+                      style={[
+                        styles.iqProgressFill,
+                        { width: `${rewardsIQ.overallScore}%` as any },
+                      ]}
+                    />
+                  </View>
+                </View>
+              )}
+              <PortfolioSummary portfolio={portfolio} />
+            </>
+          }
+          renderItem={({ item }) => (
+            <CardItem
+              userCard={item}
+              onRemove={handleRemoveCard}
+              onUpdateBalance={handleUpdateBalance}
+              onViewDetails={handleViewDetails}
+            />
+          )}
+          contentContainerStyle={styles.listContent}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          ListEmptyComponent={
+            portfolioSearchQuery ? (
+              <View style={styles.emptySearch}>
+                <Text style={styles.emptySearchText}>No cards match your search</Text>
+              </View>
+            ) : null
+          }
+        />
       )}
 
       <Modal
@@ -261,8 +828,9 @@ export default function MyCardsScreen() {
           </View>
 
           <TextInput
-            style={styles.searchInput}
+            style={styles.modalSearchInput}
             placeholder="Search cards..."
+            placeholderTextColor={colors.text.tertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"
@@ -270,89 +838,184 @@ export default function MyCardsScreen() {
             accessibilityLabel="Search cards"
           />
 
-          <FlatList
-            data={availableCards}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <CardPickerItem
-                card={item}
-                isOwned={ownedCardIds.has(item.id)}
-                onSelect={handleAddCard}
-              />
-            )}
-            contentContainerStyle={styles.pickerListContent}
-          />
+          {isLoadingCards ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Loading cards...</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={availableCards}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <CardPickerItem
+                  card={item}
+                  isOwned={ownedCardIds.has(item.id)}
+                  onSelect={handleAddCard}
+                />
+              )}
+              contentContainerStyle={styles.pickerListContent}
+            />
+          )}
         </View>
       </Modal>
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: colors.background.primary,
+    paddingHorizontal: 16,
+    paddingTop: 24,
   },
-  listContent: {
-    padding: 16,
-    paddingBottom: 80,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
   },
-  cardItem: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+  headerText: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: colors.text.primary,
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 13, // text-sm
+    color: colors.text.secondary,
+    marginTop: 2,
+  },
+  subtitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    gap: 8,
+    marginTop: 2,
+  },
+  upgradeLink: {
+    fontSize: 12,
+    color: colors.primary.main,
+    fontWeight: '600',
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: colors.primary.main,
+    borderRadius: 8,
+  },
+  addButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.background.primary, // Dark text on bright green
+  },
+  searchContainer: {
+    position: 'relative',
+    height: 44,
+    backgroundColor: colors.background.tertiary,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 12,
+    marginBottom: 16,
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: 12,
+  },
+  searchInput: {
+    flex: 1,
+    paddingLeft: 32,
+    fontSize: 15,
+    color: colors.text.primary,
+  },
+  listContent: {
+    paddingBottom: 100, // Space for tab bar
+  },
+  // Card Item styles
+  cardItemContainer: {
+    position: 'relative',
+    marginBottom: 8,
+  },
+  deleteBackground: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    paddingRight: 20,
+    width: '100%',
+  },
+  cardItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 16,
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.md, // 12px
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  issuerBadge: {
+    width: 56, // w-14
+    height: 40, // h-10
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  issuerText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.text.primary,
   },
   cardInfo: {
     flex: 1,
   },
   cardName: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#000',
-    marginBottom: 4,
-  },
-  cardIssuer: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  cardReward: {
-    fontSize: 14,
-    color: '#007AFF',
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.text.primary,
     marginBottom: 2,
   },
-  cardAnnualFee: {
-    fontSize: 13,
-    color: '#34C759',
-    marginBottom: 4,
-  },
-  cardCategories: {
+  cardMeta: {
     fontSize: 12,
-    color: '#8E8E93',
+    color: colors.text.secondary,
   },
-  removeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FF3B30',
+  balanceRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 12,
+    gap: 4,
+    marginTop: 4,
   },
-  removeButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  balanceText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.primary.main,
   },
+  balanceEditButton: {
+    padding: 8,
+    marginRight: -4,
+  },
+  deleteButton: {
+    padding: 8,
+  },
+  emptySearch: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptySearchText: {
+    fontSize: 15,
+    color: colors.text.secondary,
+  },
+  // Empty state styles
   emptyState: {
     flex: 1,
     alignItems: 'center',
@@ -364,89 +1027,69 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   emptyStateTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text.primary,
     marginBottom: 8,
   },
   emptyStateText: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 15,
+    color: colors.text.secondary,
     textAlign: 'center',
     marginBottom: 24,
   },
   addButtonLarge: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.primary.main,
     paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 12,
+    paddingVertical: 12,
+    borderRadius: borderRadius.md,
   },
   addButtonLargeText: {
-    color: '#fff',
     fontSize: 17,
     fontWeight: '600',
+    color: colors.background.primary,
   },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#007AFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  fabText: {
-    color: '#fff',
-    fontSize: 28,
-    fontWeight: '400',
-    marginTop: -2,
-  },
+  // Modal styles
   modalContainer: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: colors.background.primary,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
+    borderBottomColor: colors.border.light,
   },
   modalTitle: {
     fontSize: 17,
     fontWeight: '600',
+    color: colors.text.primary,
   },
   modalClose: {
     fontSize: 17,
-    color: '#007AFF',
     fontWeight: '600',
+    color: colors.primary.main,
   },
-  searchInput: {
-    backgroundColor: '#fff',
-    margin: 16,
-    padding: 12,
-    borderRadius: 10,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
+  modalSearchInput: {
+    height: 40,
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: 40,
+    fontSize: 15,
+    color: colors.text.primary,
+    marginHorizontal: 16,
+    marginVertical: 12,
   },
   pickerListContent: {
     paddingHorizontal: 16,
     paddingBottom: 20,
   },
   pickerItem: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 14,
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.md,
+    padding: 12,
     marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
@@ -458,32 +1101,89 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   pickerItemName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '500',
-    color: '#000',
+    color: colors.text.primary,
     marginBottom: 2,
   },
   pickerItemIssuer: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 13,
+    color: colors.text.secondary,
     marginBottom: 2,
   },
   pickerItemReward: {
-    fontSize: 13,
-    color: '#007AFF',
+    fontSize: 11,
+    color: colors.primary.main,
+  },
+  pickerItemBestFor: {
+    fontSize: 11,
+    color: colors.text.secondary,
+    marginTop: 2,
   },
   pickerItemAnnualFee: {
-    fontSize: 12,
-    color: '#34C759',
+    fontSize: 11,
+    color: colors.success.main,
     marginBottom: 2,
   },
   pickerItemTextDisabled: {
-    color: '#8E8E93',
+    color: colors.text.tertiary,
   },
   ownedBadge: {
-    fontSize: 12,
-    color: '#34C759',
+    fontSize: 11,
+    color: colors.success.main,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  loadingText: {
+    fontSize: 15,
+    color: colors.text.secondary,
+  },
+  // Rewards IQ card
+  iqCard: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    padding: 16,
+    marginBottom: 16,
+  },
+  iqOverline: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.text.secondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 10,
+  },
+  iqScoreRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 14,
+  },
+  iqScore: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: colors.primary.main,
+    fontVariant: ['tabular-nums'],
+  },
+  iqScoreMax: {
+    fontSize: 13,
+    color: colors.text.secondary,
+  },
+  iqProgressBg: {
+    height: 6,
+    borderRadius: 99,
+    backgroundColor: colors.background.tertiary,
+  },
+  iqProgressFill: {
+    height: 6,
+    borderRadius: 99,
+    backgroundColor: colors.primary.main,
   },
 });

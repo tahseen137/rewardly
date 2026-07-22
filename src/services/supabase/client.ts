@@ -15,9 +15,7 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
 // Validate configuration
 const isConfigured = Boolean(
-  supabaseUrl &&
-  supabaseAnonKey &&
-  supabaseUrl !== 'https://your-project-id.supabase.co'
+  supabaseUrl && supabaseAnonKey && supabaseUrl !== 'https://your-project-id.supabase.co'
 );
 
 if (!isConfigured) {

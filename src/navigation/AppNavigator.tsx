@@ -465,7 +465,7 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         component={InsightsNavigator}
         options={{
           tabBarLabel: 'Insights',
-          unmountOnBlur: true,
+          freezeOnBlur: false,
         }}
       />
       <Tab.Screen
@@ -480,7 +480,7 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         component={SmartWalletScreenWithErrorBoundary}
         options={{
           tabBarLabel: 'Wallet',
-          unmountOnBlur: true,
+          freezeOnBlur: false,
         }}
       />
       <Tab.Screen
@@ -488,14 +488,14 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         component={MyCardsScreenWithErrorBoundary}
         options={{
           tabBarLabel: 'My Cards',
-          unmountOnBlur: true,
+          freezeOnBlur: false,
         }}
       />
       <Tab.Screen
         name="Settings"
         options={{
           tabBarLabel: 'Settings',
-          unmountOnBlur: true,
+          freezeOnBlur: false,
         }}
       >
         {() => <SettingsScreenWithErrorBoundary onSignOut={onSignOut} onSignIn={onSignIn} />}

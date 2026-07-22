@@ -21,7 +21,11 @@ export type {
 } from './types';
 
 // Category Mapping
-export { googleTypeToCategory, canadianStoreOverrides, getCategoryFromGoogleTypes } from './categoryMapping';
+export {
+  googleTypeToCategory,
+  canadianStoreOverrides,
+  getCategoryFromGoogleTypes,
+} from './categoryMapping';
 
 // Merchant Service
 export {

@@ -33,6 +33,8 @@ yarn-error.*
 # local env files
 .env
 .env*.local
+.env.production
+.env.development
 
 # typescript
 *.tsbuildinfo
@@ -57,3 +59,34 @@ build/
 google-services.json
 GoogleService-Info.plist
 *.keystore
+*.p8
+*.cer
+*.certSigningRequest
+api-key.json
+service-account.json
+apple-api-key.json
+
+# App Store Connect
+AuthKey_*.p8
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Claude Code
+.claude/
+
+# Temporary files
+nul
+*.tmp
+.temp/
+supabase/.temp/
+
+# SQL query files (development only)
+check_data.sql
+.vercel
+coverage/
+
+# Playwright
+playwright-report/
+test-results/
