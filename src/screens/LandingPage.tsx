@@ -539,183 +539,51 @@ const socialStyles = StyleSheet.create({
   },
 });
 
-interface PricingCardProps {
-  tier: string;
-  price: string;
-  period: string;
-  features: string[];
-  highlighted?: boolean;
-  badge?: string;
-  onSelect: () => void;
-}
-
-function PricingCard({
-  tier,
-  price,
-  period,
-  features,
-  highlighted = false,
-  badge,
-  onSelect,
-}: PricingCardProps) {
-  return (
-    <View style={[styles.pricingCard, highlighted && styles.pricingCardHighlighted]}>
-      {badge && (
-        <View style={styles.pricingBadge}>
-          <Text style={styles.pricingBadgeText}>{badge}</Text>
-        </View>
-      )}
-
-      <Text style={styles.pricingTier}>{tier}</Text>
-      <View style={styles.pricingPriceRow}>
-        <Text style={[styles.pricingPrice, highlighted && styles.pricingPriceHighlighted]}>
-          {price}
-        </Text>
-        {period !== '' && <Text style={styles.pricingPeriod}>{period}</Text>}
-      </View>
-
-      <View style={styles.pricingDivider} />
-
-      <View style={styles.pricingFeatures}>
-        {features.map((feature, index) => (
-          <View key={index} style={styles.pricingFeatureRow}>
-            <Check size={16} color={highlighted ? colors.primary.main : colors.text.secondary} />
-            <Text style={styles.pricingFeatureText}>{feature}</Text>
-          </View>
-        ))}
-      </View>
-
-      <TouchableOpacity onPress={onSelect} activeOpacity={0.9}>
-        {highlighted ? (
-          <LinearGradient
-            colors={[colors.primary.main, colors.primary.dark]}
-            style={styles.pricingButton}
-          >
-            <Text style={styles.pricingButtonTextHighlighted}>Get Started</Text>
-          </LinearGradient>
-        ) : (
-          <View style={styles.pricingButtonOutline}>
-            <Text style={styles.pricingButtonText}>Get Started</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-function LifetimeBanner({ onGetStarted }: { onGetStarted: () => void }) {
-  return (
-    <View style={styles.lifetimeBanner}>
-      <LinearGradient colors={['#FFD70015', '#FF8C0008']} style={styles.lifetimeBannerGradient}>
-        <View style={styles.lifetimeBannerBadge}>
-          <Text style={styles.lifetimeBannerBadgeText}>🔥 EARLY ADOPTER SPECIAL</Text>
-        </View>
-        <Text style={styles.lifetimeBannerTitle}>Lifetime Deal</Text>
-        <View style={styles.lifetimeBannerPriceRow}>
-          <Text style={styles.lifetimeBannerPrice}>$49.99</Text>
-          <Text style={styles.lifetimeBannerOnce}> one-time</Text>
-        </View>
-        <Text style={styles.lifetimeBannerDesc}>
-          Get all Premium features forever. No monthly payments. Saves $155+/year.
-        </Text>
-        <View style={styles.lifetimeBannerFeatures}>
-          <View style={styles.pricingFeatureRow}>
-            <Check size={16} color="#FFD700" />
-            <Text style={styles.pricingFeatureText}>Everything in Premium — forever</Text>
-          </View>
-          <View style={styles.pricingFeatureRow}>
-            <Check size={16} color="#FFD700" />
-            <Text style={styles.pricingFeatureText}>Unlimited Sage AI + Smart Wallet</Text>
-          </View>
-          <View style={styles.pricingFeatureRow}>
-            <Check size={16} color="#FFD700" />
-            <Text style={styles.pricingFeatureText}>All future features included</Text>
-          </View>
-          <View style={styles.pricingFeatureRow}>
-            <Check size={16} color="#FFD700" />
-            <Text style={styles.pricingFeatureText}>Pay once, never again</Text>
-          </View>
-        </View>
-        <Text style={styles.lifetimeBannerUrgency}>⏳ Only available for first 100 users</Text>
-        <TouchableOpacity onPress={onGetStarted} activeOpacity={0.9}>
-          <LinearGradient colors={['#FFD700', '#FF8C00']} style={styles.pricingButton}>
-            <Text style={styles.pricingButtonTextHighlighted}>Claim Lifetime Access</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </LinearGradient>
-    </View>
-  );
-}
-
-function PricingSection({ onGetStarted }: { onGetStarted: () => void }) {
-  const plans = [
-    {
-      tier: 'Free',
-      price: '$0',
-      period: '/mo',
-      features: [
-        'Up to 3 cards',
-        'Best card calculator',
-        'Category-based rewards',
-        'Basic card comparison',
-      ],
-      highlighted: false,
-    },
-    {
-      tier: 'Pro',
-      price: '$5.99',
-      period: '/mo',
-      badge: 'Most Popular',
-      features: [
-        'Unlimited cards',
-        'Full Insights dashboard',
-        'Rewards IQ tracking',
-        '10 Sage AI chats/month',
-        'Spending log & reports',
-        'Sign-up bonus tracker',
-      ],
-      highlighted: true,
-    },
-    {
-      tier: 'Premium',
-      price: '$12.99',
-      period: '/mo',
-      features: [
-        'Everything in Pro',
-        'Smart Wallet',
-        'Unlimited Sage AI',
-        'Statement upload & analysis',
-        'Portfolio optimizer',
-        'Multi-country support',
-      ],
-      highlighted: false,
-    },
+function FreePricingSection({ onGetStarted }: { onGetStarted: () => void }) {
+  const features = [
+    'Unlimited cards in your wallet',
+    'Best card calculator for any store',
+    'Full Insights dashboard',
+    'Sage AI — unlimited chats',
+    'Smart Wallet location recommendations',
+    'Statement upload & spending analysis',
+    'Portfolio optimizer & Rewards IQ',
+    'Sign-up bonus tracker',
+    'Multi-country support (CA + US)',
+    'Export reports',
   ];
 
   return (
     <View style={styles.pricingSection}>
       <Text style={styles.sectionLabel}>PRICING</Text>
       <Text style={styles.sectionTitle}>
-        Simple, <Text style={styles.sectionTitleAccent}>Transparent</Text> Pricing
+        100% <Text style={styles.sectionTitleAccent}>Free</Text> — Always
       </Text>
-      <Text style={styles.pricingSublabel}>Start free. Upgrade when you're ready.</Text>
+      <Text style={styles.pricingSublabel}>Every feature. No subscription. No credit card.</Text>
 
-      {/* Lifetime Deal Banner — above the pricing grid */}
-      <LifetimeBanner onGetStarted={onGetStarted} />
-
-      <View style={styles.pricingGrid}>
-        {plans.map((plan) => (
-          <PricingCard
-            key={plan.tier}
-            tier={plan.tier}
-            price={plan.price}
-            period={plan.period}
-            features={plan.features}
-            highlighted={plan.highlighted}
-            badge={plan.badge}
-            onSelect={onGetStarted}
-          />
-        ))}
+      <View style={[styles.pricingCard, styles.pricingCardHighlighted, { marginTop: 24 }]}>
+        <Text style={styles.pricingTier}>Everything Included</Text>
+        <View style={styles.pricingPriceRow}>
+          <Text style={[styles.pricingPrice, styles.pricingPriceHighlighted]}>$0</Text>
+          <Text style={styles.pricingPeriod}>/forever</Text>
+        </View>
+        <View style={styles.pricingDivider} />
+        <View style={styles.pricingFeatures}>
+          {features.map((feature, index) => (
+            <View key={index} style={styles.pricingFeatureRow}>
+              <Check size={16} color={colors.primary.main} />
+              <Text style={styles.pricingFeatureText}>{feature}</Text>
+            </View>
+          ))}
+        </View>
+        <TouchableOpacity onPress={onGetStarted} activeOpacity={0.9}>
+          <LinearGradient
+            colors={[colors.primary.main, colors.primary.dark]}
+            style={styles.pricingButton}
+          >
+            <Text style={styles.pricingButtonTextHighlighted}>Get Started — Free</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -868,7 +736,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
       <FeaturesSection />
       <HowItWorksSection />
       <SocialProofSection />
-      <PricingSection onGetStarted={onGetStarted} />
+      <FreePricingSection onGetStarted={onGetStarted} />
       <TrustSection />
       <FinalCTA onGetStarted={onGetStarted} />
       <Footer />

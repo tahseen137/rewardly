@@ -65,7 +65,6 @@ import {
   initializePreferences,
 } from '../services/PreferenceManager';
 import { supabase, isSupabaseConfigured } from '../services/supabase';
-import { initializeSubscription, refreshSubscription } from '../services/SubscriptionService';
 import { initializeAutoPilot } from '../services/AutoPilotService';
 import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import {
@@ -112,7 +111,7 @@ export type RootTabParamList = {
   Settings: undefined;
 };
 
-// Root Stack for modals (Upgrade screen, Notifications) and global screens
+// Root Stack for modals and global screens
 export type RootStackParamList = {
   MainTabs: undefined;
   Upgrade: {
@@ -517,9 +516,6 @@ export default function AppNavigator() {
         await initializePreferences().catch((e) =>
           log.warn('Preferences init failed:', { error: e })
         );
-        await initializeSubscription().catch((e) =>
-          log.warn('Subscription init failed:', { error: e })
-        );
         await initializeAutoPilot().catch((e) => log.warn('AutoPilot init failed:', { error: e }));
         await initializeAchievements().catch((e) =>
           log.warn('Achievements init failed:', { error: e })
@@ -572,12 +568,6 @@ export default function AppNavigator() {
     const unsubscribe = onAuthStateChange(async (event, authUser) => {
       if (event === 'SIGNED_IN' && authUser) {
         setUser(authUser);
-        // Refresh subscription tier so features unlock immediately
-        try {
-          await refreshSubscription();
-        } catch (e) {
-          log.warn('Failed to refresh subscription on sign-in:', { error: e });
-        }
         // Check onboarding: local first, then Supabase profile as fallback
         let onboardingDone = isOnboardingComplete();
         if (!onboardingDone && isSupabaseConfigured() && supabase && !authUser.isAnonymous) {
@@ -770,7 +760,7 @@ function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignI
       </RootStack.Screen>
       <RootStack.Screen
         name="Upgrade"
-        component={UpgradeScreen as any}
+        component={UpgradeScreen}
         options={{
           presentation: 'modal',
           animation: 'slide_from_bottom',

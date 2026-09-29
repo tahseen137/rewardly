@@ -1,94 +1,36 @@
 /**
- * UpgradeScreen - Dedicated screen for viewing and purchasing subscription tiers
- *
- * Can be navigated to from anywhere in the app with optional context
- * about which feature prompted the upgrade
+ * UpgradeScreen - Rewardly is now completely free.
+ * This screen now informs users that all features are available at no cost.
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  Platform,
-  StatusBar,
-} from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
-import { X } from 'lucide-react-native';
-
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Sparkles } from 'lucide-react-native';
 import { colors } from '../theme/colors';
-import Paywall from '../components/Paywall';
-import {
-  SubscriptionTier,
-  BillingPeriod,
-  refreshSubscription,
-} from '../services/SubscriptionService';
 
-// Import Feature type from SubscriptionService
-import type { Feature } from '../services/SubscriptionService';
-
-export type RootStackParamList = {
-  MainTabs: undefined;
-  Upgrade: {
-    feature?: Feature;
-    source?: string;
-  };
-};
-
-type UpgradeScreenProps = {
-  route: RouteProp<RootStackParamList, 'Upgrade'>;
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Upgrade'>;
-};
-
-export default function UpgradeScreen({ route, navigation }: UpgradeScreenProps) {
-  const { feature, source: _source } = route.params || {};
-  const [showPaywall, setShowPaywall] = useState(true);
-
-  // Auto-show paywall on mount
-  useEffect(() => {
-    setShowPaywall(true);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
-
-  const handleSubscribe = useCallback(
-    async (_tier: SubscriptionTier, _period: BillingPeriod) => {
-      // Refresh subscription state after successful subscription
-      // The webhook should have already updated the database
-      await refreshSubscription();
-
-      // Close the screen
-      navigation.goBack();
-    },
-    [navigation]
-  );
+export default function UpgradeScreen() {
+  const navigation = useNavigation();
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
-
-      {/* Header with close button */}
-      <View style={styles.header}>
+      <View style={styles.content}>
+        <View style={styles.iconContainer}>
+          <Sparkles size={48} color={colors.primary.main} />
+        </View>
+        <Text style={styles.title}>Rewardly is Free 🎉</Text>
+        <Text style={styles.subtitle}>
+          All features are available to everyone at no cost. Enjoy unlimited card recommendations,
+          Sage AI, insights, and more — completely free.
+        </Text>
         <TouchableOpacity
-          onPress={handleClose}
-          style={styles.closeButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={styles.button}
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.8}
         >
-          <X size={24} color={colors.text.primary} />
+          <Text style={styles.buttonText}>Got it</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Paywall component */}
-      <Paywall
-        visible={showPaywall}
-        onClose={handleClose}
-        onSubscribe={handleSubscribe}
-        highlightFeature={feature}
-      />
     </SafeAreaView>
   );
 }
@@ -97,25 +39,45 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background.primary,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
-  header: {
-    position: 'absolute',
-    top: Platform.OS === 'ios' ? 50 : 20,
-    right: 16,
-    zIndex: 10,
-  },
-  closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.background.secondary,
+  content: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingHorizontal: 32,
+  },
+  iconContainer: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: colors.primary.bg20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: colors.text.primary,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: colors.text.secondary,
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 40,
+  },
+  button: {
+    backgroundColor: colors.primary.main,
+    paddingVertical: 16,
+    paddingHorizontal: 48,
+    borderRadius: 12,
+  },
+  buttonText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#fff',
   },
 });
