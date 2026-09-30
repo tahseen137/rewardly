@@ -124,7 +124,7 @@ export default function HomeScreen() {
   const [portfolioOpt, setPortfolioOpt] = useState<PortfolioOptimization | null>(null);
 
   // Top cards for category - shown when user has no portfolio
-  const [, setTopCardsForCategory] = useState<CalculatorOutput | null>(null);
+  const [topCardsForCategory, setTopCardsForCategory] = useState<CalculatorOutput | null>(null);
 
   // Function to load data
   const loadData = useCallback(async () => {
@@ -444,8 +444,33 @@ export default function HomeScreen() {
         <View style={styles.divider} />
 
         {/* Results Section */}
-        {!hasCards ? (
-          // When user has no portfolio, show empty state prompting them to add cards
+        {!hasCards && state.selectedCategory && state.amount && topCardsForCategory && topCardsForCategory.results.length > 0 ? (
+          // New-user discovery: show best available cards with add-to-wallet CTA
+          <View>
+            <Text style={styles.resultsHeader}>Best cards for this purchase</Text>
+            <RewardsDisplay
+              results={topCardsForCategory.results}
+              bestCard={topCardsForCategory.bestCard}
+              isLoading={false}
+              isEmpty={false}
+              amount={state.amount}
+              cards={getAllCardsSync()}
+              category={state.selectedCategory || undefined}
+              onCardPress={(result) =>
+                (navigation as any).navigate('CardDetail', { cardId: result.cardId })
+              }
+            />
+            <ApplyNowButton
+              card={topCardsForCategory.results[0] as any}
+              sourceScreen="home_new_user"
+              variant="compact"
+              showDisclosure={false}
+              label="Add to Wallet"
+              onPress={() => (navigation as any).navigate('MyCards')}
+            />
+          </View>
+        ) : !hasCards ? (
+          // No category/amount selected yet — prompt user to add cards
           <EmptyState
             icon="💳"
             title={t('home.noCardsTitle') || 'No Cards Yet'}
@@ -868,53 +893,6 @@ const createStyles = (_t: Theme) =>
     referralSub: {
       fontSize: 11,
       color: colors.text.secondary,
-    },
-    // Pro teaser for free users
-    proTeaser: {
-      backgroundColor: colors.background.secondary,
-      borderRadius: 14,
-      borderWidth: 1.5,
-      borderColor: colors.primary.main + '50',
-      padding: 16,
-      marginTop: 16,
-      marginBottom: 4,
-    },
-    proTeaserHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      marginBottom: 10,
-    },
-    proTeaserBadge: {
-      fontSize: 10,
-      fontWeight: '800',
-      color: colors.background.primary,
-      backgroundColor: colors.primary.main,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
-      borderRadius: 4,
-      letterSpacing: 0.5,
-      overflow: 'hidden',
-    },
-    proTeaserTitle: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: colors.text.primary,
-      flex: 1,
-    },
-    proTeaserItems: {
-      gap: 5,
-      marginBottom: 12,
-    },
-    proTeaserItem: {
-      fontSize: 12,
-      color: colors.text.secondary,
-      lineHeight: 18,
-    },
-    proTeaserCta: {
-      fontSize: 13,
-      fontWeight: '700',
-      color: colors.primary.main,
     },
     // Annual Rewards Estimator widget
     rewardsEstimator: {

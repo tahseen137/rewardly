@@ -8,6 +8,7 @@ export { default as SettingsScreen } from './SettingsScreen';
 export { default as SageScreen } from './SageScreen';
 export { default as AuthScreen } from './AuthScreen';
 export { default as OnboardingScreen } from './OnboardingScreen';
+// PremiumOnboardingScreen is now OnboardingScreen
 export { default as PointsCalculatorScreen } from './PointsCalculatorScreen';
 export { default as SmartWalletScreen } from './AutoPilotScreen';
 export { default as AutoPilotSetupScreen } from './AutoPilotSetupScreen';
@@ -18,7 +19,6 @@ export { default as RewardsIQScreen } from './RewardsIQScreen';
 export { default as PortfolioOptimizerScreen } from './PortfolioOptimizerScreen';
 export { default as WalletOptimizerScreen } from './WalletOptimizerScreen';
 export { default as InsightsHomeScreen } from './InsightsHomeScreen';
-export { default as PremiumOnboardingScreen } from './PremiumOnboardingScreen';
 export { default as SpendingInsightsScreen } from './SpendingInsightsScreen';
 export { default as CardTrackerScreen } from './CardTrackerScreen';
 

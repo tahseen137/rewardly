@@ -47,8 +47,7 @@ import {
   SpendingProfileWizardScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
-import PremiumOnboardingScreen from '../screens/PremiumOnboardingScreen';
-import UpgradeScreen from '../screens/UpgradeScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
 import LandingPage from '../screens/LandingPage';
 import { ErrorBoundary } from '../components';
 import { useTheme } from '../theme';
@@ -114,11 +113,6 @@ export type RootTabParamList = {
 // Root Stack for modals and global screens
 export type RootStackParamList = {
   MainTabs: undefined;
-  Upgrade: {
-    feature?: string;
-    source?: string;
-    annualGain?: number;
-  };
   Notifications: undefined;
   CardDetail: {
     cardId: string;
@@ -695,7 +689,7 @@ export default function AppNavigator() {
 
   // Show onboarding for new users
   if (appState === 'onboarding') {
-    return <PremiumOnboardingScreen onComplete={handleOnboardingComplete} />;
+    return <OnboardingScreen onComplete={handleOnboardingComplete} />;
   }
 
   // Main app with tabs
@@ -758,14 +752,6 @@ function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignI
       <RootStack.Screen name="MainTabs">
         {() => <MainTabs onSignOut={onSignOut} onSignIn={onSignIn} />}
       </RootStack.Screen>
-      <RootStack.Screen
-        name="Upgrade"
-        component={UpgradeScreen}
-        options={{
-          presentation: 'modal',
-          animation: 'slide_from_bottom',
-        }}
-      />
       <RootStack.Screen
         name="Notifications"
         component={NotificationsScreen}
