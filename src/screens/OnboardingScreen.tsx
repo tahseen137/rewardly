@@ -190,17 +190,21 @@ function ValuePropStep({ onNext }: { onNext: () => void }) {
 // Step 2: Add Your Cards
 // ============================================================================
 
+const ISSUER_CHIPS = ['TD', 'RBC', 'Scotiabank', 'CIBC', 'BMO', 'Amex', 'MBNA', 'Desjardins'];
+
 interface AddCardsStepProps {
   selectedCards: string[];
   onToggleCard: (cardId: string) => void;
   onNext: () => void;
   onBack: () => void;
+  onSkipAll: () => void;
 }
 
-function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsStepProps) {
+function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack, onSkipAll }: AddCardsStepProps) {
   const [cards, setCards] = useState<Card[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [issuerFilter, setIssuerFilter] = useState<string | null>(null);
 
   useEffect(() => {
     const loadCards = async () => {
@@ -217,12 +221,17 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
   }, []);
 
   const filteredCards = useMemo(() => {
-    if (!searchQuery.trim()) return cards.slice(0, 20);
+    let pool = cards;
+    if (issuerFilter) {
+      pool = cards.filter((c) => c.issuer.toLowerCase().includes(issuerFilter.toLowerCase()));
+      if (!searchQuery.trim()) return pool.slice(0, 20);
+    }
+    if (!searchQuery.trim()) return pool.slice(0, 20);
     const query = searchQuery.toLowerCase();
-    return cards
+    return pool
       .filter((c) => c.name.toLowerCase().includes(query) || c.issuer.toLowerCase().includes(query))
       .slice(0, 20);
-  }, [cards, searchQuery]);
+  }, [cards, searchQuery, issuerFilter]);
 
   return (
     <View style={styles.stepContainer}>
@@ -235,6 +244,27 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
           <Text style={styles.stepSubtitle}>Select the credit cards you currently have</Text>
         </View>
       </Animated.View>
+
+      {/* Issuer filter chips */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.issuerChipsScroll}
+        contentContainerStyle={styles.issuerChipsContent}
+      >
+        {ISSUER_CHIPS.map((issuer) => (
+          <TouchableOpacity
+            key={issuer}
+            style={[styles.issuerChip, issuerFilter === issuer && styles.issuerChipSelected]}
+            onPress={() => setIssuerFilter(issuerFilter === issuer ? null : issuer)}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.issuerChipText, issuerFilter === issuer && styles.issuerChipTextSelected]}>
+              {issuer}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
       {/* Search */}
       <View style={styles.searchContainer}>
@@ -327,6 +357,10 @@ function AddCardsStep({ selectedCards, onToggleCard, onNext, onBack }: AddCardsS
           </LinearGradient>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity onPress={onSkipAll} style={styles.doLaterButton}>
+        <Text style={styles.doLaterText}>Do this later</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -363,6 +397,9 @@ function SpendingStep({ spending, onUpdateSpending, onNext, onBack }: SpendingSt
           </View>
           <Text style={styles.stepTitle}>Your Spending Habits</Text>
           <Text style={styles.stepSubtitle}>Estimate your monthly spending by category</Text>
+          <Text style={styles.spendingHelperText}>
+            Adjust these to match your actual spending for better recommendations.
+          </Text>
         </View>
       </Animated.View>
 
@@ -396,7 +433,7 @@ function SpendingStep({ spending, onUpdateSpending, onNext, onBack }: SpendingSt
                   <TextInput
                     style={styles.amountInput}
                     keyboardType="numeric"
-                    value={amount > 0 ? String(amount) : ''}
+                    value={String(amount)}
                     onChangeText={(text) => {
                       const num = parseInt(text) || 0;
                       onUpdateSpending(category, num);
@@ -791,14 +828,12 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
 
   return (
     <View style={styles.container}>
-      {/* Progress indicator with skip */}
+      {/* Progress indicator */}
       <View style={styles.headerBar}>
         <View style={styles.headerBarInner}>
           <View style={styles.headerSpacer} />
           {renderProgressDots()}
-          <TouchableOpacity onPress={handleSkipAll} style={styles.skipAllButton}>
-            <Text style={styles.skipAllText}>Skip</Text>
-          </TouchableOpacity>
+          <View style={styles.headerSpacer} />
         </View>
       </View>
 
@@ -811,6 +846,7 @@ export default function PremiumOnboardingScreen({ onComplete }: PremiumOnboardin
           onToggleCard={handleToggleCard}
           onNext={() => setCurrentStep(2)}
           onBack={() => setCurrentStep(0)}
+          onSkipAll={handleSkipAll}
         />
       )}
 
@@ -1043,6 +1079,55 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: colors.background.primary,
+  },
+
+  // Issuer chips
+  issuerChipsScroll: {
+    marginBottom: 12,
+    marginHorizontal: -8,
+  },
+  issuerChipsContent: {
+    paddingHorizontal: 8,
+    gap: 8,
+    flexDirection: 'row',
+  },
+  issuerChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    backgroundColor: colors.background.secondary,
+  },
+  issuerChipSelected: {
+    backgroundColor: colors.primary.main,
+    borderColor: colors.primary.main,
+  },
+  issuerChipText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.text.secondary,
+  },
+  issuerChipTextSelected: {
+    color: colors.background.primary,
+  },
+  // Do this later button
+  doLaterButton: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingBottom: 24,
+  },
+  doLaterText: {
+    fontSize: 13,
+    color: colors.text.tertiary,
+  },
+  // Spending helper text
+  spendingHelperText: {
+    fontSize: 13,
+    color: colors.text.tertiary,
+    textAlign: 'center',
+    marginTop: 8,
+    paddingHorizontal: 16,
   },
 
   // Cards Step

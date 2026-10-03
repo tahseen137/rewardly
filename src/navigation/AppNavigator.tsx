@@ -11,7 +11,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform, View, Text, ActivityIndicator, StyleSheet, Animated } from 'react-native';
-import { Home, CreditCard, Settings, Sparkles, Navigation, BarChart3 } from 'lucide-react-native';
+import { Home, CreditCard, Settings, Sparkles, Navigation, BarChart3, Search } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 
 import {
@@ -146,7 +146,7 @@ function InsightsNavigator() {
         headerBackTitle: 'Back',
         contentStyle: { backgroundColor: colors.background.primary },
       }}
-      initialRouteName="InsightsHome"
+      initialRouteName="ExploreCards"
     >
       <InsightsStack.Screen
         name="InsightsHome"
@@ -289,7 +289,7 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
       IconComponent = Home;
       break;
     case 'Insights':
-      IconComponent = BarChart3;
+      IconComponent = Search;
       break;
     case 'Sage':
       IconComponent = Sparkles;
@@ -457,7 +457,7 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         name="Insights"
         component={InsightsNavigator}
         options={{
-          tabBarLabel: 'Insights',
+          tabBarLabel: 'Explore',
           freezeOnBlur: false,
         }}
       />

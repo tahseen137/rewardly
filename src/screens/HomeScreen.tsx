@@ -18,7 +18,8 @@ import {
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { ChevronRight, Sparkles } from 'lucide-react-native';
+import { ChevronRight, Sparkles, X } from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import {
   AmountInput,
@@ -122,6 +123,8 @@ export default function HomeScreen() {
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [portfolioOpt, setPortfolioOpt] = useState<PortfolioOptimization | null>(null);
+  const [hasPreFilled, setHasPreFilled] = useState(false);
+  const [showHomeTip, setShowHomeTip] = useState(false);
 
   // Top cards for category - shown when user has no portfolio
   const [topCardsForCategory, setTopCardsForCategory] = useState<CalculatorOutput | null>(null);
@@ -164,6 +167,23 @@ export default function HomeScreen() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Pre-fill calculator on first launch
+  useEffect(() => {
+    AsyncStorage.getItem('rewardly_calculator_used').then((val) => {
+      if (!val && !hasPreFilled) {
+        setState((prev) => ({ ...prev, selectedCategory: SpendingCategory.GROCERIES, amount: 100 }));
+        setHasPreFilled(true);
+      }
+    });
+  }, []);
+
+  // Show first-use tip banner
+  useEffect(() => {
+    AsyncStorage.getItem('rewardly_home_tip_dismissed').then((val) => {
+      if (!val) setShowHomeTip(true);
+    });
+  }, []);
 
   // Refresh portfolio state when tab comes into focus (e.g. after adding cards)
   useFocusEffect(
@@ -230,6 +250,7 @@ export default function HomeScreen() {
       ...prev,
       selectedCategory: category,
     }));
+    AsyncStorage.setItem('rewardly_calculator_used', '1');
   }, []);
 
   // Handle CategoryGrid selection (converts CategoryType to SpendingCategory)
@@ -248,6 +269,12 @@ export default function HomeScreen() {
       amount,
       amountError: amount === null ? 'Please enter a valid amount' : null,
     }));
+    AsyncStorage.setItem('rewardly_calculator_used', '1');
+  }, []);
+
+  const dismissHomeTip = useCallback(() => {
+    setShowHomeTip(false);
+    AsyncStorage.setItem('rewardly_home_tip_dismissed', '1');
   }, []);
 
   // Calculate rewards when inputs are ready
@@ -403,6 +430,21 @@ export default function HomeScreen() {
             {t('home.subtitle') || 'Find the best card for every purchase'}
           </Text>
         </View>
+
+        {/* First-use tip banner */}
+        {showHomeTip && (
+          <View style={styles.firstUseBanner}>
+            <View style={styles.firstUseBannerContent}>
+              <Text style={styles.firstUseBannerTitle}>💡 How Rewardly works</Text>
+              <Text style={styles.firstUseBannerDesc}>
+                Pick a spending category, enter an amount, and we'll show which card earns the most.
+              </Text>
+            </View>
+            <TouchableOpacity onPress={dismissHomeTip} style={styles.firstUseBannerClose}>
+              <X size={16} color={colors.text.secondary} />
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Calculator Section */}
         {/* Store Selector */}
@@ -864,6 +906,35 @@ const createStyles = (_t: Theme) =>
       fontSize: 13,
       fontWeight: '500',
       color: colors.primary.dark,
+    },
+    // First-use tip banner
+    firstUseBanner: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      backgroundColor: colors.primary.main + '12',
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.primary.main + '40',
+      padding: 12,
+      marginBottom: 16,
+      gap: 8,
+    },
+    firstUseBannerContent: {
+      flex: 1,
+    },
+    firstUseBannerTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: 4,
+    },
+    firstUseBannerDesc: {
+      fontSize: 13,
+      color: colors.text.secondary,
+      lineHeight: 18,
+    },
+    firstUseBannerClose: {
+      padding: 4,
     },
     // Referral banner
     referralBanner: {
