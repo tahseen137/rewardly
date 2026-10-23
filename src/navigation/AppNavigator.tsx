@@ -65,6 +65,12 @@ import {
 } from '../services/PreferenceManager';
 import { supabase, isSupabaseConfigured } from '../services/supabase';
 import { initializeAutoPilot } from '../services/AutoPilotService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  scheduleWeeklyMissedRewardsNotification,
+  getMissedRewardsEstimate,
+  WEEKLY_NOTIF_ID_KEY,
+} from '../services/NotificationService';
 import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import {
   initializeAchievements,
@@ -514,6 +520,18 @@ export default function AppNavigator() {
         await initializeAchievements().catch((e) =>
           log.warn('Achievements init failed:', { error: e })
         );
+
+        // On first launch, default weekly notifications to ON
+        try {
+          const notifPref = await AsyncStorage.getItem(WEEKLY_NOTIF_ID_KEY);
+          if (notifPref === null && Platform.OS !== 'web') {
+            await AsyncStorage.setItem(WEEKLY_NOTIF_ID_KEY, 'true');
+            const missed = getMissedRewardsEstimate();
+            await scheduleWeeklyMissedRewardsNotification(missed);
+          }
+        } catch (e) {
+          log.warn('Weekly notification init failed:', { error: e });
+        }
 
         // Track app open (non-blocking)
         try {

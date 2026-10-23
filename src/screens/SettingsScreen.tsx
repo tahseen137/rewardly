@@ -63,6 +63,14 @@ import {
   AutoPilotStatus,
 } from '../services/AutoPilotService';
 import { initializePortfolio, getCards } from '../services/CardPortfolioManager';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  requestPermissions,
+  scheduleWeeklyMissedRewardsNotification,
+  cancelWeeklyNotification,
+  getMissedRewardsEstimate,
+  WEEKLY_NOTIF_ID_KEY,
+} from '../services/NotificationService';
 
 function SectionHeader({ title }: { title: string }) {
   return (
@@ -135,6 +143,7 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
   const [portfolioCount, setPortfolioCount] = useState<number>(0);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [autoPilotStatus, setAutoPilotStatus] = useState<AutoPilotStatus | null>(null);
+  const [weeklyNotifEnabled, setWeeklyNotifEnabled] = useState(true);
 
   const loadPreferences = useCallback(async () => {
     await initializePreferences();
@@ -162,6 +171,14 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
 
     await initializePortfolio();
     setPortfolioCount(getCards().length);
+
+    // Load weekly notification preference
+    try {
+      const stored = await AsyncStorage.getItem(WEEKLY_NOTIF_ID_KEY);
+      setWeeklyNotifEnabled(stored !== 'false');
+    } catch {
+      setWeeklyNotifEnabled(true);
+    }
 
     setIsLoading(false);
   }, []);
@@ -288,6 +305,28 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
     }
   };
 
+  const handleWeeklyNotifToggle = async (enabled: boolean) => {
+    setWeeklyNotifEnabled(enabled);
+    await AsyncStorage.setItem(WEEKLY_NOTIF_ID_KEY, enabled ? 'true' : 'false');
+    if (enabled) {
+      const granted = await requestPermissions();
+      if (granted) {
+        const missed = getMissedRewardsEstimate();
+        await scheduleWeeklyMissedRewardsNotification(missed);
+      } else {
+        // Revert toggle if permission denied
+        setWeeklyNotifEnabled(false);
+        await AsyncStorage.setItem(WEEKLY_NOTIF_ID_KEY, 'false');
+        showAlert(
+          'Notifications Blocked',
+          'Please enable notifications in your device settings to receive weekly savings tips.'
+        );
+      }
+    } else {
+      await cancelWeeklyNotification();
+    }
+  };
+
   const handleAutoPilotToggle = async (enabled: boolean) => {
     if (enabled) {
       const success = await enableAutoPilot();
@@ -370,6 +409,18 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
             <Switch
               value={newCardSuggestions}
               onValueChange={handleNewCardSuggestionsChange}
+              trackColor={{ false: colors.border.light, true: colors.success.main }}
+              thumbColor={colors.background.secondary}
+            />
+          </SettingsRow>
+          <SettingsRow
+            icon={<Bell size={16} color={colors.text.secondary} />}
+            title="Weekly savings tips"
+            value={weeklyNotifEnabled ? 'On' : 'Off'}
+          >
+            <Switch
+              value={weeklyNotifEnabled}
+              onValueChange={handleWeeklyNotifToggle}
               trackColor={{ false: colors.border.light, true: colors.success.main }}
               thumbColor={colors.background.secondary}
             />
