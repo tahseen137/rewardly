@@ -11,7 +11,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform, View, Text, ActivityIndicator, StyleSheet, Animated } from 'react-native';
-import { Home, CreditCard, Settings, Sparkles, Navigation, BarChart3, Search } from 'lucide-react-native';
+import { Home, CreditCard, Settings, Sparkles, Navigation, BarChart3 } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 
 import {
@@ -47,7 +47,8 @@ import {
   SpendingProfileWizardScreen,
 } from '../screens';
 import AuthScreen from '../screens/AuthScreen';
-import OnboardingScreen from '../screens/OnboardingScreen';
+import PremiumOnboardingScreen from '../screens/PremiumOnboardingScreen';
+import UpgradeScreen from '../screens/UpgradeScreen';
 import LandingPage from '../screens/LandingPage';
 import { ErrorBoundary } from '../components';
 import { useTheme } from '../theme';
@@ -64,13 +65,8 @@ import {
   initializePreferences,
 } from '../services/PreferenceManager';
 import { supabase, isSupabaseConfigured } from '../services/supabase';
+import { initializeSubscription, refreshSubscription } from '../services/SubscriptionService';
 import { initializeAutoPilot } from '../services/AutoPilotService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  scheduleWeeklyMissedRewardsNotification,
-  getMissedRewardsEstimate,
-  WEEKLY_NOTIF_ID_KEY,
-} from '../services/NotificationService';
 import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import {
   initializeAchievements,
@@ -116,9 +112,13 @@ export type RootTabParamList = {
   Settings: undefined;
 };
 
-// Root Stack for modals and global screens
+// Root Stack for modals (Upgrade screen, Notifications) and global screens
 export type RootStackParamList = {
   MainTabs: undefined;
+  Upgrade: {
+    feature?: string;
+    source?: string;
+  };
   Notifications: undefined;
   CardDetail: {
     cardId: string;
@@ -152,7 +152,7 @@ function InsightsNavigator() {
         headerBackTitle: 'Back',
         contentStyle: { backgroundColor: colors.background.primary },
       }}
-      initialRouteName="ExploreCards"
+      initialRouteName="InsightsHome"
     >
       <InsightsStack.Screen
         name="InsightsHome"
@@ -295,7 +295,7 @@ function TabIcon({ name, focused, color }: { name: string; focused: boolean; col
       IconComponent = Home;
       break;
     case 'Insights':
-      IconComponent = Search;
+      IconComponent = BarChart3;
       break;
     case 'Sage':
       IconComponent = Sparkles;
@@ -463,8 +463,8 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         name="Insights"
         component={InsightsNavigator}
         options={{
-          tabBarLabel: 'Explore',
-          freezeOnBlur: false,
+          tabBarLabel: 'Insights',
+          unmountOnBlur: true,
         }}
       />
       <Tab.Screen
@@ -479,7 +479,7 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         component={SmartWalletScreenWithErrorBoundary}
         options={{
           tabBarLabel: 'Wallet',
-          freezeOnBlur: false,
+          unmountOnBlur: true,
         }}
       />
       <Tab.Screen
@@ -487,14 +487,14 @@ function MainTabs({ onSignOut, onSignIn }: { onSignOut: () => void; onSignIn: ()
         component={MyCardsScreenWithErrorBoundary}
         options={{
           tabBarLabel: 'My Cards',
-          freezeOnBlur: false,
+          unmountOnBlur: true,
         }}
       />
       <Tab.Screen
         name="Settings"
         options={{
           tabBarLabel: 'Settings',
-          freezeOnBlur: false,
+          unmountOnBlur: true,
         }}
       >
         {() => <SettingsScreenWithErrorBoundary onSignOut={onSignOut} onSignIn={onSignIn} />}
@@ -516,22 +516,13 @@ export default function AppNavigator() {
         await initializePreferences().catch((e) =>
           log.warn('Preferences init failed:', { error: e })
         );
+        await initializeSubscription().catch((e) =>
+          log.warn('Subscription init failed:', { error: e })
+        );
         await initializeAutoPilot().catch((e) => log.warn('AutoPilot init failed:', { error: e }));
         await initializeAchievements().catch((e) =>
           log.warn('Achievements init failed:', { error: e })
         );
-
-        // On first launch, default weekly notifications to ON
-        try {
-          const notifPref = await AsyncStorage.getItem(WEEKLY_NOTIF_ID_KEY);
-          if (notifPref === null && Platform.OS !== 'web') {
-            await AsyncStorage.setItem(WEEKLY_NOTIF_ID_KEY, 'true');
-            const missed = getMissedRewardsEstimate();
-            await scheduleWeeklyMissedRewardsNotification(missed);
-          }
-        } catch (e) {
-          log.warn('Weekly notification init failed:', { error: e });
-        }
 
         // Track app open (non-blocking)
         try {
@@ -580,6 +571,12 @@ export default function AppNavigator() {
     const unsubscribe = onAuthStateChange(async (event, authUser) => {
       if (event === 'SIGNED_IN' && authUser) {
         setUser(authUser);
+        // Refresh subscription tier so features unlock immediately
+        try {
+          await refreshSubscription();
+        } catch (e) {
+          log.warn('Failed to refresh subscription on sign-in:', { error: e });
+        }
         // Check onboarding: local first, then Supabase profile as fallback
         let onboardingDone = isOnboardingComplete();
         if (!onboardingDone && isSupabaseConfigured() && supabase && !authUser.isAnonymous) {
@@ -707,7 +704,7 @@ export default function AppNavigator() {
 
   // Show onboarding for new users
   if (appState === 'onboarding') {
-    return <OnboardingScreen onComplete={handleOnboardingComplete} />;
+    return <PremiumOnboardingScreen onComplete={handleOnboardingComplete} />;
   }
 
   // Main app with tabs
@@ -770,6 +767,14 @@ function RootNavigator({ onSignOut, onSignIn }: { onSignOut: () => void; onSignI
       <RootStack.Screen name="MainTabs">
         {() => <MainTabs onSignOut={onSignOut} onSignIn={onSignIn} />}
       </RootStack.Screen>
+      <RootStack.Screen
+        name="Upgrade"
+        component={UpgradeScreen as any}
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+        }}
+      />
       <RootStack.Screen
         name="Notifications"
         component={NotificationsScreen}

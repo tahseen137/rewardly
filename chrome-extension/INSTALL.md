@@ -10,30 +10,32 @@
 
 ## Features
 
-- **Auto-detection**: Automatically identifies the merchant you're visiting and recommends the best card in your wallet
-- **Best rate first**: Cards ranked by effective reward rate (cashback %, or points × valuation)
-- **Wallet-aware**: Recommendations come from the cards you've added in the Rewardly app — no generic suggestions
-- **Loyalty stacking tips**: Shows PC Optimum, Scene+, Aeroplan, Air Miles stacking opportunities where applicable
-- **Upgrade hints**: Flags when a card not in your wallet would earn significantly more at this merchant
-- **Notifications**: Opt-in push notifications when you land on a supported merchant site
-- **Settings page**: Configure notification preferences and minimum reward-rate threshold
+- **Auto-detection**: Automatically identifies merchants when you visit their sites
+- **Best rate first**: Cashback rates sorted highest-first with best-rate badge
+- **Badge indicator**: Shows the best available cashback % directly on the toolbar icon
+- **One-click activation**: Click "Activate" to open the cashback portal and start earning
+- **Estimated savings**: See estimated savings on a $100 purchase at a glance
+- **Settings page**: Configure notification preferences, minimum rate thresholds, display options
 
-## Supported Merchants
+## Supported Merchants (initial 10)
 
-The extension recognises 100+ Canadian merchant websites mapped to spending categories (groceries, gas, dining, travel, streaming, etc.). Card recommendations are drawn from 410+ Canadian credit cards across all major issuers (TD, RBC, BMO, CIBC, Scotiabank, Amex, and more).
+- Amazon.ca
+- Walmart.ca
+- Best Buy Canada
+- Sephora Canada
+- Indigo / Chapters
+- Sport Chek
+- Loblaws
+- Nike Canada
+- Winners / HomeSense
+- Hudson's Bay
 
-## Keeping Card Data Up to Date
+## Cashback Programs
 
-`data/cards.json` is the local card database used by the extension. To sync it with the latest data before a release:
-
-```bash
-# From the project root — set your Supabase credentials first
-SUPABASE_URL=https://your-project.supabase.co \
-SUPABASE_ANON_KEY=your-anon-key \
-node chrome-extension/scripts/sync-cards.js
-```
-
-Or set `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` in `.env.local` and the script will pick them up automatically.
+- 🟠 Rakuten Canada
+- 🍁 Great Canadian Rebates (GCR)
+- 💰 TopCashback
+- 🍯 PayPal Honey
 
 ## Icons Needed
 

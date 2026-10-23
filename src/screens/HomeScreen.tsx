@@ -15,14 +15,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-  Share,
-  Modal,
-  Pressable,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { ChevronRight, Sparkles, X, Share2 } from 'lucide-react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ChevronRight, Sparkles } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import {
   AmountInput,
@@ -48,8 +44,6 @@ import {
   CalculatorInput,
   CalculatorOutput,
 } from '../services/RewardsCalculatorService';
-import { getPortfolioOptimization } from '../services/RewardsIQService';
-import { PortfolioOptimization } from '../types/rewards-iq';
 // Achievement imports removed - achievements section moved to Insights tab
 
 // Map CategoryType to SpendingCategory
@@ -125,13 +119,9 @@ export default function HomeScreen() {
   const [recommendations, setRecommendations] = useState<CardRecommendation[]>([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [portfolioOpt, setPortfolioOpt] = useState<PortfolioOptimization | null>(null);
-  const [hasPreFilled, setHasPreFilled] = useState(false);
-  const [showHomeTip, setShowHomeTip] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
 
   // Top cards for category - shown when user has no portfolio
-  const [topCardsForCategory, setTopCardsForCategory] = useState<CalculatorOutput | null>(null);
+  const [, setTopCardsForCategory] = useState<CalculatorOutput | null>(null);
 
   // Function to load data
   const loadData = useCallback(async () => {
@@ -146,12 +136,8 @@ export default function HomeScreen() {
       if (userHasCards) {
         setRecommendationsLoading(true);
         try {
-          const [analysis, opt] = await Promise.all([
-            analyzeAndRecommend(),
-            getPortfolioOptimization().catch(() => null),
-          ]);
+          const analysis = await analyzeAndRecommend();
           setRecommendations(analysis.recommendations.slice(0, 3)); // Top 3
-          setPortfolioOpt(opt);
         } catch (err) {
           console.warn('Failed to load recommendations:', err);
         } finally {
@@ -159,7 +145,6 @@ export default function HomeScreen() {
         }
       } else {
         setRecommendations([]);
-        setPortfolioOpt(null);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to load card data';
@@ -171,23 +156,6 @@ export default function HomeScreen() {
   useEffect(() => {
     loadData();
   }, [loadData]);
-
-  // Pre-fill calculator on first launch
-  useEffect(() => {
-    AsyncStorage.getItem('rewardly_calculator_used').then((val) => {
-      if (!val && !hasPreFilled) {
-        setState((prev) => ({ ...prev, selectedCategory: SpendingCategory.GROCERIES, amount: 100 }));
-        setHasPreFilled(true);
-      }
-    });
-  }, []);
-
-  // Show first-use tip banner
-  useEffect(() => {
-    AsyncStorage.getItem('rewardly_home_tip_dismissed').then((val) => {
-      if (!val) setShowHomeTip(true);
-    });
-  }, []);
 
   // Refresh portfolio state when tab comes into focus (e.g. after adding cards)
   useFocusEffect(
@@ -254,7 +222,6 @@ export default function HomeScreen() {
       ...prev,
       selectedCategory: category,
     }));
-    AsyncStorage.setItem('rewardly_calculator_used', '1');
   }, []);
 
   // Handle CategoryGrid selection (converts CategoryType to SpendingCategory)
@@ -273,58 +240,7 @@ export default function HomeScreen() {
       amount,
       amountError: amount === null ? 'Please enter a valid amount' : null,
     }));
-    AsyncStorage.setItem('rewardly_calculator_used', '1');
   }, []);
-
-  const dismissHomeTip = useCallback(() => {
-    setShowHomeTip(false);
-    AsyncStorage.setItem('rewardly_home_tip_dismissed', '1');
-  }, []);
-
-  // ── Share helpers ──────────────────────────────────────────────────────────
-
-  const getCategoryLabel = (cat: SpendingCategory): string => {
-    const labels: Record<SpendingCategory, string> = {
-      [SpendingCategory.GROCERIES]: 'groceries',
-      [SpendingCategory.DINING]: 'dining out',
-      [SpendingCategory.GAS]: 'gas',
-      [SpendingCategory.TRAVEL]: 'travel',
-      [SpendingCategory.ONLINE_SHOPPING]: 'online shopping',
-      [SpendingCategory.ENTERTAINMENT]: 'entertainment',
-      [SpendingCategory.DRUGSTORES]: 'pharmacy',
-      [SpendingCategory.HOME_IMPROVEMENT]: 'home improvement',
-      [SpendingCategory.OTHER]: 'everyday purchases',
-    };
-    return labels[cat] ?? 'this purchase';
-  };
-
-  // Derive the best result to surface in the share sheet
-  const bestShareResult = state.results?.bestCard ?? topCardsForCategory?.bestCard ?? null;
-
-  const buildShareText = (): string => {
-    const cardName = bestShareResult?.cardName ?? 'a great card';
-    const catLabel = state.selectedCategory ? getCategoryLabel(state.selectedCategory) : 'this purchase';
-    const amount = state.amount ? `$${state.amount.toFixed(2)}` : '';
-    const earned =
-      bestShareResult && bestShareResult.cadValue > 0
-        ? `$${bestShareResult.cadValue.toFixed(2)}`
-        : null;
-
-    const earningsLine = earned && amount
-      ? `The ${cardName} earns me ${earned} on my ${amount} ${catLabel} purchase.`
-      : `The ${cardName} is perfect for ${catLabel}.`;
-
-    return `💳 Rewardly found me the best card for ${catLabel}!\n\n${earningsLine}\n\nFind yours free at rewardly.ca`;
-  };
-
-  const handleShare = useCallback(async () => {
-    try {
-      await Share.share({ message: buildShareText() });
-    } catch {
-      // Dismissed or failed — no-op
-    }
-    setShowShareModal(false);
-  }, [bestShareResult, state.selectedCategory, state.amount]);
 
   // Calculate rewards when inputs are ready
   useEffect(() => {
@@ -480,21 +396,6 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* First-use tip banner */}
-        {showHomeTip && (
-          <View style={styles.firstUseBanner}>
-            <View style={styles.firstUseBannerContent}>
-              <Text style={styles.firstUseBannerTitle}>💡 How Rewardly works</Text>
-              <Text style={styles.firstUseBannerDesc}>
-                Pick a spending category, enter an amount, and we'll show which card earns the most.
-              </Text>
-            </View>
-            <TouchableOpacity onPress={dismissHomeTip} style={styles.firstUseBannerClose}>
-              <X size={16} color={colors.text.secondary} />
-            </TouchableOpacity>
-          </View>
-        )}
-
         {/* Calculator Section */}
         {/* Store Selector */}
         <View style={styles.section}>
@@ -535,44 +436,8 @@ export default function HomeScreen() {
         <View style={styles.divider} />
 
         {/* Results Section */}
-        {!hasCards && state.selectedCategory && state.amount && topCardsForCategory && topCardsForCategory.results.length > 0 ? (
-          // New-user discovery: show best available cards with add-to-wallet CTA
-          <View>
-            <Text style={styles.resultsHeader}>Best cards for this purchase</Text>
-            <RewardsDisplay
-              results={topCardsForCategory.results}
-              bestCard={topCardsForCategory.bestCard}
-              isLoading={false}
-              isEmpty={false}
-              amount={state.amount}
-              cards={getAllCardsSync()}
-              category={state.selectedCategory || undefined}
-              onCardPress={(result) =>
-                (navigation as any).navigate('CardDetail', { cardId: result.cardId })
-              }
-            />
-            <ApplyNowButton
-              card={topCardsForCategory.results[0] as any}
-              sourceScreen="home_new_user"
-              variant="compact"
-              showDisclosure={false}
-              label="Add to Wallet"
-              onPress={() => (navigation as any).navigate('MyCards')}
-            />
-            {topCardsForCategory.bestCard && (
-              <TouchableOpacity
-                style={styles.shareButton}
-                onPress={() => setShowShareModal(true)}
-                accessibilityRole="button"
-                accessibilityLabel="Share this result"
-              >
-                <Share2 size={16} color={colors.primary.main} />
-                <Text style={styles.shareButtonText}>Share Result</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        ) : !hasCards ? (
-          // No category/amount selected yet — prompt user to add cards
+        {!hasCards ? (
+          // When user has no portfolio, show empty state prompting them to add cards
           <EmptyState
             icon="💳"
             title={t('home.noCardsTitle') || 'No Cards Yet'}
@@ -600,17 +465,6 @@ export default function HomeScreen() {
                 (navigation as any).navigate('CardDetail', { cardId: result.cardId })
               }
             />
-            {state.results.bestCard && (
-              <TouchableOpacity
-                style={styles.shareButton}
-                onPress={() => setShowShareModal(true)}
-                accessibilityRole="button"
-                accessibilityLabel="Share this result"
-              >
-                <Share2 size={16} color={colors.primary.main} />
-                <Text style={styles.shareButtonText}>Share Result</Text>
-              </TouchableOpacity>
-            )}
           </View>
         ) : state.selectedCategory && state.amount ? (
           <View style={styles.emptyResults}>
@@ -714,134 +568,7 @@ export default function HomeScreen() {
             )}
           </View>
         )}
-
-        {/* ── Annual Rewards Estimator (free users with cards) ── */}
-        {hasCards && portfolioOpt && (
-          <TouchableOpacity
-            style={styles.rewardsEstimator}
-            onPress={() => (navigation as any).navigate('Insights', { screen: 'InsightsDashboard' })}
-            activeOpacity={0.82}
-            accessibilityRole="button"
-            accessibilityLabel="View annual rewards estimate"
-          >
-            {/* Current wallet row */}
-            <View style={styles.estimatorRow}>
-              <View style={styles.estimatorLabelGroup}>
-                <Text style={styles.estimatorLabel}>Your wallet earns</Text>
-                <Text style={styles.estimatorSub}>est. annually</Text>
-              </View>
-              <Text style={styles.estimatorValueCurrent}>
-                ${Math.round(portfolioOpt.currentSetup.annualRewards).toLocaleString()}
-              </Text>
-            </View>
-
-            {/* Divider */}
-            <View style={styles.estimatorDivider} />
-
-            {/* Optimal wallet row */}
-            <View style={styles.estimatorRow}>
-              <View style={styles.estimatorLabelGroup}>
-                <Text style={styles.estimatorLabel}>Optimal wallet</Text>
-                <Text style={styles.estimatorSub}>could earn annually</Text>
-              </View>
-              <Text style={styles.estimatorValueOptimal}>
-                ${Math.round(portfolioOpt.recommendedSetup.annualRewards).toLocaleString()}
-              </Text>
-            </View>
-
-            {/* CTA */}
-            {portfolioOpt.annualGain > 0 && (
-              <View style={styles.estimatorCta}>
-                <Text style={styles.estimatorCtaText}>
-                  You could earn ${Math.round(portfolioOpt.annualGain).toLocaleString()} more/yr →
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        )}
-
-        {/* ── Referral banner ── */}
-        <TouchableOpacity
-          style={styles.referralBanner}
-          onPress={() => (navigation as any).navigate('ReferralDashboard')}
-          activeOpacity={0.82}
-          accessibilityRole="button"
-          accessibilityLabel="Share Rewardly with friends"
-        >
-          <Text style={styles.referralEmoji}>🎁</Text>
-          <View style={styles.referralText}>
-            <Text style={styles.referralTitle}>Share Rewardly</Text>
-            <Text style={styles.referralSub}>Help your friends optimize their credit card rewards</Text>
-          </View>
-          <ChevronRight size={16} color={colors.primary.main} />
-        </TouchableOpacity>
-
       </ScrollView>
-
-      {/* ── Share Result Modal ── */}
-      <Modal
-        visible={showShareModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowShareModal(false)}
-      >
-        <Pressable style={styles.modalOverlay} onPress={() => setShowShareModal(false)}>
-          <Pressable style={styles.modalSheet} onPress={() => {}}>
-            {/* Drag handle */}
-            <View style={styles.modalHandle} />
-
-            {/* Card preview */}
-            <View style={styles.shareCard}>
-              <Text style={styles.shareCardLogo}>Rewardly</Text>
-
-              {bestShareResult && (
-                <>
-                  <Text style={styles.shareCardCardName} numberOfLines={2}>
-                    {bestShareResult.cardName}
-                  </Text>
-
-                  {state.selectedCategory && state.amount && (
-                    <Text style={styles.shareCardContext}>
-                      {getCategoryLabel(state.selectedCategory)} · ${state.amount.toFixed(2)}
-                    </Text>
-                  )}
-
-                  {bestShareResult.cadValue > 0 && (
-                    <View style={styles.shareCardEarnings}>
-                      <Text style={styles.shareCardEarningsLabel}>You'd earn</Text>
-                      <Text style={styles.shareCardEarningsValue}>
-                        ${bestShareResult.cadValue.toFixed(2)}
-                      </Text>
-                    </View>
-                  )}
-                </>
-              )}
-
-              <Text style={styles.shareCardTagline}>Found with Rewardly — rewardly.ca</Text>
-            </View>
-
-            {/* Actions */}
-            <TouchableOpacity
-              style={styles.shareActionButton}
-              onPress={handleShare}
-              accessibilityRole="button"
-              accessibilityLabel="Share via"
-            >
-              <Share2 size={18} color={colors.background.primary} />
-              <Text style={styles.shareActionButtonText}>Share</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.shareCancelButton}
-              onPress={() => setShowShareModal(false)}
-              accessibilityRole="button"
-              accessibilityLabel="Cancel"
-            >
-              <Text style={styles.shareCancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </Pressable>
-        </Pressable>
-      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -1042,269 +769,5 @@ const createStyles = (_t: Theme) =>
       fontSize: 13,
       fontWeight: '500',
       color: colors.primary.dark,
-    },
-    // First-use tip banner
-    firstUseBanner: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      backgroundColor: colors.primary.main + '12',
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: colors.primary.main + '40',
-      padding: 12,
-      marginBottom: 16,
-      gap: 8,
-    },
-    firstUseBannerContent: {
-      flex: 1,
-    },
-    firstUseBannerTitle: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: colors.text.primary,
-      marginBottom: 4,
-    },
-    firstUseBannerDesc: {
-      fontSize: 13,
-      color: colors.text.secondary,
-      lineHeight: 18,
-    },
-    firstUseBannerClose: {
-      padding: 4,
-    },
-    // Referral banner
-    referralBanner: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.background.secondary,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: colors.border.light,
-      padding: 14,
-      marginTop: 16,
-      marginBottom: 8,
-      gap: 10,
-    },
-    referralEmoji: {
-      fontSize: 22,
-    },
-    referralText: {
-      flex: 1,
-    },
-    referralTitle: {
-      fontSize: 13,
-      fontWeight: '700',
-      color: colors.text.primary,
-      marginBottom: 2,
-    },
-    referralSub: {
-      fontSize: 11,
-      color: colors.text.secondary,
-    },
-    // Annual Rewards Estimator widget
-    rewardsEstimator: {
-      backgroundColor: colors.background.secondary,
-      borderRadius: 16,
-      borderWidth: 1.5,
-      borderColor: colors.primary.main + '40',
-      padding: 16,
-      marginTop: 16,
-      marginBottom: 4,
-    },
-    estimatorRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: 4,
-    },
-    estimatorLabelGroup: {
-      flex: 1,
-    },
-    estimatorLabel: {
-      fontSize: 13,
-      fontWeight: '600',
-      color: colors.text.primary,
-    },
-    estimatorSub: {
-      fontSize: 11,
-      color: colors.text.secondary,
-      marginTop: 1,
-    },
-    estimatorValueCurrent: {
-      fontSize: 22,
-      fontWeight: '800',
-      color: colors.success.main,
-    },
-    estimatorValueOptimal: {
-      fontSize: 22,
-      fontWeight: '800',
-      color: colors.primary.main,
-    },
-    estimatorBlurred: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-    },
-    estimatorValueBlurred: {
-      fontSize: 22,
-      fontWeight: '800',
-      color: colors.text.secondary,
-      opacity: 0.5,
-    },
-    estimatorLockBadge: {
-      backgroundColor: colors.primary.main,
-      borderRadius: 4,
-      paddingHorizontal: 5,
-      paddingVertical: 2,
-    },
-    estimatorLockText: {
-      fontSize: 9,
-      fontWeight: '800',
-      color: colors.background.primary,
-      letterSpacing: 0.5,
-    },
-    estimatorDivider: {
-      height: 1,
-      backgroundColor: colors.border.light,
-      marginVertical: 10,
-    },
-    estimatorCta: {
-      marginTop: 10,
-      paddingTop: 10,
-      borderTopWidth: 1,
-      borderTopColor: colors.border.light,
-    },
-    estimatorCtaText: {
-      fontSize: 13,
-      fontWeight: '700',
-      color: colors.primary.main,
-      textAlign: 'center',
-    },
-    // ── Share button ──────────────────────────────────────────────────────────
-    shareButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 6,
-      paddingVertical: 10,
-      paddingHorizontal: 20,
-      borderRadius: 20,
-      borderWidth: 1.5,
-      borderColor: colors.primary.main,
-      alignSelf: 'center',
-      marginTop: 12,
-    },
-    shareButtonText: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: colors.primary.main,
-    },
-    // ── Share modal ───────────────────────────────────────────────────────────
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.45)',
-      justifyContent: 'flex-end',
-    },
-    modalSheet: {
-      backgroundColor: colors.background.primary,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-      padding: 20,
-      paddingBottom: 36,
-      alignItems: 'center',
-    },
-    modalHandle: {
-      width: 40,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: colors.border.light,
-      marginBottom: 20,
-    },
-    // ── Share card preview ────────────────────────────────────────────────────
-    shareCard: {
-      width: '100%',
-      backgroundColor: colors.background.secondary,
-      borderRadius: 16,
-      borderWidth: 1.5,
-      borderColor: colors.primary.main + '40',
-      padding: 20,
-      marginBottom: 20,
-      alignItems: 'center',
-    },
-    shareCardLogo: {
-      fontSize: 13,
-      fontWeight: '800',
-      color: colors.primary.main,
-      letterSpacing: 1,
-      textTransform: 'uppercase',
-      marginBottom: 14,
-    },
-    shareCardCardName: {
-      fontSize: 20,
-      fontWeight: '700',
-      color: colors.text.primary,
-      textAlign: 'center',
-      marginBottom: 6,
-    },
-    shareCardContext: {
-      fontSize: 13,
-      color: colors.text.secondary,
-      textAlign: 'center',
-      marginBottom: 14,
-      textTransform: 'capitalize',
-    },
-    shareCardEarnings: {
-      alignItems: 'center',
-      backgroundColor: colors.success.main + '18',
-      borderRadius: 12,
-      paddingVertical: 10,
-      paddingHorizontal: 24,
-      marginBottom: 14,
-      width: '100%',
-    },
-    shareCardEarningsLabel: {
-      fontSize: 11,
-      fontWeight: '600',
-      color: colors.success.main,
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-      marginBottom: 2,
-    },
-    shareCardEarningsValue: {
-      fontSize: 32,
-      fontWeight: '800',
-      color: colors.success.main,
-    },
-    shareCardTagline: {
-      fontSize: 11,
-      color: colors.text.tertiary,
-      textAlign: 'center',
-    },
-    // ── Share action buttons ──────────────────────────────────────────────────
-    shareActionButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 8,
-      width: '100%',
-      paddingVertical: 14,
-      borderRadius: 14,
-      backgroundColor: colors.primary.main,
-      marginBottom: 10,
-    },
-    shareActionButtonText: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: colors.background.primary,
-    },
-    shareCancelButton: {
-      width: '100%',
-      paddingVertical: 12,
-      alignItems: 'center',
-    },
-    shareCancelButtonText: {
-      fontSize: 15,
-      fontWeight: '500',
-      color: colors.text.secondary,
     },
   });

@@ -95,21 +95,30 @@ async function main() {
       return;
     }
 
-    // Route through background so data files are only fetched once (cached there)
-    const rec = await chrome.runtime.sendMessage({ type: "GET_RECOMMENDATION", hostname });
+    // Load data and compute recommendation directly in popup
+    const [merchantData, cardData] = await Promise.all([
+      fetch(chrome.runtime.getURL("data/merchants.json")).then(r => r.json()),
+      fetch(chrome.runtime.getURL("data/cards.json")).then(r => r.json()),
+    ]);
 
-    if (!rec.ok || !rec.merchant || !rec.ranked?.length) {
-      // Get card data from background cache for wallet summary
-      const cardResp = await chrome.runtime.sendMessage({ type: "GET_CARD_DATA" });
-      const cardData = cardResp.ok ? { cards: cardResp.cards } : null;
+    const merchant = findMerchantByDomain(hostname, merchantData.domainIndex, merchantData.merchants);
+
+    if (!merchant) {
       await showWalletSummary(walletIds, cardData);
       return;
     }
 
-    // Get card data from background cache for upgrade check
-    const cardResp = await chrome.runtime.sendMessage({ type: "GET_CARD_DATA" });
-    const cardData = cardResp.ok ? { cards: cardResp.cards } : { cards: [] };
-    renderMerchantView({ merchant: rec.merchant, ranked: rec.ranked }, walletIds, cardData);
+    const walletCards = walletIds
+      .map(id => cardData.cards.find(c => c.id === id))
+      .filter(Boolean);
+
+    if (!walletCards.length) {
+      await showWalletSummary(walletIds, cardData);
+      return;
+    }
+
+    const ranked = getBestCards(walletCards, merchant.cardCategory);
+    renderMerchantView({ merchant, ranked }, walletIds, cardData);
 
   } catch (err) {
     console.error("[Rewardly] popup error:", err);
@@ -207,10 +216,7 @@ async function showWalletSummary(walletIds, cardData) {
   }
 
   try {
-    // cardData may already be populated from background cache; if not, fetch directly as last resort
-    const data = cardData
-      || await chrome.runtime.sendMessage({ type: "GET_CARD_DATA" }).then(r => r.ok ? { cards: r.cards } : null)
-      || await fetch(chrome.runtime.getURL("data/cards.json")).then(r => r.json());
+    const data = cardData || await fetch(chrome.runtime.getURL("data/cards.json")).then(r => r.json());
     walletIds.slice(0, 5).forEach(id => {
       const card = data.cards.find(c => c.id === id);
       if (!card) return;

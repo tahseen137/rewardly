@@ -11,21 +11,6 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   }
 });
 
-// ─── Module-level data cache (persists for service worker lifetime) ──────────
-
-let _cachedMerchants = null;
-let _cachedCards = null;
-
-async function getCachedData() {
-  if (!_cachedMerchants || !_cachedCards) {
-    [_cachedMerchants, _cachedCards] = await Promise.all([
-      fetch(chrome.runtime.getURL("data/merchants.json")).then(r => r.json()),
-      fetch(chrome.runtime.getURL("data/cards.json")).then(r => r.json()),
-    ]);
-  }
-  return { merchants: _cachedMerchants, cards: _cachedCards };
-}
-
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function findMerchantByDomain(hostname, domainIndex, merchants) {
@@ -98,13 +83,6 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true; // keep channel open for async
   }
 
-  if (message.type === "GET_CARD_DATA") {
-    getCachedData()
-      .then(({ cards }) => sendResponse({ ok: true, cards: cards.cards }))
-      .catch(err => sendResponse({ ok: false, error: err.message }));
-    return true; // keep channel open for async
-  }
-
   return true;
 });
 
@@ -144,8 +122,9 @@ async function handlePageVisit(hostname) {
 // ─── Recommendation engine ───────────────────────────────────────────────────
 
 async function getRecommendation(hostname) {
-  const [{ merchants: merchantData, cards: cardData }, prefs] = await Promise.all([
-    getCachedData(),
+  const [merchantData, cardData, prefs] = await Promise.all([
+    fetch(chrome.runtime.getURL("data/merchants.json")).then(r => r.json()),
+    fetch(chrome.runtime.getURL("data/cards.json")).then(r => r.json()),
     chrome.storage.local.get({ walletIds: [] }),
   ]);
 
@@ -186,13 +165,8 @@ async function recordVisit(merchant) {
 
 // ─── Notification click → open popup ────────────────────────────────────────
 
-chrome.notifications.onClicked.addListener((notifId) => {
+chrome.notifications.onClicked.addListener(notifId => {
   if (notifId.startsWith("rewardly-")) {
-    chrome.notifications.clear(notifId);
-    // openPopup only works in specific contexts — use tab fallback
-    chrome.action.openPopup().catch(() => {
-      // Fallback: open a new tab with the extension popup page
-      chrome.tabs.create({ url: chrome.runtime.getURL("popup.html") });
-    });
+    chrome.action.openPopup().catch(() => {});
   }
 });

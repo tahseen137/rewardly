@@ -33,6 +33,7 @@ import {
   formatTopCategoryRates,
   formatBestForCategories,
 } from '../utils/rewardFormatUtils';
+import { formatRewardValue } from '../utils/rewardUtils';
 
 // ============================================================================
 // Recommendation Card Component
@@ -108,7 +109,9 @@ function RecommendationCard({
             <View style={styles.estimate}>
               <Sparkles size={16} color={colors.warning.main} />
               <Text style={styles.estimateLabel}>Sign-Up Bonus</Text>
-              <Text style={styles.estimateValue}>{signupBonus.amount.toLocaleString()} pts</Text>
+              <Text style={styles.estimateValue}>
+                {formatRewardValue(signupBonus.amount, card.pointValuation ?? 1)}
+              </Text>
             </View>
           )}
         </View>

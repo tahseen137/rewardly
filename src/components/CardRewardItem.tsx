@@ -10,7 +10,6 @@ import { Badge } from './Badge';
 import { useTheme } from '../theme';
 import { RewardCalculationResult } from '../services/RewardsCalculatorService';
 import {
-  formatRewardEarned,
   formatAnnualFee,
   REWARD_TYPE_ICONS,
   formatCategoryName,
@@ -51,11 +50,10 @@ export function CardRewardItem({
 
   // Format reward display based on card type
   const formatRewardDisplay = (): string => {
-    if (result.isCashback) {
-      return `$${result.cadValue.toFixed(2)}`;
-    }
-    // For points/miles, show points and CAD value
-    return `${Math.round(result.pointsEarned)} pts = $${result.cadValue.toFixed(2)}`;
+    // Always display as dollar value — keeps the UI consistent across
+    // cashback and points cards. The underlying cadValue is already
+    // computed from the card's pointValuation by the calculator service.
+    return `$${result.cadValue.toFixed(2)}`;
   };
 
   const CardContent = (
@@ -144,10 +142,7 @@ export function CardRewardItem({
     return (
       <TouchableOpacity
         onPress={onPress}
-        accessibilityLabel={`${result.cardName} - ${formatRewardEarned(
-          result.pointsEarned,
-          result.rewardCurrency
-        )}`}
+        accessibilityLabel={`${result.cardName} - $${result.cadValue.toFixed(2)} reward`}
         accessibilityRole="button"
       >
         <Card variant="outlined" padding="medium" style={styles.card}>

@@ -46,6 +46,7 @@ import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
 import { AchievementEventEmitter } from '../services/AchievementEventEmitter';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { formatUpToRate, formatBestForCategories } from '../utils/rewardFormatUtils';
+import { formatRewardValue } from '../utils/rewardUtils';
 
 function _formatRewardRate(
   value: number,
@@ -250,7 +251,9 @@ function CardItem({
         {userCard.pointBalance !== undefined && userCard.pointBalance > 0 ? (
           <View style={styles.balanceRow}>
             <Wallet size={12} color={colors.primary.main} />
-            <Text style={styles.balanceText}>{formatNumber(userCard.pointBalance)} pts</Text>
+            <Text style={styles.balanceText}>
+              {formatRewardValue(userCard.pointBalance, card.pointValuation ?? 1)}
+            </Text>
           </View>
         ) : null}
       </TouchableOpacity>
@@ -366,7 +369,9 @@ function CardItemWithGesture({
             {userCard.pointBalance !== undefined && userCard.pointBalance > 0 ? (
               <View style={styles.balanceRow}>
                 <Wallet size={12} color={colors.primary.main} />
-                <Text style={styles.balanceText}>{formatNumber(userCard.pointBalance)} pts</Text>
+                <Text style={styles.balanceText}>
+                  {formatRewardValue(userCard.pointBalance, card.pointValuation ?? 1)}
+                </Text>
               </View>
             ) : null}
           </TouchableOpacity>
@@ -542,14 +547,9 @@ export default function MyCardsScreen() {
       if (result.error.type === 'LIMIT_REACHED') {
         // Show upgrade prompt for card limit reached
         if (Platform.OS === 'web') {
-          if (
-            window.confirm(
-              `Card Limit Reached\n\n${result.error.message}\n\nWould you like to upgrade to Pro?`
-            )
-          ) {
-            setIsModalVisible(false);
-            navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards' });
-          }
+          // On web, navigate directly to Upgrade (nicer UX than browser confirm dialog)
+          setIsModalVisible(false);
+          navigation.navigate('Upgrade', { feature: 'unlimited_cards', source: 'my_cards_limit' });
         } else {
           Alert.alert('Card Limit Reached', result.error.message, [
             { text: 'Maybe Later', style: 'cancel' },
