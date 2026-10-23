@@ -350,3 +350,66 @@ export class ReferralService {
 }
 
 export default ReferralService;
+
+// ─── Simple Local-First Helpers ───────────────────────────────────────────────
+// These methods operate entirely on AsyncStorage — no Supabase required.
+// Used by ReferralScreen for the viral share loop.
+
+const LOCAL_REFERRAL_CODE_KEY = 'rewardly_referral_code';
+const LOCAL_REFERRAL_COUNT_KEY = 'rewardly_referral_count';
+
+/**
+ * Generates a new local referral code and persists it to AsyncStorage.
+ * Format: RWD-XXXXXX
+ */
+export async function generateReferralCode(): Promise<string> {
+  const suffix = Math.random().toString(36).substr(2, 6).toUpperCase();
+  const code = `RWD-${suffix}`;
+  await AsyncStorage.setItem(LOCAL_REFERRAL_CODE_KEY, code);
+  return code;
+}
+
+/**
+ * Gets the stored local referral code, generating one if it doesn't exist yet.
+ */
+export async function getReferralCode(): Promise<string> {
+  const existing = await AsyncStorage.getItem(LOCAL_REFERRAL_CODE_KEY);
+  if (existing) return existing;
+  return generateReferralCode();
+}
+
+/**
+ * Returns the shareable invite message for a given code.
+ */
+export function getShareMessage(code: string): string {
+  return `I've been optimizing my credit card rewards with Rewardly (it's free!) 🍁 Use my link to get a free wallet analysis: rewardly.ca/ref/${code}`;
+}
+
+/**
+ * Retrieves the number of friends the user has invited (locally tracked).
+ */
+export async function getLocalReferralCount(): Promise<number> {
+  const raw = await AsyncStorage.getItem(LOCAL_REFERRAL_COUNT_KEY);
+  return raw ? parseInt(raw, 10) : 0;
+}
+
+/**
+ * Shares Rewardly using the native share sheet.
+ * Increments the local friend invite counter on each share.
+ */
+export async function shareReferral(): Promise<void> {
+  const { Share } = await import('react-native');
+  const code = await getReferralCode();
+  const message = getShareMessage(code);
+
+  try {
+    const result = await Share.share({ message, url: `https://rewardly.ca/ref/${code}` });
+    if (result.action === Share.sharedAction) {
+      // Increment local counter
+      const count = await getLocalReferralCount();
+      await AsyncStorage.setItem(LOCAL_REFERRAL_COUNT_KEY, String(count + 1));
+    }
+  } catch (err) {
+    console.warn('[ReferralService] shareReferral error:', err);
+  }
+}

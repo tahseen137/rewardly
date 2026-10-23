@@ -17,6 +17,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Share,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {
@@ -26,6 +27,7 @@ import {
   TrendingUp,
   CreditCard,
   Award,
+  Share2,
 } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
@@ -386,6 +388,18 @@ export default function WalletOptimizerScreen() {
             <Text style={[styles.buttonText, styles.buttonTextSecondary]}>Adjust Constraints</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Referral CTA */}
+        <TouchableOpacity
+          style={styles.referralCTA}
+          onPress={() => (navigation as any).navigate('Referral')}
+          activeOpacity={0.8}
+        >
+          <Share2 size={18} color={colors.primary.main} />
+          <Text style={styles.referralCTAText}>
+            Love your wallet analysis? Share Rewardly with a friend →
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -949,5 +963,24 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border.light,
     gap: 8,
+  },
+  referralCTA: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 20,
+    backgroundColor: colors.primary.light,
+    borderRadius: borderRadius.md,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: colors.primary.main + '40',
+  },
+  referralCTAText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primary.main,
+    lineHeight: 20,
   },
 });

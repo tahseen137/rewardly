@@ -10,7 +10,7 @@ import {
   Linking,
   Platform,
 } from 'react-native';
-import { showAlert, showConfirm, showError } from '../utils/crossPlatformAlert';
+import { showAlert, showConfirm } from '../utils/crossPlatformAlert';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -22,7 +22,6 @@ import {
   LogOut,
   LogIn,
   User,
-  Crown,
   Navigation,
   ChevronRight,
   Gift,
@@ -34,7 +33,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { borderRadius } from '../theme/borders';
-import Badge from '../components/Badge';
 
 import {
   isNewCardSuggestionsEnabled,
@@ -58,18 +56,6 @@ import { CountryChangeEmitter } from '../services/CountryChangeEmitter';
 import { isSupabaseConfigured } from '../services/supabase';
 import { getCurrentUser, signOut, AuthUser } from '../services/AuthService';
 import {
-  getCurrentTier,
-  SUBSCRIPTION_TIERS,
-  SubscriptionTier,
-  getSageUsage,
-  SageUsage,
-  getSubscriptionState,
-  SubscriptionState,
-  refreshSubscription,
-  openCustomerPortal,
-} from '../services/SubscriptionService';
-import Paywall from '../components/Paywall';
-import {
   enableAutoPilot,
   disableAutoPilot,
   getAutoPilotStatus,
@@ -77,6 +63,14 @@ import {
   AutoPilotStatus,
 } from '../services/AutoPilotService';
 import { initializePortfolio, getCards } from '../services/CardPortfolioManager';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  requestPermissions,
+  scheduleWeeklyMissedRewardsNotification,
+  cancelWeeklyNotification,
+  getMissedRewardsEstimate,
+  WEEKLY_NOTIF_ID_KEY,
+} from '../services/NotificationService';
 
 function SectionHeader({ title }: { title: string }) {
   return (
@@ -148,11 +142,8 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
   const [_cardCountDetail, setCardCountDetail] = useState<string>('');
   const [portfolioCount, setPortfolioCount] = useState<number>(0);
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>('free');
-  const [subscriptionState, setSubscriptionState] = useState<SubscriptionState | null>(null);
-  const [sageUsage, setSageUsage] = useState<SageUsage | null>(null);
-  const [showPaywall, setShowPaywall] = useState(false);
   const [autoPilotStatus, setAutoPilotStatus] = useState<AutoPilotStatus | null>(null);
+  const [weeklyNotifEnabled, setWeeklyNotifEnabled] = useState(true);
 
   const loadPreferences = useCallback(async () => {
     await initializePreferences();
@@ -162,18 +153,6 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
 
     const currentUser = await getCurrentUser();
     setUser(currentUser);
-
-    await refreshSubscription();
-    const tier = await getCurrentTier();
-    setSubscriptionTier(tier);
-
-    const subState = await getSubscriptionState();
-    setSubscriptionState(subState);
-
-    if (tier === 'pro') {
-      const usage = await getSageUsage();
-      setSageUsage(usage);
-    }
 
     try {
       const cardStats = await getTotalCardCount();
@@ -192,6 +171,14 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
 
     await initializePortfolio();
     setPortfolioCount(getCards().length);
+
+    // Load weekly notification preference
+    try {
+      const stored = await AsyncStorage.getItem(WEEKLY_NOTIF_ID_KEY);
+      setWeeklyNotifEnabled(stored !== 'false');
+    } catch {
+      setWeeklyNotifEnabled(true);
+    }
 
     setIsLoading(false);
   }, []);
@@ -318,8 +305,26 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
     }
   };
 
-  const handleUpgrade = () => {
-    setShowPaywall(true);
+  const handleWeeklyNotifToggle = async (enabled: boolean) => {
+    setWeeklyNotifEnabled(enabled);
+    await AsyncStorage.setItem(WEEKLY_NOTIF_ID_KEY, enabled ? 'true' : 'false');
+    if (enabled) {
+      const granted = await requestPermissions();
+      if (granted) {
+        const missed = getMissedRewardsEstimate();
+        await scheduleWeeklyMissedRewardsNotification(missed);
+      } else {
+        // Revert toggle if permission denied
+        setWeeklyNotifEnabled(false);
+        await AsyncStorage.setItem(WEEKLY_NOTIF_ID_KEY, 'false');
+        showAlert(
+          'Notifications Blocked',
+          'Please enable notifications in your device settings to receive weekly savings tips.'
+        );
+      }
+    } else {
+      await cancelWeeklyNotification();
+    }
   };
 
   const handleAutoPilotToggle = async (enabled: boolean) => {
@@ -347,24 +352,6 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
       </View>
     );
   }
-
-  const tierConfig = SUBSCRIPTION_TIERS[subscriptionTier];
-
-  const getTierBadgeLabel = () => {
-    if (subscriptionState?.isAdmin) return 'Admin';
-    if (subscriptionTier === 'lifetime') return 'Lifetime';
-    if (subscriptionTier === 'max') return 'Max';
-    if (subscriptionTier === 'pro') return 'Pro';
-    return 'Free';
-  };
-
-  const getTierBadgeVariant = (): 'primary' | 'secondary' | 'success' | 'warning' | 'neutral' => {
-    if (subscriptionState?.isAdmin) return 'warning';
-    if (subscriptionTier === 'lifetime') return 'success';
-    if (subscriptionTier === 'max') return 'primary';
-    if (subscriptionTier === 'pro') return 'secondary';
-    return 'neutral';
-  };
 
   const getLanguageLabel = (lang: Language) => (lang === 'en' ? 'English' : 'Français');
 
@@ -394,7 +381,6 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
               </Text>
             ) : null}
           </View>
-          <Badge label={getTierBadgeLabel()} variant={getTierBadgeVariant()} size="small" />
           {user && !user.isAnonymous ? (
             <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
               <LogOut size={18} color={colors.error.main} />
@@ -428,6 +414,18 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
             />
           </SettingsRow>
           <SettingsRow
+            icon={<Bell size={16} color={colors.text.secondary} />}
+            title="Weekly savings tips"
+            value={weeklyNotifEnabled ? 'On' : 'Off'}
+          >
+            <Switch
+              value={weeklyNotifEnabled}
+              onValueChange={handleWeeklyNotifToggle}
+              trackColor={{ false: colors.border.light, true: colors.success.main }}
+              thumbColor={colors.background.secondary}
+            />
+          </SettingsRow>
+          <SettingsRow
             icon={<MapPin size={16} color={colors.text.secondary} />}
             title={t('settings.country') || 'Country'}
             value={countryValue}
@@ -448,87 +446,12 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
           />
         </View>
 
-        {/* SUBSCRIPTION section */}
-        <SectionHeader title={t('settings.subscription_header')} />
-        <View style={[styles.section, styles.subscriptionCard]}>
-          <View style={styles.subscriptionHeader}>
-            <View>
-              <Text style={styles.subscriptionPlan}>
-                {subscriptionTier === 'lifetime'
-                  ? 'Lifetime Member ✨'
-                  : subscriptionState?.isAdmin
-                    ? 'Admin Access'
-                    : tierConfig.name}
-              </Text>
-              <Text style={styles.subscriptionDesc}>
-                {subscriptionTier === 'free'
-                  ? 'Upgrade to unlock AI, insights, and more'
-                  : subscriptionTier === 'lifetime'
-                    ? 'All Premium features — forever'
-                    : 'Full access to all features'}
-              </Text>
-            </View>
-            {subscriptionTier === 'lifetime' && <Crown size={20} color="#FFD700" />}
-          </View>
-
-          {subscriptionTier === 'pro' && sageUsage && sageUsage.limit !== null && (
-            <View style={styles.usageRow}>
-              <Text style={styles.usageLabel}>
-                Sage AI: {sageUsage.chatCount} / {sageUsage.limit} chats
-              </Text>
-              <Text
-                style={[
-                  styles.usageRemaining,
-                  sageUsage.remaining !== null && sageUsage.remaining <= 2
-                    ? styles.usageWarning
-                    : null,
-                  sageUsage.remaining === 0 ? styles.usageDanger : null,
-                ]}
-              >
-                {sageUsage.remaining ?? 0} left
-              </Text>
-            </View>
-          )}
-
-          {subscriptionTier === 'free' ? (
-            <TouchableOpacity style={styles.upgradeButton} onPress={handleUpgrade}>
-              <Text style={styles.upgradeButtonText}>Upgrade to Pro</Text>
-            </TouchableOpacity>
-          ) : (subscriptionTier === 'pro' || subscriptionTier === 'max') &&
-            !subscriptionState?.isAdmin ? (
-            <TouchableOpacity
-              style={styles.manageButton}
-              onPress={async () => {
-                try {
-                  const result = await openCustomerPortal();
-                  if ('error' in result) {
-                    showError(result.error);
-                  } else if (result.url) {
-                    const supported = await Linking.canOpenURL(result.url);
-                    if (supported) {
-                      await Linking.openURL(result.url);
-                    } else {
-                      showError('Unable to open settings page');
-                    }
-                  }
-                } catch (error) {
-                  console.error('Portal error:', error);
-                  showError('Failed to open subscription management');
-                }
-              }}
-            >
-              <Text style={styles.manageButtonText}>Manage subscription</Text>
-              <ChevronRight size={14} color={colors.primary.main} />
-            </TouchableOpacity>
-          ) : null}
-        </View>
-
         {/* Referral row */}
         <SectionHeader title={t('settings.earn')} />
         <View style={styles.section}>
           <SettingsRow
             icon={<Gift size={16} color={colors.primary.main} />}
-            title="Invite & Earn Rewards"
+            title="Invite Friends 🎁"
             value="Share Rewardly"
             isLast
             onPress={() => navigation.navigate('ReferralDashboard' as never)}
@@ -599,14 +522,6 @@ export default function SettingsScreen({ onSignOut, onSignIn }: SettingsScreenPr
           <Text style={styles.footerText}>Made for the Canadian rewards community</Text>
         </View>
       </ScrollView>
-
-      <Paywall
-        visible={showPaywall}
-        onClose={() => setShowPaywall(false)}
-        onSubscribe={async (tier) => {
-          setSubscriptionTier(tier);
-        }}
-      />
     </>
   );
 }
